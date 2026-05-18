@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 17:00 +07 | T-0405 | Fix Next.js env inlining bug trong client.ts | `Correction` |
 | 2026-05-18 16:30 +07 | T-0405 | Implement auth/account boundary | `Task` |
 | 2026-05-18 15:15 +07 | T-0404 | Tạo storage adapter interfaces | `Task` |
 | 2026-05-18 14:30 +07 | T-0403 | Tạo data schemas/types với Zod | `Task` |
@@ -73,7 +74,34 @@
 
 ---
 
-## [2026-05-18 16:30 +07] — T-0405: Implement auth/account boundary
+## [2026-05-18 17:00 +07] — T-0405: Correction — fix Next.js env inlining bug trong client.ts
+
+**Loại:** `Correction`
+**Ref:** T-0405
+**Môi trường:** `DEV/TEST`
+
+### Vấn đề
+`getRequiredEnv(key: string)` dùng `process.env[key]` dynamic access. Next.js chỉ inline `NEXT_PUBLIC_*` khi access **trực tiếp** (`process.env.NEXT_PUBLIC_FIREBASE_API_KEY`). Dynamic access không được inline vào client bundle → browser throw `"process is not defined"` hoặc `"Thiếu biến môi trường"`.
+
+Ref: https://nextjs.org/docs/app/building-your-application/configuring/environment-variables
+
+### Fix
+- Xóa hàm `getRequiredEnv(key: string)`.
+- `createFirebaseConfig()` dùng direct property access cho từng biến:
+  `process.env.NEXT_PUBLIC_FIREBASE_API_KEY`, `...AUTH_DOMAIN`, `...PROJECT_ID`, `...STORAGE_BUCKET`, `...MESSAGING_SENDER_ID`, `...APP_ID`.
+- Guard `if (!apiKey || ...)` throw Error tiếng Việt rõ ràng.
+- `admin.ts` không đụng (server-side, dynamic access OK).
+
+### Thay đổi
+- `apps/web/src/lib/firebase/client.ts` (37 dòng): refactor direct access.
+
+### Verify
+- `npm run check` → Pass.
+- Dev server restart sạch (kill node + xóa `.next`): `✓ Ready in 1245ms`.
+- `http://localhost:3000` load OK, Header có Button "Đăng nhập".
+- Test login Google: cần `.env.local` với Firebase config thật + Firebase Console enable Google Provider.
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0405
