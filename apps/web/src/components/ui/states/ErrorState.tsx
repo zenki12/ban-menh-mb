@@ -1,20 +1,33 @@
 "use client";
 
+import { type ErrorCode, getErrorMessage } from "@banmenh/shared";
 import { Button } from "../Button";
 
 type ErrorStateProps = {
+  /**
+   * Mã lỗi shared contract. Khi truyền mà không có `description`,
+   * component tự dùng message tiếng Việt từ `ERROR_MESSAGES`.
+   */
+  code?: ErrorCode;
   title?: string;
   description?: string;
+  /** Hiển thị nhỏ ở dưới để user copy khi liên hệ support. */
+  requestId?: string;
   onRetry?: () => void;
   retryLabel?: string;
 };
 
 export function ErrorState({
+  code,
   title = "Có lỗi xảy ra",
-  description = "Vui lòng thử lại sau ít phút.",
+  description,
+  requestId,
   onRetry,
   retryLabel = "Thử lại",
 }: ErrorStateProps) {
+  const resolvedDescription =
+    description ?? (code ? getErrorMessage(code) : "Vui lòng thử lại sau ít phút.");
+
   return (
     <div className="mx-auto flex max-w-md flex-col items-center justify-center px-6 py-10 text-center">
       <svg
@@ -32,11 +45,19 @@ export function ErrorState({
         />
       </svg>
       <h3 className="mt-4">{title}</h3>
-      <p className="mt-3 text-[var(--bm-text-soft)]">{description}</p>
+      <p className="mt-3 text-[var(--bm-text-soft)]">{resolvedDescription}</p>
       {onRetry ? (
         <Button className="mt-6" onClick={onRetry} variant="secondary">
           {retryLabel}
         </Button>
+      ) : null}
+      {requestId ? (
+        <p className="mt-5 text-xs text-[var(--bm-text-muted)]">
+          Mã lỗi:{" "}
+          <code className="font-mono text-[var(--bm-text-soft)]">
+            {requestId}
+          </code>
+        </p>
       ) : null}
     </div>
   );

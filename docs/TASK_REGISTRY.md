@@ -1176,7 +1176,29 @@ Update khi xong:
 
 ### T-0402 - Tạo shared error contract
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- Đã tạo `packages/shared/src/errors.ts` (~152 dòng) với:
+  - `ErrorCode` union 26 mã, gom theo nhóm: Auth (3), Permission (2), Validation (3), Resource (2), Payment (4), Voucher (5), KB (2), Rate/Network (3), Generic (2).
+  - Type `AppError` (`code`, `message`, `requestId?`, `details?`) và `AppErrorDetails = Record<string, string | number | boolean>` để chặn PII/object lồng.
+  - `ERROR_MESSAGES` map đầy đủ 26 message tiếng Việt có dấu, đồng bộ với `legal-commercial-spec.md` mục 6 cho voucher.
+  - Helpers: `getErrorMessage(code)`, `createError(code, options?)`, `isAppError(value)` (type guard chặt: kiểm tra `code` thuộc `ERROR_MESSAGES`, validate `details` không chứa object/array).
+  - Comment đầu file ghi rõ: nguồn sự thật, không expose stack/PII.
+- Đã cập nhật `packages/shared/src/index.ts`: thêm `export * from "./errors"` (giữ `pricing` cũ).
+- Đã refactor `apps/web/src/components/ui/states/ErrorState.tsx` (~64 dòng) backward compatible:
+  - Thêm prop `code?: ErrorCode` và `requestId?: string`.
+  - Khi `description` không truyền: nếu có `code` dùng `getErrorMessage(code)`, ngược lại fallback `"Vui lòng thử lại sau ít phút."` (giữ behavior cũ).
+  - `requestId` hiển thị nhỏ ở dưới dạng `Mã lỗi: <code>` để user copy khi support.
+  - Title default `"Có lỗi xảy ra"` không đổi.
+- Demo: `apps/web/src/app/demo-components/page.tsx` thay `<ErrorState />` thành `<ErrorState code="VOUCHER_EXPIRED" requestId="req_demo_123" />`.
+- Verify pass:
+  - `npm run check` (typecheck + lint + security:smoke + build) — `/demo-components` build OK.
+  - `npm run qa:responsive-audit` pass.
+  - Import `@banmenh/shared` resolve `ErrorCode`, `ERROR_MESSAGES`, `getErrorMessage`, `createError`, `isAppError`.
+  - File `errors.ts` 152 dòng (<200), `ErrorState.tsx` 64 dòng (<100).
+- Worker payment/admin (T-0501+) sẽ tiêu thụ `AppError` shape khi serialize lỗi qua API; payload API placeholder format `{ ok: false, error: AppError }` đã sẵn sàng.
 
 Bối cảnh:
 

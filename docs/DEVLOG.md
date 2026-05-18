@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 13:30 +07 | T-0402 | Tạo shared error contract | `Task` |
 | 2026-05-18 12:20 +07 | T-0401 | Đồng bộ legal-commercial-spec mục 7 với pricing.ts | `Correction` |
 | 2026-05-18 12:05 +07 | T-0401 | Tạo shared product/pricing contract | `Task` |
 | 2026-05-18 11:30 +07 | T-0209 | Visual polish: GalaxyBackground component | `Task` |
@@ -69,7 +70,53 @@
 
 ---
 
-## [2026-05-18 12:20 +07] — T-0401: Correction — đồng bộ legal-commercial-spec mục 7 với pricing.ts
+## [2026-05-18 13:30 +07] — T-0402: Tạo shared error contract
+
+**Loại:** `Task`
+**Ref:** T-0402
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Khoá nguồn sự thật cho error codes và message tiếng Việt trong `@banmenh/shared`. ErrorState component nâng cấp backward compatible để nhận `code`/`requestId`.
+
+### Thay đổi
+- `packages/shared/src/errors.ts` (mới, ~152 dòng): `ErrorCode` union 26 mã, type `AppError` + `AppErrorDetails`, `ERROR_MESSAGES` map tiếng Việt, helpers `getErrorMessage`/`createError`/`isAppError`. Comment đầu file cấm expose stack/PII.
+- `packages/shared/src/index.ts`: thêm `export * from "./errors"`.
+- `apps/web/src/components/ui/states/ErrorState.tsx` (~64 dòng): thêm prop `code?: ErrorCode` và `requestId?: string`; auto resolve `description` từ `getErrorMessage(code)` khi không truyền; render `Mã lỗi: <code>` ở dưới khi có `requestId`. Backward compatible 100%.
+- `apps/web/src/app/demo-components/page.tsx`: thay `<ErrorState />` showcase bằng `<ErrorState code="VOUCHER_EXPIRED" requestId="req_demo_123" />` để verify contract.
+- `docs/TASK_REGISTRY.md`: T-0402 → `Done`.
+
+### Error codes đã chốt (26)
+- Auth: `AUTH_REQUIRED`, `AUTH_INVALID_TOKEN`, `AUTH_SESSION_EXPIRED`.
+- Permission: `FORBIDDEN`, `ENTITLEMENT_MISSING`.
+- Validation: `VALIDATION_FAILED`, `INPUT_REQUIRED`, `INPUT_INVALID`.
+- Resource: `NOT_FOUND`, `ALREADY_EXISTS`.
+- Payment: `PAYMENT_FAILED`, `PAYMENT_PENDING`, `PAYMENT_EXPIRED`, `PAYMENT_AMOUNT_MISMATCH`.
+- Voucher: `VOUCHER_NOT_FOUND`, `VOUCHER_EXPIRED`, `VOUCHER_OUT_OF_USES`, `VOUCHER_NOT_APPLICABLE`, `VOUCHER_ALREADY_USED` (đồng bộ legal-commercial-spec mục 6).
+- KB: `KB_ACCESS_DENIED`, `KB_NOT_AVAILABLE`.
+- Rate/Network: `RATE_LIMITED`, `NETWORK_ERROR`, `TIMEOUT`.
+- Generic: `INTERNAL_ERROR`, `SERVICE_UNAVAILABLE`.
+
+### Không làm
+- Không hardcode error message ở frontend (đã chuyển sang `ERROR_MESSAGES`).
+- Không expose stack trace, raw exception, PII.
+- Không thêm zod (để T-0403).
+- Không đụng `pricing.ts` hay schemas.
+- Không thêm dependency.
+- Không sửa `Loading/Empty/Unauthorized` state component.
+
+### Verify
+- `npm run check` → Pass; `/demo-components` prerender static.
+- `npm run qa:responsive-audit` → Pass.
+- Import `@banmenh/shared` resolve `ErrorCode`, `ERROR_MESSAGES`, `getErrorMessage`, `createError`, `isAppError`.
+- File line count: `errors.ts` 152 dòng (<200), `ErrorState.tsx` 64 dòng (<100).
+- Type guard `isAppError` từ chối object có `details` chứa nested object/array (chặn lộ PII).
+
+### Rủi ro / lưu ý còn lại
+- API/Worker layer chưa tồn tại — Worker payment/admin (T-0501+) sẽ adopt `AppError` shape `{ ok: false, error: AppError }` khi serialize lỗi qua HTTP.
+- `details` chỉ cho phép primitive — nếu cần truyền danh sách field invalid của form, sẽ thêm key dạng `field` + `reason` hoặc tạo type chuyên dụng ở task validation (T-0403).
+
+---
 
 **Loại:** `Correction`
 **Ref:** T-0401

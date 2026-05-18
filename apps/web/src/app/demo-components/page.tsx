@@ -143,7 +143,7 @@ export default function HomePage() {
               <LoadingState message="Đang tải luận giải..." />
             </Card>
             <Card padding="lg" variant="default">
-              <ErrorState />
+              <ErrorState code="VOUCHER_EXPIRED" requestId="req_demo_123" />
             </Card>
             <Card padding="lg" variant="default">
               <EmptyState
