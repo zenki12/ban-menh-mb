@@ -115,17 +115,32 @@ Thông báo lỗi chuẩn:
 
 ## 7. Pricing Copy
 
+Giá chính thức và copy pricing đến từ `packages/shared/src/pricing.ts` (T-0401). File này là nguồn sự thật duy nhất. Tài liệu này phải phản ánh đúng giá đã chốt trong code.
+
 Thần số học:
 
-- “49.000đ / 1 bản luận giải”.
-- “Mở khóa vĩnh viễn cho bản luận giải đã mua”.
-- Không dùng chữ “không giới hạn” nếu chỉ áp dụng cho một report.
+- "99.000₫ / 1 báo cáo".
+- "Mở khóa vĩnh viễn cho hồ sơ đã mua".
+- Không dùng chữ "không giới hạn" nếu chỉ áp dụng cho một report.
 
 Tarot:
 
+- Phiên 1 lá: "49.000₫ / phiên".
+- Phiên 3 lá: "79.000₫ / phiên".
 - Không hứa quyền/gói ngoài scope trong V2 nếu chưa có chính sách riêng được user approve.
 - Nếu có monthly tier, phải ghi rõ là theo tháng.
 - Nếu chưa có auto-renew, không gọi là subscription tự động.
+
+Combo:
+
+- "Gói Khám phá: 249.000₫".
+- Bao gồm: 1 báo cáo Thần số học (vĩnh viễn) + 2 phiên Tarot 3 lá (90 ngày).
+- Phải ghi rõ thời hạn 90 ngày cho phần phiên Tarot, không gây hiểu nhầm vĩnh viễn.
+
+Lưu ý chung:
+
+- Mọi thay đổi giá phải đồng bộ giữa `pricing.ts` và section này.
+- Giá hiện tại là placeholder pre-launch; sẽ được rà soát chính thức ở T-0801 trước khi mở payment thật.
 
 ## 8. Commercial Risk Checklist
 

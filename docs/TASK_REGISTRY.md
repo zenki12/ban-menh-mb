@@ -1116,7 +1116,32 @@ Cập nhật hoàn tất 2026-05-18:
 
 ### T-0401 - Tạo shared product/pricing contract
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- Đã tạo `packages/shared/package.json` (`@banmenh/shared`, private workspace, không dependency).
+- Đã thêm `"@banmenh/shared": "*"` vào `apps/web/package.json` dependencies; `npm install` tạo Junction `node_modules/@banmenh/shared` → `packages/shared`.
+- Không cần thêm `paths` alias trong `apps/web/tsconfig.json` vì `moduleResolution: bundler` + workspace symlink đã đủ resolve. Đã verify bằng file test tạm rồi xóa.
+- Đã refactor `packages/shared/src/pricing.ts` (~108 dòng):
+  - Type `Product` đầy đủ: `code`, `module`, `name`, `description`, `priceVnd`, `tier`, `features` (readonly), `activeFrom?`, `activeUntil?`.
+  - `ProductModule = "numerology" | "tarot" | "bundle"`, `ProductTier = "single_report" | "session" | "bundle" | "subscription"`.
+  - 4 sản phẩm placeholder: `numerology_single_report` (99.000₫), `tarot_session_one` (49.000₫), `tarot_session_three` (79.000₫), `bundle_explorer` (249.000₫).
+  - Mỗi product có 3 features tiếng Việt mô tả quyền lợi.
+  - Helpers: `formatPriceVnd`, `findProduct`, `getProductsByModule`.
+- `packages/shared/src/index.ts` đã `export * from "./pricing"` từ trước, không cần đổi.
+- Đã refactor `apps/web/src/app/pricing/page.tsx` (~165 dòng):
+  - Import từ `@banmenh/shared` thay vì path relative `../../../../../packages/shared/src/pricing`.
+  - Group cards theo module (Thần số học / Tarot / Combo) qua `getProductsByModule`.
+  - Mỗi card hiển thị `features[]` dưới dạng bullet list với icon `✦`.
+  - Tier badge dùng nhãn tiếng Việt qua `TIER_LABELS` map.
+  - Render đủ 4 products thay vì 3.
+- Verify pass:
+  - `npm run check` (typecheck + lint + security:smoke + build) — `/pricing` được prerender static.
+  - `npm run qa:responsive-audit` pass.
+  - Alias `@banmenh/shared` resolve qua workspace Junction, không còn `../../../../`.
+- Discrepancy đã flag (xem DEVLOG): legal-commercial-spec mục 7 ghi Numerology 49.000đ, task chỉ định 99.000₫. Đã theo task; cần Zenki chốt giá chính thức ở task pricing copy / pre-launch.
+- Tier voucher/payment runtime (PayOS, voucher validation, entitlement) sẽ làm ở T-0505/T-0506.
 
 Bối cảnh:
 

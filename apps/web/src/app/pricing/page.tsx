@@ -1,9 +1,39 @@
-import { PageShell } from "../../components/layout";
-import { Button, Card } from "../../components/ui";
 import {
   formatPriceVnd,
-  PRODUCTS,
-} from "../../../../../packages/shared/src/pricing";
+  getProductsByModule,
+  type Product,
+} from "@banmenh/shared";
+import { PageShell } from "../../components/layout";
+import { Button, Card } from "../../components/ui";
+
+const TIER_LABELS: Record<Product["tier"], string> = {
+  single_report: "Báo cáo lẻ",
+  session: "Phiên",
+  bundle: "Combo",
+  subscription: "Định kỳ",
+};
+
+const MODULE_GROUPS: ReadonlyArray<{
+  module: Product["module"];
+  title: string;
+  description: string;
+}> = [
+  {
+    module: "numerology",
+    title: "Thần số học",
+    description: "Báo cáo cá nhân hóa từ tên và ngày sinh.",
+  },
+  {
+    module: "tarot",
+    title: "Tarot",
+    description: "Phiên rút bài soi chiếu câu hỏi cụ thể.",
+  },
+  {
+    module: "bundle",
+    title: "Combo tiết kiệm",
+    description: "Gói gộp Thần số học và Tarot với giá ưu đãi.",
+  },
+];
 
 const faqs = [
   {
@@ -12,9 +42,9 @@ const faqs = [
       "Luồng thanh toán sẽ được triển khai trong các task payment riêng, sau khi contract và webhook được khóa rõ.",
   },
   {
-    question: "Giá hiện tại đã là chính thức chưa?",
+    question: "Giá có được cập nhật ở một nơi duy nhất không?",
     answer:
-      "Đây là bảng giá skeleton để kiểm tra layout và product code; T-0401 sẽ mở rộng contract pricing đầy đủ.",
+      "Có. Toàn bộ giá và mô tả gói đến từ shared contract, không hardcode rải rác trong frontend.",
   },
   {
     question: "Có dùng voucher ở bước này không?",
@@ -24,9 +54,39 @@ const faqs = [
   {
     question: "Sau khi mua sẽ nhận gì?",
     answer:
-      "Mỗi gói sẽ mô tả rõ quyền truy cập trước khi thanh toán thật được bật.",
+      "Mỗi gói liệt kê quyền lợi rõ ngay trên thẻ giá. Quyền truy cập chỉ được kích hoạt sau khi backend xác nhận thanh toán.",
   },
 ];
+
+function ProductCard({ product }: { product: Product }) {
+  return (
+    <Card as="article" interactive padding="lg" variant="glass">
+      <div className="flex items-start justify-between gap-4">
+        <h3 className="text-2xl">{product.name}</h3>
+        <span className="rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-3 py-1 text-xs font-bold text-[var(--bm-gold-bright)]">
+          {TIER_LABELS[product.tier]}
+        </span>
+      </div>
+      <p className="mt-5 text-3xl font-bold text-[var(--bm-text-main)]">
+        {formatPriceVnd(product.priceVnd)}
+      </p>
+      <p className="mt-4 text-[var(--bm-text-soft)]">{product.description}</p>
+      <ul className="mt-5 space-y-2 text-sm text-[var(--bm-text-soft)]">
+        {product.features.map((feature) => (
+          <li className="flex items-start gap-2" key={feature}>
+            <span aria-hidden className="text-[var(--bm-gold-bright)]">
+              ✦
+            </span>
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
+      <Button className="mt-8" disabled fullWidth variant="primary">
+        Chọn gói (sắp mở thanh toán)
+      </Button>
+    </Card>
+  );
+}
 
 export default function PricingPage() {
   return (
@@ -38,35 +98,29 @@ export default function PricingPage() {
       backLabel="Dashboard"
       containerWidth="default"
     >
-      <section>
-        <div className="grid gap-5 lg:grid-cols-3">
-          {PRODUCTS.map((product) => (
-            <Card
-              as="article"
-              interactive
-              key={product.code}
-              padding="lg"
-              variant="glass"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl">{product.name}</h2>
-                <span className="rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-3 py-1 text-xs font-bold text-[var(--bm-gold-bright)]">
-                  {product.tier}
-                </span>
-              </div>
-              <p className="mt-5 text-3xl font-bold text-[var(--bm-text-main)]">
-                {formatPriceVnd(product.priceVnd)}
+      {MODULE_GROUPS.map((group) => {
+        const products = getProductsByModule(group.module);
+        if (products.length === 0) return null;
+        const gridClass =
+          products.length >= 2
+            ? "grid gap-5 md:grid-cols-2"
+            : "grid gap-5";
+        return (
+          <section className="mt-10 first:mt-0" key={group.module}>
+            <div className="max-w-2xl">
+              <h2>{group.title}</h2>
+              <p className="mt-3 text-[var(--bm-text-soft)]">
+                {group.description}
               </p>
-              <p className="mt-4 text-[var(--bm-text-soft)]">
-                {product.description}
-              </p>
-              <Button className="mt-8" disabled fullWidth variant="primary">
-                Chọn gói (sắp mở thanh toán)
-              </Button>
-            </Card>
-          ))}
-        </div>
-      </section>
+            </div>
+            <div className={`mt-6 ${gridClass}`}>
+              {products.map((product) => (
+                <ProductCard key={product.code} product={product} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
 
       <section className="mt-14">
         <div className="max-w-2xl">

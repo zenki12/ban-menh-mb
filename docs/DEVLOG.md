@@ -37,6 +37,8 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 12:20 +07 | T-0401 | Đồng bộ legal-commercial-spec mục 7 với pricing.ts | `Correction` |
+| 2026-05-18 12:05 +07 | T-0401 | Tạo shared product/pricing contract | `Task` |
 | 2026-05-18 11:30 +07 | T-0209 | Visual polish: GalaxyBackground component | `Task` |
 | 2026-05-18 11:01 +07 | T-0306 | Tạo legal/support route skeleton | `Task` |
 | 2026-05-18 10:52 +07 | T-0305 | Tạo skeleton route `/account` | `Task` |
@@ -67,7 +69,79 @@
 
 ---
 
-## [2026-05-18 11:30 +07] — T-0209: Visual polish GalaxyBackground component
+## [2026-05-18 12:20 +07] — T-0401: Correction — đồng bộ legal-commercial-spec mục 7 với pricing.ts
+
+**Loại:** `Correction`
+**Ref:** T-0401
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Đính chính giá trong `legal-commercial-spec.md` mục 7 cho khớp `packages/shared/src/pricing.ts` (T-0401 đã chốt). Chỉ sửa docs, không đụng code.
+
+### Thay đổi
+- `docs/product-specs/legal-commercial-spec.md` mục `## 7. Pricing Copy`:
+  - Numerology: `49.000đ / 1 bản luận giải` → `99.000₫ / 1 báo cáo`.
+  - Thêm pricing copy cho Tarot 1 lá (`49.000₫ / phiên`) và Tarot 3 lá (`79.000₫ / phiên`).
+  - Thêm subsection Combo cho `Gói Khám phá` 249.000₫, ghi rõ 1 báo cáo Thần số học (vĩnh viễn) + 2 phiên Tarot 3 lá (90 ngày).
+  - Chốt nguyên tắc: `pricing.ts` là source of truth duy nhất; mọi thay đổi giá phải đồng bộ với section này; rà soát chính thức ở T-0801 trước khi mở payment.
+- `docs/DEVLOG.md`: thêm entry này và cập nhật Index nhanh.
+
+### Verify
+- `grep "49.000đ / 1 bản luận giải"` trong file → không còn match.
+- `grep "49.000"` chỉ còn ở vị trí mới (Tarot 1 lá).
+- `npm run check` → Pass (xem khối output bên dưới).
+
+### Không làm
+- Không đụng `packages/shared/src/pricing.ts`.
+- Không thêm pricing rule mới ngoài đồng bộ.
+- Không xóa section khác của legal spec.
+
+---
+
+**Loại:** `Task`
+**Ref:** T-0401
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Khoá nguồn sự thật cho giá/gói trong `@banmenh/shared`. Frontend pricing đọc qua workspace alias, không còn relative path xuyên thư mục, không hardcode giá.
+
+### Thay đổi
+- `packages/shared/package.json` (mới): khai báo `@banmenh/shared` workspace package, private, `main`/`types`/`exports` trỏ `./src/index.ts`, không dependency.
+- `packages/shared/src/pricing.ts` (refactor, ~108 dòng): mở rộng type `Product` đầy đủ (`code`, `module`, `name`, `description`, `priceVnd`, `tier`, `features`, `activeFrom?`, `activeUntil?`); `ProductModule` và `ProductTier` thành discriminated union; `PRODUCTS` 4 sản phẩm placeholder; helpers `formatPriceVnd`, `findProduct`, `getProductsByModule`.
+- `packages/shared/src/index.ts`: giữ `export * from "./pricing"` (đã có sẵn).
+- `apps/web/package.json`: thêm `"@banmenh/shared": "*"` vào dependencies (npm workspaces).
+- `apps/web/src/app/pricing/page.tsx` (refactor, ~165 dòng): import từ `@banmenh/shared`, group 4 cards theo module (Thần số học / Tarot / Combo), render `features[]` bullet, badge tier dùng nhãn tiếng Việt.
+- `docs/TASK_REGISTRY.md`: T-0401 → `Done` với block update đầy đủ.
+
+### Product codes đã chốt (placeholder)
+- `numerology_single_report` — Báo cáo Thần số học — 99.000₫ — `single_report`.
+- `tarot_session_one` — Phiên Tarot 1 lá — 49.000₫ — `session`.
+- `tarot_session_three` — Phiên Tarot 3 lá — 79.000₫ — `session`.
+- `bundle_explorer` — Gói Khám phá — 249.000₫ — `bundle`.
+
+### Không làm
+- Không thêm zod (để T-0403).
+- Không đụng `errors.ts` (T-0402).
+- Không đụng `schemas/` (T-0403).
+- Không implement payment flow / voucher logic (T-0505/T-0506).
+- Không copy code V1.
+- Không hardcode giá ở frontend.
+- Không thêm `paths` alias trong `tsconfig.json` vì `moduleResolution: bundler` + workspace symlink đã đủ; verify bằng file test tạm rồi xóa.
+
+### Verify
+- `npm install` ở root → tạo Junction `node_modules/@banmenh/shared` → `E:\Project\Project\banmenh\packages\shared`.
+- `npm run check` (typecheck + lint + security:smoke + build) → Pass; `/pricing` được prerender static.
+- `npm run qa:responsive-audit` → Pass.
+- Import `@banmenh/shared` trong `pricing/page.tsx` resolve OK qua workspace symlink, không còn `../../../../../packages/shared/src/pricing`.
+- File `pricing.ts` ~108 dòng (<150), `pricing/page.tsx` ~165 dòng (<200).
+
+### Rủi ro / lưu ý còn lại
+- **Pricing inconsistency với legal-commercial-spec mục 7:** spec ghi Numerology 49.000đ, task chỉ định 99.000₫. Đã theo task vì cụ thể hơn, nhưng cần Zenki chốt giá chính thức trước launch (hoặc cập nhật `legal-commercial-spec.md` mục 7) để tránh claim mâu thuẫn.
+- `tarot_session_one` (49.000₫) là placeholder mới chưa được nhắc trong legal spec; cần chốt cùng đợt rà giá.
+- Tier `subscription` đã định nghĩa trong type nhưng chưa có sản phẩm; sẽ kích hoạt khi có monthly tier (cần ADR theo legal-commercial-spec mục 7).
+- Voucher/entitlement runtime sẽ dùng cùng `productCode` này khi vào T-0505/T-0506.
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0209
