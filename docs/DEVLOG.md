@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 19:30 +07 | T-0501 | Implement payment create API | `Task` |
 | 2026-05-18 18:00 +07 | T-0406 | Implement entitlement service | `Task` |
 | 2026-05-18 17:00 +07 | T-0405 | Fix Next.js env inlining bug trong client.ts | `Correction` |
 | 2026-05-18 16:30 +07 | T-0405 | Implement auth/account boundary | `Task` |
@@ -75,7 +76,48 @@
 
 ---
 
-## [2026-05-18 18:00 +07] — T-0406: Implement entitlement service
+## [2026-05-18 19:30 +07] — T-0501: Implement payment create API
+
+**Loại:** `Task`
+**Ref:** T-0501
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> PayOS payment create qua Next.js API route. Backend tự tính amount từ pricing contract. Không tin amount từ frontend. Voucher chỉ lưu code, chưa apply discount (T-0505).
+
+### Kiến trúc
+- Dùng Next.js API route thay vì Worker cho T-0501 — Worker sẽ vào ở T-0503 (webhook edge use case).
+- PayOS integration qua HTTP fetch + HMAC-SHA256 signature, không dùng SDK third-party.
+- Signature format: fixed field order `amount&cancelUrl&description&orderCode&returnUrl` (theo PayOS spec).
+
+### Thay đổi
+- `apps/web/src/lib/firestore/purchase-repository.ts` (74 dòng): thêm `create()` + `updatePurchaseProviderRef()`.
+- `apps/web/src/lib/payos/signature.ts` (52 dòng): `signPayosPaymentRequest` + `verifyPayosSignature`.
+- `apps/web/src/lib/payos/client.ts` (103 dòng): `createPaymentRequest()` — HTTP fetch tới PayOS API.
+- `apps/web/src/lib/payment/order-id.ts` (10 dòng): `generateOrderId()` numeric.
+- `apps/web/src/app/api/payment/create/route.ts` (156 dòng): POST handler đầy đủ.
+- `.env.example`: thêm `PAYOS_WEBHOOK_URL` placeholder.
+- `apps/web/src/lib/firestore/index.ts`: export thêm `updatePurchaseProviderRef`.
+- `docs/TASK_REGISTRY.md`: T-0501 → Done.
+
+### Không làm
+- Không implement voucher discount (T-0505).
+- Không tạo entitlement ở bước create (T-0503 webhook).
+- Không tạo /payment/success hay /payment/cancel pages (T-0502).
+- Không wire Button "Chọn gói" thành active (T-0502).
+
+### Verify
+- `npm run check` → Pass. `/api/payment/create` dynamic.
+- File sizes: purchase-repo 74, signature 52, client 103, order-id 10, route 156 — tất cả trong giới hạn.
+- Test thủ công cần PayOS credentials thật trong `.env.local`.
+
+### Rủi ro / lưu ý còn lại
+- Voucher logic chỉ lưu code, chưa apply discount — T-0505 sẽ wire.
+- `bundle_explorer` module được map sang `"numerology"` trong purchase document (bundle không phải module hợp lệ trong schema). Cần review khi T-0503 implement entitlement grant từ webhook.
+- PayOS description giới hạn 25 ký tự — đã truncate.
+- `PAYOS_WEBHOOK_URL` là placeholder — sẽ điền ở T-0503 khi Worker webhook được deploy.
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0406

@@ -1454,7 +1454,18 @@ Update khi xong:
 
 ### T-0501 - Implement payment create API
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- **Kiến trúc:** Dùng Next.js API route (`apps/web/src/app/api/payment/create/route.ts`) thay vì Worker cho T-0501. Worker sẽ vào ở T-0503 (webhook edge use case).
+- **purchase-repository.ts** (74 dòng): implement `create()` — doc id = orderId string, `createdAt = now`. Thêm `updatePurchaseProviderRef()` để update paymentLinkId sau khi PayOS trả về. `updateStatus`/`markConfirmed` vẫn throw "Implement ở T-0503".
+- **payos/signature.ts** (52 dòng): `signPayosPaymentRequest()` — fixed field order `amount&cancelUrl&description&orderCode&returnUrl` (theo PayOS spec, không sort A-Z). `verifyPayosSignature()` — sort A-Z cho response/webhook.
+- **payos/client.ts** (103 dòng): `createPaymentRequest()` — HTTP fetch tới `https://api-merchant.payos.vn/v2/payment-requests`, headers `x-client-id`/`x-api-key`, không dùng SDK third-party. Description truncate 25 ký tự.
+- **payment/order-id.ts** (10 dòng): `generateOrderId()` — `Date.now() * 10000 + random(0-9999)` → 17-19 digit number.
+- **api/payment/create/route.ts** (156 dòng): POST, `runtime=nodejs`. Flow: verify Bearer → lookup product (backend tự tính amount) → tạo purchase pending → gọi PayOS → update providerRef → trả `{ orderId, amount, qrCode, checkoutUrl, expiresAt }`. Log chỉ orderId, không log amount/raw response.
+- **.env.example**: thêm `PAYOS_WEBHOOK_URL` placeholder.
+- Verify pass: `npm run check` + build. `/api/payment/create` dynamic.
 
 Bối cảnh:
 
