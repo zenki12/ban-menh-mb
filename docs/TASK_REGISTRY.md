@@ -820,6 +820,49 @@ Update khi xong:
 - Ghi viewport đã check.
 - Ghi lỗi đã sửa.
 
+### T-0209 - Visual polish: GalaxyBackground component
+
+Status: Done
+
+Bối cảnh:
+
+- Phase 2 đã chốt tokens, components, Header/Footer nhưng app vẫn phẳng vì chỉ có gradient tĩnh.
+- User cung cấp reference file vanilla JS Canvas galaxy: `C:\Users\ADMIN\Desktop\New folder\galaxy-effect.html`.
+- Cần adapt sang React component để áp dụng global, mọi route auto có ambient huyền học.
+
+Yêu cầu:
+
+- Tạo `apps/web/src/components/layout/GalaxyBackground.tsx` client component.
+- Canvas 2D fixed toàn màn hình, không block click.
+- Có sao lấp lánh, hạt bụi lơ lửng, nebula và 5 vòng quỹ đạo elip nghiêng 3D.
+- DPR-aware, cleanup khi unmount, pause khi tab inactive, respect `prefers-reduced-motion`.
+- Không thêm dependency, không copy nguyên HTML reference.
+
+Output cần có:
+
+- `GalaxyBackground` component.
+- Export từ layout index.
+- Render global trong app layout.
+
+Goal:
+
+- App có ambient background nhất quán cho mọi route.
+
+Điều kiện Done:
+
+- `npm run check` pass.
+- `npm run qa:responsive-audit` pass.
+- Route chính có canvas global, mobile không tràn ngang.
+- Reduced motion chỉ render frame tĩnh.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-18: tạo `GalaxyBackground` canvas 2D global, render trước `Header`, export từ layout index.
+- Source reference: user-provided `C:\Users\ADMIN\Desktop\New folder\galaxy-effect.html`; chỉ tham khảo/adapt logic, không copy nguyên HTML vào project.
+- Verify: `npm run check` pass, `npm run qa:responsive-audit` pass, Chrome headless 375px trên `/`, `/than-so-hoc`, `/tarot`, `/pricing`, `/account` có canvas fixed `z-index: -1`, không overflow ngang.
+- Reduced motion được emulate qua browser media query và component chỉ render frame tĩnh; tab inactive pause qua `document.hidden` + `visibilitychange`.
+- File `GalaxyBackground.tsx` còn 248 dòng (<250).
+
 ## Phase 3 - Route Skeleton
 
 ### T-0301 - Tạo route `/` Hub skeleton

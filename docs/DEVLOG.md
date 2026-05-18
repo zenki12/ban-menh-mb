@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 11:30 +07 | T-0209 | Visual polish: GalaxyBackground component | `Task` |
 | 2026-05-18 11:01 +07 | T-0306 | Tạo legal/support route skeleton | `Task` |
 | 2026-05-18 10:52 +07 | T-0305 | Tạo skeleton route `/account` | `Task` |
 | 2026-05-18 10:41 +07 | T-0304 | Tạo skeleton route `/pricing` | `Task` |
@@ -63,6 +64,30 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-18 11:30 +07] — T-0209: Visual polish GalaxyBackground component
+
+**Loại:** `Task`
+**Ref:** T-0209
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Thêm ambient galaxy background toàn app bằng Canvas 2D React component. Source reference là file user cung cấp `C:\Users\ADMIN\Desktop\New folder\galaxy-effect.html`; chỉ tham khảo/adapt logic, không copy nguyên HTML.
+
+### Thay đổi
+- `apps/web/src/components/layout/GalaxyBackground.tsx`: thêm client component canvas fixed, DPR-aware, sao twinkle, particles, nebula và 5 vòng orbit elip nghiêng 3D.
+- `apps/web/src/components/layout/index.ts`: export `GalaxyBackground`.
+- `apps/web/src/app/layout.tsx`: render background global trước `Header`, body giữ `position: relative` để z-index hoạt động.
+- `docs/TASK_REGISTRY.md`: thêm và hoàn tất T-0209 ở cuối Phase 2.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Chrome headless 375px: `/`, `/than-so-hoc`, `/tarot`, `/pricing`, `/account` đều có canvas fixed `z-index: -1`, không overflow ngang, canvas có pixel render.
+- `prefers-reduced-motion` được emulate qua DevTools protocol và component chỉ render frame tĩnh; tab inactive pause qua `document.hidden`/`visibilitychange`.
+- File `GalaxyBackground.tsx`: 248 dòng (<250).
 
 ---
 

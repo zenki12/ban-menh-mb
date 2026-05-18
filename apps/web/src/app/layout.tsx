@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Footer, Header } from "../components/layout";
+import { Footer, GalaxyBackground, Header } from "../components/layout";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +14,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className="flex min-h-screen flex-col" suppressHydrationWarning>
+      <body className="relative isolate flex min-h-screen flex-col" suppressHydrationWarning>
+        <GalaxyBackground />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
