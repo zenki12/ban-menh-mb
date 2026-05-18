@@ -1,0 +1,147 @@
+"use client";
+
+import {
+  createError,
+  type AppError,
+  type User as SharedUser,
+} from "@banmenh/shared";
+import {
+  GoogleAuthProvider,
+  linkWithPopup,
+  onAuthStateChanged,
+  signInAnonymously,
+  signInWithPopup,
+  signOut,
+  type User as FirebaseUser,
+} from "firebase/auth";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { firebaseAuth } from "../firebase/client";
+
+type AuthContextValue = {
+  user: SharedUser | null;
+  loading: boolean;
+  isAnonymous: boolean;
+  error: AppError | null;
+  signInWithGoogle: () => Promise<void>;
+  signInAnonymouslyFn: () => Promise<void>;
+  linkAnonymousToGoogle: () => Promise<void>;
+  signOutFn: () => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+function mapFirebaseUser(fbUser: FirebaseUser): SharedUser {
+  const now = new Date().toISOString();
+  return {
+    id: fbUser.uid,
+    email: fbUser.email ?? undefined,
+    displayName: fbUser.displayName ?? undefined,
+    photoURL: fbUser.photoURL ?? undefined,
+    provider: fbUser.isAnonymous ? "anonymous" : "google",
+    createdAt: fbUser.metadata.creationTime ?? now,
+    updatedAt: now,
+  };
+}
+
+function mapFirebaseError(err: unknown): AppError | null {
+  if (typeof err !== "object" || err === null) return null;
+  const code = (err as { code?: string }).code ?? "";
+  // User tự cancel popup — không coi là lỗi
+  if (
+    code === "auth/cancelled-popup-request" ||
+    code === "auth/popup-closed-by-user"
+  ) {
+    return null;
+  }
+  if (code === "auth/network-request-failed") {
+    return createError("NETWORK_ERROR");
+  }
+  if (code === "auth/invalid-credential") {
+    return createError("AUTH_INVALID_TOKEN");
+  }
+  return createError("INTERNAL_ERROR");
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<SharedUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<AppError | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (fbUser) => {
+      setUser(fbUser ? mapFirebaseUser(fbUser) : null);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  async function signInWithGoogle() {
+    setError(null);
+    try {
+      await signInWithPopup(firebaseAuth, new GoogleAuthProvider());
+    } catch (err) {
+      const mapped = mapFirebaseError(err);
+      if (mapped) setError(mapped);
+    }
+  }
+
+  async function signInAnonymouslyFn() {
+    setError(null);
+    try {
+      await signInAnonymously(firebaseAuth);
+    } catch (err) {
+      const mapped = mapFirebaseError(err);
+      if (mapped) setError(mapped);
+    }
+  }
+
+  async function linkAnonymousToGoogle() {
+    setError(null);
+    const current = firebaseAuth.currentUser;
+    if (!current) {
+      setError(createError("AUTH_REQUIRED"));
+      return;
+    }
+    try {
+      await linkWithPopup(current, new GoogleAuthProvider());
+    } catch (err) {
+      const mapped = mapFirebaseError(err);
+      if (mapped) setError(mapped);
+    }
+  }
+
+  async function signOutFn() {
+    setError(null);
+    try {
+      await signOut(firebaseAuth);
+    } catch (err) {
+      const mapped = mapFirebaseError(err);
+      if (mapped) setError(mapped);
+    }
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAnonymous: user?.provider === "anonymous",
+        error,
+        signInWithGoogle,
+        signInAnonymouslyFn,
+        linkAnonymousToGoogle,
+        signOutFn,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export { AuthContext };

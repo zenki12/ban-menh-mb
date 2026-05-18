@@ -1,84 +1,54 @@
+"use client";
+
 import { PageShell } from "../../components/layout";
-import { Card, EmptyState, UnauthorizedState } from "../../components/ui";
+import { Button, Card, EmptyState, LoadingState, UnauthorizedState } from "../../components/ui";
+import { useAuth } from "../../lib/auth";
 
-type AccountPageProps = {
-  searchParams: Promise<{
-    preview?: string;
-  }>;
-};
+export default function AccountPage() {
+  const { user, loading, isAnonymous, signInWithGoogle, linkAnonymousToGoogle } = useAuth();
 
-function LoggedInPreview() {
-  return (
-    <>
-      <section>
-        <div className="max-w-2xl">
-          <h2>Thông tin tài khoản</h2>
-          <p className="mt-4 text-[var(--bm-text-soft)]">
-            Đây là dữ liệu placeholder để kiểm tra bố cục trước khi Firebase Auth
-            được triển khai.
-          </p>
-        </div>
+  if (loading) {
+    return (
+      <PageShell title="Tài khoản" showBack backHref="/" backLabel="Dashboard">
+        <LoadingState message="Đang tải tài khoản..." />
+      </PageShell>
+    );
+  }
 
-        <Card as="section" className="mt-6" variant="glass" padding="lg">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h3>Người dùng demo</h3>
-              <p className="mt-3 text-[var(--bm-text-soft)]">
-                demo@banmenh.online
-              </p>
-            </div>
-            <span className="w-fit rounded-full border border-[var(--bm-border-gold)] bg-[var(--bm-bg-glass)] px-3 py-1 text-xs font-bold text-[var(--bm-gold-bright)]">
-              Chế độ xem trước
-            </span>
-          </div>
-        </Card>
-      </section>
-
-      <section className="mt-14">
-        <div className="max-w-2xl">
-          <h2>Báo cáo đã mua</h2>
-          <p className="mt-4 text-[var(--bm-text-soft)]">
-            Danh sách này sẽ đọc từ dữ liệu giao dịch khi account/payment được
-            mở ở các task sau.
-          </p>
-        </div>
-
-        <Card as="section" className="mt-6" variant="default" padding="md">
-          <EmptyState
-            title="Chưa có báo cáo"
-            description="Khi bạn hoàn tất thanh toán, báo cáo sẽ xuất hiện tại đây."
+  if (!user) {
+    return (
+      <PageShell title="Tài khoản" showBack backHref="/" backLabel="Dashboard">
+        <Card as="section" padding="lg" variant="glass">
+          <UnauthorizedState
+            description="Đăng nhập để xem báo cáo và quyền truy cập của bạn."
+            onLogin={signInWithGoogle}
           />
         </Card>
-      </section>
+      </PageShell>
+    );
+  }
 
-      <section className="mt-14">
-        <div className="max-w-2xl">
-          <h2>Quyền truy cập</h2>
+  if (isAnonymous) {
+    return (
+      <PageShell
+        title="Tài khoản"
+        subtitle="Tài khoản khách"
+        showBack
+        backHref="/"
+        backLabel="Dashboard"
+      >
+        <Card as="section" padding="lg" variant="glass">
+          <h3>Tài khoản tạm thời</h3>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Entitlement thật sẽ được nối sau khi auth và payment backend hoàn
-            chỉnh.
+            Đây là tài khoản tạm. Liên kết Google để giữ dữ liệu khi đổi thiết bị hoặc trình duyệt.
           </p>
-        </div>
-
-        <Card as="section" className="mt-6" variant="default" padding="md">
-          <EmptyState
-            title="Chưa có quyền truy cập"
-            description="Các gói đã mua sẽ hiển thị trạng thái và thời hạn tại đây."
-          />
+          <Button className="mt-6" onClick={linkAnonymousToGoogle} variant="primary">
+            Liên kết Google
+          </Button>
         </Card>
-      </section>
-
-      <p className="mt-10 max-w-3xl text-sm text-[var(--bm-text-muted)]">
-        Bản Mệnh V2 chỉ lưu dữ liệu cần thiết để phục vụ tra cứu và thanh toán.
-        Chi tiết xem trang Bảo mật.
-      </p>
-    </>
-  );
-}
-
-export default async function AccountPage({ searchParams }: AccountPageProps) {
-  const params = await searchParams;
-  const isLoggedInPreview = params.preview === "loggedin";
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell
@@ -89,13 +59,53 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
       backLabel="Dashboard"
       containerWidth="default"
     >
-      {isLoggedInPreview ? (
-        <LoggedInPreview />
-      ) : (
-        <Card as="section" variant="glass" padding="lg">
-          <UnauthorizedState description="Đăng nhập sẽ được mở ở T-0405." />
+      <section>
+        <h2>Thông tin tài khoản</h2>
+        <Card as="div" className="mt-6" padding="lg" variant="glass">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="font-bold text-[var(--bm-text-main)]">
+                {user.displayName ?? "Người dùng"}
+              </p>
+              {user.email ? (
+                <p className="mt-1 text-sm text-[var(--bm-text-soft)]">{user.email}</p>
+              ) : null}
+            </div>
+            <span className="w-fit rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-3 py-1 text-xs font-bold text-[var(--bm-gold-bright)]">
+              {user.provider === "google" ? "Google" : "Khách"}
+            </span>
+          </div>
         </Card>
-      )}
+      </section>
+
+      <section className="mt-14">
+        <h2>Báo cáo đã mua</h2>
+        <Card as="div" className="mt-6" padding="md" variant="default">
+          <EmptyState
+            title="Chưa có báo cáo"
+            description="Khi bạn hoàn tất thanh toán, báo cáo sẽ xuất hiện tại đây."
+          />
+        </Card>
+      </section>
+
+      <section className="mt-14">
+        <h2>Quyền truy cập</h2>
+        <Card as="div" className="mt-6" padding="md" variant="default">
+          <EmptyState
+            title="Chưa có quyền truy cập"
+            description="Các gói đã mua sẽ hiển thị trạng thái và thời hạn tại đây."
+          />
+        </Card>
+      </section>
+
+      <p className="mt-10 max-w-3xl text-sm text-[var(--bm-text-muted)]">
+        Bản Mệnh V2 chỉ lưu dữ liệu cần thiết để phục vụ tra cứu và thanh toán.
+        Chi tiết xem trang{" "}
+        <a className="underline hover:text-[var(--bm-text-soft)]" href="/legal/privacy">
+          Bảo mật
+        </a>
+        .
+      </p>
     </PageShell>
   );
 }

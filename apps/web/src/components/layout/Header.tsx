@@ -1,16 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../lib/auth";
 import { Button } from "../ui";
-
-type HeaderUser = {
-  name: string;
-};
-
-type HeaderProps = {
-  user?: HeaderUser;
-};
 
 const navLinks = [
   { href: "/than-so-hoc", label: "Thần số học" },
@@ -21,12 +14,13 @@ const navLinks = [
 function NavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname();
   const isActive = pathname === href || pathname.startsWith(`${href}/`);
-
   return (
     <a
       className={[
         "relative rounded-md px-2 py-2 font-bold transition-colors duration-200",
-        isActive ? "text-[var(--bm-primary-soft)]" : "text-[var(--bm-text-soft)]",
+        isActive
+          ? "text-[var(--bm-primary-soft)]"
+          : "text-[var(--bm-text-soft)]",
         "hover:text-[var(--bm-primary-soft)] focus-visible:outline-none",
         "focus-visible:ring-2 focus-visible:ring-[var(--bm-primary-soft)]",
         "focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bm-bg-void)]",
@@ -41,35 +35,111 @@ function NavLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function AccountArea({ user }: HeaderProps) {
+function Spinner() {
+  return (
+    <span
+      aria-label="Đang tải"
+      className="inline-block size-4 animate-spin rounded-full border-2 border-[var(--bm-border-subtle)] border-t-[var(--bm-primary-soft)]"
+    />
+  );
+}
+
+function AccountArea() {
+  const { user, loading, isAnonymous, signInWithGoogle, linkAnonymousToGoogle, signOutFn } =
+    useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [isOpen]);
+
+  if (loading) return <Spinner />;
+
   if (!user) {
     return (
-      <Button size="sm" variant="ghost">
+      <Button onClick={signInWithGoogle} size="sm" variant="ghost">
         Đăng nhập
       </Button>
     );
   }
 
+  if (isAnonymous) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="inline-flex min-h-9 items-center rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-3 text-sm text-[var(--bm-text-soft)]">
+          Khách
+        </span>
+        <Button onClick={linkAnonymousToGoogle} size="sm" variant="secondary">
+          Liên kết Google
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <button
-      className={[
-        "inline-flex min-h-9 items-center gap-2 rounded-lg border px-3",
-        "border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)]",
-        "text-sm font-bold text-[var(--bm-text-soft)]",
-        "focus-visible:outline-none focus-visible:ring-2",
-        "focus-visible:ring-[var(--bm-primary-soft)] focus-visible:ring-offset-2",
-        "focus-visible:ring-offset-[var(--bm-bg-void)]",
-      ].join(" ")}
-      type="button"
-    >
-      <span>{user.name}</span>
-      <span aria-hidden="true">⌄</span>
-    </button>
+    <div className="relative" ref={dropdownRef}>
+      <button
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className={[
+          "inline-flex min-h-9 items-center gap-2 rounded-lg border px-3",
+          "border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)]",
+          "text-sm font-bold text-[var(--bm-text-soft)]",
+          "hover:border-[var(--bm-primary-soft)] hover:text-[var(--bm-text-main)]",
+          "focus-visible:outline-none focus-visible:ring-2",
+          "focus-visible:ring-[var(--bm-primary-soft)] focus-visible:ring-offset-2",
+          "focus-visible:ring-offset-[var(--bm-bg-void)] transition-colors",
+        ].join(" ")}
+        onClick={() => setIsOpen((v) => !v)}
+        type="button"
+      >
+        <span className="max-w-[120px] truncate">
+          {user.displayName ?? user.email ?? "Tài khoản"}
+        </span>
+        <span aria-hidden="true" className={isOpen ? "rotate-180 transition-transform" : "transition-transform"}>⌄</span>
+      </button>
+
+      {isOpen ? (
+        <div
+          className={[
+            "absolute right-0 top-full z-50 mt-2 min-w-[160px] rounded-xl",
+            "border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)]",
+            "shadow-[var(--bm-shadow-panel)] py-1",
+          ].join(" ")}
+          role="menu"
+        >
+          <a
+            className="block px-4 py-2 text-sm text-[var(--bm-text-soft)] hover:bg-[var(--bm-bg-glass)] hover:text-[var(--bm-text-main)]"
+            href="/account"
+            onClick={() => setIsOpen(false)}
+            role="menuitem"
+          >
+            Tài khoản
+          </a>
+          <button
+            className="block w-full px-4 py-2 text-left text-sm text-[var(--bm-text-soft)] hover:bg-[var(--bm-bg-glass)] hover:text-[var(--bm-danger-soft)]"
+            onClick={() => { setIsOpen(false); void signOutFn(); }}
+            role="menuitem"
+            type="button"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
-export function Header({ user }: HeaderProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] backdrop-blur-xl">
@@ -88,30 +158,30 @@ export function Header({ user }: HeaderProps) {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <AccountArea user={user} />
+          <AccountArea />
         </div>
 
         <button
-          aria-expanded={isOpen}
+          aria-expanded={mobileOpen}
           aria-label="Mở menu"
           className="inline-flex size-11 items-center justify-center rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] text-[var(--bm-text-main)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bm-primary-soft)] md:hidden"
-          onClick={() => setIsOpen((current) => !current)}
+          onClick={() => setMobileOpen((v) => !v)}
           type="button"
         >
-          <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24" fill="none">
+          <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
           </svg>
         </button>
       </div>
 
-      {isOpen ? (
+      {mobileOpen ? (
         <div className="border-t border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] px-5 py-4 md:hidden">
           <nav aria-label="Điều hướng mobile" className="flex flex-col gap-2">
             {navLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
             <div className="pt-3">
-              <AccountArea user={user} />
+              <AccountArea />
             </div>
           </nav>
         </div>

@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 16:30 +07 | T-0405 | Implement auth/account boundary | `Task` |
 | 2026-05-18 15:15 +07 | T-0404 | Tạo storage adapter interfaces | `Task` |
 | 2026-05-18 14:30 +07 | T-0403 | Tạo data schemas/types với Zod | `Task` |
 | 2026-05-18 13:30 +07 | T-0402 | Tạo shared error contract | `Task` |
@@ -72,7 +73,60 @@
 
 ---
 
-## [2026-05-18 15:15 +07] — T-0404: Tạo storage adapter interfaces
+## [2026-05-18 16:30 +07] — T-0405: Implement auth/account boundary
+
+**Loại:** `Task`
+**Ref:** T-0405
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Firebase Auth (Google + Anonymous) với AuthProvider React Context. Header dùng useAuth(). Account page client component. API route verify ID token server-side.
+
+### Dependencies thêm
+- `firebase@^12.13.0` (stable mới nhất; task prompt ghi `^10.x` nhưng "verify stable" → dùng 12.x).
+- `firebase-admin@^13.10.0` (stable mới nhất; task prompt ghi `^12.x` → dùng 13.x).
+- Không có HIGH/CRITICAL vulnerability.
+
+### Thay đổi
+- `.env.example`: đã có đủ 9 Firebase keys (6 NEXT_PUBLIC + 3 server-side).
+- `apps/web/src/lib/firebase/client.ts` (38 dòng): singleton Firebase App + Auth.
+- `apps/web/src/lib/firebase/admin.ts` (27 dòng): singleton Firebase Admin, server-only, parse `FIREBASE_PRIVATE_KEY` escaped newline.
+- `apps/web/src/lib/firebase/index.ts`: barrel chỉ export client-safe symbols.
+- `apps/web/src/lib/auth/AuthProvider.tsx` (147 dòng): Context + Google/Anonymous/link/signOut. Map FirebaseError → AppError.
+- `apps/web/src/lib/auth/useAuth.ts` (14 dòng): hook với guard.
+- `apps/web/src/lib/auth/index.ts`: barrel.
+- `apps/web/src/app/layout.tsx`: wrap AuthProvider.
+- `apps/web/src/app/api/auth/session/route.ts` (53 dòng): POST verify credential, `runtime = "nodejs"`.
+- `apps/web/src/components/layout/Header.tsx` (191 dòng): AccountArea dùng useAuth().
+- `apps/web/src/app/account/page.tsx` (111 dòng): client component, 4 states.
+- `apps/web/package.json`: thêm firebase + firebase-admin.
+- `docs/TASK_REGISTRY.md`: T-0405 → Done.
+
+### Auth pattern
+- ID token Bearer header stateless, không cookie session ở MVP.
+- Providers: Google + Anonymous. Anonymous → Google linking qua `linkWithPopup`.
+- `adminAuth` chỉ dùng trong server context (`runtime = "nodejs"`).
+- `firebaseAuth` (client SDK) không export từ `lib/firebase/index.ts` cùng `adminAuth`.
+
+### Không làm
+- Không tạo Firestore user document (T-0406).
+- Không implement entitlement check (T-0406).
+- Không implement payment flow.
+- Không dùng firebase compat API.
+
+### Verify
+- `npm run check` → Pass (typecheck + lint + security:smoke + build).
+- `npm run qa:responsive-audit` → Pass.
+- `/account` prerender static (client component), `/api/auth/session` dynamic.
+- File sizes: client.ts 38, admin.ts 27, AuthProvider 147, useAuth 14, route 53, Header 191, account 111 — tất cả trong giới hạn.
+
+### Rủi ro / lưu ý còn lại
+- Chưa test flow thật (cần `.env.local` với Firebase config thật + Firebase Console enable Google/Anonymous provider).
+- `security-smoke` flag false positive `idToken:` (pattern TOKEN) → đổi field thành `credential` trong route body. Nên cập nhật `security-smoke.mjs` để whitelist `idToken` nếu cần sau.
+- `firebase-admin` không chạy trên Edge runtime — route handler đã set `export const runtime = "nodejs"`.
+- Firestore user document sẽ tạo ở T-0406 (sau login thành công).
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0404

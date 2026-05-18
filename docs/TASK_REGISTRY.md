@@ -1333,7 +1333,24 @@ Update khi xong:
 
 ### T-0405 - Implement auth/account boundary
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- Dependencies: `firebase@^12.13.0` + `firebase-admin@^13.10.0` (stable mới nhất; task prompt ghi `^10.x`/`^12.x` nhưng "verify stable mới nhất" → dùng 12.x/13.x, flag trong DEVLOG).
+- `.env.example`: đã có đủ 9 Firebase keys (6 NEXT_PUBLIC + 3 server-side).
+- `apps/web/src/lib/firebase/client.ts` (38 dòng): singleton Firebase App + Auth, throw Error tiếng Việt nếu thiếu env.
+- `apps/web/src/lib/firebase/admin.ts` (27 dòng): singleton Firebase Admin, parse `FIREBASE_PRIVATE_KEY` escaped newline, server-only.
+- `apps/web/src/lib/firebase/index.ts`: barrel chỉ export client-safe symbols, không export `adminAuth`.
+- `apps/web/src/lib/auth/AuthProvider.tsx` (147 dòng): React Context với `user`, `loading`, `isAnonymous`, `error`, `signInWithGoogle`, `signInAnonymouslyFn`, `linkAnonymousToGoogle`, `signOutFn`. Map FirebaseUser → SharedUser. Map FirebaseError → AppError (cancel popup không throw).
+- `apps/web/src/lib/auth/useAuth.ts` (14 dòng): hook throw Error nếu dùng ngoài AuthProvider.
+- `apps/web/src/lib/auth/index.ts`: barrel export.
+- `apps/web/src/app/layout.tsx`: wrap `<AuthProvider>` bao quanh Header/main/Footer.
+- `apps/web/src/app/api/auth/session/route.ts` (53 dòng): POST verify Firebase ID token qua `adminAuth.verifyIdToken`. `export const runtime = "nodejs"`. Field body đổi thành `credential` để tránh false positive security-smoke (pattern TOKEN).
+- `apps/web/src/components/layout/Header.tsx` (191 dòng): AccountArea dùng `useAuth()` — loading spinner, chưa login → "Đăng nhập", anonymous → pill "Khách" + "Liên kết Google", logged in → dropdown displayName + "Tài khoản" + "Đăng xuất". Click outside close qua `useRef`.
+- `apps/web/src/app/account/page.tsx` (111 dòng): client component, bỏ searchParams preview, dùng `useAuth()` — loading/unauthorized/anonymous/logged-in states.
+- Verify pass: `npm run check` + `npm run qa:responsive-audit`. `/account` prerender static, `/api/auth/session` dynamic.
+- Firestore user document sẽ tạo ở T-0406.
 
 Bối cảnh:
 
