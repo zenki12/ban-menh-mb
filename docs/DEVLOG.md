@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 20:30 +07 | T-0502 | Payment check API + success/cancel pages + pricing wire | `Task` |
 | 2026-05-18 19:30 +07 | T-0501 | Implement payment create API | `Task` |
 | 2026-05-18 18:00 +07 | T-0406 | Implement entitlement service | `Task` |
 | 2026-05-18 17:00 +07 | T-0405 | Fix Next.js env inlining bug trong client.ts | `Correction` |
@@ -76,7 +77,37 @@
 
 ---
 
-## [2026-05-18 19:30 +07] — T-0501: Implement payment create API
+## [2026-05-18 20:30 +07] — T-0502: Payment check API + success/cancel pages + pricing wire
+
+**Loại:** `Task`
+**Ref:** T-0502
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Payment check API stateless polling. /pricing wire button "Chọn gói" thật. /payment/success polls mỗi 3s max 60s. Webhook (T-0503) sẽ update status từ pending → confirmed.
+
+### Thay đổi
+- `apps/web/src/app/api/payment/check/route.ts` (74 dòng): GET verify Bearer → ownership check → trả purchase status.
+- `apps/web/src/app/payment/success/page.tsx` (130 dòng): polling 3s × 20 = 60s max, Suspense boundary cho useSearchParams.
+- `apps/web/src/app/payment/cancel/page.tsx` (28 dòng): cancel page với CTA.
+- `apps/web/src/app/pricing/page.tsx` (189 dòng): client component, handleSelectPlan → fetchWithAuth → redirect checkoutUrl.
+
+### Không làm
+- Không tạo entitlement ở /payment/success (T-0503 webhook).
+- Không mock confirmed status.
+- Không implement webhook (T-0503).
+
+### Verify
+- `npm run check` → Pass. 2 routes dynamic mới (`/api/payment/check`, `/api/payment/create`), 3 pages static.
+- `npm run qa:responsive-audit` → Pass.
+- File sizes: check 74, success 130, cancel 28, pricing 189 — tất cả trong giới hạn.
+
+### Expected behavior hiện tại
+- `/payment/success` sẽ poll tới timeout (60s) vì webhook T-0503 chưa implement → status vẫn "pending".
+- Sau timeout hiển thị "Hệ thống đang xác nhận, vui lòng kiểm tra ở /account sau ít phút."
+- Đây là EXPECTED — T-0503 sẽ fix bằng cách update status từ webhook PayOS.
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0501

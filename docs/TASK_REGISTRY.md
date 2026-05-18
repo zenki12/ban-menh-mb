@@ -1500,7 +1500,16 @@ Update khi xong:
 
 ### T-0502 - Implement payment check API
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- `api/payment/check/route.ts` (74 dòng): GET, verify Bearer → lookup purchase → verify ownership (purchase.userId === uid) → trả `{ orderId, status, amount, productCode, expiresAt, confirmedAt }`.
+- `payment/success/page.tsx` (130 dòng): poll `/api/payment/check` mỗi 3s, max 60s (20 lần). Suspense boundary cho `useSearchParams`. States: polling/confirmed/failed/expired/timeout.
+- `payment/cancel/page.tsx` (28 dòng): hiển thị "Đã hủy giao dịch" + CTA quay lại pricing/home.
+- `pricing/page.tsx` (189 dòng): đổi sang client component, `handleSelectPlan()` — nếu chưa login gọi `signInWithGoogle()`, nếu đã login gọi `fetchWithAuth("/api/payment/create")` → redirect `checkoutUrl`. Loading state per-card.
+- Verify pass: `npm run check` + `npm run qa:responsive-audit`. 2 routes dynamic mới, 3 pages static.
+- Lưu ý: `/payment/success` sẽ poll tới timeout vì webhook (T-0503) chưa implement — đây là expected behavior ở T-0502.
 
 Bối cảnh:
 
