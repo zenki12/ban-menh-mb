@@ -1284,7 +1284,24 @@ Update khi xong:
 
 ### T-0404 - Tạo storage adapter interfaces
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- Đây là interface contract thuần TypeScript, chưa có implementation. Không import firebase-admin, @cloudflare/workers-types hay bất kỳ runtime SDK nào.
+- Đã tạo 10 files trong `packages/shared/src/storage/` (tất cả < 50 dòng):
+  - `common.ts` (47 dòng): `StorageContext`, `PaginationOptions`, `QueryResult<T>`, `WriteResult`, `StorageNotFoundError` (code: `NOT_FOUND`), `StorageConflictError` (code: `ALREADY_EXISTS`).
+  - `user-repository.ts`: `UserRepository` interface — getById, getByEmail, create, update, list.
+  - `report-repository.ts`: `ReportRepository` — getById, listByUser, findByInputHash, create, updateStatus.
+  - `purchase-repository.ts`: `PurchaseRepository` — getById, getByOrderId, listByUser, create, updateStatus, markConfirmed.
+  - `entitlement-repository.ts`: `EntitlementRepository` — getById, listByUser, findActiveForReport, create, markCancelled.
+  - `voucher-repository.ts`: `VoucherRepository` — getByCode, listActive, create, incrementUsage, setActive.
+  - `payment-log-repository.ts`: `PaymentLogRepository` — append (append-only), listByOrderId.
+  - `tarot-reading-repository.ts`: `TarotReadingRepository` — getById, listByUser, create.
+  - `kb-gateway.ts`: `KBGateway` interface + `KBLookupKey` + `KBChunk` — fetchChunk, fetchChunks. Comment rõ: frontend không gọi trực tiếp, phải qua Worker /api/kb/* có entitlement check.
+  - `index.ts`: barrel export tất cả.
+- Đã cập nhật `packages/shared/src/index.ts`: thêm `export * from "./storage"`.
+- Verify pass: `npm run check` (typecheck + lint + security:smoke + build). Không có import runtime SDK.
 
 Bối cảnh:
 

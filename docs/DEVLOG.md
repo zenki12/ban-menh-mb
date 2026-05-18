@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 15:15 +07 | T-0404 | Tạo storage adapter interfaces | `Task` |
 | 2026-05-18 14:30 +07 | T-0403 | Tạo data schemas/types với Zod | `Task` |
 | 2026-05-18 13:30 +07 | T-0402 | Tạo shared error contract | `Task` |
 | 2026-05-18 12:20 +07 | T-0401 | Đồng bộ legal-commercial-spec mục 7 với pricing.ts | `Correction` |
@@ -71,7 +72,46 @@
 
 ---
 
-## [2026-05-18 14:30 +07] — T-0403: Tạo data schemas/types với Zod
+## [2026-05-18 15:15 +07] — T-0404: Tạo storage adapter interfaces
+
+**Loại:** `Task`
+**Ref:** T-0404
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Interface contract thuần TypeScript cho storage layer. Không có implementation, không import runtime SDK. Worker T-0501+ sẽ implement Firestore adapter.
+
+### Thay đổi
+- `packages/shared/src/storage/common.ts` (47 dòng): base types + error classes.
+- `packages/shared/src/storage/user-repository.ts` (21 dòng): `UserRepository`.
+- `packages/shared/src/storage/report-repository.ts` (32 dòng): `ReportRepository`.
+- `packages/shared/src/storage/purchase-repository.ts` (38 dòng): `PurchaseRepository` — có `markConfirmed` để webhook handler dùng.
+- `packages/shared/src/storage/entitlement-repository.ts` (32 dòng): `EntitlementRepository` — có `findActiveForReport` để check quyền unlock.
+- `packages/shared/src/storage/voucher-repository.ts` (28 dòng): `VoucherRepository` — `incrementUsage` phải atomic.
+- `packages/shared/src/storage/payment-log-repository.ts` (23 dòng): `PaymentLogRepository` — append-only.
+- `packages/shared/src/storage/tarot-reading-repository.ts` (22 dòng): `TarotReadingRepository`.
+- `packages/shared/src/storage/kb-gateway.ts` (37 dòng): `KBGateway` + `KBLookupKey` + `KBChunk` — comment rõ frontend không gọi trực tiếp.
+- `packages/shared/src/storage/index.ts` (12 dòng): barrel export.
+- `packages/shared/src/index.ts`: thêm `export * from "./storage"`.
+- `docs/TASK_REGISTRY.md`: T-0404 → `Done`.
+
+### Không làm
+- Không implement (chỉ interface).
+- Không import firebase-admin, @cloudflare/workers-types hay runtime SDK.
+- Không thêm dependency mới.
+
+### Verify
+- `npm run check` → Pass (typecheck + lint + security:smoke + build).
+- `Select-String` scan không tìm thấy firebase-admin/@cloudflare/workers-types trong storage files.
+- Tất cả files < 50 dòng (max: common.ts 47 dòng).
+
+### Rủi ro / lưu ý còn lại
+- Chưa có implementation — Worker T-0501+ sẽ implement Firestore adapter cho user/report/purchase/entitlement/voucher/payment-log/tarot-reading.
+- In-memory adapter cho test chưa có task riêng — sẽ tạo khi cần.
+- `KBGateway` là interface đặc biệt: R2 binary/JSON, không phải Firestore. Frontend tuyệt đối không gọi trực tiếp.
+- `VoucherRepository.incrementUsage` phải atomic ở implementation (Firestore transaction) để tránh race condition vượt `maxUses`.
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0403
