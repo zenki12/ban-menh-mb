@@ -1,0 +1,26 @@
+# Resource thật điền qua wrangler secret put, không commit.
+name = "banmenh-payment"
+main = "src/index.ts"
+compatibility_date = "2026-05-16"
+
+[env.dev]
+name = "banmenh-payment-dev"
+
+[[env.dev.kv_namespaces]]
+binding = "CONFIG_KV"
+id = "placeholder-dev-kv-namespace-id"
+
+[[env.dev.r2_buckets]]
+binding = "KB_BUCKET"
+bucket_name = "banmenh-kb-dev"
+
+[env.production]
+name = "banmenh-payment-prod"
+
+[[env.production.kv_namespaces]]
+binding = "CONFIG_KV"
+id = "placeholder-prod-kv-namespace-id"
+
+[[env.production.r2_buckets]]
+binding = "KB_BUCKET"
+bucket_name = "banmenh-kb-prod"

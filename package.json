@@ -1,0 +1,28 @@
+{
+  "name": "banmenh-v2",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Ban Menh V2 independent rebuild",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "workers/*"
+  ],
+  "scripts": {
+    "dev": "npm --workspace apps/web run dev",
+    "build": "npm --workspace apps/web run build",
+    "typecheck": "npm --workspace apps/web run typecheck",
+    "lint": "npm --workspace apps/web run lint",
+    "security:smoke": "node tools/security-smoke.mjs",
+    "qa:responsive-audit": "node tools/responsive-qa-audit.mjs",
+    "check": "npm run typecheck && npm run lint && npm run security:smoke && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.10"
+    }
+  }
+}

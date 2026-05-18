@@ -1,0 +1,150 @@
+/**
+ * Bản Mệnh V2 Design Tokens
+ *
+ * Nguồn: docs/design-extraction-spec.md (section 5).
+ * Mọi component phải dùng token này, không hardcode màu/spacing rải rác.
+ * Khi thêm/sửa token, cập nhật design-extraction-spec.md trước.
+ */
+
+:root {
+  /* ========== Background ========== */
+  --bm-bg-void: #020617;
+  --bm-bg-deep: #0a0514;
+  --bm-bg-indigo: #1e1b4b;
+  --bm-bg-panel: rgba(20, 15, 35, 0.72);
+  --bm-bg-glass: rgba(255, 255, 255, 0.04);
+  --bm-bg-glass-strong: rgba(255, 255, 255, 0.07);
+
+  /* ========== Text ========== */
+  --bm-text-main: #f8fafc;
+  --bm-text-soft: #e2e8f0;
+  --bm-text-muted: #94a3b8;
+  --bm-text-faint: rgba(255, 255, 255, 0.5);
+
+  /* ========== Primary (purple/violet) ========== */
+  --bm-primary: #7c3aed;
+  --bm-primary-hover: #6d28d9;
+  --bm-primary-soft: #a78bfa;
+  --bm-primary-dark: #4f46e5;
+
+  /* ========== Magenta ========== */
+  --bm-magenta: #c026d3;
+  --bm-magenta-hover: #a21caf;
+
+  /* ========== Gold accent (premium) ========== */
+  --bm-gold: #fbbf24;
+  --bm-gold-bright: #fde047;
+  --bm-gold-dark: #ca8a04;
+
+  /* ========== Blue (report/analysis) ========== */
+  --bm-blue: #3b82f6;
+  --bm-blue-deep: #1e3a8a;
+  --bm-cyan: #7dd3fc;
+
+  /* ========== Status ========== */
+  --bm-success: #059669;
+  --bm-success-soft: #34d399;
+  --bm-warning: #f59e0b;
+  --bm-danger: #ef4444;
+  --bm-danger-soft: #fca5a5;
+
+  /* ========== Border ========== */
+  --bm-border-subtle: rgba(255, 255, 255, 0.10);
+  --bm-border-strong: rgba(255, 255, 255, 0.15);
+  --bm-border-purple: rgba(167, 139, 250, 0.45);
+  --bm-border-gold: rgba(251, 191, 36, 0.35);
+
+  /* ========== Gradient ========== */
+  --bm-gradient-bg:
+    radial-gradient(ellipse 80% 80% at 50% -20%, rgba(120, 40, 200, 0.35), transparent),
+    radial-gradient(ellipse 60% 60% at 80% 80%, rgba(30, 80, 200, 0.20), transparent),
+    radial-gradient(ellipse 40% 40% at 20% 60%, rgba(200, 80, 120, 0.15), transparent),
+    #020617;
+
+  --bm-gradient-primary: linear-gradient(135deg, #a21caf 0%, #7c3aed 100%);
+  --bm-gradient-primary-blue: linear-gradient(135deg, #7c3aed, #4f46e5);
+  --bm-gradient-purple-text: linear-gradient(135deg, #a78bfa, #60a5fa, #f472b6);
+  --bm-gradient-gold-text: linear-gradient(135deg, #fbbf24, #f59e0b, #fde68a);
+  --bm-gradient-report: linear-gradient(135deg, #0a0f2e 0%, #1a2460 100%);
+  --bm-gradient-footer: linear-gradient(135deg, #0a0f2e 0%, #0f172a 100%);
+
+  /* ========== Radius ========== */
+  --bm-radius-sm: 6px;
+  --bm-radius-md: 8px;
+  --bm-radius-lg: 12px;
+  --bm-radius-xl: 16px;
+  --bm-radius-2xl: 20px;
+
+  /* ========== Shadow ========== */
+  --bm-shadow-purple: 0 20px 60px rgba(139, 92, 246, 0.25);
+  --bm-shadow-gold: 0 0 20px rgba(251, 191, 36, 0.30);
+  --bm-shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.40);
+
+  /* ========== Typography scale ========== */
+  --bm-text-hero: clamp(2.75rem, 6vw + 1rem, 4.5rem);          /* 44 → 72 */
+  --bm-text-page-title: clamp(1.875rem, 3vw + 1rem, 3rem);     /* 30 → 48 */
+  --bm-text-section-title: clamp(1.5rem, 2vw + 0.75rem, 2rem); /* 24 → 32 */
+  --bm-text-card-title: clamp(1.125rem, 1vw + 0.75rem, 1.5rem);/* 18 → 24 */
+  --bm-text-body: 1rem;                                         /* 16 */
+  --bm-text-small: 0.875rem;                                    /* 14 */
+}
+
+/* Theme mapping cho Tailwind v4. Cho phép dùng class kiểu `bg-bg-void`, `text-primary`, v.v. */
+@theme inline {
+  --color-bg-void: var(--bm-bg-void);
+  --color-bg-deep: var(--bm-bg-deep);
+  --color-bg-indigo: var(--bm-bg-indigo);
+  --color-bg-panel: var(--bm-bg-panel);
+  --color-bg-glass: var(--bm-bg-glass);
+  --color-bg-glass-strong: var(--bm-bg-glass-strong);
+
+  --color-text-main: var(--bm-text-main);
+  --color-text-soft: var(--bm-text-soft);
+  --color-text-muted: var(--bm-text-muted);
+  --color-text-faint: var(--bm-text-faint);
+
+  --color-primary: var(--bm-primary);
+  --color-primary-hover: var(--bm-primary-hover);
+  --color-primary-soft: var(--bm-primary-soft);
+  --color-primary-dark: var(--bm-primary-dark);
+
+  --color-magenta: var(--bm-magenta);
+  --color-magenta-hover: var(--bm-magenta-hover);
+
+  --color-gold: var(--bm-gold);
+  --color-gold-bright: var(--bm-gold-bright);
+  --color-gold-dark: var(--bm-gold-dark);
+
+  --color-blue: var(--bm-blue);
+  --color-blue-deep: var(--bm-blue-deep);
+  --color-cyan: var(--bm-cyan);
+
+  --color-success: var(--bm-success);
+  --color-success-soft: var(--bm-success-soft);
+  --color-warning: var(--bm-warning);
+  --color-danger: var(--bm-danger);
+  --color-danger-soft: var(--bm-danger-soft);
+
+  --color-border-subtle: var(--bm-border-subtle);
+  --color-border-strong: var(--bm-border-strong);
+  --color-border-purple: var(--bm-border-purple);
+  --color-border-gold: var(--bm-border-gold);
+
+  --radius-sm: var(--bm-radius-sm);
+  --radius-md: var(--bm-radius-md);
+  --radius-lg: var(--bm-radius-lg);
+  --radius-xl: var(--bm-radius-xl);
+  --radius-2xl: var(--bm-radius-2xl);
+}
+
+/* ========== Reduced motion ========== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

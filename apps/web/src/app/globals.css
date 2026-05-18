@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  font-size: var(--bm-text-body);
+  line-height: 1.7;
+  color: var(--bm-text-main);
+  background: var(--bm-gradient-bg);
+  background-color: var(--bm-bg-void);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  max-width: 100%;
+  color: var(--bm-text-main);
+  font-weight: 700;
+  letter-spacing: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--bm-text-hero);
+  line-height: 1.16;
+}
+
+h2 {
+  font-size: var(--bm-text-page-title);
+  line-height: 1.28;
+}
+
+h3 {
+  font-size: var(--bm-text-section-title);
+  line-height: 1.32;
+}
+
+h4 {
+  font-size: var(--bm-text-card-title);
+  line-height: 1.38;
+}
+
+p {
+  max-width: 100%;
+  font-size: var(--bm-text-body);
+  line-height: 1.75;
+  color: var(--bm-text-soft);
+  overflow-wrap: break-word;
+}
+
+small {
+  font-size: var(--bm-text-small);
+  line-height: 1.6;
+  color: var(--bm-text-muted);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.text-gradient-purple {
+  background: var(--bm-gradient-purple-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bm-primary-soft);
+  outline-offset: 2px;
+}
