@@ -37,6 +37,13 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 11:01 +07 | T-0306 | Tạo legal/support route skeleton | `Task` |
+| 2026-05-18 10:52 +07 | T-0305 | Tạo skeleton route `/account` | `Task` |
+| 2026-05-18 10:41 +07 | T-0304 | Tạo skeleton route `/pricing` | `Task` |
+| 2026-05-18 10:32 +07 | T-0303 | Tạo skeleton route `/tarot` | `Task` |
+| 2026-05-18 10:13 +07 | T-0302 | Tạo skeleton route `/than-so-hoc` | `Task` |
+| 2026-05-18 09:58 +07 | T-0301 | Correction: Button polymorphic + responsive audit Hub | `Correction` |
+| 2026-05-18 09:45 +07 | T-0301 | Tạo Hub skeleton cho route `/` | `Task` |
 | 2026-05-17 10:15 +07 | T-0208 | Responsive QA — bổ sung tablet + audit tĩnh | `Correction` |
 | 2026-05-16 23:52 +07 | T-0208 | Responsive UI QA nền | `Task` |
 | 2026-05-16 23:35 +07 | T-0207 | Tạo Header/Footer chuẩn | `Task` |
@@ -56,6 +63,203 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-18 11:01 +07] — T-0306: Tạo legal/support route skeleton
+
+**Loại:** `Task`
+**Ref:** T-0306
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Tạo 3 route skeleton cho Privacy, Terms và Support. Copy là skeleton, T-0801 sẽ rà soát pháp lý trước launch.
+
+### Thay đổi
+- `apps/web/src/app/legal/privacy/page.tsx`: thêm route `/legal/privacy` với các section dữ liệu thu thập, cách sử dụng, bên thứ ba, quyền người dùng và cập nhật.
+- `apps/web/src/app/legal/terms/page.tsx`: thêm route `/legal/terms` với bản chất nội dung, quyền tác giả, thanh toán/hoàn tiền, hành vi cấm, thay đổi điều khoản và liên hệ.
+- `apps/web/src/app/support/page.tsx`: thêm route `/support` với FAQ placeholder và kênh liên hệ.
+- `docs/TASK_REGISTRY.md`: cập nhật T-0306 sang `Done` và ghi block hoàn tất.
+
+### Không làm
+- Không copy điều khoản từ site khác.
+- Không thêm dependency, không thêm claim thương mại quá mức.
+- Không sửa Footer vì link đã trỏ đúng `/support`, `/legal/terms`, `/legal/privacy`.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Build prerender `/legal/privacy`, `/legal/terms`, `/support`.
+- Chrome headless 375px: cả 3 route `maxScrollWidth=375`, click `Dashboard` về `/`.
+- File line count: privacy 65 dòng, terms 77 dòng, support 82 dòng.
+
+---
+
+## [2026-05-18 10:52 +07] — T-0305: Tạo skeleton route `/account`
+
+**Loại:** `Task`
+**Ref:** T-0305
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Tạo account skeleton với logged-out state mặc định và preview logged-in bằng query param `?preview=loggedin`. Auth thật sẽ mở ở T-0405.
+
+### Thay đổi
+- `apps/web/src/app/account/page.tsx`: thêm route `/account` dùng PageShell, UnauthorizedState mặc định và layout preview logged-in.
+- Preview logged-in có 3 section: thông tin tài khoản demo, báo cáo đã mua, quyền truy cập.
+- `docs/TASK_REGISTRY.md`: cập nhật T-0305 sang `Done` và ghi block hoàn tất.
+
+### Không làm
+- Không implement Firebase Auth.
+- Không đọc/ghi Firestore.
+- Không persist state, không expose dữ liệu giả như dữ liệu thật.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Build có route `/account`.
+- Chrome headless 375px: `/account` hiển thị UnauthorizedState; `/account?preview=loggedin` hiển thị 3 section placeholder; `maxScrollWidth=375`.
+- Click link `Dashboard` trên PageShell quay về `/`.
+- `apps/web/src/app/account/page.tsx`: 91 dòng.
+
+---
+
+## [2026-05-18 10:41 +07] — T-0304: Tạo skeleton route `/pricing`
+
+**Loại:** `Task`
+**Ref:** T-0304
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Tạo pricing skeleton đọc dữ liệu từ shared pricing placeholder thay vì hardcode trong page. T-0401 sẽ mở rộng pricing contract đầy đủ.
+
+### Thay đổi
+- `packages/shared/src/pricing.ts`: thêm `PRODUCTS`, `Product` type và `formatPriceVnd`; đây là placeholder pricing — sẽ được mở rộng ở T-0401.
+- `packages/shared/src/index.ts`: export pricing placeholder.
+- `apps/web/src/app/pricing/page.tsx`: thêm route `/pricing` với pricing cards, FAQ placeholder và disclaimer thương mại mềm.
+- `docs/TASK_REGISTRY.md`: cập nhật T-0304 sang `Done` và ghi block hoàn tất.
+
+### Không làm
+- Không implement payment flow.
+- Không thêm voucher, entitlement hoặc business logic thanh toán.
+- Không thêm dependency, không đổi alias/config.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Build prerender route `/pricing`.
+- Chrome headless 375px route `/pricing`: `maxScrollWidth=375`, hiển thị giá `99.000₫`, `79.000₫`, `249.000₫`.
+- Click link `Dashboard` trên PageShell quay về `/`.
+- `apps/web/src/app/pricing/page.tsx`: 99 dòng; `packages/shared/src/pricing.ts`: 34 dòng.
+
+---
+
+## [2026-05-18 10:32 +07] — T-0303: Tạo skeleton route `/tarot`
+
+**Loại:** `Task`
+**Ref:** T-0303
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Tạo route skeleton riêng cho Tarot, đồng bộ layout với Numerology và giữ đúng boundary: không rút bài, không gọi AI/API/KB, không mở spread ngoài MVP.
+
+### Thay đổi
+- `apps/web/src/app/tarot/page.tsx`: thêm route `/tarot` với PageShell, skeleton Daily Message, skeleton phiên Tarot, thư viện lá bài placeholder và disclaimer Tarot.
+- `docs/TASK_REGISTRY.md`: cập nhật T-0303 sang `Done` và ghi block hoàn tất.
+
+### Không làm
+- Không implement shuffle/select/flip.
+- Không hiển thị spread 5/7/10/12 lá.
+- Không gọi AI, không gọi API, không import/public KB private.
+- Không thêm dependency.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Build prerender route `/tarot`.
+- Chrome headless 375px route `/tarot`: render H1 `Tarot`, `maxScrollWidth=375`.
+- Click link `Dashboard` trên PageShell quay về `/`.
+- `apps/web/src/app/tarot/page.tsx`: 95 dòng.
+
+---
+
+## [2026-05-18 10:13 +07] — T-0302: Tạo skeleton route `/than-so-hoc`
+
+**Loại:** `Task`
+**Ref:** T-0302
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Tạo route skeleton riêng cho module Thần số học trước khi build form thật, dùng PageShell/component chung và giữ link Hub `/than-so-hoc` render được.
+
+### Thay đổi
+- `apps/web/src/app/than-so-hoc/page.tsx`: thêm route `/than-so-hoc` với PageShell, card placeholder nhập thông tin, button disabled, grid 6 chỉ số và disclaimer module.
+- `docs/TASK_REGISTRY.md`: cập nhật T-0302 sang `Done` và ghi block hoàn tất.
+
+### Không làm
+- Không tạo `/than-so-hoc/result`.
+- Không implement form input thật; phần này giữ cho T-0601.
+- Không gọi API, không import KB, không thêm dependency.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Build prerender route `/than-so-hoc`.
+- Chrome headless 375px route `/than-so-hoc`: render H1 `Thần số học`, `maxScrollWidth=375`.
+- Click link `Dashboard` trên PageShell quay về `/`.
+- `apps/web/src/app/than-so-hoc/page.tsx`: 101 dòng.
+
+---
+
+## [2026-05-18 09:58 +07] — Correction: T-0301 Button polymorphic + responsive audit Hub
+
+**Loại:** `Correction`
+**Ref:** T-0301
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Patch nhỏ sau T-0301 để `Button` render được link nội bộ bằng `<a href>` khi có `href`, refactor Hub dùng lại Button cho CTA/link module, và cập nhật responsive audit theo route demo mới.
+
+### Thay đổi
+- `apps/web/src/components/ui/Button.tsx`: thêm prop optional `href`, render `<a>` khi có href; giữ nhánh `<button>` cũ khi không có href.
+- `apps/web/src/app/page.tsx`: bỏ class CTA riêng, dùng `Button href` cho hero CTA và link module.
+- `tools/responsive-qa-audit.mjs`: đổi check Home cũ thành check Hub hero grid và check demo-components showcase.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Chrome headless 375px route `/`: `maxScrollWidth=375`, các anchor `/than-so-hoc`, `/tarot`, `/pricing` render được.
+- `apps/web/src/components/ui/Button.tsx`: 143 dòng.
+
+---
+
+## [2026-05-18 09:45 +07] — T-0301: Tạo Hub skeleton cho route `/`
+
+**Loại:** `Task`
+**Ref:** T-0301
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Thay route `/` từ demo showcase sang Hub skeleton thật, giữ demo component ở route riêng `/demo-components`, và nối các CTA/module bằng `<a href>` placeholder đúng phạm vi task.
+
+### Thay đổi
+- `apps/web/src/app/page.tsx`: tạo Hub bằng `PageShell showBack={false}`, hero, CTA, module cards Thần số học/Tarot/Daily Message, lý do chọn Bản Mệnh V2 và disclaimer.
+- `apps/web/src/app/demo-components/page.tsx`: chuyển nội dung demo showcase cũ sang route `/demo-components`.
+- `docs/TASK_REGISTRY.md`: cập nhật T-0301 sang `Done` và ghi block hoàn tất.
+
+### Không làm
+- Không tạo route `/than-so-hoc`, `/tarot`, `/pricing`, `/account`.
+- Không thêm dependency, không import KB, không gọi API thật.
+- Không dùng `next/link`; skeleton giữ `<a href>` như scope T-0301.
+
+### Verify
+- `npm run check` → Pass.
+- `npm run qa:responsive-audit` → Pass.
+- Chrome headless 375px route `/`: `maxScrollWidth=375`, không tràn ngang.
+- `apps/web/src/app/page.tsx`: 135 dòng; `apps/web/src/app/demo-components/page.tsx`: 149 dòng.
+
+### Rủi ro còn lại
+- Link `/than-so-hoc`, `/tarot`, `/pricing` hiện trả 404 cho đến các task route tương ứng; đây là expected ở T-0301.
 
 ---
 

@@ -30,8 +30,13 @@ const checks = [
     mustInclude: ["max-w-3xl", "max-w-5xl", "max-w-7xl"],
   },
   {
-    name: "Home: Card showcase md:grid-cols-2",
+    name: "Home Hub: hero grid lg:grid-cols-[",
     file: join(webSrc, "app", "page.tsx"),
+    mustInclude: ["lg:grid-cols-["],
+  },
+  {
+    name: "Demo components: showcase md:grid-cols-2",
+    file: join(webSrc, "app", "demo-components", "page.tsx"),
     mustInclude: ["md:grid-cols-2"],
   },
 ];

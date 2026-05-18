@@ -824,7 +824,7 @@ Update khi xong:
 
 ### T-0301 - Tạo route `/` Hub skeleton
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -856,9 +856,17 @@ Update khi xong:
 - Ghi route đã tạo.
 - Ghi link module.
 
+Cập nhật hoàn tất 2026-05-18:
+
+- Đã thay `apps/web/src/app/page.tsx` từ demo showcase thành Hub skeleton thật cho route `/`.
+- Đã chuyển demo component hiện tại sang `apps/web/src/app/demo-components/page.tsx` (`/demo-components`).
+- Link module dùng `<a href>`: `/than-so-hoc`, `/tarot`; CTA bảng giá dùng `/pricing`; các route này chưa được tạo trong task này.
+- Đã thêm card Daily Message ở trạng thái sắp ra mắt, CTA disabled.
+- Verify: `npm run check`, `npm run qa:responsive-audit`, Chrome headless 375px `maxScrollWidth=375`.
+
 ### T-0302 - Tạo route `/than-so-hoc` skeleton
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -889,9 +897,17 @@ Update khi xong:
 
 - Ghi route và layout.
 
+Cập nhật hoàn tất 2026-05-18:
+
+- Đã tạo `apps/web/src/app/than-so-hoc/page.tsx` cho route `/than-so-hoc`.
+- Layout dùng `PageShell` với title/subtitle module, back link về `/`, container `default`.
+- Đã thêm card placeholder nhập thông tin, button disabled và grid 6 chỉ số Thần số học.
+- Không tạo `/than-so-hoc/result`, không implement form thật, không gọi API/KB.
+- Verify: `npm run check`, `npm run qa:responsive-audit`, Chrome headless route `/than-so-hoc`, click `Dashboard` về `/`.
+
 ### T-0303 - Tạo route `/tarot` skeleton
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -923,9 +939,18 @@ Update khi xong:
 
 - Ghi route và module boundary.
 
+Cập nhật hoàn tất 2026-05-18:
+
+- Đã tạo `apps/web/src/app/tarot/page.tsx` cho route `/tarot`.
+- Layout dùng `PageShell` đồng bộ với Numerology, back link về `/`, container `default`.
+- Đã thêm skeleton Daily Message, phiên Tarot, thư viện lá bài và disclaimer Tarot.
+- Chỉ nhắc MVP spread 1 lá hoặc 3 lá; không hiển thị 5/7/10/12 lá.
+- Không implement shuffle/select/flip, không gọi AI/API/KB, không public KB private.
+- Verify: `npm run check`, `npm run qa:responsive-audit`, Chrome headless route `/tarot`, click `Dashboard` về `/`.
+
 ### T-0304 - Tạo route `/pricing` skeleton
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -954,9 +979,17 @@ Update khi xong:
 
 - Ghi pricing source.
 
+Cập nhật hoàn tất 2026-05-18:
+
+- Đã tạo `packages/shared/src/pricing.ts` làm placeholder pricing source cho T-0304.
+- Đã export pricing từ `packages/shared/src/index.ts`.
+- Đã tạo `apps/web/src/app/pricing/page.tsx` cho route `/pricing`, đọc `PRODUCTS` và `formatPriceVnd` từ shared pricing placeholder.
+- Không implement payment flow, voucher hoặc entitlement.
+- Verify: `npm run check`, `npm run qa:responsive-audit`, Chrome headless route `/pricing`, click `Dashboard` về `/`.
+
 ### T-0305 - Tạo route `/account` skeleton
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -985,9 +1018,17 @@ Update khi xong:
 
 - Ghi account states.
 
+Cập nhật hoàn tất 2026-05-18:
+
+- Đã tạo `apps/web/src/app/account/page.tsx` cho route `/account`.
+- Mặc định hiển thị logged-out state bằng `UnauthorizedState`, không truyền `onLogin`; auth thật mở ở T-0405.
+- Đã thêm preview state bằng query param `?preview=loggedin` với thông tin tài khoản demo, báo cáo đã mua và quyền truy cập.
+- Không implement Firebase Auth, không đọc/ghi Firestore, không persist state.
+- Verify: `npm run check`, `npm run qa:responsive-audit`, Chrome headless `/account` và `/account?preview=loggedin`, click `Dashboard` về `/`.
+
 ### T-0306 - Tạo legal/support routes skeleton
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -1017,6 +1058,16 @@ Goal:
 Update khi xong:
 
 - Ghi routes legal/support đã tạo.
+
+Cập nhật hoàn tất 2026-05-18:
+
+- Đã tạo `apps/web/src/app/legal/privacy/page.tsx` cho route `/legal/privacy`.
+- Đã tạo `apps/web/src/app/legal/terms/page.tsx` cho route `/legal/terms`.
+- Đã tạo `apps/web/src/app/support/page.tsx` cho route `/support`.
+- Các page dùng `PageShell` `containerWidth="narrow"` và back link về `/`.
+- Footer đã trỏ sẵn các route legal/support nên không cần sửa.
+- Copy là skeleton; T-0801 sẽ rà soát pháp lý/biên tập trước launch.
+- Verify: `npm run check`, `npm run qa:responsive-audit`, Chrome headless 375px cho 3 route, click `Dashboard` về `/`.
 
 ## Phase 4 - Shared Contracts Và Backend Boundary
 
@@ -2166,4 +2217,3 @@ Cập nhật hoàn tất 2026-05-16:
 - Đã cập nhật `docs/product-specs/tarot-workflow-reference.md` thành spec chi tiết cho landing/daily/topic/spread/reading/result/history/library.
 - Đã chia MVP/P1/P2 để tránh app phình.
 - Đã cập nhật `docs/modules/tarot.md`.
-

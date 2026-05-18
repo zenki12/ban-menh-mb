@@ -1,16 +1,33 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ReactNode,
+} from "react";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonSharedProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
+  disabled?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   fullWidth?: boolean;
 };
+
+type ButtonAsButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonSharedProps & {
+    href?: undefined;
+  };
+
+type ButtonAsAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> &
+  ButtonSharedProps & {
+    href: string;
+  };
+
+export type ButtonProps = ButtonAsButtonProps | ButtonAsAnchorProps;
 
 const baseClasses = [
   "inline-flex items-center justify-center gap-2 rounded-lg font-bold",
@@ -87,28 +104,54 @@ export function Button({
   fullWidth = false,
   className,
   children,
-  type = "button",
+  href,
+  type,
   ...rest
 }: ButtonProps) {
   const isDisabled = disabled || loading;
-
-  return (
-    <button
-      type={type}
-      className={joinClasses(
-        baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
-        fullWidth && "w-full",
-        className,
-      )}
-      disabled={isDisabled}
-      aria-busy={loading || undefined}
-      {...rest}
-    >
+  const buttonType = (type ?? "button") as ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  const classes = joinClasses(
+    baseClasses,
+    variantClasses[variant],
+    sizeClasses[size],
+    fullWidth && "w-full",
+    isDisabled && "pointer-events-none opacity-50 shadow-none",
+    className,
+  );
+  const content = (
+    <>
       {loading ? <Spinner /> : leftIcon}
       <span>{children}</span>
       {!loading && rightIcon}
+    </>
+  );
+
+  if (href) {
+    const { tabIndex, ...anchorRest } = rest as AnchorHTMLAttributes<HTMLAnchorElement>;
+
+    return (
+      <a
+        {...anchorRest}
+        className={classes}
+        href={isDisabled ? undefined : href}
+        aria-busy={loading || undefined}
+        aria-disabled={isDisabled ? "true" : undefined}
+        tabIndex={isDisabled ? -1 : tabIndex}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      {...(rest as ButtonHTMLAttributes<HTMLButtonElement>)}
+      type={buttonType}
+      className={classes}
+      disabled={isDisabled}
+      aria-busy={loading || undefined}
+    >
+      {content}
     </button>
   );
 }

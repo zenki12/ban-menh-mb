@@ -143,3 +143,24 @@ Format timestamp trong DEVLOG: `YYYY-MM-DD HH:mm +07`.
 
 Cursor **được làm:** code theo task, chạy test, cập nhật docs, đề xuất ADR.
 Cursor **không được:** deploy production, giữ secret thật trong chat, tự đổi scope, tự mark Done khi chưa đủ DoD.
+
+## 8. Requesting Code Review (trước khi báo Done)
+
+Trước khi đổi task sang Done, request code review cho Claude:
+
+**Lấy git SHAs:**
+```bash
+BASE_SHA=$(git rev-parse HEAD~1)
+HEAD_SHA=$(git rev-parse HEAD)
+```
+
+**Tạo review request với:**
+- `DESCRIPTION` — Tóm tắt những gì đã làm
+- `REQUIREMENTS` — Link task trong `TASK_REGISTRY.md`
+- `BASE_SHA` / `HEAD_SHA` — Commit range
+
+**Xử lý feedback:**
+- **Critical** → fix ngay, không tiếp tục
+- **Important** → fix trước khi Done
+- **Minor** → ghi vào DEVLOG, để sau
+- Nếu reviewer sai → phản biện bằng lý do kỹ thuật cụ thể
