@@ -1229,7 +1229,32 @@ Update khi xong:
 
 ### T-0403 - Tạo data schemas/types
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- Đã thêm `"zod": "^3.23.8"` vào `packages/shared/package.json` (theo ADR-005). Dùng v3 để khớp với `apps/web` đang dùng `^3.23.8`, tránh 2 phiên bản zod trong tree. Zod stable mới nhất là v4.4.3 — nâng cấp nên là task riêng khi cần.
+- Đã tạo 8 schema files trong `packages/shared/src/schemas/`, tất cả mirror đúng `data-contract.md` mục 2:
+  - `common.ts` (37 dòng): `timestampSchema`, `idSchema`, `vndAmountSchema`, `isoDateSchema`, `emailSchema`, `moduleSchema`, `currencySchema`.
+  - `user.ts` (20 dòng): `userSchema` + `User` type — mirror `users` collection.
+  - `report.ts` (41 dòng): `reportSchema` + `Report` type, `reportInputSnapshotSchema` — mirror `reports` collection.
+  - `purchase.ts` (45 dòng): `purchaseSchema` + `Purchase` type — mirror `purchases` collection.
+  - `entitlement.ts` (34 dòng): `entitlementSchema` + `Entitlement` type — mirror `entitlements` collection.
+  - `voucher.ts` (28 dòng): `voucherSchema` + `Voucher` type — mirror `vouchers` collection.
+  - `payment-log.ts` (26 dòng): `paymentLogSchema` + `PaymentLog` type — mirror `payment_logs` collection.
+  - `tarot-reading.ts` (41 dòng): `tarotReadingSchema` + `TarotReading` type — mirror `tarot_readings` collection.
+  - `index.ts` (11 dòng): barrel export tất cả.
+- Đã cập nhật `packages/shared/src/index.ts`: thêm `export * from "./schemas"`.
+- Verify pass: `npm run check` (typecheck + lint + security:smoke + build).
+
+**Deviation giữa task prompt và data-contract.md (đã theo data-contract.md):**
+- `report.module`: task gợi ý `"numerology" | "tarot"`, data-contract.md chỉ có `"numerology"` — dùng `z.literal("numerology")`.
+- `report.status`: task gợi ý `draft/ready/archived`, data-contract.md dùng `free/unlocked` — dùng đúng spec.
+- `purchase`: task gợi ý `amountVnd`/`payosOrderId`/`discountVnd`, data-contract.md dùng `amount`/`providerRef`/không có `discountVnd` — dùng đúng spec.
+- `entitlement`: task gợi ý `productCode`/`source`/`grantedAt`, data-contract.md dùng `module`/`type`/`purchaseId`/`startsAt`/`lifetime` — dùng đúng spec.
+- `voucher.modules`: task gợi ý `z.enum(["numerology","tarot","bundle","all"])`, data-contract.md dùng `Array<"numerology" | "tarot">` — dùng đúng spec.
+- `tarot_readings.spread`: task gợi ý `"one_card" | "three_cards"`, data-contract.md dùng `1 | 3 | 5 | 7 | 10 | 12` — dùng đúng spec (MVP chỉ dùng 1 và 3 nhưng schema giữ đủ).
+- Cần Zenki review các deviation này và cập nhật `data-contract.md` nếu muốn thay đổi.
 
 Bối cảnh:
 

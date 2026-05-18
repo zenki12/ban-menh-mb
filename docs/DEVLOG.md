@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 14:30 +07 | T-0403 | Tạo data schemas/types với Zod | `Task` |
 | 2026-05-18 13:30 +07 | T-0402 | Tạo shared error contract | `Task` |
 | 2026-05-18 12:20 +07 | T-0401 | Đồng bộ legal-commercial-spec mục 7 với pricing.ts | `Correction` |
 | 2026-05-18 12:05 +07 | T-0401 | Tạo shared product/pricing contract | `Task` |
@@ -70,7 +71,55 @@
 
 ---
 
-## [2026-05-18 13:30 +07] — T-0402: Tạo shared error contract
+## [2026-05-18 14:30 +07] — T-0403: Tạo data schemas/types với Zod
+
+**Loại:** `Task`
+**Ref:** T-0403
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Tạo 7 entity schemas + common primitives trong `packages/shared/src/schemas/`, mirror đúng `data-contract.md`. Thêm zod v3 vào shared package. Mọi schema export cả Zod object lẫn inferred TypeScript type.
+
+### Thay đổi
+- `packages/shared/package.json`: thêm `"zod": "^3.23.8"`.
+- `packages/shared/src/schemas/common.ts` (37 dòng): primitives chung.
+- `packages/shared/src/schemas/user.ts` (20 dòng): `userSchema` + `User`.
+- `packages/shared/src/schemas/report.ts` (41 dòng): `reportSchema` + `Report` + `reportInputSnapshotSchema`.
+- `packages/shared/src/schemas/purchase.ts` (45 dòng): `purchaseSchema` + `Purchase`.
+- `packages/shared/src/schemas/entitlement.ts` (34 dòng): `entitlementSchema` + `Entitlement`.
+- `packages/shared/src/schemas/voucher.ts` (28 dòng): `voucherSchema` + `Voucher`.
+- `packages/shared/src/schemas/payment-log.ts` (26 dòng): `paymentLogSchema` + `PaymentLog`.
+- `packages/shared/src/schemas/tarot-reading.ts` (41 dòng): `tarotReadingSchema` + `TarotReading`.
+- `packages/shared/src/schemas/index.ts` (11 dòng): barrel export.
+- `packages/shared/src/index.ts`: thêm `export * from "./schemas"`.
+- `docs/TASK_REGISTRY.md`: T-0403 → `Done`.
+
+### Không làm
+- Không implement storage layer (T-0404).
+- Không implement auth/entitlement service (T-0405/T-0406).
+- Không thêm dependency nào khác ngoài zod.
+- Không hardcode magic string (dùng `z.enum`/`z.literal`).
+
+### Deviation task prompt vs data-contract.md (đã theo data-contract.md)
+- `report.module`: prompt gợi ý `"numerology"|"tarot"` → spec chỉ có `"numerology"` → dùng `z.literal("numerology")`.
+- `report.status`: prompt gợi ý `draft/ready/archived` → spec dùng `free/unlocked`.
+- `purchase`: prompt gợi ý `amountVnd`/`payosOrderId` → spec dùng `amount`/`providerRef`.
+- `entitlement`: prompt gợi ý `productCode`/`source`/`grantedAt` → spec dùng `module`/`type`/`purchaseId`/`startsAt`.
+- `voucher.modules`: prompt gợi ý `enum(["numerology","tarot","bundle","all"])` → spec dùng `Array<"numerology"|"tarot">`.
+- `tarot_readings.spread`: prompt gợi ý `"one_card"|"three_cards"` → spec dùng `1|3|5|7|10|12`.
+- **Cần Zenki review và cập nhật `data-contract.md` nếu muốn thay đổi.**
+
+### Verify
+- `npm run check` → Pass (typecheck + lint + security:smoke + build).
+- Tất cả schema files < 100 dòng (max: purchase.ts 45 dòng).
+- Zod v3.25.76 hoisted tại root `node_modules/zod`.
+
+### Rủi ro / lưu ý còn lại
+- Zod stable mới nhất là v4.4.3; dùng v3 để khớp `apps/web`. Nâng cấp lên v4 nên là task riêng.
+- API request/response schemas (payment create, check, voucher validate) chưa tạo — sẽ vào khi Worker payment (T-0501+) được implement.
+- `tarot_readings.spread` giữ đủ 6 giá trị (1/3/5/7/10/12) dù MVP chỉ dùng 1 và 3 lá (ADR-003), để không phải migrate schema sau.
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0402
