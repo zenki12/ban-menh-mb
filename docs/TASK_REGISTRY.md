@@ -1388,7 +1388,33 @@ Update khi xong:
 
 ### T-0406 - Implement entitlement service
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-18):
+
+- **Firestore Admin:** `admin.ts` thêm `adminFirestore = getFirestore(getAdminApp())` (29 dòng).
+- **Firestore adapters** (`apps/web/src/lib/firestore/`):
+  - `converters.ts` (53 dòng): `convertFirestoreTimestamp`, `fromFirestoreDoc<T>`, `toFirestoreDoc`.
+  - `user-repository.ts` (106 dòng): implement `UserRepository` + `ensureUser()` — auto-tạo/merge user doc khi login.
+  - `entitlement-repository.ts` (65 dòng): implement `EntitlementRepository` — deterministic doc id `${userId}_${purchaseId}`, idempotent create.
+  - `purchase-repository.ts` (48 dòng): chỉ implement `getById` + `getByOrderId`. Các method khác throw rõ ràng "Implement ở T-0503".
+- **Entitlement service** (`apps/web/src/lib/entitlements/service.ts`, 144 dòng):
+  - `grantEntitlementFromPurchase(purchase, ctx)`: verify confirmed + userId match, map productCode → entitlement spec, set expiresAt 90 ngày cho session, lifetime cho single_report.
+  - `checkEntitlement(userId, productCode, reportId?)`: check active entitlement.
+  - `grantFromPurchaseId(purchaseId, ctx)`: lookup purchase rồi grant (dùng cho webhook T-0503).
+- **API routes:**
+  - `POST /api/auth/session` (75 dòng): thêm `ensureUser()` sau verifyIdToken — non-blocking nếu Firestore fail.
+  - `GET /api/entitlements` (46 dòng): verify Bearer → listByUser → `{ items }`.
+  - `POST /api/entitlements/check` (72 dòng): verify Bearer + Zod body → checkEntitlement.
+- **Frontend:**
+  - `AuthProvider.tsx` (157 dòng): thêm `syncSessionToFirestore()` non-blocking sau onAuthStateChanged.
+  - `lib/api/client.ts` (58 dòng): `fetchWithAuth()` tự lấy credential + Authorization header.
+  - `account/page.tsx` (190 dòng): fetch `/api/entitlements` khi user login, hiển thị EntitlementCard list hoặc EmptyState.
+- **Infra:**
+  - `infra/firestore.rules` (52 dòng): rules cho users/entitlements/purchases/vouchers/payment_logs/tarot_readings. CHƯA deploy.
+  - `infra/firestore.indexes.json`: composite indexes cho entitlements + tarot_readings.
+- Verify pass: `npm run check` + `npm run qa:responsive-audit`. 3 API routes dynamic, `/account` static.
+- Security-smoke false positive `idToken` → đổi tên biến thành `credential`/`getFirebaseCredential()`.
 
 Bối cảnh:
 

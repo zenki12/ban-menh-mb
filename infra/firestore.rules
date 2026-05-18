@@ -1,0 +1,52 @@
+// Firestore Security Rules — Bản Mệnh V2
+// Deploy bằng: firebase deploy --only firestore:rules
+// CHƯA deploy ở T-0406 — cần Firebase CLI login và project ID chính thức.
+// Review lại trước khi deploy production (T-0801).
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users: chỉ owner đọc/ghi doc của mình.
+    // Server (admin SDK) bypass rules — không cần grant thêm.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Entitlements: user chỉ đọc entitlement của mình.
+    // KHÔNG cho client write — chỉ server qua admin SDK.
+    match /entitlements/{entitlementId} {
+      allow read: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+      allow write: if false; // server-only via admin SDK
+    }
+
+    // Purchases: server-only. Client không đọc/ghi trực tiếp.
+    match /purchases/{purchaseId} {
+      allow read, write: if false;
+    }
+
+    // Vouchers: server-only.
+    match /vouchers/{voucherCode} {
+      allow read, write: if false;
+    }
+
+    // Payment logs: server-only, append-only.
+    match /payment_logs/{logId} {
+      allow read, write: if false;
+    }
+
+    // Tarot readings: user chỉ đọc/ghi của mình.
+    match /tarot_readings/{readingId} {
+      allow read: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+      allow write: if false; // server-only via admin SDK
+    }
+
+    // Deny all other paths.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

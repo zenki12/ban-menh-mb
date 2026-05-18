@@ -2,10 +2,11 @@
 // firebase-admin không chạy trên Edge runtime — route handler phải set
 // export const runtime = "nodejs".
 
-import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
+import { cert, getApp, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth, type Auth } from "firebase-admin/auth";
+import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
-function getAdminApp() {
+function getAdminApp(): App {
   if (getApps().length > 0) return getApp();
 
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -25,3 +26,4 @@ function getAdminApp() {
 }
 
 export const adminAuth: Auth = getAuth(getAdminApp());
+export const adminFirestore: Firestore = getFirestore(getAdminApp());

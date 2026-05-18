@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 18:00 +07 | T-0406 | Implement entitlement service | `Task` |
 | 2026-05-18 17:00 +07 | T-0405 | Fix Next.js env inlining bug trong client.ts | `Correction` |
 | 2026-05-18 16:30 +07 | T-0405 | Implement auth/account boundary | `Task` |
 | 2026-05-18 15:15 +07 | T-0404 | Tạo storage adapter interfaces | `Task` |
@@ -74,7 +75,52 @@
 
 ---
 
-## [2026-05-18 17:00 +07] — T-0405: Correction — fix Next.js env inlining bug trong client.ts
+## [2026-05-18 18:00 +07] — T-0406: Implement entitlement service
+
+**Loại:** `Task`
+**Ref:** T-0406
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Firestore adapters (User + Entitlement + Purchase partial) + entitlement service + 2 API routes + wire frontend account page. Idempotent grant qua deterministic doc id.
+
+### Thay đổi
+- `apps/web/src/lib/firebase/admin.ts`: thêm `adminFirestore`.
+- `apps/web/src/lib/firestore/converters.ts` (53 dòng): Firestore timestamp converters.
+- `apps/web/src/lib/firestore/user-repository.ts` (106 dòng): `firestoreUserRepository` + `ensureUser()`.
+- `apps/web/src/lib/firestore/entitlement-repository.ts` (65 dòng): `firestoreEntitlementRepository`, idempotent create.
+- `apps/web/src/lib/firestore/purchase-repository.ts` (48 dòng): chỉ `getById`/`getByOrderId`. Các method khác throw "Implement ở T-0503".
+- `apps/web/src/lib/firestore/index.ts`: barrel.
+- `apps/web/src/lib/entitlements/service.ts` (144 dòng): `grantEntitlementFromPurchase`, `checkEntitlement`, `grantFromPurchaseId`.
+- `apps/web/src/app/api/auth/session/route.ts` (75 dòng): thêm `ensureUser` non-blocking.
+- `apps/web/src/app/api/entitlements/route.ts` (46 dòng): `GET /api/entitlements`.
+- `apps/web/src/app/api/entitlements/check/route.ts` (72 dòng): `POST /api/entitlements/check`.
+- `apps/web/src/lib/api/client.ts` (58 dòng): `fetchWithAuth()`.
+- `apps/web/src/lib/auth/AuthProvider.tsx` (157 dòng): `syncSessionToFirestore` non-blocking.
+- `apps/web/src/app/account/page.tsx` (190 dòng): fetch entitlements + EntitlementCard.
+- `infra/firestore.rules` (52 dòng): security rules — CHƯA deploy.
+- `infra/firestore.indexes.json`: composite indexes.
+
+### Không làm
+- Không implement payment flow (T-0501-T-0503).
+- Không cho frontend write Firestore trực tiếp.
+- Không mock purchase data.
+- Không deploy Firestore rules (cần Firebase CLI login).
+
+### Verify
+- `npm run check` → Pass (typecheck + lint + security:smoke + build).
+- `npm run qa:responsive-audit` → Pass.
+- 3 API routes dynamic: `/api/auth/session`, `/api/entitlements`, `/api/entitlements/check`.
+- Tất cả file sizes trong giới hạn (max: account/page.tsx 190 dòng).
+
+### Rủi ro / lưu ý còn lại
+- Firestore rules + indexes CHƯA deploy — cần `firebase deploy --only firestore:rules,firestore:indexes` trước production.
+- `PurchaseRepository` chỉ có `getById`/`getByOrderId` — các method còn lại sẽ implement ở T-0503 (worker payment).
+- Test thật cần Firebase project với Firestore enabled + `.env.local` đầy đủ.
+- `security-smoke` false positive `idToken` → đổi tên biến. Nên cập nhật `security-smoke.mjs` whitelist sau.
+- Audit P0.2 (fake entitlement từ frontend): đã chặn — frontend không write Firestore, chỉ đọc qua API có verify token.
+
+---
 
 **Loại:** `Correction`
 **Ref:** T-0405

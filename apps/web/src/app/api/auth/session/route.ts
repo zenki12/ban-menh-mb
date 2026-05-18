@@ -5,6 +5,7 @@ import { createError } from "@banmenh/shared";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { adminAuth } from "../../../../lib/firebase/admin";
+import { ensureUser } from "../../../../lib/firestore";
 
 /**
  * Body: { credential: string } — Firebase ID token từ client SDK.
@@ -33,21 +34,42 @@ export async function POST(request: Request) {
     );
   }
 
+  let decoded: Awaited<ReturnType<typeof adminAuth.verifyIdToken>>;
   try {
-    const decoded = await adminAuth.verifyIdToken(parsed.data.credential);
-    return NextResponse.json({
-      uid: decoded.uid,
-      email: decoded.email ?? null,
-      displayName: decoded.name ?? null,
-      photoURL: decoded.picture ?? null,
-      provider: decoded.firebase?.sign_in_provider ?? null,
-      isAnonymous: !decoded.email,
-      emailVerified: decoded.email_verified ?? false,
-    });
+    decoded = await adminAuth.verifyIdToken(parsed.data.credential);
   } catch {
     return NextResponse.json(
       { error: createError("AUTH_INVALID_TOKEN") },
       { status: 401 },
     );
   }
+
+  // Auto-tạo hoặc update Firestore user doc — không block login nếu fail.
+  try {
+    await ensureUser(
+      decoded.uid,
+      {
+        email: decoded.email ?? null,
+        displayName: decoded.name ?? null,
+        photoURL: decoded.picture ?? null,
+        provider:
+          decoded.firebase?.sign_in_provider === "anonymous"
+            ? "anonymous"
+            : "google",
+      },
+      { userId: decoded.uid },
+    );
+  } catch (err) {
+    console.warn("[session] ensureUser failed (non-blocking):", err);
+  }
+
+  return NextResponse.json({
+    uid: decoded.uid,
+    email: decoded.email ?? null,
+    displayName: decoded.name ?? null,
+    photoURL: decoded.picture ?? null,
+    provider: decoded.firebase?.sign_in_provider ?? null,
+    isAnonymous: !decoded.email,
+    emailVerified: decoded.email_verified ?? false,
+  });
 }

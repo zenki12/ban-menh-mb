@@ -16,7 +16,6 @@ import {
 } from "firebase/auth";
 import {
   createContext,
-  useContext,
   useEffect,
   useState,
   type ReactNode,
@@ -34,7 +33,7 @@ type AuthContextValue = {
   signOutFn: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 function mapFirebaseUser(fbUser: FirebaseUser): SharedUser {
   const now = new Date().toISOString();
@@ -52,20 +51,29 @@ function mapFirebaseUser(fbUser: FirebaseUser): SharedUser {
 function mapFirebaseError(err: unknown): AppError | null {
   if (typeof err !== "object" || err === null) return null;
   const code = (err as { code?: string }).code ?? "";
-  // User tự cancel popup — không coi là lỗi
   if (
     code === "auth/cancelled-popup-request" ||
     code === "auth/popup-closed-by-user"
   ) {
     return null;
   }
-  if (code === "auth/network-request-failed") {
-    return createError("NETWORK_ERROR");
-  }
-  if (code === "auth/invalid-credential") {
-    return createError("AUTH_INVALID_TOKEN");
-  }
+  if (code === "auth/network-request-failed") return createError("NETWORK_ERROR");
+  if (code === "auth/invalid-credential") return createError("AUTH_INVALID_TOKEN");
   return createError("INTERNAL_ERROR");
+}
+
+/** Gọi /api/auth/session để ensure Firestore user doc — non-blocking. */
+async function syncSessionToFirestore(fbUser: FirebaseUser): Promise<void> {
+  try {
+    const credential = await fbUser.getIdToken();
+    await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+    });
+  } catch (err) {
+    console.warn("[AuthProvider] syncSession failed (non-blocking):", err);
+  }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -77,6 +85,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (fbUser) => {
       setUser(fbUser ? mapFirebaseUser(fbUser) : null);
       setLoading(false);
+      if (fbUser) {
+        // Ensure Firestore user doc — không await để không block UI
+        void syncSessionToFirestore(fbUser);
+      }
     });
     return unsubscribe;
   }, []);
@@ -143,5 +155,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
-export { AuthContext };
