@@ -34,3 +34,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .claude/
+
+# Cloudflare Workers local secrets
+workers/*/.dev.vars
+workers/*/.wrangler/

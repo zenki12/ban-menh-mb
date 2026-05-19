@@ -1542,7 +1542,11 @@ Update khi xong:
 
 ### T-0503 - Implement payment webhook
 
-Status: Todo
+Status: In Progress
+
+> Chia thành 2 sub-task:
+> - **T-0503a** (scaffold Hono Worker): tạo workers/payment/ chạy được local, /health endpoint.
+> - **T-0503b** (webhook logic): PayOS signature verify, Firestore REST API, entitlement grant.
 
 Bối cảnh:
 

@@ -1,7 +1,7 @@
 # Resource thật điền qua wrangler secret put, không commit.
 name = "banmenh-payment"
 main = "src/index.ts"
-compatibility_date = "2026-05-16"
+compatibility_date = "2026-05-18"
 
 [env.dev]
 name = "banmenh-payment-dev"

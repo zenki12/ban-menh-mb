@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-19 23:30 +07 | T-0503a | Scaffold Cloudflare Worker với Hono | `Task` |
 | 2026-05-18 21:30 +07 | T-0401 | Pricing strategy correction — Tarot subscription model | `Correction` |
 | 2026-05-18 21:00 +07 | T-0406 | Fix Firestore undefined field error | `Correction` |
 | 2026-05-18 20:30 +07 | T-0502 | Payment check API + success/cancel pages + pricing wire | `Task` |
@@ -79,7 +80,42 @@
 
 ---
 
-## [2026-05-18 21:30 +07] — T-0401: Correction — Pricing strategy: Tarot subscription model
+## [2026-05-19 23:30 +07] — T-0503a: Scaffold Cloudflare Worker với Hono
+
+**Loại:** `Task`
+**Ref:** T-0503a (sub-task của T-0503)
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Worker đầu tiên scaffold xong với Hono. /health endpoint verify pattern Hono work. Wrangler dev chạy port 8787 local.
+
+### Thay đổi
+- `workers/payment/package.json`: `@banmenh/payment-worker`, hono `^4.6.0`, wrangler `^4.93.0` (bump từ 3.85 để fix HIGH esbuild vuln).
+- `workers/payment/tsconfig.json`: target es2022, `@cloudflare/workers-types`.
+- `workers/payment/wrangler.toml`: cập nhật `compatibility_date = "2026-05-18"`, giữ env.dev/production skeleton.
+- `workers/payment/src/index.ts` (35 dòng): Hono app, logger middleware, GET `/`, GET `/health`, POST `/webhook/payos` → 501 placeholder.
+- `workers/payment/.dev.vars`: placeholder secrets (gitignored).
+- `workers/payment/README.md`: cập nhật status + endpoints.
+- `.gitignore`: thêm `workers/*/.dev.vars`.
+- `docs/TASK_REGISTRY.md`: T-0503 → In Progress, ghi rõ chia 0503a/0503b.
+
+### Verify
+- `npm install` trong `workers/payment/` → packages hoist lên root `node_modules` (npm workspaces behavior).
+- `wrangler dev --port 8787` → `Ready on http://127.0.0.1:8787`.
+- `GET /` → `"Bản Mệnh V2 — Payment Worker"`.
+- `GET /health` → `{ ok: true, service: "payment-worker", timestamp: "..." }`.
+- `POST /webhook/payos` → 501 `{ ok: false, error: "Not implemented yet (T-0503b)" }`.
+- `npm run check` ở root → Pass (chỉ Next.js, không bao workers/).
+
+### T-0503b sẽ implement
+- PayOS signature verify (HMAC-SHA256).
+- Firestore REST API (không dùng firebase-admin — không chạy ở Workers).
+- Purchase status update: pending → confirmed.
+- Entitlement grant idempotent.
+- Payment log append.
+- Telegram alert.
+
+---
 
 **Loại:** `Correction`
 **Ref:** T-0401
