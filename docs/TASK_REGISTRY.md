@@ -1610,6 +1610,46 @@ Update khi xong:
 
 - Ghi alert đã test.
 
+### T-0504b - Telegram reminder cho subscription sắp hết hạn
+
+Status: Todo
+
+Bối cảnh:
+
+- Tarot subscription (tarot_guide_monthly, tarot_guide_quarterly) KHÔNG auto-renew.
+- User cần được nhắc trước khi hết hạn để chủ động gia hạn.
+- Không có reminder → user mất quyền truy cập mà không biết → trải nghiệm xấu.
+
+Yêu cầu:
+
+- Cron job chạy daily 8:00 +07.
+- Query Firestore: entitlements có `type = "tarot_guide"`, `status = "active"`, `expiresAt` trong vòng 3 ngày tới.
+- Gửi Telegram message cho từng user (nếu có Telegram linked) hoặc log để admin xử lý.
+- Idempotent: không gửi trùng nếu cron chạy lại trong ngày.
+- Không auto-renew, không tự tạo purchase.
+
+Output cần có:
+
+- Cron script hoặc scheduled Worker.
+- Telegram message template tiếng Việt.
+- Idempotency mechanism (vd: flag `reminderSentAt` trên entitlement doc).
+
+Goal:
+
+- User biết subscription sắp hết hạn, có thể gia hạn chủ động.
+
+Điều kiện Done:
+
+- Cron chạy được.
+- Telegram message gửi đúng user.
+- Không gửi trùng trong cùng ngày.
+- Không tự tạo purchase/entitlement.
+
+Update khi xong:
+
+- Ghi template message.
+- Ghi idempotency mechanism.
+
 ### T-0505 - Implement voucher validate API
 
 Status: Todo

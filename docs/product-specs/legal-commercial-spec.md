@@ -119,23 +119,20 @@ Giá chính thức và copy pricing đến từ `packages/shared/src/pricing.ts`
 
 Thần số học:
 
-- "99.000₫ / 1 báo cáo".
-- "Mở khóa vĩnh viễn cho hồ sơ đã mua".
+- "99.000₫ / 1 báo cáo" — mở khóa vĩnh viễn cho hồ sơ đã mua.
 - Không dùng chữ "không giới hạn" nếu chỉ áp dụng cho một report.
 
-Tarot:
+Tarot (subscription, KHÔNG auto-renew):
 
-- Phiên 1 lá: "49.000₫ / phiên".
-- Phiên 3 lá: "79.000₫ / phiên".
+- Tarot 1 tháng: "29.000₫ / 30 ngày" — trải bài 1 lá và 3 lá không giới hạn.
+- Tarot 3 tháng: "79.000₫ / 90 ngày" — tiết kiệm ~9% so với mua từng tháng.
+- Phải ghi rõ "Hiệu lực X ngày" — không gọi là subscription tự động.
+- Không auto-renew; có Telegram reminder 3 ngày trước hết hạn (T-0504b).
 - Không hứa quyền/gói ngoài scope trong V2 nếu chưa có chính sách riêng được user approve.
-- Nếu có monthly tier, phải ghi rõ là theo tháng.
-- Nếu chưa có auto-renew, không gọi là subscription tự động.
 
-Combo:
+Bundle:
 
-- "Gói Khám phá: 249.000₫".
-- Bao gồm: 1 báo cáo Thần số học (vĩnh viễn) + 2 phiên Tarot 3 lá (90 ngày).
-- Phải ghi rõ thời hạn 90 ngày cho phần phiên Tarot, không gây hiểu nhầm vĩnh viễn.
+- Defer khỏi MVP. Không hiển thị trên pricing page cho đến khi có task riêng.
 
 Lưu ý chung:
 

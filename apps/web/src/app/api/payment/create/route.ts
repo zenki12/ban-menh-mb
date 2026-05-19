@@ -105,7 +105,8 @@ export async function POST(request: Request) {
       },
       ctx,
     );
-  } catch {
+  } catch (err) {
+    console.error("[payment/create] firestore create failed:", err);
     return NextResponse.json(
       { error: createError("INTERNAL_ERROR") },
       { status: 500 },

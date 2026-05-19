@@ -37,6 +37,8 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-18 21:30 +07 | T-0401 | Pricing strategy correction — Tarot subscription model | `Correction` |
+| 2026-05-18 21:00 +07 | T-0406 | Fix Firestore undefined field error | `Correction` |
 | 2026-05-18 20:30 +07 | T-0502 | Payment check API + success/cancel pages + pricing wire | `Task` |
 | 2026-05-18 19:30 +07 | T-0501 | Implement payment create API | `Task` |
 | 2026-05-18 18:00 +07 | T-0406 | Implement entitlement service | `Task` |
@@ -77,7 +79,60 @@
 
 ---
 
-## [2026-05-18 20:30 +07] — T-0502: Payment check API + success/cancel pages + pricing wire
+## [2026-05-18 21:30 +07] — T-0401: Correction — Pricing strategy: Tarot subscription model
+
+**Loại:** `Correction`
+**Ref:** T-0401
+**Môi trường:** `DEV/TEST`
+
+### Thay đổi pricing strategy (chốt sau brainstorm với Zenki)
+
+**Trước:**
+- `numerology_single_report` 99k, `tarot_session_one` 49k, `tarot_session_three` 79k, `bundle_explorer` 249k.
+
+**Sau (3 sản phẩm):**
+- `numerology_single_report` — 99.000₫ — lifetime single_report.
+- `tarot_guide_monthly` — 29.000₫ — subscription 30 ngày.
+- `tarot_guide_quarterly` — 79.000₫ — subscription 90 ngày, tiết kiệm ~9%.
+- Bundle: defer khỏi MVP.
+- Tarot Master tier 109k: defer.
+- Subscription KHÔNG auto-renew; Telegram reminder T-0504b.
+
+### Thay đổi code
+- `packages/shared/src/pricing.ts` (96 dòng): thay PRODUCTS array, giữ helpers.
+- `apps/web/src/lib/entitlements/service.ts`: cập nhật `PRODUCT_ENTITLEMENT_MAP` — monthly=30 ngày, quarterly=90 ngày.
+- `docs/product-specs/legal-commercial-spec.md` mục 7: đồng bộ pricing copy mới.
+- `docs/TASK_REGISTRY.md`: thêm T-0504b "Telegram reminder cho subscription sắp hết hạn".
+
+### Không làm
+- Không implement reminder (T-0504b).
+- Không xóa data Firestore (purchase docs cũ sẽ orphan, không migration).
+- Không implement auto-renew.
+
+### Verify
+- `npm run check` → Pass. `pricing.ts` 96 dòng (<150).
+
+### Rủi ro / lưu ý
+- Purchase docs cũ trong Firestore (tarot_session_one, tarot_session_three, bundle_explorer) sẽ orphan — không migration, không ảnh hưởng production vì chưa có payment thật.
+- `pricing/page.tsx` hiển thị bundle group nếu `getProductsByModule("bundle")` trả kết quả — hiện trả rỗng vì không còn bundle product → section bundle không render (đúng behavior).
+
+---
+
+**Loại:** `Correction`
+**Ref:** T-0406
+**Môi trường:** `DEV/TEST`
+
+### Vấn đề
+Firestore Admin SDK reject document có field value `undefined`. Optional fields trong schema (`voucherCode`, `expiresAt`, `providerRef`, `photoURL`, ...) khi không có giá trị thì là `undefined` → crash khi write.
+
+### Fix
+`apps/web/src/lib/firebase/admin.ts`: thêm `getAdminFirestore()` wrapper gọi `fs.settings({ ignoreUndefinedProperties: true })` — Firestore tự strip `undefined` fields trước khi write. `try/catch` để tránh crash khi hot reload re-import (settings chỉ call được 1 lần).
+
+### Verify
+- `npm run check` → Pass. File `admin.ts` 43 dòng (<60).
+- Payment create flow now writes purchase doc OK (undefined fields bị strip thay vì crash).
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0502

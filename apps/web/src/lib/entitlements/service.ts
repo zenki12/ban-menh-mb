@@ -27,15 +27,11 @@ const PRODUCT_ENTITLEMENT_MAP: Record<string, EntitlementSpec[]> = {
   numerology_single_report: [
     { module: "numerology", type: "single_report" },
   ],
-  tarot_session_one: [
-    { module: "tarot", type: "tarot_guide", expiresInDays: 90 },
+  tarot_guide_monthly: [
+    { module: "tarot", type: "tarot_guide", expiresInDays: 30 },
   ],
-  tarot_session_three: [
+  tarot_guide_quarterly: [
     { module: "tarot", type: "tarot_guide", expiresInDays: 90 },
-  ],
-  bundle_explorer: [
-    { module: "numerology", type: "single_report", idSuffix: "_num" },
-    { module: "tarot", type: "tarot_guide", expiresInDays: 90, idSuffix: "_tarot" },
   ],
 };
 

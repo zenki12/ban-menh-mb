@@ -25,5 +25,19 @@ function getAdminApp(): App {
   return initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
 }
 
+function getAdminFirestore(): Firestore {
+  const fs = getFirestore(getAdminApp());
+  // ignoreUndefinedProperties: Firestore tự strip undefined fields trước khi write.
+  // Cần thiết vì optional fields trong schema (voucherCode, expiresAt, providerRef, ...)
+  // có thể là undefined — Firestore Admin SDK reject nếu không set.
+  // settings() chỉ call được 1 lần; catch để tránh crash khi hot reload re-import.
+  try {
+    fs.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // Settings đã được set trước đó — bỏ qua.
+  }
+  return fs;
+}
+
 export const adminAuth: Auth = getAuth(getAdminApp());
-export const adminFirestore: Firestore = getFirestore(getAdminApp());
+export const adminFirestore: Firestore = getAdminFirestore();

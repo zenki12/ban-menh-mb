@@ -1,6 +1,12 @@
 // Shared product/pricing contract — nguồn sự thật duy nhất cho giá và gói.
 // Được kiểm soát bởi T-0401. Mọi thay đổi giá phải qua đây, không hardcode
 // nơi khác. Voucher/payment runtime sẽ vào ở T-0505/T-0506.
+//
+// Pricing strategy (chốt sau brainstorm 2026-05-18):
+// - Numerology: per-action lifetime (99k)
+// - Tarot: subscription 30-day pass (29k) + 90-day pass (79k), KHÔNG auto-renew
+// - Bundle: defer khỏi MVP
+// - Tarot Master tier: defer
 
 export type ProductModule = "numerology" | "tarot" | "bundle";
 
@@ -32,55 +38,42 @@ export const PRODUCTS = [
     module: "numerology",
     name: "Báo cáo Thần số học",
     description:
-      "Một bản luận giải Thần số học cá nhân hóa, mở khóa vĩnh viễn cho hồ sơ đã mua.",
+      "Báo cáo cá nhân hóa đầy đủ chỉ số, mở khóa vĩnh viễn cho hồ sơ đã mua.",
     priceVnd: 99000,
     tier: "single_report",
     features: [
-      "Báo cáo đầy đủ các chỉ số cốt lõi",
-      "Lưu vào tài khoản, đọc lại bất kỳ lúc nào",
-      "Xuất bản đẹp để xem trên mọi thiết bị",
+      "Đầy đủ 6+ chỉ số cốt lõi (Đường đời, Sứ mệnh, Linh hồn, Cá tính, Năm cá nhân, Tháng cá nhân)",
+      "Luận giải chi tiết từng chỉ số",
+      "Lưu vĩnh viễn trong tài khoản, đọc lại bất kỳ lúc nào",
     ],
   },
   {
-    code: "tarot_session_one",
+    code: "tarot_guide_monthly",
     module: "tarot",
-    name: "Phiên Tarot 1 lá",
+    name: "Tarot 1 tháng",
     description:
-      "Một phiên rút 1 lá nhanh để soi chiếu một câu hỏi cụ thể trong ngày.",
-    priceVnd: 49000,
-    tier: "session",
+      "Truy cập trải bài 1 lá và 3 lá không giới hạn trong 30 ngày.",
+    priceVnd: 29000,
+    tier: "subscription",
     features: [
-      "Rút 1 lá theo câu hỏi của bạn",
-      "Diễn giải xuôi/ngược rõ ràng",
-      "Lưu lịch sử để đối chiếu sau",
+      "Trải bài 1 lá và 3 lá không giới hạn",
+      "Lưu lịch sử trong tài khoản",
+      "Hiệu lực 30 ngày",
     ],
   },
   {
-    code: "tarot_session_three",
+    code: "tarot_guide_quarterly",
     module: "tarot",
-    name: "Phiên Tarot 3 lá",
+    name: "Tarot 3 tháng",
     description:
-      "Phiên 3 lá Quá khứ - Hiện tại - Tương lai cho góc nhìn đa chiều hơn.",
+      "Truy cập trải bài 1 lá và 3 lá không giới hạn trong 90 ngày, tiết kiệm 9%.",
     priceVnd: 79000,
-    tier: "session",
+    tier: "subscription",
     features: [
-      "Trải bài 3 lá theo trục thời gian",
-      "Diễn giải tổng hợp dòng chảy năng lượng",
-      "Gợi ý hành động phản tỉnh từ kết quả",
-    ],
-  },
-  {
-    code: "bundle_explorer",
-    module: "bundle",
-    name: "Gói Khám phá",
-    description:
-      "Combo tiết kiệm gồm 1 báo cáo Thần số học và 2 phiên Tarot 3 lá.",
-    priceVnd: 249000,
-    tier: "bundle",
-    features: [
-      "1 báo cáo Thần số học mở khóa vĩnh viễn",
-      "2 phiên Tarot 3 lá dùng trong 90 ngày",
-      "Tiết kiệm so với mua lẻ từng gói",
+      "Trải bài 1 lá và 3 lá không giới hạn",
+      "Lưu lịch sử trong tài khoản",
+      "Hiệu lực 90 ngày — tiết kiệm 8.000₫ (~9%) so với mua từng tháng",
+      "Reminder qua Telegram khi sắp hết hạn",
     ],
   },
 ] as const satisfies readonly Product[];
