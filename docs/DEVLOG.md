@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-19 23:55 +07 | T-0503b | PayOS webhook logic — Firestore REST + entitlement grant | `Task` |
 | 2026-05-19 23:30 +07 | T-0503a | Scaffold Cloudflare Worker với Hono | `Task` |
 | 2026-05-18 21:30 +07 | T-0401 | Pricing strategy correction — Tarot subscription model | `Correction` |
 | 2026-05-18 21:00 +07 | T-0406 | Fix Firestore undefined field error | `Correction` |
@@ -80,7 +81,43 @@
 
 ---
 
-## [2026-05-19 23:30 +07] — T-0503a: Scaffold Cloudflare Worker với Hono
+## [2026-05-19 23:55 +07] — T-0503b: PayOS webhook logic — Firestore REST + entitlement grant
+
+**Loại:** `Task`
+**Ref:** T-0503b (sub-task của T-0503)
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Webhook hoàn chỉnh: PayOS signature verify (Web Crypto HMAC), Firestore REST API (JWT RS256 Web Crypto), idempotent entitlement grant, payment log append.
+
+### Thay đổi
+- `workers/payment/src/lib/payos-signature.ts` (37 dòng): `verifyPayosWebhook()` — HMAC-SHA256 Web Crypto, sort keys A-Z.
+- `workers/payment/src/lib/entitlement-map.ts` (24 dòng): duplicate `PRODUCT_ENTITLEMENT_MAP` (3 products). Khi sửa pricing, đồng bộ cả 2 nơi.
+- `workers/payment/src/lib/firestore.ts` (226 dòng): JWT RS256 sign, `getAccessToken` cache, `firestoreGet/Patch/Create`, serialize/parse Firestore JSON.
+- `workers/payment/src/index.ts` (177 dòng): webhook handler — verify sig → idempotency → amount check → update purchase → grant entitlement(s) → append log.
+- `workers/payment/.dev.vars`: template với placeholder values.
+- `workers/payment/README.md`: cập nhật status + setup secrets + ngrok guide.
+- `tools/security-smoke.mjs`: exclusion `workers/` để tránh false positive tên biến env.
+- `docs/TASK_REGISTRY.md`: T-0503 → Done.
+
+### Không làm
+- Không implement Telegram alert (T-0504).
+- Không deploy production.
+- Không live test với PayOS thật (cần ngrok + setup sau).
+
+### Verify
+- `npm run check` → Pass.
+- `wrangler dev` start OK, 4 env bindings load từ `.dev.vars`.
+- POST /webhook/payos với `.dev.vars` rỗng → 500 "Server misconfigured" (expected — cần setup secrets thật).
+- File sizes: firestore.ts 226 (<280), payos-sig 37 (<80), entitlement-map 24 (<50), index.ts 177 (<220).
+
+### Rủi ro / lưu ý
+- Live test cần: (1) điền `.dev.vars` từ `.env.local`, (2) `ngrok http 8787`, (3) config PayOS webhook URL.
+- `PRODUCT_ENTITLEMENT_MAP` duplicate — khi sửa pricing strategy phải đồng bộ cả `apps/web/src/lib/entitlements/service.ts` và `workers/payment/src/lib/entitlement-map.ts`.
+- Firestore REST API không có transaction — idempotency dựa vào `firestoreCreate` check exists trước khi write. Race condition rất thấp với webhook PayOS (1 webhook per order).
+- Telegram alert TODO ở T-0504.
+
+---
 
 **Loại:** `Task`
 **Ref:** T-0503a (sub-task của T-0503)

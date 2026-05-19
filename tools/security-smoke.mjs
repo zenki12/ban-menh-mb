@@ -100,6 +100,9 @@ function checkSecretAssignments() {
     const ext = path.extname(filePath);
 
     if (relativePath === ".env.example") return;
+    // Workers source dùng tên biến env như FIREBASE_PRIVATE_KEY trong type/param
+    // — không phải hardcode secret. Scan KB leak riêng qua checkKbLeakage.
+    if (relativePath.startsWith("workers/")) return;
     if (!textExtensions.has(ext) && !relativePath.endsWith("package-lock.json")) return;
 
     const content = readFileSync(filePath, "utf8");

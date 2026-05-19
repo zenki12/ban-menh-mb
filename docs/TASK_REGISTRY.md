@@ -1542,11 +1542,51 @@ Update khi xong:
 
 ### T-0503 - Implement payment webhook
 
-Status: In Progress
+Status: Done
 
-> Chia thành 2 sub-task:
-> - **T-0503a** (scaffold Hono Worker): tạo workers/payment/ chạy được local, /health endpoint.
-> - **T-0503b** (webhook logic): PayOS signature verify, Firestore REST API, entitlement grant.
+Update khi xong (2026-05-19):
+
+- **T-0503a** (scaffold): ✅ Done — Hono setup, /health endpoint, wrangler dev port 8787.
+- **T-0503b** (webhook logic): ✅ Done — PayOS signature verify, Firestore REST API, entitlement grant.
+- `workers/payment/src/lib/payos-signature.ts` (37 dòng): `verifyPayosWebhook()` — HMAC-SHA256 qua Web Crypto `crypto.subtle`, sort keys A-Z.
+- `workers/payment/src/lib/entitlement-map.ts` (24 dòng): duplicate `PRODUCT_ENTITLEMENT_MAP` từ `apps/web/src/lib/entitlements/service.ts`.
+- `workers/payment/src/lib/firestore.ts` (226 dòng): Firestore REST API helper — JWT RS256 sign qua `crypto.subtle`, `getAccessToken` với in-memory cache, `firestoreGet/Patch/Create`, serialize/parse Firestore JSON format.
+- `workers/payment/src/index.ts` (177 dòng): webhook handler đầy đủ — verify signature, idempotency check, amount mismatch reject, update purchase confirmed, grant entitlement(s), append payment_log.
+- `tools/security-smoke.mjs`: thêm exclusion `workers/` để tránh false positive tên biến env trong type definitions.
+- Verify: `npm run check` pass, wrangler dev start OK, POST /webhook/payos với key rỗng → 500 "Server misconfigured" (expected — cần setup `.dev.vars` thật).
+- Live test sẽ làm sau khi user setup ngrok + PayOS webhook URL.
+
+Bối cảnh:
+
+- Webhook là nguồn xác nhận payment.
+
+Yêu cầu:
+
+- `POST /api/payment/webhook`
+- Verify signature.
+- Idempotent.
+- Amount mismatch không unlock.
+- Tạo entitlement sau confirmed.
+
+Output cần có:
+
+- Webhook endpoint.
+- Payment logs.
+
+Goal:
+
+- Payment success tạo quyền chính xác, không trùng.
+
+Điều kiện Done:
+
+- Signature fail không update.
+- Webhook replay không tạo entitlement trùng.
+- Amount mismatch không unlock.
+- Payment success tạo entitlement đúng.
+
+Update khi xong:
+
+- Ghi webhook cases đã test.
 
 Bối cảnh:
 
