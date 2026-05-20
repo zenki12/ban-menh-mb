@@ -1622,7 +1622,7 @@ Update khi xong:
 
 ### T-0504 - Implement Telegram payment/admin alerts
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 

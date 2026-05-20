@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-21 00:19 +07 | T-0504 | Telegram payment alerts cho Worker webhook | `Task` |
 | 2026-05-19 23:55 +07 | T-0503b | PayOS webhook logic — Firestore REST + entitlement grant | `Task` |
 | 2026-05-19 23:30 +07 | T-0503a | Scaffold Cloudflare Worker với Hono | `Task` |
 | 2026-05-18 21:30 +07 | T-0401 | Pricing strategy correction — Tarot subscription model | `Correction` |
@@ -78,6 +79,63 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-21 00:19 +07] — T-0504: Telegram payment alerts cho Worker webhook
+
+**Loại:** `Task`
+**Ref:** T-0504
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Payment Worker gửi Telegram alert cho webhook success và các nhánh lỗi quan trọng, theo hướng fire-and-forget để không làm chậm hoặc làm fail response webhook.
+
+### Thay đổi
+- `workers/payment/src/lib/telegram.ts` (90 dòng): thêm `sendTelegram()`, `formatPaymentSuccess()`, `formatPaymentError()`, `formatVnd()`.
+- `workers/payment/src/index.ts` (247 dòng): thêm binding `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; wire alert vào các case:
+  - `payment_success`: sau khi grant entitlement, trước khi append payment log.
+  - `signature_mismatch`: alert kèm IP request, vẫn trả `401`.
+  - `amount_mismatch`: alert expected/got, vẫn ack `200` và không grant entitlement.
+  - `purchase_not_found`: alert khi orderId đủ lớn; skip orderId `< 1000000000` để tránh PayOS test data.
+  - `server_error`: alert cho lỗi auth/Firestore/update/entitlement/payment log.
+- `workers/payment/.dev.vars`: thêm `TELEGRAM_BOT_TOKEN` và `TELEGRAM_CHAT_ID` từ `apps/web/.env.local` (file gitignored, không commit secret).
+
+### Message format mẫu
+
+```text
+*✅ Thanh toán thành công*
+Order: `{orderId}`
+Amount: `{99.000₫}`
+Product: `{numerology_single_report}`
+User: `{abcdefgh...}`
+Time: `{2026-05-21T00:19:00.000Z}`
+```
+
+```text
+*🚨 Amount mismatch*
+Order: `{orderId}`
+Expected: `{99.000₫}`
+Got: `{2.000₫}`
+Time: `{2026-05-21T00:19:00.000Z}`
+```
+
+### Không làm
+- Không hardcode token/chat ID.
+- Không log full bot token.
+- Không đưa PII vào Telegram message; user chỉ là userId truncate.
+- Không đổi logic verify signature hoặc Firestore ngoài việc thêm alert.
+- Không deploy production.
+
+### Verify
+- `npm --workspace workers/payment exec tsc -- --noEmit` → Pass.
+- `npm run check` → Pass.
+- Local Worker smoke: signed PayOS test payload `orderCode=123` → `200 { ok: true, ack: true, note: "purchase_not_found" }`; alert skipped do orderId `< 1000000000`.
+- File sizes: `telegram.ts` 90 (<150), `index.ts` 247 (<250).
+
+### Rủi ro / lưu ý
+- Telegram send dùng `executionCtx.waitUntil()` và helper tự catch lỗi; fail gửi Telegram không ảnh hưởng response webhook.
+- Live E2E cần user xác nhận sau khi chạy dev tunnel và thanh toán thử: tạo order 1k VND → quét QR → purchase confirmed → entitlement granted → Telegram nhận message success.
 
 ---
 

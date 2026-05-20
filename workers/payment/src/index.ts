@@ -11,12 +11,15 @@ import {
   getAccessToken,
 } from "./lib/firestore";
 import { verifyPayosWebhook } from "./lib/payos-signature";
+import { formatPaymentError, formatPaymentSuccess, sendTelegram } from "./lib/telegram";
 
 type Env = {
   PAYOS_CHECKSUM_KEY: string;
   FIREBASE_PROJECT_ID: string;
   FIREBASE_CLIENT_EMAIL: string;
   FIREBASE_PRIVATE_KEY: string;
+  TELEGRAM_BOT_TOKEN?: string;
+  TELEGRAM_CHAT_ID?: string;
 };
 
 // Zod không available ở Workers — validate thủ công
@@ -56,6 +59,21 @@ app.get("/webhook/payos", (c) =>
 app.post("/webhook/payos", async (c) => {
   const env = c.env;
   const now = new Date().toISOString();
+  const notifyTelegram = (text: string) => {
+    if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) {
+      console.warn("[telegram] missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID, skip alert");
+      return;
+    }
+
+    try {
+      c.executionCtx.waitUntil(sendTelegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, text));
+    } catch (err) {
+      console.warn("[telegram] waitUntil failed:", err);
+    }
+  };
+
+  const serverErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : String(err ?? "unknown");
 
   // 1. Parse body
   let body: unknown;
@@ -78,7 +96,13 @@ app.post("/webhook/payos", async (c) => {
   }
   const valid = await verifyPayosWebhook(data, signature, env.PAYOS_CHECKSUM_KEY);
   if (!valid) {
+    const orderId = String(data.orderCode ?? "unknown");
     console.warn("[webhook] signature mismatch");
+    notifyTelegram(
+      formatPaymentError("signature_mismatch", orderId, {
+        ip: c.req.header("CF-Connecting-IP") ?? c.req.header("X-Forwarded-For") ?? "unknown",
+      }),
+    );
     return c.json({ ok: false, error: "Invalid signature" }, 401);
   }
 
@@ -95,6 +119,11 @@ app.post("/webhook/payos", async (c) => {
     accessToken = await getAccessToken(sa);
   } catch (err) {
     console.error("[webhook] getAccessToken failed:", err);
+    notifyTelegram(
+      formatPaymentError("server_error", orderId, {
+        message: serverErrorMessage(err),
+      }),
+    );
     return c.json({ ok: false, error: "Auth error" }, 500);
   }
 
@@ -102,6 +131,9 @@ app.post("/webhook/payos", async (c) => {
   const purchase = await firestoreGet(sa.projectId, accessToken, "purchases", orderId);
   if (!purchase) {
     console.warn(`[webhook] purchase not found orderId=${orderId}, ack 200`);
+    if (Number(orderId) >= 1000000000) {
+      notifyTelegram(formatPaymentError("purchase_not_found", orderId));
+    }
     return c.json({ ok: true, ack: true, note: "purchase_not_found" });
   }
 
@@ -116,6 +148,12 @@ app.post("/webhook/payos", async (c) => {
   if (webhookAmount !== purchaseAmount) {
     console.error(
       `[webhook] amount mismatch orderId=${orderId} expected=${purchaseAmount} got=${webhookAmount}`,
+    );
+    notifyTelegram(
+      formatPaymentError("amount_mismatch", orderId, {
+        expected: purchaseAmount,
+        got: webhookAmount,
+      }),
     );
     return c.json({ ok: true, ack: true, note: "amount_mismatch" });
   }
@@ -136,6 +174,11 @@ app.post("/webhook/payos", async (c) => {
     );
   } catch (err) {
     console.error("[webhook] firestorePatch purchase failed:", err);
+    notifyTelegram(
+      formatPaymentError("server_error", orderId, {
+        message: serverErrorMessage(err),
+      }),
+    );
     return c.json({ ok: false, error: "DB error" }, 500);
   }
 
@@ -161,9 +204,23 @@ app.post("/webhook/payos", async (c) => {
         });
       } catch (err) {
         console.error(`[webhook] firestoreCreate entitlement ${entitlementId} failed:`, err);
+        notifyTelegram(
+          formatPaymentError("server_error", orderId, {
+            message: serverErrorMessage(err),
+          }),
+        );
       }
     }
   }
+
+  notifyTelegram(
+    formatPaymentSuccess(
+      orderId,
+      Number(purchase.amount),
+      String(purchase.productCode),
+      String(purchase.userId ?? ""),
+    ),
+  );
 
   // 9. Append payment log
   try {
@@ -177,9 +234,12 @@ app.post("/webhook/payos", async (c) => {
     });
   } catch (err) {
     console.warn("[webhook] payment_log append failed:", err);
+    notifyTelegram(
+      formatPaymentError("server_error", orderId, {
+        message: serverErrorMessage(err),
+      }),
+    );
   }
-
-  // TODO T-0504: Telegram alert khi payment confirmed
 
   return c.json({ ok: true, orderId, status: "confirmed" });
 });
