@@ -1502,6 +1502,15 @@ Update khi xong:
 
 Status: Done
 
+Update khi xong (2026-05-21):
+
+- **T-0502a** (payment check + success/cancel): Done — xem update 2026-05-18 bên dưới.
+- **T-0502b** (inline PayOS QR checkout): Done — `/payment/checkout` render QR trong app bằng `react-qr-code`, countdown 5 phút bằng sessionStorage, polling status mỗi 3s, giữ PayOS checkoutUrl làm fallback.
+- `pricing/page.tsx`: sau khi tạo order, lưu `{ orderId, qrCode, checkoutUrl, amount, productName, expiresAt }` vào `sessionStorage` và `router.push("/payment/checkout?orderId=...")`, không redirect thẳng PayOS.
+- `payment/checkout/page.tsx` (194 dòng): đọc pending payment, redirect `/pricing` nếu thiếu/mismatch, render QR responsive, countdown MM:SS, fallback "Mở trên PayOS", trạng thái expired + CTA tạo đơn mới, redirect success khi polling confirmed.
+- `apps/web/package.json` + `package-lock.json`: thêm dependency `react-qr-code`.
+- Verify: `npm install react-qr-code@^2.0.15 --workspace apps/web` OK, `npm run check` pass, build có route `/payment/checkout`. Live QR payment cần test thủ công với PayOS/ngrok.
+
 Update khi xong (2026-05-18):
 
 - `api/payment/check/route.ts` (74 dòng): GET, verify Bearer → lookup purchase → verify ownership (purchase.userId === uid) → trả `{ orderId, status, amount, productCode, expiresAt, confirmedAt }`.

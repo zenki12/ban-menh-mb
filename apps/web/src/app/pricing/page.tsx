@@ -5,6 +5,7 @@ import {
   getProductsByModule,
   type Product,
 } from "@banmenh/shared";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PageShell } from "../../components/layout";
 import { Button, Card } from "../../components/ui";
@@ -58,7 +59,13 @@ const faqs = [
   },
 ];
 
-type CreateResponse = { checkoutUrl: string; orderId: string };
+type CreateResponse = {
+  orderId: string;
+  amount: number;
+  qrCode: string;
+  checkoutUrl?: string;
+  expiresAt: string;
+};
 
 function ProductCard({
   product,
@@ -66,7 +73,7 @@ function ProductCard({
   isLoading,
 }: {
   product: Product;
-  onSelect: (code: string) => void;
+  onSelect: (product: Product) => void;
   isLoading: boolean;
 }) {
   return (
@@ -94,7 +101,7 @@ function ProductCard({
         disabled={isLoading}
         fullWidth
         loading={isLoading}
-        onClick={() => onSelect(product.code)}
+        onClick={() => onSelect(product)}
         variant="primary"
       >
         {isLoading ? "Đang xử lý..." : "Chọn gói"}
@@ -104,21 +111,35 @@ function ProductCard({
 }
 
 export default function PricingPage() {
+  const router = useRouter();
   const { user, signInWithGoogle } = useAuth();
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
 
-  async function handleSelectPlan(productCode: string) {
+  async function handleSelectPlan(product: Product) {
     if (!user) {
       await signInWithGoogle();
       return;
     }
+    const productCode = product.code;
     setLoadingCode(productCode);
     try {
       const data = await fetchWithAuth<CreateResponse>("/api/payment/create", {
         method: "POST",
         body: JSON.stringify({ productCode }),
       });
-      window.location.href = data.checkoutUrl;
+      const checkoutExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+      sessionStorage.setItem(
+        "banmenh-payment-pending",
+        JSON.stringify({
+          orderId: data.orderId,
+          qrCode: data.qrCode,
+          checkoutUrl: data.checkoutUrl,
+          amount: data.amount,
+          productName: product.name,
+          expiresAt: checkoutExpiresAt,
+        }),
+      );
+      router.push(`/payment/checkout?orderId=${encodeURIComponent(data.orderId)}`);
     } catch (err) {
       console.error("[pricing] payment create failed:", err);
       alert("Có lỗi khi tạo đơn hàng. Vui lòng thử lại.");

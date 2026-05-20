@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-21 00:37 +07 | T-0502b | Render PayOS QR inline với countdown 5 phút | `Task` |
 | 2026-05-21 00:19 +07 | T-0504 | Telegram payment alerts cho Worker webhook | `Task` |
 | 2026-05-19 23:55 +07 | T-0503b | PayOS webhook logic — Firestore REST + entitlement grant | `Task` |
 | 2026-05-19 23:30 +07 | T-0503a | Scaffold Cloudflare Worker với Hono | `Task` |
@@ -79,6 +80,45 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-21 00:37 +07] — T-0502b: Render PayOS QR inline với countdown 5 phút
+
+**Loại:** `Task`
+**Ref:** T-0502b (extension của T-0502)
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> User chọn gói xong ở lại app tại `/payment/checkout`, thấy QR PayOS inline, countdown 5 phút, polling payment status mỗi 3 giây và vẫn có link fallback mở PayOS.
+
+### Thay đổi
+- `apps/web/package.json` + `package-lock.json`: thêm dependency `react-qr-code@^2.0.15`.
+- `apps/web/src/app/pricing/page.tsx`: thay redirect thẳng `checkoutUrl` bằng flow:
+  - gọi `/api/payment/create` như cũ;
+  - lưu pending payment vào `sessionStorage` key `banmenh-payment-pending` gồm `orderId`, `qrCode`, `checkoutUrl`, `amount`, `productName`, `expiresAt`;
+  - `router.push("/payment/checkout?orderId=...")`.
+- `apps/web/src/app/payment/checkout/page.tsx` (194 dòng): route mới render QR inline bằng `react-qr-code`, QR responsive trong container max-width, countdown MM:SS, trạng thái expired và CTA tạo đơn mới.
+- Polling `/api/payment/check?orderId=...` mỗi 3 giây; khi `confirmed` thì xóa pending storage và redirect `/payment/success?orderId=...`.
+- Giữ `checkoutUrl` làm fallback button "Mở trên PayOS".
+
+### Không làm
+- Không sửa `/api/payment/create`.
+- Không sửa `/api/payment/check`.
+- Không sửa Worker payment/webhook.
+- Không dùng iframe PayOS.
+- Không persist `qrCode`/`checkoutUrl` vào Firestore; T-0502b dùng sessionStorage theo Option 2.
+
+### Verify
+- `npm install react-qr-code@^2.0.15 --workspace apps/web` → OK.
+- `npm --workspace apps/web run typecheck` → Pass.
+- `npm run check` → Pass; build có route `/payment/checkout`.
+- File size: `payment/checkout/page.tsx` 194 dòng (≤ 220).
+
+### Rủi ro / lưu ý
+- `/api/payment/create` hiện tạo `expiresAt` backend 15 phút; T-0502b cấm sửa route này nên checkout UI dùng expiry 5 phút khi lưu sessionStorage.
+- Chưa chạy live QR payment trong phiên này; cần test thủ công: click "Chọn gói" → `/payment/checkout`, quét QR, webhook confirmed, polling redirect success.
+- Nếu user reload `/payment/checkout` sau khi sessionStorage mất hoặc orderId mismatch, page redirect về `/pricing`.
 
 ---
 
