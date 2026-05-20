@@ -43,6 +43,16 @@ app.get("/health", (c) =>
   c.json({ ok: true, service: "payment-worker", timestamp: new Date().toISOString() }),
 );
 
+// PayOS dashboard verify webhook URL bằng GET request.
+app.get("/webhook/payos", (c) =>
+  c.json({
+    ok: true,
+    method: "GET not used for webhook delivery",
+    expected: "POST",
+    service: "payment-worker",
+  }),
+);
+
 app.post("/webhook/payos", async (c) => {
   const env = c.env;
   const now = new Date().toISOString();
@@ -91,8 +101,8 @@ app.post("/webhook/payos", async (c) => {
   // 4. Lookup purchase
   const purchase = await firestoreGet(sa.projectId, accessToken, "purchases", orderId);
   if (!purchase) {
-    console.error(`[webhook] purchase not found: orderId=${orderId}`);
-    return c.json({ ok: false, error: "Purchase not found" }, 404);
+    console.warn(`[webhook] purchase not found orderId=${orderId}, ack 200`);
+    return c.json({ ok: true, ack: true, note: "purchase_not_found" });
   }
 
   // 5. Idempotency
@@ -107,7 +117,7 @@ app.post("/webhook/payos", async (c) => {
     console.error(
       `[webhook] amount mismatch orderId=${orderId} expected=${purchaseAmount} got=${webhookAmount}`,
     );
-    return c.json({ ok: false, error: "Amount mismatch" }, 400);
+    return c.json({ ok: true, ack: true, note: "amount_mismatch" });
   }
 
   // 7. Update purchase → confirmed
