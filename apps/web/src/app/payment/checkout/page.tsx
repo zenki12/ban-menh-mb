@@ -14,6 +14,8 @@ type PendingPayment = {
   checkoutUrl?: string;
   amount: number;
   productName: string;
+  voucherCode?: string | null;
+  discountVnd?: number;
   expiresAt: string;
 };
 
@@ -46,6 +48,8 @@ function readPendingPayment(orderId: string | null): PendingPayment | null {
       checkoutUrl: parsed.checkoutUrl,
       amount: parsed.amount,
       productName: parsed.productName,
+      voucherCode: parsed.voucherCode,
+      discountVnd: parsed.discountVnd,
       expiresAt: parsed.expiresAt,
     };
   } catch {
@@ -148,6 +152,11 @@ function CheckoutContent() {
         <p className="mt-4 text-3xl font-bold text-[var(--bm-text-main)]">
           {formatPriceVnd(pending.amount)}
         </p>
+        {pending.voucherCode && pending.discountVnd ? (
+          <p className="mt-2 text-sm text-[var(--bm-success)]">
+            Đã áp dụng voucher {pending.voucherCode}: -{formatPriceVnd(pending.discountVnd)}
+          </p>
+        ) : null}
         <div className="mt-8 w-full max-w-[18rem] rounded-2xl bg-white p-4">
           <QRCode
             aria-label="Mã QR thanh toán"

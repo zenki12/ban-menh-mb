@@ -14,6 +14,7 @@ import {
 } from "../../../../lib/firestore";
 import { generateOrderId } from "../../../../lib/payment/order-id";
 import { createPaymentRequest } from "../../../../lib/payos/client";
+import { validateVoucher } from "../../../../lib/voucher/service";
 
 const createBodySchema = z.object({
   productCode: z.string().min(1),
@@ -77,8 +78,20 @@ export async function POST(request: Request) {
     );
   }
 
-  // 4. Tính amount (T-0505 sẽ apply voucher discount thật)
-  const amount = product.priceVnd;
+  // 4. Tính amount. Voucher chỉ được validate server-side.
+  let amount = product.priceVnd;
+  let discountVnd: number | undefined;
+  if (voucherCode) {
+    const voucherResult = await validateVoucher(voucherCode, productCode, uid);
+    if (!voucherResult.valid) {
+      return NextResponse.json(
+        { error: voucherResult.error },
+        { status: 400 },
+      );
+    }
+    amount = voucherResult.finalAmount;
+    discountVnd = voucherResult.discountVnd;
+  }
 
   // 5. Tạo orderId numeric cho PayOS
   const orderCode = generateOrderId();
@@ -101,6 +114,7 @@ export async function POST(request: Request) {
         status: "pending",
         provider: "payos",
         voucherCode: voucherCode ?? undefined,
+        discountVnd,
         expiresAt,
       },
       ctx,
@@ -119,7 +133,7 @@ export async function POST(request: Request) {
     payosData = await createPaymentRequest({
       orderCode,
       amount,
-      description: product.name,
+      description: voucherCode ? `${product.name} (${voucherCode})` : product.name,
       items: [{ name: product.name, quantity: 1, price: amount }],
       returnUrl: `${appUrl}/payment/success?orderId=${orderId}`,
       cancelUrl: `${appUrl}/payment/cancel?orderId=${orderId}`,
@@ -152,6 +166,8 @@ export async function POST(request: Request) {
     amount,
     qrCode: payosData.qrCode,
     checkoutUrl: payosData.checkoutUrl,
+    voucherCode: voucherCode ?? null,
+    discountVnd: discountVnd ?? 0,
     expiresAt,
   });
 }

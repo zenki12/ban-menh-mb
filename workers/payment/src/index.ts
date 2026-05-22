@@ -7,6 +7,7 @@ import { PRODUCT_ENTITLEMENT_MAP } from "./lib/entitlement-map";
 import {
   firestoreCreate,
   firestoreGet,
+  firestoreIncrementField,
   firestorePatch,
   getAccessToken,
 } from "./lib/firestore";
@@ -210,6 +211,26 @@ app.post("/webhook/payos", async (c) => {
           }),
         );
       }
+    }
+  }
+
+  const voucherCode = String(purchase.voucherCode ?? "").trim().toUpperCase();
+  if (voucherCode) {
+    try {
+      await firestoreIncrementField(
+        sa.projectId,
+        accessToken,
+        "vouchers",
+        voucherCode,
+        "usedCount",
+      );
+    } catch (err) {
+      console.error(`[webhook] increment voucher usage ${voucherCode} failed:`, err);
+      notifyTelegram(
+        formatPaymentError("server_error", orderId, {
+          message: serverErrorMessage(err),
+        }),
+      );
     }
   }
 

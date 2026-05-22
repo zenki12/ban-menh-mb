@@ -5,3 +5,4 @@ export {
   firestorePurchaseRepository,
   updatePurchaseProviderRef,
 } from "./purchase-repository";
+export { firestoreVoucherRepository } from "./voucher-repository";

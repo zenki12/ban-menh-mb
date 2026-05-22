@@ -3,6 +3,7 @@
 import {
   formatPriceVnd,
   getProductsByModule,
+  isAppError,
   type Product,
 } from "@banmenh/shared";
 import { useRouter } from "next/navigation";
@@ -64,6 +65,8 @@ type CreateResponse = {
   amount: number;
   qrCode: string;
   checkoutUrl?: string;
+  voucherCode?: string | null;
+  discountVnd?: number;
   expiresAt: string;
 };
 
@@ -114,6 +117,21 @@ export default function PricingPage() {
   const router = useRouter();
   const { user, signInWithGoogle } = useAuth();
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherStatus, setVoucherStatus] = useState<"idle" | "applied" | "invalid">("idle");
+  const [voucherError, setVoucherError] = useState<string | null>(null);
+
+  function handleApplyVoucher() {
+    const normalized = voucherCode.trim().toUpperCase();
+    if (!normalized) {
+      setVoucherStatus("idle");
+      setVoucherError(null);
+      return;
+    }
+    setVoucherCode(normalized);
+    setVoucherStatus("applied");
+    setVoucherError(null);
+  }
 
   async function handleSelectPlan(product: Product) {
     if (!user) {
@@ -121,11 +139,16 @@ export default function PricingPage() {
       return;
     }
     const productCode = product.code;
+    const normalizedVoucher = voucherCode.trim().toUpperCase();
     setLoadingCode(productCode);
+    setVoucherError(null);
     try {
       const data = await fetchWithAuth<CreateResponse>("/api/payment/create", {
         method: "POST",
-        body: JSON.stringify({ productCode }),
+        body: JSON.stringify({
+          productCode,
+          voucherCode: normalizedVoucher || undefined,
+        }),
       });
       const checkoutExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
       sessionStorage.setItem(
@@ -136,12 +159,19 @@ export default function PricingPage() {
           checkoutUrl: data.checkoutUrl,
           amount: data.amount,
           productName: product.name,
+          voucherCode: data.voucherCode,
+          discountVnd: data.discountVnd ?? 0,
           expiresAt: checkoutExpiresAt,
         }),
       );
       router.push(`/payment/checkout?orderId=${encodeURIComponent(data.orderId)}`);
     } catch (err) {
       console.error("[pricing] payment create failed:", err);
+      if (isAppError(err) && err.code.startsWith("VOUCHER_")) {
+        setVoucherStatus("invalid");
+        setVoucherError(err.message);
+        return;
+      }
       alert("Có lỗi khi tạo đơn hàng. Vui lòng thử lại.");
     } finally {
       setLoadingCode(null);
@@ -157,6 +187,38 @@ export default function PricingPage() {
       backLabel="Dashboard"
       containerWidth="default"
     >
+      <Card as="section" className="mb-10" padding="md" variant="glass">
+        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+          <label className="block">
+            <span className="text-sm font-bold text-[var(--bm-text-main)]">
+              Mã voucher
+            </span>
+            <input
+              className="mt-2 min-h-11 w-full rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-4 text-[var(--bm-text-main)] outline-none transition focus:border-[var(--bm-border-purple)]"
+              maxLength={64}
+              onChange={(event) => {
+                setVoucherCode(event.target.value);
+                setVoucherStatus("idle");
+                setVoucherError(null);
+              }}
+              placeholder="Nhập mã nếu có"
+              value={voucherCode}
+            />
+          </label>
+          <Button onClick={handleApplyVoucher} variant="secondary">
+            Áp dụng
+          </Button>
+        </div>
+        {voucherStatus === "applied" ? (
+          <p className="mt-3 text-sm text-[var(--bm-success)]">
+            Đã lưu mã {voucherCode}. Hệ thống sẽ kiểm tra và áp dụng khi tạo đơn.
+          </p>
+        ) : null}
+        {voucherStatus === "invalid" && voucherError ? (
+          <p className="mt-3 text-sm text-[var(--bm-danger)]">{voucherError}</p>
+        ) : null}
+      </Card>
+
       {MODULE_GROUPS.map((group) => {
         const products = getProductsByModule(group.module);
         if (products.length === 0) return null;

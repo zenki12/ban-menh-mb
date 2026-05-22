@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-21 00:50 +07 | T-0505 | Voucher validate API + apply discount | `Task` |
 | 2026-05-21 00:37 +07 | T-0502b | Render PayOS QR inline với countdown 5 phút | `Task` |
 | 2026-05-21 00:19 +07 | T-0504 | Telegram payment alerts cho Worker webhook | `Task` |
 | 2026-05-19 23:55 +07 | T-0503b | PayOS webhook logic — Firestore REST + entitlement grant | `Task` |
@@ -80,6 +81,60 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-21 00:50 +07] — T-0505: Voucher validate API + apply discount
+
+**Loại:** `Task`
+**Ref:** T-0505
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Thêm voucher validation server-side, apply discount khi tạo order PayOS và increment usage khi webhook confirmed. Frontend chỉ nhập/gửi voucher code, không tự tính discount.
+
+### Thay đổi
+- Repository: `apps/web/src/lib/firestore/voucher-repository.ts` implement `getByCode` và `incrementUsage` cho collection `vouchers`; admin CRUD còn lại defer T-0506.
+- Service: `apps/web/src/lib/voucher/service.ts` validate `active`, `startsAt`, `expiresAt`, `maxUses`, module áp dụng và tính `fixed` / `percent` / `finalPrice`.
+- API route: `apps/web/src/app/api/voucher/validate/route.ts` trả `200 { valid: true/false }`; invalid voucher dùng `AppError` `VOUCHER_*`.
+- Payment create: `apps/web/src/app/api/payment/create/route.ts` validate voucher server-side, dùng `finalAmount` cho PayOS, lưu `voucherCode` và `discountVnd` vào purchase.
+- Worker webhook: `workers/payment/src/lib/firestore.ts` thêm `firestoreIncrementField()` qua Firestore REST commit transform; `workers/payment/src/index.ts` increment `usedCount` sau khi grant entitlement.
+- Frontend: `apps/web/src/app/pricing/page.tsx` thêm input voucher trước pricing cards; lỗi voucher hiển thị bằng message từ shared error contract. `apps/web/src/app/payment/checkout/page.tsx` hiển thị voucher discount từ backend response.
+- Contract: `packages/shared/src/schemas/purchase.ts` và `docs/product-specs/data-contract.md` thêm `discountVnd?: number`.
+
+### Không làm
+- Không seed voucher bằng code.
+- Không implement admin voucher CRUD; thuộc T-0506.
+- Không implement `perUserLimit`; có TODO trong service để làm ở T-0506/T-0801.
+- Không cho frontend tự tính discount hoặc ghi vào `vouchers`.
+
+### Hướng dẫn tạo voucher test
+Tạo thủ công trong Firebase Console → Firestore:
+
+```text
+Collection: vouchers
+Document ID: TEST10
+Fields:
+code: "TEST10"
+active: true
+modules: ["numerology"]
+discountType: "percent"
+discountValue: 10
+usedCount: 0
+maxUses: 100
+createdAt: "<ISO now>"
+updatedAt: "<ISO now>"
+```
+
+### Verify
+- `npm run typecheck` → Pass.
+- `npm --workspace workers/payment exec tsc -- --noEmit` → Pass.
+- Worker restart: `workers/payment npm run dev` OK, `/health` trả 200 tại `http://127.0.0.1:8788/health`.
+- File sizes: `voucher-repository.ts` 46 (≤100), `service.ts` 89 (≤180), `api/voucher/validate/route.ts` 61 (≤100), `pricing/page.tsx` 272 (≤280).
+
+### Rủi ro / lưu ý
+- PayOS minimum 1.000 VND được enforce bằng floor `finalAmount >= 1000`, discount được adjust tương ứng.
+- Live voucher TEST10/payment QR chưa chạy trong phiên này; cần tạo voucher thủ công rồi test flow `/pricing` → `/payment/checkout` → webhook confirmed.
 
 ---
 

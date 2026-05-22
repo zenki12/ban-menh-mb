@@ -63,6 +63,7 @@ Tài liệu này định nghĩa dữ liệu/API cốt lõi để frontend, backe
   provider: "payos",
   providerRef?: string,
   voucherCode?: string,
+  discountVnd?: number,
   createdAt: string,
   confirmedAt?: string,
   expiresAt?: string
@@ -253,4 +254,3 @@ Response:
 - Raw webhook payload: nếu lưu, phải redact dữ liệu nhạy cảm.
 - Tarot local history: client tự giữ, có giới hạn.
 - Cloud history: cần delete/export khi user yêu cầu trong tương lai.
-

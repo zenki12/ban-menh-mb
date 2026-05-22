@@ -1705,7 +1705,21 @@ Update khi xong:
 
 ### T-0505 - Implement voucher validate API
 
-Status: Todo
+Status: Done
+
+Update khi xong (2026-05-21):
+
+- `apps/web/src/lib/firestore/voucher-repository.ts` (46 dòng): Firestore adapter cho `VoucherRepository`, implement `getByCode` và `incrementUsage`; admin CRUD còn lại throw rõ `Implement ở T-0506`.
+- `apps/web/src/lib/voucher/service.ts` (89 dòng): server-side voucher validation, check active/time/maxUses/module, tính `fixed`/`percent`/`finalPrice`, floor PayOS minimum 1.000 VND.
+- `apps/web/src/app/api/voucher/validate/route.ts` (61 dòng): POST validate voucher, Bearer auth, invalid voucher trả `200 { valid: false, error }`.
+- `apps/web/src/app/api/payment/create/route.ts`: apply discount server-side khi có `voucherCode`, lưu `voucherCode` + `discountVnd`, PayOS amount dùng giá đã giảm.
+- `workers/payment/src/lib/firestore.ts`: thêm `firestoreIncrementField()` bằng Firestore REST commit transform.
+- `workers/payment/src/index.ts`: sau grant entitlement, nếu purchase có `voucherCode` thì increment `vouchers/{code}.usedCount`.
+- `apps/web/src/app/pricing/page.tsx`: thêm input voucher trước pricing cards; frontend chỉ gửi code lên backend, không tự tính discount.
+- `apps/web/src/app/payment/checkout/page.tsx`: hiển thị voucher/discount từ response backend nếu đã áp dụng.
+- `packages/shared/src/schemas/purchase.ts` + `docs/product-specs/data-contract.md`: thêm `discountVnd?: number`.
+- Chưa implement `perUserLimit` (TODO trong service) và admin voucher CRUD (T-0506).
+- Verify: app typecheck pass, worker payment typecheck pass.
 
 Bối cảnh:
 

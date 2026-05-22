@@ -37,6 +37,7 @@ export const purchaseSchema = z.object({
   /** Reference từ provider (vd: PayOS transaction id). */
   providerRef: z.string().min(1).optional(),
   voucherCode: z.string().min(1).optional(),
+  discountVnd: vndAmountSchema.optional(),
   createdAt: timestampSchema,
   confirmedAt: timestampSchema.optional(),
   expiresAt: timestampSchema.optional(),

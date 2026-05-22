@@ -143,6 +143,10 @@ function docUrl(projectId: string, collection: string, docId: string): string {
   return `${FIRESTORE_BASE}/projects/${projectId}/databases/(default)/documents/${collection}/${docId}`;
 }
 
+function docName(projectId: string, collection: string, docId: string): string {
+  return `projects/${projectId}/databases/(default)/documents/${collection}/${docId}`;
+}
+
 /** GET Firestore document → flat object hoặc null nếu không tồn tại. */
 export async function firestoreGet(
   projectId: string,
@@ -223,4 +227,42 @@ export async function firestoreCreate(
   });
 
   if (!resp.ok) throw new Error(`firestoreCreate ${collection}/${docId}: ${resp.status}`);
+}
+
+/** Atomic numeric increment via Firestore commit transform. */
+export async function firestoreIncrementField(
+  projectId: string,
+  accessToken: string,
+  collection: string,
+  docId: string,
+  field: string,
+  value = 1,
+): Promise<void> {
+  const url = `${FIRESTORE_BASE}/projects/${projectId}/databases/(default)/documents:commit`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      writes: [
+        {
+          transform: {
+            document: docName(projectId, collection, docId),
+            fieldTransforms: [
+              {
+                fieldPath: field,
+                increment: { integerValue: String(value) },
+              },
+            ],
+          },
+        },
+      ],
+    }),
+  });
+
+  if (!resp.ok) {
+    throw new Error(`firestoreIncrementField ${collection}/${docId}.${field}: ${resp.status}`);
+  }
 }
