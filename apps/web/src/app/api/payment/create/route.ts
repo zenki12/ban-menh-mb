@@ -98,7 +98,7 @@ export async function POST(request: Request) {
   const orderId = String(orderCode);
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
   // 6. Tạo purchase document (status: pending)
   const ctx = { userId: uid };

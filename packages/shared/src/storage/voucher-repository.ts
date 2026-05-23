@@ -4,6 +4,21 @@
 import type { Voucher } from "../schemas";
 import type { PaginationOptions, QueryResult, StorageContext } from "./common";
 
+export type VoucherUpdatePatch = Partial<
+  Pick<
+    Voucher,
+    | "discountType"
+    | "discountValue"
+    | "finalPrice"
+    | "maxUses"
+    | "perUserLimit"
+    | "modules"
+    | "startsAt"
+    | "expiresAt"
+    | "note"
+  >
+>;
+
 export interface VoucherRepository {
   /** code unique uppercase (data-contract.md mục 4). */
   getByCode(code: string, ctx: StorageContext): Promise<Voucher | null>;
@@ -23,6 +38,11 @@ export interface VoucherRepository {
   setActive(
     code: string,
     active: boolean,
+    ctx: StorageContext,
+  ): Promise<Voucher>;
+  update(
+    code: string,
+    patch: VoucherUpdatePatch,
     ctx: StorageContext,
   ): Promise<Voucher>;
 }

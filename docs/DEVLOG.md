@@ -37,6 +37,8 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-22 15:50 +07 | T-0506 | Admin voucher CRUD API | `Task` |
+| 2026-05-22 15:30 +07 | T-0505b | UX refactor voucher input sang payment setup | `Task` |
 | 2026-05-21 00:50 +07 | T-0505 | Voucher validate API + apply discount | `Task` |
 | 2026-05-21 00:37 +07 | T-0502b | Render PayOS QR inline với countdown 5 phút | `Task` |
 | 2026-05-21 00:19 +07 | T-0504 | Telegram payment alerts cho Worker webhook | `Task` |
@@ -81,6 +83,99 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-22 15:50 +07] - T-0506: Admin voucher CRUD API
+
+**Loại:** `Task`
+**Ref:** T-0506
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Thêm API quản trị voucher cho Zenki dùng qua curl/Postman/Insomnia trước khi có admin UI. Admin auth dùng `X-Admin-Token`, không dùng Firebase Auth.
+
+### Thay đổi
+- Repository: `apps/web/src/lib/firestore/voucher-repository.ts` implement create/listActive/listAll/update/setActive/incrementUsage; create dùng Firestore `create()` để không ghi đè voucher đã tồn tại.
+- Auth: `apps/web/src/lib/admin/auth.ts` verify header `X-Admin-Token` với `ADMIN_TOKEN`, dùng constant-time compare khi cùng length, thiếu token trả `AUTH_REQUIRED`, sai token trả `AUTH_INVALID_TOKEN`, thiếu env trả 500.
+- Audit: `apps/web/src/lib/admin/audit-log.ts` append fire-and-forget vào collection `admin_logs` với `action`, `target`, `details`, `createdAt`, `source="admin_api"`.
+- Endpoints:
+  - `POST /api/admin/voucher/create`
+  - `GET /api/admin/voucher/list?limit=50&cursor=...`
+  - `POST /api/admin/voucher/[code]/update`
+  - `POST /api/admin/voucher/[code]/pause`
+  - `POST /api/admin/voucher/[code]/activate`
+  - `POST /api/admin/voucher/[code]/delete`
+- Voucher delete là soft delete: giữ document Firestore để trace purchase cũ, chỉ set `active=false`.
+- Không cho edit `code` hoặc `usedCount`; `usedCount` vẫn chỉ tăng qua payment/webhook flow.
+
+### Hướng dẫn curl
+```bash
+curl -X POST http://localhost:3000/api/admin/voucher/create \
+  -H "X-Admin-Token: $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"FIXED5K","discountType":"fixed","discountValue":5000,"modules":["numerology"],"maxUses":50}'
+
+curl http://localhost:3000/api/admin/voucher/list \
+  -H "X-Admin-Token: $ADMIN_TOKEN"
+
+curl -X POST http://localhost:3000/api/admin/voucher/TEST10/pause \
+  -H "X-Admin-Token: $ADMIN_TOKEN"
+
+curl -X POST http://localhost:3000/api/admin/voucher/TEST10/activate \
+  -H "X-Admin-Token: $ADMIN_TOKEN"
+
+curl -X POST http://localhost:3000/api/admin/voucher/TEST10/update \
+  -H "X-Admin-Token: $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"maxUses":200}'
+```
+
+### Không làm
+- Không tạo admin UI; admin UI là task riêng sau MVP launch.
+- Không hard delete voucher.
+- Không log token admin thật.
+
+### Verify
+- `npm.cmd run typecheck` pass trong quá trình sửa.
+- `npm.cmd run check` pass: typecheck, lint, security smoke và Next.js build đều thành công; build liệt kê đủ 6 route admin voucher.
+- File limits pass: voucher repository 143 dòng, auth 42 dòng, audit log 24 dòng, các route handler 27-42 dòng.
+
+### Rủi ro / lưu ý
+- Chưa chạy curl thật vì cần `.env.local` có Firebase service account và `ADMIN_TOKEN` thật. Nếu thiếu `ADMIN_TOKEN`, endpoint cố ý trả 500 để báo cấu hình admin chưa sẵn sàng.
+
+---
+
+## [2026-05-22 15:30 +07] - T-0505b: UX refactor voucher input sang payment setup
+
+**Loại:** `Task`
+**Ref:** T-0505b
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Refactor theo UX feedback của Zenki: voucher không còn nhập ở `/pricing`; user chọn gói trước, qua `/payment/setup` để validate voucher inline và xem tổng tiền sau giảm trước khi tạo QR.
+
+### Thay đổi
+- `apps/web/src/app/pricing/page.tsx`: gỡ voucher input/state/payment create khỏi pricing; CTA "Chọn gói" chuyển sang `/payment/setup?productCode=...`. File giảm từ 272 dòng xuống dưới 230 dòng.
+- `apps/web/src/app/payment/setup/page.tsx`: thêm trang trung gian với `Suspense` + `useSearchParams`, lookup product bằng `findProduct`, hiển thị product/features, nhập voucher, validate inline qua `/api/voucher/validate`, preview discount/final amount từ backend response, rồi tạo đơn qua `/api/payment/create`.
+- Flow mới: `pricing -> setup (input voucher + preview) -> checkout (QR) -> success`.
+- Checkout giữ nguyên logic sessionStorage; amount/voucher/discount lấy từ response `/api/payment/create`.
+
+### Không làm
+- Không đụng `/api/voucher/validate`.
+- Không đụng `/api/payment/create`.
+- Không đụng worker.
+- Không để frontend tự tính discount; UI chỉ hiển thị `discountVnd` và `finalAmount` từ API validate hoặc `amount` từ API create.
+
+### Verify
+- `npm.cmd run typecheck` pass trong quá trình sửa.
+- `npm.cmd run check` pass: typecheck, lint, security smoke và Next.js build đều thành công.
+- Static flow review: `/pricing` chỉ còn push sang `/payment/setup?productCode=...`; `/payment/setup` gọi `/api/voucher/validate`, `/api/payment/create`, lưu sessionStorage và redirect checkout.
+- File limits: `pricing/page.tsx` 169 dòng, `payment/setup/page.tsx` 273 dòng. `payment/checkout/page.tsx` không chỉnh sửa; line count thực tế hiện là 203 dòng.
+
+### Rủi ro / lưu ý
+- Không có test runner UI trong repo, nên chưa thêm automated UI test để mô phỏng click/voucher. Verification chính dùng typecheck/lint/security/build và static flow review.
+- `apps/web/src/app/payment/checkout/page.tsx` không chỉnh sửa theo yêu cầu; line count thực tế trong workspace đang lớn hơn mô tả task.
 
 ---
 

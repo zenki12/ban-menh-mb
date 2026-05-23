@@ -1751,9 +1751,51 @@ Update khi xong:
 
 - Ghi voucher cases đã test.
 
+### T-0505b - UX refactor voucher input
+
+Status: Done
+
+Bối cảnh:
+
+- Voucher input hiện nằm ở `/pricing` trước khi user chọn gói nên user không biết voucher hợp lệ hay không và không thấy giá sau giảm.
+
+Yêu cầu:
+
+- Gỡ voucher input khỏi `/pricing`.
+- Khi click "Chọn gói", chuyển sang `/payment/setup?productCode=...`.
+- Tạo trang `/payment/setup` để user xác nhận gói, nhập voucher, validate inline và xem giá sau discount trước khi tạo QR.
+- Không để frontend tự tính discount; discount/final amount phải lấy từ API validate/payment create.
+- Không đụng `/api/voucher/validate`, `/api/payment/create`, `/payment/checkout` hoặc worker.
+
+Output cần có:
+
+- `/pricing` chỉ còn danh sách gói và CTA sang setup.
+- `/payment/setup` có product summary, voucher validate, preview tổng tiền và CTA tạo đơn.
+- DEVLOG ghi flow mới và verification.
+
+Goal:
+
+- Flow thanh toán rõ hơn: chọn gói trước, nhập voucher sau, thấy discount trước khi sinh QR.
+
+Điều kiện Done:
+
+- `npm run check` pass.
+- `/pricing` click "Chọn gói" sang `/payment/setup`.
+- Voucher valid hiển thị trạng thái đã áp dụng, số tiền giảm và tổng tiền sau giảm.
+- Voucher invalid hiển thị message từ shared error contract.
+- Checkout nhận sessionStorage amount đã discount từ response backend.
+- File limit: `pricing/page.tsx` < 230 dòng, `payment/setup/page.tsx` < 280 dòng, `payment/checkout/page.tsx` <= 200 dòng.
+
+Update khi xong:
+
+- `apps/web/src/app/pricing/page.tsx` gỡ voucher input/state/payment create; CTA "Chọn gói" đi tới `/payment/setup?productCode=...`.
+- `apps/web/src/app/payment/setup/page.tsx` thêm bước xác nhận đơn hàng, validate voucher inline qua API và preview discount/final amount từ backend response.
+- Flow mới: `pricing -> setup -> checkout -> success`.
+- `npm run check` pass ngày 2026-05-22.
+
 ### T-0506 - Implement admin voucher API
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -1783,8 +1825,11 @@ Goal:
 
 Update khi xong:
 
-- Ghi API đã tạo.
-- Ghi cách tắt/xóa voucher.
+- Đã tạo 6 endpoint admin voucher: create, list, update, pause, activate, delete.
+- Admin auth dùng header `X-Admin-Token` so với `ADMIN_TOKEN`, không dùng Firebase Auth.
+- Audit log append vào collection `admin_logs` cho mỗi action.
+- Delete là soft delete: set `active=false`, không hard delete khỏi Firestore.
+- Admin UI không làm trong task này; sẽ là task riêng sau MVP launch.
 
 ## Phase 6 - Numerology MVP
 
