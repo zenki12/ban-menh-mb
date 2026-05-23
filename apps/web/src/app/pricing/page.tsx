@@ -1,24 +1,12 @@
 "use client";
 
 import {
-  formatPriceVnd,
   getProductsByModule,
-  isAppError,
   type Product,
 } from "@banmenh/shared";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { PageShell } from "../../components/layout";
-import { Button, Card } from "../../components/ui";
-import { fetchWithAuth } from "../../lib/api/client";
-import { useAuth } from "../../lib/auth";
-
-const TIER_LABELS: Record<Product["tier"], string> = {
-  single_report: "Báo cáo lẻ",
-  session: "Phiên",
-  bundle: "Combo",
-  subscription: "Định kỳ",
-};
+import { Card, ProductCard } from "../../components/ui";
 
 const MODULE_GROUPS: ReadonlyArray<{
   module: Product["module"];
@@ -38,7 +26,7 @@ const MODULE_GROUPS: ReadonlyArray<{
   {
     module: "bundle",
     title: "Combo tiết kiệm",
-    description: "Gói gộp Thần số học và Tarot với giá ưu đãi.",
+    description: "Gói ghép Thần số học và Tarot với giá ưu đãi.",
   },
 ];
 
@@ -51,7 +39,7 @@ const faqs = [
   {
     question: "Có dùng voucher không?",
     answer:
-      "Voucher sẽ được hỗ trợ trong phiên bản tiếp theo. Hiện tại chưa áp dụng.",
+      "Voucher được nhập sau khi chọn gói. Bạn sẽ thấy trạng thái hợp lệ và tổng tiền sau giảm trước khi tạo QR.",
   },
   {
     question: "Chính sách hoàn tiền?",
@@ -60,122 +48,11 @@ const faqs = [
   },
 ];
 
-type CreateResponse = {
-  orderId: string;
-  amount: number;
-  qrCode: string;
-  checkoutUrl?: string;
-  voucherCode?: string | null;
-  discountVnd?: number;
-  expiresAt: string;
-};
-
-function ProductCard({
-  product,
-  onSelect,
-  isLoading,
-}: {
-  product: Product;
-  onSelect: (product: Product) => void;
-  isLoading: boolean;
-}) {
-  return (
-    <Card as="article" interactive padding="lg" variant="glass">
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="text-2xl">{product.name}</h3>
-        <span className="rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-3 py-1 text-xs font-bold text-[var(--bm-gold-bright)]">
-          {TIER_LABELS[product.tier]}
-        </span>
-      </div>
-      <p className="mt-5 text-3xl font-bold text-[var(--bm-text-main)]">
-        {formatPriceVnd(product.priceVnd)}
-      </p>
-      <p className="mt-4 text-[var(--bm-text-soft)]">{product.description}</p>
-      <ul className="mt-5 space-y-2 text-sm text-[var(--bm-text-soft)]">
-        {product.features.map((feature) => (
-          <li className="flex items-start gap-2" key={feature}>
-            <span aria-hidden className="text-[var(--bm-gold-bright)]">✦</span>
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-      <Button
-        className="mt-8"
-        disabled={isLoading}
-        fullWidth
-        loading={isLoading}
-        onClick={() => onSelect(product)}
-        variant="primary"
-      >
-        {isLoading ? "Đang xử lý..." : "Chọn gói"}
-      </Button>
-    </Card>
-  );
-}
-
 export default function PricingPage() {
   const router = useRouter();
-  const { user, signInWithGoogle } = useAuth();
-  const [loadingCode, setLoadingCode] = useState<string | null>(null);
-  const [voucherCode, setVoucherCode] = useState("");
-  const [voucherStatus, setVoucherStatus] = useState<"idle" | "applied" | "invalid">("idle");
-  const [voucherError, setVoucherError] = useState<string | null>(null);
 
-  function handleApplyVoucher() {
-    const normalized = voucherCode.trim().toUpperCase();
-    if (!normalized) {
-      setVoucherStatus("idle");
-      setVoucherError(null);
-      return;
-    }
-    setVoucherCode(normalized);
-    setVoucherStatus("applied");
-    setVoucherError(null);
-  }
-
-  async function handleSelectPlan(product: Product) {
-    if (!user) {
-      await signInWithGoogle();
-      return;
-    }
-    const productCode = product.code;
-    const normalizedVoucher = voucherCode.trim().toUpperCase();
-    setLoadingCode(productCode);
-    setVoucherError(null);
-    try {
-      const data = await fetchWithAuth<CreateResponse>("/api/payment/create", {
-        method: "POST",
-        body: JSON.stringify({
-          productCode,
-          voucherCode: normalizedVoucher || undefined,
-        }),
-      });
-      const checkoutExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-      sessionStorage.setItem(
-        "banmenh-payment-pending",
-        JSON.stringify({
-          orderId: data.orderId,
-          qrCode: data.qrCode,
-          checkoutUrl: data.checkoutUrl,
-          amount: data.amount,
-          productName: product.name,
-          voucherCode: data.voucherCode,
-          discountVnd: data.discountVnd ?? 0,
-          expiresAt: checkoutExpiresAt,
-        }),
-      );
-      router.push(`/payment/checkout?orderId=${encodeURIComponent(data.orderId)}`);
-    } catch (err) {
-      console.error("[pricing] payment create failed:", err);
-      if (isAppError(err) && err.code.startsWith("VOUCHER_")) {
-        setVoucherStatus("invalid");
-        setVoucherError(err.message);
-        return;
-      }
-      alert("Có lỗi khi tạo đơn hàng. Vui lòng thử lại.");
-    } finally {
-      setLoadingCode(null);
-    }
+  function handleSelectPlan(productCode: string) {
+    router.push(`/payment/setup?productCode=${encodeURIComponent(productCode)}`);
   }
 
   return (
@@ -187,38 +64,6 @@ export default function PricingPage() {
       backLabel="Dashboard"
       containerWidth="default"
     >
-      <Card as="section" className="mb-10" padding="md" variant="glass">
-        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
-          <label className="block">
-            <span className="text-sm font-bold text-[var(--bm-text-main)]">
-              Mã voucher
-            </span>
-            <input
-              className="mt-2 min-h-11 w-full rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-4 text-[var(--bm-text-main)] outline-none transition focus:border-[var(--bm-border-purple)]"
-              maxLength={64}
-              onChange={(event) => {
-                setVoucherCode(event.target.value);
-                setVoucherStatus("idle");
-                setVoucherError(null);
-              }}
-              placeholder="Nhập mã nếu có"
-              value={voucherCode}
-            />
-          </label>
-          <Button onClick={handleApplyVoucher} variant="secondary">
-            Áp dụng
-          </Button>
-        </div>
-        {voucherStatus === "applied" ? (
-          <p className="mt-3 text-sm text-[var(--bm-success)]">
-            Đã lưu mã {voucherCode}. Hệ thống sẽ kiểm tra và áp dụng khi tạo đơn.
-          </p>
-        ) : null}
-        {voucherStatus === "invalid" && voucherError ? (
-          <p className="mt-3 text-sm text-[var(--bm-danger)]">{voucherError}</p>
-        ) : null}
-      </Card>
-
       {MODULE_GROUPS.map((group) => {
         const products = getProductsByModule(group.module);
         if (products.length === 0) return null;
@@ -232,7 +77,6 @@ export default function PricingPage() {
             <div className={`mt-6 ${gridClass}`}>
               {products.map((product) => (
                 <ProductCard
-                  isLoading={loadingCode === product.code}
                   key={product.code}
                   onSelect={handleSelectPlan}
                   product={product}
@@ -261,9 +105,9 @@ export default function PricingPage() {
         <Card as="section" padding="lg" variant="panel">
           <h2>Lưu ý thương mại</h2>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Giá, quyền truy cập và điều kiện hỗ trợ sẽ được trình bày rõ trước khi thanh toán.
-            Với sản phẩm luận giải mở khóa ngay, yêu cầu hỗ trợ hoặc hoàn tiền sẽ được xem xét
-            theo lỗi kỹ thuật truy cập nội dung.
+            Giá, quyền truy cập và điều kiện hỗ trợ sẽ được trình bày rõ trước khi
+            thanh toán. Với sản phẩm luận giải mở khóa ngay, yêu cầu hỗ trợ hoặc
+            hoàn tiền sẽ được xem xét theo lỗi kỹ thuật truy cập nội dung.
           </p>
         </Card>
       </section>

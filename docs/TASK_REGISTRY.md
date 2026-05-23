@@ -1112,6 +1112,46 @@ Cập nhật hoàn tất 2026-05-18:
 - Copy là skeleton; T-0801 sẽ rà soát pháp lý/biên tập trước launch.
 - Verify: `npm run check`, `npm run qa:responsive-audit`, Chrome headless 375px cho 3 route, click `Dashboard` về `/`.
 
+### T-0307 - Add pricing section vào module pages
+
+Status: Done
+
+Bối cảnh:
+
+- User vào `/than-so-hoc` hoặc `/tarot` cần thấy gói mua ngay trong đúng module, không phải tự qua `/pricing`.
+
+Yêu cầu:
+
+- Extract `ProductCard` dùng chung, không duplicate component trong `/pricing`.
+- `/than-so-hoc` hiển thị gói numerology inline.
+- `/tarot` hiển thị các gói tarot inline.
+- `/pricing` vẫn giữ vai trò compare tất cả sản phẩm.
+- Không show bundle trong module page.
+
+Output cần có:
+
+- `apps/web/src/components/ui/ProductCard.tsx`.
+- `/pricing`, `/than-so-hoc`, `/tarot` dùng `ProductCard`.
+
+Goal:
+
+- Tăng rõ ràng chuyển đổi mua gói ngay tại module.
+
+Điều kiện Done:
+
+- `npm run check` pass.
+- Click card module page đi tới `/payment/setup?productCode=...`.
+- Không hardcode giá trong module page.
+- Mobile 375px không tràn ngang.
+
+Update khi xong:
+
+- Đã extract `ProductCard` shared UI.
+- `/than-so-hoc` thêm pricing inline cho `numerology_single_report`.
+- `/tarot` thêm pricing inline cho 2 gói subscription Tarot.
+- `/pricing` refactor dùng `ProductCard` chung.
+- Disabled CTA cũ đổi thành note text về unlock sau khi mua.
+
 ## Phase 4 - Shared Contracts Và Backend Boundary
 
 ### T-0401 - Tạo shared product/pricing contract

@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-23 14:02 +07 | T-0307 | Pricing inline trên module pages | `Task` |
 | 2026-05-22 15:50 +07 | T-0506 | Admin voucher CRUD API | `Task` |
 | 2026-05-22 15:30 +07 | T-0505b | UX refactor voucher input sang payment setup | `Task` |
 | 2026-05-21 00:50 +07 | T-0505 | Voucher validate API + apply discount | `Task` |
@@ -83,6 +84,37 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-23 14:02 +07] - T-0307: Pricing inline trên module pages
+
+**Loại:** `Task`
+**Ref:** T-0307
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Thêm pricing section trực tiếp vào `/than-so-hoc` và `/tarot` để user thấy CTA mua gói ngay trong module, không phải chuyển sang `/pricing`.
+
+### Thay đổi
+- `apps/web/src/components/ui/ProductCard.tsx`: extract ProductCard thành shared client component, tự redirect mặc định tới `/payment/setup?productCode=...`.
+- `apps/web/src/app/pricing/page.tsx`: refactor dùng `ProductCard` chung, vẫn group toàn bộ sản phẩm theo module.
+- `apps/web/src/app/than-so-hoc/page.tsx`: thêm section "Sở hữu báo cáo của bạn" với card numerology lấy từ `getProductsByModule("numerology")`.
+- `apps/web/src/app/tarot/page.tsx`: thêm section "Chọn gói Tarot phù hợp" với 2 card subscription lấy từ `getProductsByModule("tarot")`.
+- Disabled CTA cũ trong module pages được đổi thành note text nói sau khi mua sẽ unlock.
+
+### Không làm
+- Không đụng `/payment/setup`, `/payment/checkout`, `/payment/success`.
+- Không đụng API.
+- Không show bundle ở module page; bundle vẫn defer ngoài MVP.
+- Không hardcode giá trong module page.
+
+### Verify
+- `npm.cmd run typecheck` pass trong quá trình sửa.
+- `npm.cmd run check` pass: typecheck, lint, security smoke và Next.js build đều thành công.
+- `npm.cmd run qa:responsive-audit` pass.
+- HTTP smoke trên dev server sẵn có `http://localhost:3000`: `/than-so-hoc` có section "Sở hữu báo cáo của bạn" + `numerology_single_report` + `99.000`; `/tarot` có section "Chọn gói Tarot phù hợp" + `tarot_guide_monthly` + `tarot_guide_quarterly`; `/pricing` render đủ nhóm Thần số học/Tarot.
+- File limits: ProductCard 60 dòng, `/pricing` 116 dòng, `/than-so-hoc` 124 dòng, `/tarot` 115 dòng.
 
 ---
 

@@ -1,40 +1,43 @@
+import { getProductsByModule } from "@banmenh/shared";
 import { PageShell } from "../../components/layout";
-import { Button, Card } from "../../components/ui";
+import { Card, ProductCard } from "../../components/ui";
 
 const numerologyMetrics = [
   {
-    icon: "🌟",
+    icon: "1",
     title: "Số đường đời",
     description: "Gợi ý nhịp phát triển chính từ ngày sinh.",
   },
   {
-    icon: "🔮",
+    icon: "2",
     title: "Số sứ mệnh",
     description: "Tóm tắt hướng thể hiện qua tên khai sinh.",
   },
   {
-    icon: "💫",
+    icon: "3",
     title: "Số linh hồn",
     description: "Gợi mở động lực bên trong và điều bạn coi trọng.",
   },
   {
-    icon: "✨",
+    icon: "4",
     title: "Số cá tính",
     description: "Cách năng lượng cá nhân thường được người khác nhận thấy.",
   },
   {
-    icon: "🌙",
+    icon: "5",
     title: "Năm cá nhân",
     description: "Bối cảnh chủ đề trong chu kỳ một năm hiện tại.",
   },
   {
-    icon: "☀",
+    icon: "6",
     title: "Tháng cá nhân",
-    description: "Gợi ý nhịp ngắn hạn để quan sát và điều chỉnh.",
+    description: "Gợi ý ngắn hạn để quan sát và điều chỉnh.",
   },
 ];
 
 export default function NumerologyPage() {
+  const products = getProductsByModule("numerology");
+
   return (
     <PageShell
       title="Thần số học"
@@ -48,23 +51,21 @@ export default function NumerologyPage() {
         <div className="max-w-2xl">
           <h2>Bắt đầu tra cứu</h2>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Đây là khung nhập liệu nền cho module Thần số học. Form thật sẽ
-            được triển khai riêng để giữ đúng phạm vi skeleton.
+            Đây là khung nhập liệu nền cho module Thần số học. Form thật sẽ được
+            triển khai riêng ở T-0601.
           </p>
         </div>
 
         <Card as="section" className="mt-6" variant="glass" padding="lg">
           <h3>Nhập thông tin</h3>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Form sẽ được triển khai ở T-0601.
+            Sau khi mua, form nhập dữ liệu và báo cáo sẽ được mở khóa cho tài
+            khoản của bạn.
           </p>
           <div className="mt-6 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5 text-sm text-[var(--bm-text-muted)]">
             Khu vực này sẽ chứa họ tên, tên thường dùng, giới tính và ngày sinh
             khi bước nhập liệu được mở.
           </div>
-          <Button className="mt-6" disabled variant="primary">
-            Tạo báo cáo (sắp ra mắt)
-          </Button>
         </Card>
       </section>
 
@@ -72,8 +73,8 @@ export default function NumerologyPage() {
         <div className="max-w-2xl">
           <h2>Các chỉ số sẽ được luận giải</h2>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Báo cáo sẽ chia thông tin thành các nhóm chỉ số rõ ràng để bạn dễ
-            đọc và đối chiếu từng phần.
+            Báo cáo chia thông tin thành các nhóm chỉ số rõ ràng để bạn dễ đọc
+            và đối chiếu từng phần.
           </p>
         </div>
 
@@ -95,13 +96,27 @@ export default function NumerologyPage() {
       </section>
 
       <section className="mt-14">
+        <div className="max-w-2xl">
+          <h2>Sở hữu báo cáo của bạn</h2>
+          <p className="mt-4 text-[var(--bm-text-soft)]">
+            Mua một lần, mở khóa vĩnh viễn báo cáo Thần số học đầy đủ trong tài khoản.
+          </p>
+        </div>
+        <div className="mt-8 grid gap-5">
+          {products.map((product) => (
+            <ProductCard key={product.code} product={product} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-14">
         <Card as="section" variant="panel" padding="lg">
           <h2>Lưu ý khi đọc luận giải</h2>
           <p className="mt-4 text-[var(--bm-text-soft)]">
             Thần số học trong Bản Mệnh V2 được dùng như công cụ tham khảo và tự
             quan sát. Nội dung không khẳng định tương lai chắc chắn, không thay
-            thế tư vấn chuyên môn và không nên là căn cứ duy nhất cho quyết
-            định quan trọng.
+            thế tư vấn chuyên môn và không nên là căn cứ duy nhất cho quyết định
+            quan trọng.
           </p>
         </Card>
       </section>
