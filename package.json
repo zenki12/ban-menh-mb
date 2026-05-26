@@ -13,6 +13,11 @@
     "build": "npm --workspace apps/web run build",
     "typecheck": "npm --workspace apps/web run typecheck",
     "lint": "npm --workspace apps/web run lint",
+    "kb:validate": "node tools/kb-import/validate-numerology-kb.mjs",
+    "kb:test-engine": "node tools/kb-import/test-engine.mjs",
+    "kb:extract-narrative": "node tools/kb-import/extract-narrative.mjs",
+    "kb:validate-narrative": "node tools/kb-import/validate-narrative.mjs",
+    "kb:upload-kv": "node tools/kb-import/upload-to-kv.mjs",
     "security:smoke": "node tools/security-smoke.mjs",
     "qa:responsive-audit": "node tools/responsive-qa-audit.mjs",
     "check": "npm run typecheck && npm run lint && npm run security:smoke && npm run build"

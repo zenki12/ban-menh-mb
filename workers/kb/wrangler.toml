@@ -1,26 +1,18 @@
-# Resource thật điền qua wrangler secret put, không commit.
+# Production KV id must be set via wrangler before production deploy.
 name = "banmenh-kb"
 main = "src/index.ts"
-compatibility_date = "2026-05-16"
+compatibility_date = "2026-05-23"
 
 [env.dev]
 name = "banmenh-kb-dev"
 
 [[env.dev.kv_namespaces]]
-binding = "CONFIG_KV"
-id = "placeholder-dev-kv-namespace-id"
-
-[[env.dev.r2_buckets]]
-binding = "KB_BUCKET"
-bucket_name = "banmenh-kb-dev"
+binding = "BANMENH_KB_DEV"
+id = "70886bee025145cf8ff352bcfa0148b6"
 
 [env.production]
 name = "banmenh-kb-prod"
 
 [[env.production.kv_namespaces]]
-binding = "CONFIG_KV"
-id = "placeholder-prod-kv-namespace-id"
-
-[[env.production.r2_buckets]]
-binding = "KB_BUCKET"
-bucket_name = "banmenh-kb-prod"
+binding = "BANMENH_KB_DEV"
+id = "placeholder-prod-kv-id"

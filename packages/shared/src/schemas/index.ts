@@ -9,3 +9,4 @@ export * from "./entitlement";
 export * from "./voucher";
 export * from "./payment-log";
 export * from "./tarot-reading";
+export * from "./numerology-kb";

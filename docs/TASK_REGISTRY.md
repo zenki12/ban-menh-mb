@@ -1490,6 +1490,155 @@ Update khi xong:
 - Ghi test đã chạy.
 - Ghi rủi ro còn lại.
 
+## Phase 4B - KB Pipeline
+
+### T-0407 - Numerology KB private import pipeline
+
+Status: Done
+
+Boi canh:
+
+- KB Than so hoc la tai san private, khong duoc dua vao frontend/static asset.
+- ADR-002 quy dinh KB private chi di qua storage/backend boundary.
+- Can copy nguon V1 vao `kb-private/` de validate va chuan bi import R2/KV.
+
+Yeu cau:
+
+- Copy nguon KB vao `kb-private/numerology/` va dam bao gitignored.
+- Tao schema validate cau truc KB.
+- Tao import/validate tooling truoc khi extract narrative va publish storage.
+
+Output can co:
+
+- `kb-private/numerology/` chua raw KB/reference files, khong track git.
+- Zod schema Numerology KB trong `packages/shared`.
+- Tool validate local cho KB source.
+
+Goal:
+
+- Co pipeline an toan de dua KB private vao V2 ma khong leak qua repo/app bundle.
+
+Dieu kien Done:
+
+- Tung sub-task T-0407a-f hoan tat.
+- Khong co raw KB trong git status/staged files.
+- Validate/import commands duoc ghi DEVLOG.
+
+Update khi xong (2026-05-26):
+
+- Phase 4B hoan tat: KB private copy, schema validate, engine TypeScript, narrative extract, KV upload va KB Worker live test.
+- `POST /numerology/report` live test pass voi Firebase ID token that.
+- Worker khong expose raw KB endpoint; chi generate report tu input user.
+
+#### T-0407a - Copy V1 KB sources va validate cau truc
+
+Status: Done
+
+Yeu cau:
+
+- Copy 3 file Database chuan vao `kb-private/numerology/`.
+- Copy V1 narrative full reference vao `kb-private/numerology/`.
+- Tao `NumerologyKbSchema` bang Zod trong shared schemas.
+- Tao `npm run kb:validate`.
+
+Dieu kien Done:
+
+- `npm run kb:validate` pass.
+- `git status` khong hien raw KB files.
+- DEVLOG ghi so chi so trong KB.
+
+Update khi xong (2026-05-23):
+
+- Da copy raw KB/reference files vao `kb-private/numerology/` va xac nhan folder nay bi `.gitignore` chan.
+- Da them `packages/shared/src/schemas/numerology-kb.ts` va export tu shared schemas.
+- Da them `tools/kb-import/validate-numerology-kb.mjs` va root script `npm run kb:validate`.
+- `npm.cmd run kb:validate` pass: 33 nhom KB, 303 chi so tim duoc.
+- Raw KB files khong xuat hien trong `git status --short`; chi hien ignored khi dung `--ignored`.
+
+#### T-0407b - Convert numerology KB sang import artifact
+
+Status: Done
+
+Update khi xong (2026-05-26):
+
+- Da hoan tat schema/import artifact boundary trong Phase 4B.
+- `NumerologyKbSchema` validate 33 nhom KB, 303 chi so.
+- `NarrativeKbSchema` validate 2 nhom narrative, 22 entries.
+- Raw artifact nam trong `kb-private/` va khong track git.
+
+#### T-0407c - Port numerology engine sang TypeScript Worker-ready
+
+Status: Done
+
+Yeu cau:
+
+- Port logic tinh chi so tu `kb-private/numerology/engine.v1.js` sang TypeScript pure functions.
+- Khong import KB file trong runtime; KB duoc pass qua parameter.
+- Module nam trong `packages/shared/src/numerology/`, khong dung Node `fs`, `path`, `require` trong source.
+- Test voi KB private local qua tool rieng.
+
+Dieu kien Done:
+
+- `npm run kb:test-engine` pass voi 3 case.
+- `npm run kb:validate` pass.
+- `npm run check` pass.
+
+Update khi xong (2026-05-23):
+
+- Da them `packages/shared/src/numerology/calculator.ts`, `indicators.ts`, `report.ts`, `index.ts`.
+- Engine la pure TypeScript module, khong dung Node `fs`, `path`, `require`, DOM trong `packages/shared/src/numerology`.
+- `generateReport(input, kb)` nhan KB qua tham so, lookup data theo section trong `NumerologyKb`.
+- Da them `npm run kb:test-engine` voi 3 case va compare V1 cho life path/destiny tren case ASCII.
+- Verify pass: `npm.cmd run kb:test-engine`, `npm.cmd run kb:validate`, `npm.cmd run check`.
+
+#### T-0407d - Extract narrative templates thanh data an toan
+
+Status: Done
+
+Yeu cau:
+
+- Parse `kb-private/numerology/narrative_v1_full.js` bang text-only regex/scanner, khong eval/require/import.
+- Extract 2 nhom `lifePath` va `destiny`.
+- Output `kb-private/numerology/narrative.json` voi placeholder `{{name}}`.
+- Validate shape bang shared Zod schema.
+
+Dieu kien Done:
+
+- `npm run kb:extract-narrative` pass va tao `narrative.json`.
+- `npm run kb:validate-narrative` pass voi 22 entries.
+- `git status --ignored kb-private` xac nhan `narrative.json` bi ignore.
+- `npm run check` pass.
+
+Update khi xong (2026-05-23):
+
+- Da them `tools/kb-import/extract-narrative.mjs` de extract text-only lifePath/destiny.
+- Da them `tools/kb-import/validate-narrative.mjs` va `NarrativeKbSchema`.
+- Da them scripts `kb:extract-narrative` va `kb:validate-narrative`.
+- Extract pass: lifePath 11 entries, destiny 11 entries, total 22 entries.
+- `narrative.json` nam trong `kb-private/numerology/` va bi gitignore chan.
+
+#### T-0407e - Implement KB gateway lookup API
+
+Status: Done
+
+Update khi xong (2026-05-26):
+
+- `workers/kb` scaffold Hono + KV hoan tat.
+- KV remote upload pass voi namespace `BANMENH_KB_DEV`, keys `kb-numerology` va `kb-narrative`.
+- Wrangler dev pattern khoa lai: `wrangler dev --env dev --remote` de load env binding va dung cloud KV.
+- Live test `POST /numerology/report` pass voi Firebase ID token that, tra full report va narrative HTML.
+
+#### T-0407f - Wire numerology report generator to KB gateway
+
+Status: Done
+
+Update khi xong (2026-05-26):
+
+- Smoke test endpoint `POST /numerology/report` pass.
+- Response tra 33 indicator slots tu TypeScript engine va merge narrative lifePath/destiny.
+- Master number 33 va karmic debt 10/16 detect dung trong live report.
+- Entitlement filter van la Phase 6, nhung KB Worker report flow da san sang cho integration.
+
 ## Phase 5 - Payment, Voucher, Alert
 
 ### T-0501 - Implement payment create API

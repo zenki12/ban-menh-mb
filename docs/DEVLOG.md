@@ -37,6 +37,10 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-26 22:40 +07 | T-0407 | Phase 4B KB pipeline hoàn tất | `Phase-Retro` |
+| 2026-05-23 16:11 +07 | T-0407d | Extract V1 narrative lifePath + destiny | `Task` |
+| 2026-05-23 16:00 +07 | T-0407c | Numerology engine TypeScript Worker-ready | `Task` |
+| 2026-05-23 15:50 +07 | T-0407a | Numerology KB private copy + schema validate | `Task` |
 | 2026-05-23 14:02 +07 | T-0307 | Pricing inline trên module pages | `Task` |
 | 2026-05-22 15:50 +07 | T-0506 | Admin voucher CRUD API | `Task` |
 | 2026-05-22 15:30 +07 | T-0505b | UX refactor voucher input sang payment setup | `Task` |
@@ -84,6 +88,148 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-26 22:40 +07] - T-0407: Phase 4B KB pipeline hoàn tất
+
+**Loại:** `Phase-Retro`
+**Ref:** T-0407
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Phase 4B hoàn tất: KB private được đưa vào pipeline an toàn, có schema validate, engine TypeScript Worker-ready, narrative extract, KV upload và KB Worker live test pass.
+
+### Thay đổi
+- `workers/kb`: Hono Worker mới cho Numerology report generation, load KB từ KV binding `BANMENH_KB_DEV`.
+- KV remote dùng 2 keys: `kb-numerology` và `kb-narrative`; upload qua `tools/kb-import/upload-to-kv.mjs`.
+- `packages/shared/src/numerology`: engine pure TypeScript gồm calculator, indicators, report generator.
+- `packages/shared/src/schemas/numerology-kb.ts`: schema cho structured KB và narrative KB.
+- `tools/kb-import`: validate KB, test engine, extract narrative, validate narrative, upload KV.
+
+### Verify
+- KB Worker `workers/kb` live test pass với Firebase ID token thật.
+- `POST /numerology/report` trả 33 indicators + narrative HTML; placeholder `{{name}}` được render bằng tên user đã escape.
+- Master number `33` và karmic debt `10`, `16` detect đúng trong report.
+- Engine cross-check V1 match cho life path/destiny trong test tool.
+- `npm.cmd run security:smoke` pass trước commit.
+
+### Lessons Learned
+- Wrangler v4 cần `wrangler dev --env dev` để load env-scoped binding.
+- Muốn dùng cloud KV trong dev phải thêm `--remote`; nếu không Wrangler dùng local KV simulation rỗng.
+- `kb:upload-kv` đã khóa `--remote` để upload đúng KV namespace dev.
+
+### Không làm
+- Không expose raw KB qua endpoint nào.
+- Không thêm entitlement filter ở Phase 4B; phần này chuyển sang Phase 6.
+
+---
+
+## [2026-05-23 16:11 +07] - T-0407d: Extract V1 narrative lifePath + destiny
+
+**Loại:** `Task`
+**Ref:** T-0407d
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Extract text-only narrative templates từ V1 cho 2 indicator cốt lõi `lifePath` và `destiny`, xuất ra JSON private để dùng cho pipeline KB sau này.
+
+### Thay đổi
+- `tools/kb-import/extract-narrative.mjs`: đọc `narrative_v1_full.js` dạng text, parse 2 group `lifePath` và `destiny`, extract 11 entries mỗi group (`1-9`, `11`, `22`), đổi `${name}` thành `{{name}}`.
+- `tools/kb-import/validate-narrative.mjs`: validate `kb-private/numerology/narrative.json` qua shared schema.
+- `packages/shared/src/schemas/numerology-kb.ts`: thêm `NarrativeEntrySchema`, `NarrativeKbSchema` và inferred types.
+- `package.json`: thêm scripts `kb:extract-narrative` và `kb:validate-narrative`.
+- Output private: `kb-private/numerology/narrative.json` với 22 entries total, mỗi entry gồm `{ html, variables: ["name"] }`.
+
+### Không làm
+- Không eval/require/import `narrative_v1_full.js`.
+- Không extract ngoài `lifePath` và `destiny`.
+- Không strip HTML class V1; các class như `lp-section-title`, `nar`, `lp-traits` được giữ nguyên.
+- Không commit `narrative.json`; file nằm trong `kb-private/` và bị gitignore.
+- Chưa map CSS V2 cho HTML narrative; để T-0407e.
+
+### Verify
+- `npm.cmd run kb:extract-narrative` pass: `lifePath: 11 entries`, `destiny: 11 entries`.
+- `npm.cmd run kb:validate-narrative` pass: total 22 entries, schema OK.
+- Kiểm tra JSON: có đúng 2 key `lifePath` + `destiny`, keys `1-9,11,22`, variables `["name"]`.
+- `rg '\$\{name\}|\$\{' kb-private/numerology/narrative.json` không có match, xác nhận không còn raw template expression.
+- `git status --short --ignored kb-private` chỉ hiện `!! kb-private/numerology/`, xác nhận narrative JSON bị ignore.
+- `npm.cmd run check` pass: typecheck, lint, security smoke và Next.js build.
+
+### Lưu ý
+- `destiny` trong V1 dùng signature `(name, d)` và có conditional template expression phụ; extractor xử lý text-only bằng scanner template literal, giữ fallback HTML khi có và loại bỏ biến `d` vì output MVP chỉ khai báo `variables: ["name"]`.
+
+---
+
+## [2026-05-23 16:00 +07] - T-0407c: Numerology engine TypeScript Worker-ready
+
+**Loại:** `Task`
+**Ref:** T-0407c
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port engine Numerology V1 sang TypeScript module trong `packages/shared`, dùng được ở Worker/Next.js vì không phụ thuộc Node runtime và không import KB hardcode.
+
+### Thay đổi
+- `packages/shared/src/numerology/calculator.ts`: core math helpers Pythagoras, vowel/consonant sums, master number, normalize tên tiếng Việt có dấu sang ASCII.
+- `packages/shared/src/numerology/indicators.ts`: port các calculator chỉ số từ V1: đường đời, sứ mệnh, linh hồn, cá tính, ngày sinh, thái độ, năm/tháng/ngày cá nhân, chu kỳ đời, kim tự tháp, thử thách, bài học nghiệp, trưởng thành, cornerstone/capstone và các chỉ số năng lực/tiếp cận.
+- `packages/shared/src/numerology/report.ts`: thêm `generateReport(input, kb)` trả structured report 33 indicator slots, lookup KB qua parameter.
+- `packages/shared/src/numerology/index.ts` và `packages/shared/src/index.ts`: export module Numerology.
+- `tools/kb-import/test-engine.mjs`: test 3 case với KB private local và compare V1 cho `lifePath`/`destiny` trên case ASCII tương thích V1.
+- `package.json`: thêm script `npm run kb:test-engine`.
+
+### Không làm
+- Không import KB file trong `packages/shared/src/numerology`.
+- Không dùng `fs`, `path`, `require`, DOM trong source runtime.
+- Không đưa raw KB vào frontend/static asset.
+- Không wire Worker/R2 trong task này; phần đó để T-0407e.
+
+### Verify
+- `npm.cmd run kb:test-engine` pass: 3 case generate report không crash, V1 compare pass `lifePath=4`, `destiny=11`.
+- `npm.cmd run kb:validate` pass: 33 nhóm KB, 303 chỉ số.
+- `npm.cmd run check` pass: typecheck, lint, security smoke và Next.js build.
+- Runtime source scan: không thấy `node:`, `require(`, `fs`, `document`, `window` trong `packages/shared/src/numerology`.
+- File limits: `calculator.ts` 62 dòng, `indicators.ts` 195 dòng, `report.ts` 194 dòng, `test-engine.mjs` 80 dòng.
+
+### Lưu ý
+- V1 không normalize tiếng Việt có dấu, nên compare V1 dùng case ASCII `Le Hoang C`; engine mới vẫn normalize tên tiếng Việt theo yêu cầu của T-0407c.
+
+---
+
+## [2026-05-23 15:50 +07] - T-0407a: Numerology KB private copy + schema validate
+
+**Loại:** `Task`
+**Ref:** T-0407a
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Copy nguồn Numerology KB V1 vào `kb-private/` để chuẩn bị pipeline import private, đồng thời thêm Zod schema và tool validate cấu trúc KB local.
+
+### Thay đổi
+- Copy raw KB/reference files vào `kb-private/numerology/`:
+  - `kb.json` từ `numerology_knowledge_base.json`.
+  - `engine.v1.js` và `calculator.v1.ts` chỉ để reference, không chạy runtime.
+  - `narrative_v1_full.js` chỉ để reference; extraction để T-0407d.
+- `packages/shared/src/schemas/numerology-kb.ts`: thêm `NumerologyKbSchema` và các schema con cho letter map, karmic debt, life cycle, birthday number, pyramid peak/challenge và các section KB thực tế.
+- `packages/shared/src/schemas/index.ts`: export schema Numerology KB.
+- `tools/kb-import/validate-numerology-kb.mjs`: đọc `kb-private/numerology/kb.json`, import schema từ `@banmenh/shared` qua esbuild bundle, validate và in thống kê.
+- `package.json`: thêm script `npm run kb:validate`.
+- `docs/TASK_REGISTRY.md`: thêm Phase 4B - KB Pipeline với T-0407 và subtasks T-0407a-f.
+
+### Không làm
+- Không copy KB vào `apps/web/`, `workers/` hoặc public/static asset.
+- Không chạy `engine.v1.js` hay `narrative_v1_full.js` trong runtime.
+- Không extract narrative trong task này; để T-0407d.
+
+### Verify
+- `npm.cmd run kb:validate` pass.
+- `npm.cmd run check` pass: typecheck, lint, security smoke và Next.js build thành công.
+- Output validate: `So nhom KB: 33`, `So chi so tim duoc: 303`, `Validation pass: Numerology KB structure OK`.
+- `git status --short --ignored kb-private` chỉ hiện `!! kb-private/numerology/`, xác nhận raw KB files đang bị ignore.
+- File limits: `numerology-kb.ts` 198 dòng, `validate-numerology-kb.mjs` 65 dòng.
+
+### Lưu ý
+- Schema đã điều chỉnh theo file thật: `karmic_debt.how_to_reduce` có thể là string hoặc array; `personal_year.love` optional vì year 7 không có field này.
 
 ---
 

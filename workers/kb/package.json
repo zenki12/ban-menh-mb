@@ -1,13 +1,14 @@
 {
-  "name": "@banmenh/payment-worker",
+  "name": "@banmenh/kb-worker",
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "wrangler dev --env dev",
+    "dev": "wrangler dev --env dev --remote",
     "deploy:dev": "wrangler deploy --env dev",
     "deploy:prod": "wrangler deploy --env production"
   },
   "dependencies": {
+    "@banmenh/shared": "*",
     "hono": "^4.6.0"
   },
   "devDependencies": {
