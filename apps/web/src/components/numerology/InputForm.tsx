@@ -26,8 +26,8 @@ const initialForm: FormData = {
   birthYear: "",
 };
 const genderOptions = [
-  { value: "male", icon: "🌞", label: "Nam", selectedClass: "border-[var(--bm-border-gold)] shadow-[var(--bm-shadow-gold)]", selectedBg: "linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.05))" },
-  { value: "female", icon: "🌙", label: "Nữ", selectedClass: "border-[var(--bm-border-purple)] shadow-[var(--bm-shadow-purple)]", selectedBg: "linear-gradient(135deg, rgba(167,139,250,0.15), rgba(124,58,237,0.05))" },
+  { value: "male", iconSrc: "/icons/gender-male.png", label: "Nam", selectedClass: "border-[var(--bm-border-gold)] shadow-[var(--bm-shadow-gold)]", selectedBg: "linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.05))" },
+  { value: "female", iconSrc: "/icons/gender-female.png", label: "Nữ", selectedClass: "border-[var(--bm-border-purple)] shadow-[var(--bm-shadow-purple)]", selectedBg: "linear-gradient(135deg, rgba(167,139,250,0.15), rgba(124,58,237,0.05))" },
 ] as const;
 
 function pad(value: string) {
@@ -168,14 +168,14 @@ export function InputForm() {
                     aria-checked={selected}
                     onClick={() => setField("gender", option.value)}
                     className={[
-                      "group flex flex-col items-center gap-2 rounded-2xl border-2 px-4 py-5 transition-all duration-200",
+                      "group flex flex-col items-center gap-2 rounded-2xl border-2 px-4 py-6 transition-all duration-200",
                       selected
                         ? option.selectedClass
                         : "border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] opacity-70 hover:-translate-y-0.5 hover:opacity-100",
                     ].join(" ")}
                     style={selected ? { backgroundImage: option.selectedBg } : undefined}
                   >
-                    <span className="text-5xl" aria-hidden="true">{option.icon}</span>
+                    <img src={option.iconSrc} alt="" aria-hidden="true" className="size-32 object-contain sm:size-40" />
                     <span className="text-base font-bold text-[var(--bm-text-main)]">{option.label}</span>
                   </button>
                 );
