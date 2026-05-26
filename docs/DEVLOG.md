@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-26 22:48 +07 | T-0601 | Numerology input form | `Task` |
 | 2026-05-26 22:40 +07 | T-0407 | Phase 4B KB pipeline hoàn tất | `Phase-Retro` |
 | 2026-05-23 16:11 +07 | T-0407d | Extract V1 narrative lifePath + destiny | `Task` |
 | 2026-05-23 16:00 +07 | T-0407c | Numerology engine TypeScript Worker-ready | `Task` |
@@ -88,6 +89,33 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-26 22:48 +07] - T-0601: Numerology input form
+
+**Loại:** `Task`
+**Ref:** T-0601
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> `/than-so-hoc` có form nhập liệu Thần số học đầu tiên: user nhập họ tên, tên thường gọi, giới tính và ngày sinh trước khi sang result flow ở T-0602.
+
+### Thay đổi
+- Tạo `apps/web/src/components/numerology/InputForm.tsx` với 4 field: họ tên đầy đủ, tên thường gọi, giới tính, ngày sinh.
+- Validate client-side bằng `reportInputSnapshotSchema` + kiểm tra ngày hợp lệ; lỗi tên trống trả message `"Vui lòng nhập họ tên"`, ngày không tồn tại trả `"Ngày sinh không hợp lệ"`.
+- Submit không gọi API; chuyển sang `/than-so-hoc/result` với params `fullName`, `dob`, `gender`, `nickname`.
+- Tạo `apps/web/src/app/than-so-hoc/result/page.tsx` placeholder cho T-0602 để route không 404.
+- Dùng 3 dropdown DD/MM/YYYY thay date picker để dễ nhập hơn cho user non-tech.
+
+### Verify
+- `npm.cmd run check` pass: typecheck, lint, security smoke, build.
+- `npm.cmd run qa:responsive-audit` pass checklist responsive tối thiểu.
+- File limits: `InputForm.tsx` 199 dòng, `/than-so-hoc/page.tsx` 110 dòng, `/than-so-hoc/result/page.tsx` 50 dòng.
+
+### Không làm
+- Không gọi API và không implement report generation; phần này defer sang T-0602.
+- Không remove pricing inline trên `/than-so-hoc`.
 
 ---
 

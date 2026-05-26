@@ -84,6 +84,15 @@ a {
   text-decoration: none;
 }
 
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: var(--bm-bg-deep);
+  color: var(--bm-text-main);
+}
+
 .text-gradient-purple {
   background: var(--bm-gradient-purple-text);
   -webkit-background-clip: text;

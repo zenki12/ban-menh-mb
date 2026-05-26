@@ -2024,7 +2024,7 @@ Update khi xong:
 
 ### T-0601 - Build numerology input form
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -2054,6 +2054,11 @@ Goal:
 Update khi xong:
 
 - Ghi fields và validate rules.
+
+- Hoàn tất 2026-05-26: tạo form input Thần số học tại `/than-so-hoc` với họ tên, tên thường gọi, giới tính, ngày sinh dạng 3 dropdown.
+- Validate client-side bằng Zod/shared schema + kiểm tra ngày hợp lệ; không gọi API trong task này.
+- Submit chuyển sang `/than-so-hoc/result` với query params để T-0602 tiếp tục implement result generation.
+- Tạo placeholder result page để route không 404.
 
 ### T-0602 - Implement numerology free result generation
 

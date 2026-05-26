@@ -1,5 +1,6 @@
 import { getProductsByModule } from "@banmenh/shared";
 import { PageShell } from "../../components/layout";
+import { InputForm } from "../../components/numerology/InputForm";
 import { Card, ProductCard } from "../../components/ui";
 
 const numerologyMetrics = [
@@ -26,7 +27,7 @@ const numerologyMetrics = [
   {
     icon: "5",
     title: "Năm cá nhân",
-    description: "Bối cảnh chủ đề trong chu kỳ một năm hiện tại.",
+    description: "Bối cảnh chủ đạo trong chu kỳ một năm hiện tại.",
   },
   {
     icon: "6",
@@ -51,30 +52,17 @@ export default function NumerologyPage() {
         <div className="max-w-2xl">
           <h2>Bắt đầu tra cứu</h2>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Đây là khung nhập liệu nền cho module Thần số học. Form thật sẽ được
-            triển khai riêng ở T-0601.
+            Nhập thông tin cơ bản để tạo bản phân tích Thần số học cá nhân hóa.
           </p>
         </div>
-
-        <Card as="section" className="mt-6" variant="glass" padding="lg">
-          <h3>Nhập thông tin</h3>
-          <p className="mt-4 text-[var(--bm-text-soft)]">
-            Sau khi mua, form nhập dữ liệu và báo cáo sẽ được mở khóa cho tài
-            khoản của bạn.
-          </p>
-          <div className="mt-6 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5 text-sm text-[var(--bm-text-muted)]">
-            Khu vực này sẽ chứa họ tên, tên thường dùng, giới tính và ngày sinh
-            khi bước nhập liệu được mở.
-          </div>
-        </Card>
+        <InputForm />
       </section>
 
       <section className="mt-14">
         <div className="max-w-2xl">
           <h2>Các chỉ số sẽ được luận giải</h2>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Báo cáo chia thông tin thành các nhóm chỉ số rõ ràng để bạn dễ đọc
-            và đối chiếu từng phần.
+            Báo cáo chia thông tin thành các nhóm chỉ số rõ ràng để bạn dễ đọc và đối chiếu.
           </p>
         </div>
 
@@ -87,9 +75,7 @@ export default function NumerologyPage() {
                 </span>
                 <h3 className="text-lg">{metric.title}</h3>
               </div>
-              <p className="mt-3 text-sm text-[var(--bm-text-soft)]">
-                {metric.description}
-              </p>
+              <p className="mt-3 text-sm text-[var(--bm-text-soft)]">{metric.description}</p>
             </Card>
           ))}
         </div>
@@ -113,10 +99,9 @@ export default function NumerologyPage() {
         <Card as="section" variant="panel" padding="lg">
           <h2>Lưu ý khi đọc luận giải</h2>
           <p className="mt-4 text-[var(--bm-text-soft)]">
-            Thần số học trong Bản Mệnh V2 được dùng như công cụ tham khảo và tự
-            quan sát. Nội dung không khẳng định tương lai chắc chắn, không thay
-            thế tư vấn chuyên môn và không nên là căn cứ duy nhất cho quyết định
-            quan trọng.
+            Thần số học trong Bản Mệnh V2 được dùng như công cụ tham khảo và tự quan sát.
+            Nội dung không khẳng định tương lai chắc chắn, không thay thế tư vấn chuyên môn
+            và không nên là căn cứ duy nhất cho quyết định quan trọng.
           </p>
         </Card>
       </section>
