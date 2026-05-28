@@ -39,22 +39,22 @@ const sourceLabels: Record<string, string> = {
 const lockedGroups: LockedGroup[] = [
   {
     label: "Cá tính & Linh hồn",
-    icon: "1",
+    icon: "👤",
     items: ["Số sứ mệnh", "Số linh hồn", "Số cá tính", "Số thái độ", "Động lực tiếp cận", "Năng lực tiếp cận", "Thái độ tiếp cận"].map((title) => ({ title })),
   },
   {
     label: "Chu kỳ thời gian",
-    icon: "2",
+    icon: "⏳",
     items: ["12 tháng cá nhân", "Ngày cá nhân", "3 chu kỳ cuộc đời", "4 đỉnh kim tự tháp", "4 thử thách kim tự tháp"].map((title) => ({ title })),
   },
   {
     label: "Bài học & Hành trình",
-    icon: "3",
+    icon: "🎯",
     items: ["Bài học karmic", "Số trưởng thành", "Năng lực trưởng thành", "Năng lực nhận thức", "Khó khăn vượt qua", "Thử thách linh hồn", "Thử thách sứ mệnh", "Thử thách cá tính"].map((title) => ({ title })),
   },
   {
     label: "Dấu ấn biểu tượng",
-    icon: "4",
+    icon: "💎",
     items: [{ title: "Chữ cái mở đầu" }, { title: "Chữ cái đóng" }],
   },
 ];
