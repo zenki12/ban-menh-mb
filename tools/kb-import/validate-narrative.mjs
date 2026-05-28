@@ -23,25 +23,68 @@ async function loadSchema() {
   return import(`data:text/javascript;base64,${encoded}`);
 }
 
-function countEntries(value) {
-  return Object.keys(value).length;
+function validateEntry(groupName, key, entry) {
+  const errors = [];
+  const prefix = `${groupName}.${key}`;
+  if (!Array.isArray(entry.variables) || entry.variables.length === 0) {
+    errors.push(`${prefix}.variables: must not be empty`);
+  } else if (entry.variables[0] !== "name") {
+    errors.push(`${prefix}.variables: first variable must be name`);
+  }
+
+  for (const variable of entry.variables ?? []) {
+    if (!entry.html.includes(`{{${variable}}}`)) {
+      errors.push(`${prefix}.html: missing {{${variable}}}`);
+    }
+  }
+
+  if (entry.html.includes("${")) {
+    errors.push(`${prefix}.html: contains raw template expression`);
+  }
+  return errors;
+}
+
+function validateSemantics(narrative) {
+  const errors = [];
+  for (const [groupName, group] of Object.entries(narrative)) {
+    if (!group || typeof group !== "object" || Array.isArray(group)) {
+      errors.push(`${groupName}: group must be an object`);
+      continue;
+    }
+    for (const [key, entry] of Object.entries(group)) {
+      errors.push(...validateEntry(groupName, key, entry));
+    }
+  }
+  return errors;
+}
+
+function countEntries(group) {
+  return Object.keys(group ?? {}).length;
 }
 
 const raw = await readFile(narrativePath, "utf8");
 const narrative = JSON.parse(raw);
 const { NarrativeKbSchema } = await loadSchema();
 const result = NarrativeKbSchema.safeParse(narrative);
+const semanticErrors = validateSemantics(narrative);
 
-const lifePathCount = countEntries(narrative.lifePath ?? {});
-const destinyCount = countEntries(narrative.destiny ?? {});
-console.log(`lifePath: ${lifePathCount} entries`);
-console.log(`destiny: ${destinyCount} entries`);
-console.log(`total: ${lifePathCount + destinyCount} entries`);
+let total = 0;
+for (const [groupName, group] of Object.entries(narrative)) {
+  const count = countEntries(group);
+  total += count;
+  console.log(`${groupName}: ${count} entries`);
+}
+console.log(`total: ${total} entries`);
 
-if (!result.success) {
+if (!result.success || semanticErrors.length > 0) {
   console.error("Validation fail:");
-  console.error(result.error.issues.map((issue) => `- ${issue.path.join(".")}: ${issue.message}`).join("\n"));
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      console.error(`- ${issue.path.join(".")}: ${issue.message}`);
+    }
+  }
+  for (const error of semanticErrors) console.error(`- ${error}`);
   process.exit(1);
 }
 
-console.log("Validation pass: Narrative KB structure OK");
+console.log("Validation pass: Narrative KB structure and placeholders OK");
