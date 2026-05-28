@@ -203,8 +203,27 @@ export const NarrativeEntrySchema = z.object({
 });
 export type NarrativeEntry = z.infer<typeof NarrativeEntrySchema>;
 
+const narrativeGroupSchema = z.record(z.string(), NarrativeEntrySchema);
+
 export const NarrativeKbSchema = z.object({
-  lifePath: z.record(z.string(), NarrativeEntrySchema),
-  destiny: z.record(z.string(), NarrativeEntrySchema),
+  lifePath: narrativeGroupSchema,
+  soul: narrativeGroupSchema,
+  destiny: narrativeGroupSchema,
+  personality: narrativeGroupSchema,
+  maturity: narrativeGroupSchema,
+  attitude: narrativeGroupSchema,
+  karmicLesson: narrativeGroupSchema,
+  birthday: narrativeGroupSchema,
+  pyramidPeak: narrativeGroupSchema,
+  pyramidChallenge: narrativeGroupSchema,
+  tensionNumber: narrativeGroupSchema,
+  soulChallenge: narrativeGroupSchema,
+  destinyChallenge: narrativeGroupSchema,
+  personalityChallenge: narrativeGroupSchema,
+  cognitiveAbility: narrativeGroupSchema,
+  approachMotivation: narrativeGroupSchema,
+  approachAbility: narrativeGroupSchema,
+  approachAttitude: narrativeGroupSchema,
+  personalYearDomains: narrativeGroupSchema,
 });
 export type NarrativeKb = z.infer<typeof NarrativeKbSchema>;
