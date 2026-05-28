@@ -49,15 +49,6 @@ export const PERSONALITY_GROUPS: PersonalityGroup[] = [
   { num: 9, label: "Trách nhiệm - Rộng lượng - Hào phóng", color: "#ec4899" },
 ];
 
-function normalizeToHundred<T extends { pct: number }>(items: T[]): T[] {
-  const total = items.reduce((sum, item) => sum + item.pct, 0);
-  const diff = 100 - total;
-  if (diff === 0 || items.length === 0) return items;
-  const maxIndex = items.reduce((max, item, index) => (item.pct > items[max].pct ? index : max), 0);
-  items[maxIndex] = { ...items[maxIndex], pct: items[maxIndex].pct + diff };
-  return items;
-}
-
 export function calcCareerGroups(lifePath: number, destiny: number): CareerChartGroup[] {
   const lifePathRow = CAREER_TABLE[String(lifePath)] ?? CAREER_TABLE["5"];
   const destinyRow = CAREER_TABLE[String(destiny)] ?? CAREER_TABLE["5"];
@@ -67,7 +58,14 @@ export function calcCareerGroups(lifePath: number, destiny: number): CareerChart
     pct: Math.round(lifePathRow[group.key] * 0.55 + destinyRow[group.key] * 0.45),
   }));
 
-  return normalizeToHundred(rows).sort((a, b) => b.pct - a.pct);
+  const total = rows.reduce((sum, row) => sum + row.pct, 0);
+  const diff = 100 - total;
+  if (diff !== 0) {
+    const maxIndex = rows.reduce((max, row, index) => (row.pct > rows[max].pct ? index : max), 0);
+    rows[maxIndex] = { ...rows[maxIndex], pct: rows[maxIndex].pct + diff };
+  }
+
+  return rows.sort((a, b) => b.pct - a.pct);
 }
 
 export function calcPersonalityGroups(dobParts: DobParts): PersonalityChartGroup[] {
@@ -76,25 +74,56 @@ export function calcPersonalityGroups(dobParts: DobParts): PersonalityChartGroup
     String(dobParts.month).padStart(2, "0"),
     String(dobParts.year).padStart(4, "0"),
   ].join("");
-  const counts = Array.from({ length: 10 }, () => 0);
+  const counts: Record<number, number> = {};
+  for (let i = 1; i <= 9; i++) counts[i] = 0;
 
   for (const digit of digits) {
     const num = Number(digit);
     if (num >= 1 && num <= 9) counts[num] += 1;
   }
 
-  const total = counts.reduce((sum, count) => sum + count, 0) || 1;
-  const rows = PERSONALITY_GROUPS.map((group) => {
-    const pct = Math.round((counts[group.num] / total) * 100);
-    return {
-      ...group,
-      pct: Math.min(40, Math.max(3, pct)),
-    };
-  });
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0) || 1;
+  const minPct = 3;
+  const maxPct = 40;
+  const result = PERSONALITY_GROUPS.map((group) => ({
+    ...group,
+    raw: Math.round((counts[group.num] / total) * 100),
+  }));
 
-  return normalizeToHundred(rows)
-    .map(({ pct, ...group }) => ({ ...group, raw: pct }))
-    .sort((a, b) => b.raw - a.raw);
+  for (let iter = 0; iter < 100; iter++) {
+    const zeroIdx = result.findIndex((group) => group.raw < minPct);
+    if (zeroIdx === -1) break;
+    const deficit = minPct - result[zeroIdx].raw;
+    result[zeroIdx].raw = minPct;
+    let maxIdx = 0;
+    for (let i = 0; i < result.length; i++) {
+      if (i !== zeroIdx && result[i].raw > result[maxIdx].raw) maxIdx = i;
+    }
+    result[maxIdx].raw = Math.max(minPct, result[maxIdx].raw - deficit);
+  }
+
+  for (let iter = 0; iter < 100; iter++) {
+    const overIdx = result.findIndex((group) => group.raw > maxPct);
+    if (overIdx === -1) break;
+    const excess = result[overIdx].raw - maxPct;
+    result[overIdx].raw = maxPct;
+    let minIdx = 0;
+    for (let i = 0; i < result.length; i++) {
+      if (i !== overIdx && result[i].raw < result[minIdx].raw) minIdx = i;
+    }
+    result[minIdx].raw += excess;
+  }
+
+  const sum = result.reduce((totalPct, group) => totalPct + group.raw, 0);
+  if (sum !== 100) {
+    let maxIdx = 0;
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].raw > result[maxIdx].raw) maxIdx = i;
+    }
+    result[maxIdx].raw += 100 - sum;
+  }
+
+  return result.sort((a, b) => b.raw - a.raw);
 }
 
 export function calcLineChartData(
