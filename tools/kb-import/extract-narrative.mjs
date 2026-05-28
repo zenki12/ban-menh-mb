@@ -31,7 +31,10 @@ const GROUP_CONFIG = {
 function sliceGroup(source, groupName, nextGroupName) {
   const groupStart = source.indexOf(`  ${groupName}: {`);
   if (groupStart === -1) throw new Error(`Cannot locate group ${groupName}`);
-  if (nextGroupName === null) return source.slice(groupStart);
+  if (nextGroupName === null) {
+    const braceStart = source.indexOf("{", groupStart);
+    return source.slice(groupStart, skipExpression(source, braceStart + 1));
+  }
   const nextStart = source.indexOf(`  ${nextGroupName}: {`, groupStart + 1);
   if (nextStart === -1) throw new Error(`Cannot locate next group ${nextGroupName}`);
   return source.slice(groupStart, nextStart);
@@ -154,11 +157,14 @@ function stripLeadingListDashes(html) {
   return html.replace(/(<li[^>]*>\s*<p[^>]*>)-\s+/g, "$1");
 }
 
-function ensurePlaceholderDataAttrs(html, params) {
-  const missing = params.filter((param) => param !== "d" && !html.includes(`{{${param}}}`));
-  if (missing.length === 0) return html;
-  const attrs = missing.map((param) => ` data-${param}="{{${param}}}"`).join("");
-  return html.replace(/<p class="nar"/, `<p class="nar"${attrs}`);
+function ensureVisiblePlaceholders(html, groupName) {
+  if (groupName === "pyramidPeak" && !html.includes("{{peakIndex}}")) {
+    return `<p class="nar"><strong>Đỉnh {{peakIndex}}</strong></p>\n${html}`;
+  }
+  if (groupName === "personalYearDomains" && (!html.includes("{{year}}") || !html.includes("{{age}}"))) {
+    return `<p class="nar">Năm <strong>{{year}}</strong>, khi <strong>{{name}}</strong> bước sang tuổi <strong>{{age}}</strong>, các miền đời sống nổi bật như sau.</p>\n${html}`;
+  }
+  return html;
 }
 
 function extractGroup(groupText, groupName, config) {
@@ -176,9 +182,10 @@ function extractGroup(groupText, groupName, config) {
     if (!config.keys.includes(key)) continue;
     if (params[0] !== "name") throw new Error(`${groupName}.${key} does not accept name first`);
     if (!config.keys.includes(key)) throw new Error(`${groupName}.${key} is not configured`);
+    if (entries[key]) throw new Error(`${groupName}.${key} extracted more than once`);
 
     let html = stripLeadingListDashes(replaceExpressions(template.body));
-    html = ensurePlaceholderDataAttrs(html, config.params);
+    html = ensureVisiblePlaceholders(html, groupName);
     if (!html.includes("{{name}}")) throw new Error(`${groupName}.${key} missing {{name}}`);
     if (html.includes("${")) throw new Error(`${groupName}.${key} has raw template expressions`);
     for (const param of config.params) {
