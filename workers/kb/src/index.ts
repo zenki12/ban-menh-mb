@@ -1,6 +1,6 @@
 // Ban Menh V2 - KB Worker. Generates reports from private KV data.
 
-import { generateReport } from "@banmenh/shared";
+import { generateReport, type NarrativeKb } from "@banmenh/shared";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { verifyFirebaseToken } from "./lib/auth";
@@ -50,7 +50,34 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-app.get("/", (c) => c.text("Bản Mệnh V2 — KB Worker"));
+function mergeNarrative(html: string, vars: Record<string, string | number>): string {
+  let out = html;
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.replaceAll(`{{${k}}}`, escapeHtml(String(v)));
+  }
+  return out;
+}
+
+function getNarrative(
+  narrative: NarrativeKb,
+  group: keyof NarrativeKb,
+  number: number,
+  vars: Record<string, string | number>,
+): string | null {
+  const entry = narrative[group]?.[String(number)];
+  return entry ? mergeNarrative(entry.html, vars) : null;
+}
+
+function attachNarrative<T extends { number: number }>(
+  item: T,
+  narrative: NarrativeKb,
+  group: keyof NarrativeKb,
+  vars: Record<string, string | number>,
+): T & { narrative: string | null } {
+  return { ...item, narrative: getNarrative(narrative, group, item.number, vars) };
+}
+
+app.get("/", (c) => c.text("Bản Mệnh V2 - KB Worker"));
 
 app.get("/health", (c) =>
   c.json({ ok: true, service: "kb-worker", timestamp: new Date().toISOString() }),
@@ -90,22 +117,52 @@ app.post("/numerology/report", async (c) => {
       loadNarrative(c.env.BANMENH_KB_DEV),
     ]);
     const report = await generateReport(body, kb);
-    const escapedName = escapeHtml(body.fullName);
-    const lifePathNarrative = narrative.lifePath[String(report.lifePath.number)]?.html.replaceAll(
-      "{{name}}",
-      escapedName,
-    );
-    const destinyNarrative = narrative.destiny[String(report.destiny.number)]?.html.replaceAll(
-      "{{name}}",
-      escapedName,
-    );
+    const nameVars = { name: body.fullName };
+    const personalYearVars = {
+      ...nameVars,
+      year: report.personalYear.year,
+      age: report.personalYear.year - report.input.dobParts.year,
+    };
 
     return c.json({
       ok: true,
       report: {
         ...report,
-        lifePath: { ...report.lifePath, narrative: lifePathNarrative ?? null },
-        destiny: { ...report.destiny, narrative: destinyNarrative ?? null },
+        lifePath: attachNarrative(report.lifePath, narrative, "lifePath", nameVars),
+        soul: attachNarrative(report.soul, narrative, "soul", nameVars),
+        destiny: attachNarrative(report.destiny, narrative, "destiny", nameVars),
+        personality: attachNarrative(report.personality, narrative, "personality", nameVars),
+        maturity: attachNarrative(report.maturity, narrative, "maturity", nameVars),
+        attitude: attachNarrative(report.attitude, narrative, "attitude", nameVars),
+        birthday: attachNarrative(report.birthday, narrative, "birthday", nameVars),
+        soulChallenge: attachNarrative(report.soulChallenge, narrative, "soulChallenge", nameVars),
+        destinyChallenge: attachNarrative(report.destinyChallenge, narrative, "destinyChallenge", nameVars),
+        personalityChallenge: attachNarrative(
+          report.personalityChallenge,
+          narrative,
+          "personalityChallenge",
+          nameVars,
+        ),
+        cognitiveAbility: attachNarrative(report.cognitiveAbility, narrative, "cognitiveAbility", nameVars),
+        approachMotivation: attachNarrative(
+          report.approachMotivation,
+          narrative,
+          "approachMotivation",
+          nameVars,
+        ),
+        approachAbility: attachNarrative(report.approachAbility, narrative, "approachAbility", nameVars),
+        approachAttitude: attachNarrative(report.approachAttitude, narrative, "approachAttitude", nameVars),
+        personalYear: attachNarrative(report.personalYear, narrative, "personalYearDomains", personalYearVars),
+        pyramidPeaks: report.pyramidPeaks.map((item, index) =>
+          attachNarrative(item, narrative, "pyramidPeak", {
+            ...nameVars,
+            period: item.period,
+            peakIndex: index + 1,
+          }),
+        ),
+        pyramidChallenges: report.pyramidChallenges.map((item) =>
+          attachNarrative(item, narrative, "pyramidChallenge", { ...nameVars, period: item.period }),
+        ),
       },
     });
   } catch (err) {
