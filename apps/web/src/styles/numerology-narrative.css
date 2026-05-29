@@ -1,0 +1,111 @@
+.nar {
+  @apply mb-4 text-base leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.lp-section-title {
+  @apply mb-3 mt-6 text-lg font-bold text-[var(--bm-gold-bright)];
+}
+
+.lp-traits,
+.lp-strengths,
+.lp-weaknesses {
+  @apply list-disc space-y-2 pl-5;
+}
+
+.lp-traits strong,
+.lp-strengths strong,
+.lp-weaknesses strong {
+  @apply text-[var(--bm-text-main)];
+}
+
+.nar-container {
+  @apply text-base leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.nar-container .nar {
+  @apply mb-4;
+}
+
+.nar-container .lp-section-title {
+  @apply mb-4 mt-8 text-lg font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.nar-container .lp-strengths li,
+.nar-container .lp-weaknesses li {
+  @apply mb-3 leading-relaxed;
+}
+
+.nar-container strong {
+  @apply text-[var(--bm-text-main)];
+}
+
+.nar-container em {
+  @apply font-medium not-italic text-[var(--bm-primary-soft)];
+}
+
+.section-header {
+  @apply rounded-lg border border-[var(--bm-border-gold)] bg-[var(--bm-bg-glass)] px-5 py-4 text-lg font-bold uppercase tracking-[0.18em] text-[var(--bm-gold-bright)];
+}
+
+.index-title {
+  @apply flex flex-wrap items-center justify-between gap-3 text-xl font-bold text-[var(--bm-text-main)];
+}
+
+.index-title .number {
+  background-image: var(--bm-gradient-purple-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.num-badge {
+  @apply rounded-full border border-[var(--bm-border-gold)] px-3 py-1 text-sm font-bold text-[var(--bm-gold-bright)];
+}
+
+.synthetic-text {
+  @apply mb-4 text-base leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.insight-box {
+  @apply rounded-lg border border-[var(--bm-border-purple)] bg-[var(--bm-bg-glass)] p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.profile-card {
+  @apply mb-6 grid gap-5 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5 md:grid-cols-[auto_1fr];
+}
+
+.profile-avatar {
+  @apply flex size-28 flex-col items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[image:var(--bm-gradient-gold-text)] text-[var(--bm-bg-void)] shadow-[var(--bm-shadow-gold)];
+}
+
+.avatar-number {
+  @apply text-4xl font-bold leading-none;
+}
+
+.avatar-label {
+  @apply mt-1 text-xs font-bold uppercase;
+}
+
+.profile-name {
+  @apply text-2xl font-bold text-[var(--bm-text-main)];
+}
+
+.profile-dob {
+  @apply mt-1 text-sm text-[var(--bm-text-soft)];
+}
+
+.profile-nums {
+  @apply mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.pn-item {
+  @apply flex items-center justify-between gap-3 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] px-3 py-2;
+}
+
+.pn-label {
+  @apply text-xs text-[var(--bm-text-soft)];
+}
+
+.pn-val {
+  @apply font-bold text-[var(--bm-gold-bright)];
+}

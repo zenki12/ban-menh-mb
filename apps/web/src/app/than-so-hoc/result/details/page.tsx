@@ -6,7 +6,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 import { PageShell } from "../../../../components/layout";
 import { FreeIndicatorSection } from "../../../../components/numerology/result/FreeIndicatorSection";
-import { FullReport, type NumerologyReportWithNarrative } from "../../../../components/numerology/result/FullReport";
+import { FullReport, type NumerologyReportWithSections } from "../../../../components/numerology/result/FullReport";
 import { LockedGrid, type LockedGroup } from "../../../../components/numerology/result/LockedGrid";
 import { MagneticCTA } from "../../../../components/numerology/result/MagneticCTA";
 import { PartialIndicatorSection } from "../../../../components/numerology/result/PartialIndicatorSection";
@@ -18,7 +18,7 @@ import { useAuth } from "../../../../lib/auth";
 
 type ReportResponse = {
   ok: true;
-  report: NumerologyReportWithNarrative;
+  report: NumerologyReportWithSections;
   unlocked: boolean;
   entitlement: unknown;
 };
@@ -93,7 +93,7 @@ function ResultDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
-  const [report, setReport] = useState<NumerologyReportWithNarrative | null>(null);
+  const [report, setReport] = useState<NumerologyReportWithSections | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
   const [unlocked, setUnlocked] = useState(false);
