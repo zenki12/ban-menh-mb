@@ -2555,6 +2555,37 @@ Update khi xong:
 - Thêm `YearCard`, `AspectBlock` và CSS cho `.py-year-block`, `.py-domain`, `.year-detail-block`, `.year-domain-block`.
 - Spot-check chuỗi V1: "Đây là năm lý tưởng để bắt đầu một dự án mới", "Xây nền tảng bền vững", "Làm tới đâu chắc chắn tới đó", "Tình yêu cần không gian tự do", "Tha thứ và buông bỏ".
 
+### T-0610c-section5 - Literal V1 life path section + career detail
+
+Status: Done
+
+Bối cảnh:
+
+- T-0610 section 5 mới render base lifePath narrative + ctx block, chưa có 7 box extra của V1.
+- Section 3 "Nhóm ngành nghề phù hợp" còn là 3 card đơn giản, chưa có career bars và định hướng nghề nghiệp chi tiết.
+
+Yêu cầu:
+
+- Port literal `LIFE_PATH_EXTRA` từ `kb-private/numerology/narrative_v1_full.js`.
+- Port `renderLifePathExtra` và `_lifePathCtxBlock` từ `kb-private/numerology/app_v1_full.js`.
+- Section 5 render theo order V1: narrative lifePath, cross-context, người nổi tiếng, tương thích, tình duyên, bài học, bạn bè & gia đình, du lịch & sở thích, nghề nghiệp.
+- Section 3 mở rộng thành 3 card career + career bars chart slot + box định hướng nghề nghiệp chi tiết.
+
+Điều kiện Done:
+
+- `LIFE_PATH_EXTRA[5]` có 6 người nổi tiếng, `tuongThich.tot` là array số và `tinhDuyen` chứa "Phong cách yêu".
+- `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-29: port toàn bộ `LIFE_PATH_EXTRA` thực tế từ dòng 3467-4008 của V1 source; file nguồn là khoảng 542 dòng, không phải 2250 dòng như ước lượng ban đầu.
+- Thêm type `LifePathFamous`, `LifePathCompat`, `LifePathExtraEntry` và export `renderLifePathExtra`.
+- `lifePathCtxBlock` thay bằng literal V1 `_lifePathCtxBlock`.
+- Section 5 không dùng `generic()`; dùng `narrative.lifePath[n]` + ctx block + `renderLifePathExtra`.
+- Section 3 thêm marker `career-bars`, FullReport inject `CareerBars` đúng vị trí giữa 3 career cards và box nghề nghiệp chi tiết.
+- CSS narrative bổ sung class V1 cho career cards, famous grid, compatibility grid và life path extra boxes.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done

@@ -1,6 +1,7 @@
 import {
   calcBirthChartCells,
   calcCombinedCells,
+  calcCareerGroups,
   calcNameChartCells,
   DEFAULT_GRID_ARROWS,
   detectArrows,
@@ -13,6 +14,7 @@ import {
 } from "@banmenh/shared";
 import { Card } from "../../ui";
 import { BirthChartGrid } from "./charts/BirthChartGrid";
+import { CareerBars } from "./charts/CareerBars";
 import { CombinedChartGrid } from "./charts/CombinedChartGrid";
 import { PyramidSvgChart } from "./charts/PyramidSvgChart";
 import { PhaseDivider, ProfileHeaderCard, SectionHeader } from "./v1";
@@ -82,7 +84,32 @@ function ChartSlot({ slot, report }: { slot?: Phase["sections"][number]["chartSl
   }
   if (slot === "birth-grid") return <BirthGridSlot report={report} />;
   if (slot === "combined-grid") return <CombinedGridSlot report={report} />;
+  if (slot === "career-bars") {
+    return <CareerBars groups={calcCareerGroups(report.lifePath.number, report.destiny.number)} />;
+  }
   return null;
+}
+
+function SectionBody({ item, report }: { item: Phase["sections"][number]; report: NumerologyReport }) {
+  if (item.chartSlot === "career-bars") {
+    const [beforeChart, afterChart = ""] = item.html.split("<!-- CHART:career-bars -->");
+    return (
+      <>
+        <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: beforeChart }} />
+        <div className="mt-6">
+          <ChartSlot report={report} slot={item.chartSlot} />
+        </div>
+        {afterChart ? <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: afterChart }} /> : null}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <ChartSlot report={report} slot={item.chartSlot} />
+      <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: item.html }} />
+    </>
+  );
 }
 
 export function FullReport({ report, userName }: FullReportProps) {
@@ -107,8 +134,7 @@ export function FullReport({ report, userName }: FullReportProps) {
             <Card as="article" className="v1-report-section" id={item.id} key={item.id} variant="glass" padding="lg">
               <SectionHeader number={item.number} title={item.title} />
               {item.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{item.intro}</p> : null}
-              <ChartSlot report={report} slot={item.chartSlot} />
-              <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: item.html }} />
+              <SectionBody item={item} report={report} />
             </Card>
           ))}
         </section>

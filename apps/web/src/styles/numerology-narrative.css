@@ -70,6 +70,10 @@
   @apply rounded-lg border border-[var(--bm-border-purple)] bg-[var(--bm-bg-glass)] p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
 
+.insight-box strong {
+  @apply text-[var(--bm-text-main)];
+}
+
 .profile-card {
   @apply mb-6 grid gap-5 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5 md:grid-cols-[auto_1fr];
 }
@@ -159,6 +163,22 @@
   @apply my-5 grid gap-4 md:grid-cols-2;
 }
 
+.career-cards-grid {
+  @apply my-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.career-card {
+  @apply rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+}
+
+.career-card-label {
+  @apply mb-2 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.career-card-text {
+  @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
 .career-item,
 .lc-advice-item {
   @apply rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
@@ -177,6 +197,95 @@
 .cycle-block,
 .pyramid-period {
   @apply my-6 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-5;
+}
+
+.lp-extra-section {
+  @apply mt-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+}
+
+.lp-extra-heading {
+  @apply -mx-5 -mt-5 mb-4 rounded-t-xl border-b border-[var(--bm-border-subtle)] bg-[rgba(37,99,235,0.18)] px-5 py-3 text-base font-bold uppercase tracking-wider text-[var(--bm-text-main)];
+}
+
+.lp-extra-body {
+  @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.lp-extra-body ul {
+  @apply list-disc space-y-3 pl-5;
+}
+
+.lp-extra-body strong {
+  @apply text-[var(--bm-text-main)];
+}
+
+.lp-famous-grid {
+  @apply grid gap-3 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.lp-famous-card {
+  @apply rounded-lg border border-[var(--bm-border-subtle)] border-l-[3px] border-l-[var(--bm-gold-bright)] bg-[var(--bm-bg-panel)] p-4;
+}
+
+.lp-famous-name {
+  @apply mb-1 text-sm font-bold text-[var(--bm-gold-bright)];
+}
+
+.lp-famous-field {
+  @apply mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--bm-primary-soft)];
+}
+
+.lp-famous-note {
+  @apply text-sm italic leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.lp-compat-wrapper {
+  @apply mb-5 grid gap-4 md:grid-cols-2;
+}
+
+.lp-compat-good,
+.lp-compat-bad {
+  @apply rounded-xl p-4;
+}
+
+.lp-compat-good {
+  @apply border border-green-400/30 bg-green-500/10;
+}
+
+.lp-compat-bad {
+  @apply border border-red-400/30 bg-red-500/10;
+}
+
+.lp-compat-label {
+  @apply mb-3 text-sm font-bold uppercase tracking-wider;
+}
+
+.lp-compat-good .lp-compat-label {
+  @apply text-green-300;
+}
+
+.lp-compat-bad .lp-compat-label {
+  @apply text-red-300;
+}
+
+.lp-compat-numbers {
+  @apply mb-3 flex flex-wrap gap-2;
+}
+
+.lp-compat-num {
+  @apply grid size-8 place-items-center rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] text-sm font-bold;
+}
+
+.lp-compat-good .lp-compat-num {
+  @apply border-green-400/40 text-green-300;
+}
+
+.lp-compat-bad .lp-compat-num {
+  @apply border-red-400/40 text-red-300;
+}
+
+.lp-compat-desc {
+  @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
 
 .year-card-deep-head,

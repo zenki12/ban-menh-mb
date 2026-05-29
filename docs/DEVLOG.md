@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-29 23:43 +07 | T-0610c-section5 | Literal V1 life path section + career detail | `Task` |
 | 2026-05-29 17:48 +07 | T-0610c-year | Literal V1 personal year deep narrative | `Task` |
 | 2026-05-29 17:21 +07 | T-0610 | Mechanical port V1 web numerology details 4 phần | `Task` |
 | 2026-05-29 11:14 +07 | T-0609 | Port V1 pyramid + 3x3 numerology charts | `Task` |
@@ -102,6 +103,36 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-29 23:43 +07] - T-0610c-section5: Literal V1 life path section + career detail
+
+**Loại:** `Task`
+**Ref:** T-0610c-section5
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 cho section 5 "Chỉ số Đường Đời" và mở rộng section 3 "Nhóm ngành nghề phù hợp" với career bars + định hướng nghề nghiệp chi tiết.
+
+### Thay đổi
+- Thêm `LIFE_PATH_EXTRA` trong `narrative-deep.ts`, port từ `narrative_v1_full.js` dòng 3467-4008.
+- Thêm type `LifePathFamous`, `LifePathCompat`, `LifePathExtraEntry` và `renderLifePathExtra`.
+- `lifePathCtxBlock` thay bằng literal V1 `_lifePathCtxBlock`.
+- Section 5 render `narrative.lifePath[n]` + cross-context + 7 box extra: người nổi tiếng, tương thích, tình duyên, bài học, bạn bè & gia đình, du lịch & sở thích, nghề nghiệp.
+- Section 3 render 3 career cards, placeholder `career-bars`, `CareerBars` chart và box "Định Hướng Nghề Nghiệp Chi Tiết".
+- `FullReport` hỗ trợ chart slot `career-bars` và tách HTML tại marker để đặt chart đúng giữa content.
+- CSS narrative thêm class cho career card, famous grid, compatibility grid và life path extra sections.
+
+### Verify
+- Spot-check V1 strings: "Angelina Jolie", "Mick Jagger", "Phong cách yêu", "Du lịch tự túc không có lịch trình cố định", "Travel blogger".
+- `LIFE_PATH_EXTRA[5]` text-check có 6 `nguoiNoiTieng`, `tuongThich.tot` có số; source chứa "Phong cách yêu".
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- V1 `lifePathExtra` thực tế dài khoảng 542 dòng nguồn, không phải ước lượng 2250 dòng. Không thêm dòng giả chỉ để đạt line-count.
+- Không đụng engine calc, route/auth/payment/voucher/charts logic.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`.
 
 ---
 

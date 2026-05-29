@@ -4,6 +4,7 @@ import {
   destinyCtxBlock,
   escapeHtml,
   generic,
+  LIFE_PATH_EXTRA,
   lifeCycleNarrative,
   lifePathCtxBlock,
   maturityCtxBlock,
@@ -13,6 +14,7 @@ import {
   personalityCtxBlock,
   pyramidPeakAnalysis,
   readString,
+  renderLifePathExtra,
   soulCtxBlock,
   type NarrativeContext,
 } from "./narrative-deep";
@@ -30,7 +32,7 @@ export type SectionBlock = {
   title: string;
   intro?: string;
   html: string;
-  chartSlot?: "pyramid" | "birth-grid" | "combined-grid";
+  chartSlot?: "pyramid" | "birth-grid" | "combined-grid" | "career-bars";
 };
 
 export type Phase = {
@@ -126,18 +128,31 @@ function overviewHtml(report: NumerologyReport, name: string): string {
   <p class="nar">Hãy đọc từng phần với tâm thái cởi mở và suy ngẫm. Thần số học không phải lời tiên tri — đó là tấm gương phản chiếu bản chất sâu xa nhất của bạn, để bạn hiểu rõ hơn về chính mình và đưa ra những lựa chọn có ý thức hơn.</p>`;
 }
 
+function careerCard(label: string, text: string): string {
+  if (!text) return "";
+  return `<div class="career-card"><div class="career-card-label">${escapeHtml(label)}</div><div class="career-card-text">${escapeHtml(text)}</div></div>`;
+}
+
 function careerHtml(report: NumerologyReport, name: string): string {
-  const sources = [report.lifePath.data, report.destiny.data, report.birthday.data];
-  const rows = sources
-    .map((data, index) => {
-      const text = readString(data, ["career", "career_fit", "mission"]);
-      if (!text) return "";
-      const label = index === 0 ? "Đường đời" : index === 1 ? "Sứ mệnh" : "Ngày sinh";
-      return `<div class="career-item"><div class="career-lbl">${label}</div><p>${escapeHtml(text)}</p></div>`;
-    })
+  const lpCareer = readString(report.lifePath.data, ["career", "career_fit", "mission"]);
+  const destCareer = readString(report.destiny.data, ["career", "career_fit", "mission"]);
+  const bdayCareer = readString(report.birthday.data, ["career_fit", "career", "mission"]);
+  const cards = [
+    careerCard("ĐƯỜNG ĐỜI", lpCareer),
+    careerCard("SỨ MỆNH", destCareer),
+    careerCard("NGÀY SINH", bdayCareer),
+  ]
     .filter(Boolean)
     .join("");
-  return `<p class="nar">Nhóm ngành nghề phù hợp của <strong>${escapeHtml(name)}</strong> được tổng hợp từ các chỉ số cốt lõi, đặc biệt là Đường đời, Sứ mệnh và Ngày sinh.</p><div class="career-grid">${rows}</div>`;
+  const lpExtra = LIFE_PATH_EXTRA[report.lifePath.number];
+  const detail = lpExtra?.ngheNghiep
+    ? `<div class="lp-extra-section">
+        <div class="lp-extra-heading">💼 Định Hướng Nghề Nghiệp Chi Tiết</div>
+        <div class="lp-extra-body">${lpExtra.ngheNghiep}</div>
+      </div>`
+    : "";
+
+  return `<p class="nar">Nhóm ngành nghề phù hợp của <strong>${escapeHtml(name)}</strong> được tổng hợp từ các chỉ số cốt lõi, đặc biệt là Đường đời, Sứ mệnh và Ngày sinh.</p><div class="career-cards-grid">${cards}</div><!-- CHART:career-bars -->${detail}`;
 }
 
 function lifeCyclesHtml(report: NumerologyReport, name: string): string {
@@ -185,6 +200,12 @@ function karmicDebtHtml(report: NumerologyReport, kb: NumerologyKb, name: string
     .join("");
 }
 
+function lifePathHtml(report: NumerologyReport, narrative: NarrativeKb, ctx: NarrativeContext, name: string): string {
+  const lpNum = report.lifePath.number;
+  const narrativeHtml = fromNarrative(narrative, "lifePath", lpNum, { name, number: lpNum }) ?? "";
+  return [narrativeHtml, lifePathCtxBlock(lpNum, ctx, name), renderLifePathExtra(lpNum, name)].join("");
+}
+
 function challengeHtml(
   narrative: NarrativeKb,
   group: NarrativeGroup,
@@ -221,14 +242,16 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
             .map((item) => buildYearDomainBlock(item.number, item.year, item.age, name))
             .join("")}`,
         ),
-        section("3", "Nhóm ngành nghề phù hợp", careerHtml(report, name)),
+        section("3", "Nhóm ngành nghề phù hợp", careerHtml(report, name), { chartSlot: "career-bars" }),
       ],
     },
     {
       letter: "B",
       title: "PHÂN TÍCH ĐƯỜNG ĐỜI",
       sections: [
-        section("5", "Chỉ số Đường Đời (Số Chủ Đạo)", renderIndicator(narrative, "lifePath", "Đường đời", report.lifePath, name) + lifePathCtxBlock(report.lifePath.number, ctx, name)),
+        section("5", "Chỉ số Đường Đời (Số Chủ Đạo)", lifePathHtml(report, narrative, ctx, name), {
+          intro: readString(report.lifePath.data, ["title"]) ? `${report.lifePath.number} · ${readString(report.lifePath.data, ["title"])}` : String(report.lifePath.number),
+        }),
         section("6", "Chu Kỳ Đường Đời", lifeCyclesHtml(report, name)),
         section(
           "7",
