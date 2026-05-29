@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-30 01:30 +07 | T-0610c-section8 | Literal V1 personal year summary + 3-year cycle | `Task` |
 | 2026-05-30 01:07 +07 | T-0610c-cleanup | Split narrative modules + diacritics test | `Task` |
 | 2026-05-30 00:59 +07 | T-0610c-fix | Vietnamese period strings + pyramid year labels | `Hotfix` |
 | 2026-05-30 00:34 +07 | T-0610c-section7 | Literal V1 pyramid section | `Task` |
@@ -107,6 +108,35 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-30 01:30 +07] - T-0610c-section8: Literal V1 personal year summary + 3-year cycle
+
+**Loại:** `Task`
+**Ref:** T-0610c-section8
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 section 8 "Chỉ số Năm Cá Nhân" và section 8.1 "Chu Kỳ Vận Số — Phân Tích Chi Tiết 3 Năm" vào module narrative đã split.
+
+### Thay đổi
+- `year-month.ts` thay `personalPeriod` rút gọn bằng V1 `numMeta` 9 entry, summary card, energy paragraph, Nên làm/Tránh grid và lời khuyên đặc biệt.
+- `year-month.ts` port V1 `personalYearDeep` và thêm helper `yearContent` / `yearIntro` từ `_yearContent` / `_yearIntro`.
+- Thêm `buildPersonalYearFullBlock` để render block năm theo heading `8.X`, intro, 5 domain blocks và `Tóm lại`; giữ fallback typo `taichinhthanhhoc` / `taichinhthanhhoc`.
+- `synthesizer.ts` đổi section 8 sang `personalPeriod("Năm", ...)`; section 8.1 thêm intro italic, `year-cards-grid` và 3 detailed blocks.
+- `numerology-narrative.css` thêm class section 8/8.1 và nén block mới để file còn 584 dòng, không vượt lint limit.
+
+### Verify
+- Spot-check literal V1 bằng `rg`: `Thực tế và kỷ luật là từ khóa của giai đoạn này`, `Đây là năm lý tưởng để bắt đầu một dự án mới`, `Trong khía cạnh tài chính`, `Năm 4 là năm của hậu trường`, `Lập kế hoạch chi tiết`.
+- Case synth thật `Nông Xuân Thái / 1996-09-03`: năm cá nhân 2026 = 4, range 2026/2027/2028 = 4/5/6 và tuổi 30/31/32; section 8/8.1 có các marker card/grid/domain.
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run kb:test-engine`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- Không sửa section 1-7, 9-30; không sửa engine/route/auth/payment/charts.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`, `.env.local`.
+- Browser plugin không chạy được trong phiên này vì Node REPL MCP crash với lỗi sandbox; đã fallback bằng synth fixture và build.
+- Ngưỡng length trong prompt (`section 8 > 3000`, `section 8.1 > 20000`) cao hơn output literal V1 thực tế của các helper được yêu cầu; không bơm/paraphrase thêm nội dung ngoài V1 để đạt số dòng/bytes.
 
 ---
 

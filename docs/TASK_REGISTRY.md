@@ -2650,6 +2650,39 @@ Update khi xong:
 - CSS narrative thêm `.pyramid-*` và `.peak-*` cho period blocks, peak analysis, 4 aspect boxes, negatives và reflection.
 - Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build`; section 7 HTML fixture dài 29561 chars.
 
+### T-0610c-section8 - Literal V1 personal year summary and 3-year cycle
+
+Status: Done
+
+Bối cảnh:
+
+- T-0610c-year trước đó đã port một phần personal year nhưng section 8/8.1 chưa bám đúng cấu trúc V1 hiện tại.
+- Section 8 cần summary card `personalPeriod('Năm', ...)`; section 8.1 cần intro, 3 year card grid và 3 block chi tiết từ `buildPersonalYearFullBlock`.
+
+Yêu cầu:
+
+- Port literal V1 `personalPeriod` từ `kb-private/numerology/narrative_v1_full.js`.
+- Port literal V1 `personalYearDeep`, `_yearContent`, `_yearIntro` và adapt `buildPersonalYearFullBlock` từ `kb-private/numerology/app_v1_full.js`.
+- Section 8 dùng `personalPeriod`, không dùng `personalYearDeep`.
+- Section 8.1 render intro italic, grid 3 năm và 3 detailed blocks với 5 domain blocks + Tóm lại.
+- Thêm CSS cho summary card, dos/donts grid, year card grid và year detail/domain blocks.
+
+Điều kiện Done:
+
+- Spot-check chuỗi tiếng Việt V1 từ `personalPeriod` và `personalYearDeep` tồn tại trong V2.
+- Giữ nguyên fallback typo field `taichinhthanhoc` / `taichinhthanhhoc` trong orchestrator.
+- `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- Port `personalPeriod` V1 literal vào `packages/shared/src/numerology/narrative/year-month.ts` với `numMeta` 9 entry, summary card, energy paragraph, dos/donts grid và `insight-box` lời khuyên.
+- Port `personalYearDeep` V1 literal và thêm helper `yearContent` / `yearIntro` từ `_yearContent` / `_yearIntro`.
+- Thêm `buildPersonalYearFullBlock` V1-style để render 3 detailed year blocks theo section label `8.1`/`8.2`/`8.3`, giữ fallback typo `taichinhthanhhoc` / `taichinhthanhhoc`.
+- Section 8 trong `synthesizer.ts` chuyển sang `personalPeriod("Năm", ...)`; section 8.1 thêm intro italic, `year-cards-grid` và 3 block chi tiết.
+- CSS narrative thêm class cho personal-year card, dos/donts grid, year cards grid và year detail/domain blocks; block CSS được nén để giữ file dưới 600 dòng.
+- Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build`.
+
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
 
 Status: Done
