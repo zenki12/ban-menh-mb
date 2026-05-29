@@ -378,6 +378,106 @@
   @apply mt-1 text-xs text-[var(--bm-text-soft)];
 }
 
+.lc-circle-row {
+  @apply my-6 grid gap-4 sm:grid-cols-3;
+}
+
+.lc-circle-item {
+  @apply min-w-0;
+}
+
+.lc-circle {
+  @apply rounded-2xl border-2 border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5 text-center shadow-[var(--bm-shadow-purple)];
+  border-color: var(--lc-phase-color, var(--bm-border-purple));
+}
+
+.lc-stage-icon {
+  @apply mb-2 text-3xl;
+}
+
+.lc-number,
+.lc-circle-num {
+  @apply mb-2 text-5xl font-extrabold leading-none text-[var(--bm-gold-bright)];
+}
+
+.lc-stage-name {
+  @apply mb-2 text-xs font-bold uppercase tracking-wider text-[var(--bm-text-main)];
+}
+
+.lc-age-range {
+  @apply text-sm font-semibold text-[var(--bm-text-soft)];
+}
+
+.lc-year-range {
+  @apply mt-1 text-xs italic text-[var(--bm-text-muted)];
+}
+
+.lc-intro-box {
+  @apply mb-6 rounded-lg border-l-[3px] border-l-[var(--bm-primary-soft)] bg-[var(--bm-bg-panel)] p-5;
+}
+
+.lc-intro-text {
+  @apply mb-3 text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.lc-intro-text:last-child {
+  @apply mb-0;
+}
+
+.lc-intro-text strong {
+  @apply text-[var(--bm-text-main)];
+}
+
+.lc-phase-block {
+  @apply mb-6 rounded-xl border border-[var(--bm-border-subtle)] border-l-4 bg-[var(--bm-bg-glass)] p-5;
+  border-left-color: var(--lc-phase-color, var(--bm-primary-soft));
+}
+
+.lc-phase-header {
+  @apply mb-4;
+}
+
+.lc-phase-title {
+  @apply text-lg font-bold;
+  color: var(--lc-phase-color, var(--bm-text-main));
+}
+
+.lc-phase-sub {
+  @apply mt-1 text-sm italic text-[var(--bm-text-soft)];
+}
+
+.lc-phase-body {
+  @apply text-[var(--bm-text-soft)];
+}
+
+.lc-phase-intro {
+  @apply mb-4 rounded-lg border-l-2 border-l-[var(--bm-primary-soft)] bg-[rgba(124,58,237,0.08)] p-4 text-sm italic leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.lc-advice-box {
+  @apply mt-5 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-5;
+}
+
+.lc-advice-title {
+  @apply mb-4 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.lc-advice-icon {
+  @apply mb-2 text-2xl;
+}
+
+.lc-advice-content {
+  @apply min-w-0;
+}
+
+.lc-advice-avoid {
+  @apply mt-4 rounded-lg border border-red-400/30 bg-red-500/10 p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.lc-avoid-label {
+  @apply font-bold text-red-300;
+}
+
 .pyramid-period-heading {
   @apply mb-3 text-base font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }

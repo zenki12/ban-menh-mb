@@ -2586,6 +2586,38 @@ Update khi xong:
 - Section 3 thêm marker `career-bars`, FullReport inject `CareerBars` đúng vị trí giữa 3 career cards và box nghề nghiệp chi tiết.
 - CSS narrative bổ sung class V1 cho career cards, famous grid, compatibility grid và life path extra boxes.
 
+### T-0610c-section6 - Literal V1 life cycles section
+
+Status: Done
+
+Bối cảnh:
+
+- T-0610 section 6 còn dùng `lifeCyclesHtml` rút gọn, chưa match V1 PDF.
+- V1 section 6 có 3 vòng tròn tổng quan, intro 4 đoạn và 3 phase block chi tiết với `lifeCycleNarrative` + advice grid.
+
+Yêu cầu:
+
+- Port literal `lifeCycleNarrative` từ `kb-private/numerology/narrative_v1_full.js`.
+- Port literal `lifeCyclePhaseExtra` từ V1.
+- Port/adapt `buildLifeCyclesSection` từ `kb-private/numerology/app_v1_full.js` sang V2 `NumerologyReport`.
+- Section 6 dùng `buildLifeCyclesSection(report, name)`, không dùng `generic()` fallback.
+- Thêm CSS cho circle row, intro box, phase blocks và advice grid nếu thiếu.
+
+Điều kiện Done:
+
+- Spot-check 5 chuỗi tiếng Việt V1 tồn tại trong `narrative-deep.ts`.
+- `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- Port `lifeCycleNarrative` V1 literal vào `narrative-deep.ts` với `stageLabels`, `deepNarrative` và `adviceData` tự chứa.
+- Port `LIFE_CYCLE_PHASE_EXTRA` V1 cho các phase intro `gieoHat` / `truongThanh` / `vienMan`.
+- Thêm `buildLifeCyclesSection(report, name)` để render 3 vòng chu kỳ, intro 4 đoạn và 3 phase block chi tiết.
+- Section 6 trong `synthesizer.ts` chuyển sang dùng `buildLifeCyclesSection`, không còn dùng `lifeCyclesHtml` rút gọn.
+- CSS narrative thêm `.lc-*` cho circle row, intro box, phase block, advice grid và avoid callout.
+- Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build`.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done

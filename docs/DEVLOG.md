@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-30 00:08 +07 | T-0610c-section6 | Literal V1 life cycles section | `Task` |
 | 2026-05-29 23:43 +07 | T-0610c-section5 | Literal V1 life path section + career detail | `Task` |
 | 2026-05-29 17:48 +07 | T-0610c-year | Literal V1 personal year deep narrative | `Task` |
 | 2026-05-29 17:21 +07 | T-0610 | Mechanical port V1 web numerology details 4 phần | `Task` |
@@ -103,6 +104,34 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-30 00:08 +07] - T-0610c-section6: Literal V1 life cycles section
+
+**Loại:** `Task`
+**Ref:** T-0610c-section6
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 cho section 6 "Chu Kỳ Đường Đời": 3 vòng chu kỳ, intro 4 đoạn và 3 phase block chi tiết với `lifeCycleNarrative` + lời khuyên thực tiễn 4-grid.
+
+### Thay đổi
+- `narrative-deep.ts` thêm `lifeCycleNarrative` V1 với `stageLabels`, `deepNarrative` và `adviceData` tự chứa.
+- Thêm `LIFE_CYCLE_PHASE_EXTRA` cho phase intro `gieoHat` / `truongThanh` / `vienMan`.
+- Thêm `buildLifeCyclesSection(report, name)` để adapt từ V1 orchestrator sang V2 `NumerologyReport`.
+- `synthesizer.ts` thay section 6 từ helper rút gọn `lifeCyclesHtml` sang `buildLifeCyclesSection`.
+- `numerology-narrative.css` thêm `.lc-*` cho circle row, intro box, phase blocks, advice grid và avoid callout.
+
+### Verify
+- Spot-check V1 strings trong `narrative-deep.ts`: "Ngọn lửa đầu đời", "Lời Khuyên Thực Tiễn", "Cuộc đời mỗi người", "Giai Đoạn 1", "Năng lượng số 9 trong giai đoạn niên thiếu".
+- `narrative-deep.ts`: 2011 dòng sau task; `LIFE_CYCLE_PHASE_EXTRA` có entries cho 1-9, 11, 22, 33.
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run kb:test-engine`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- V1 `lifeCyclePhaseExtra` thực tế compact khoảng 68 dòng nguồn, không phải ước lượng 289 dòng. Không thêm nội dung giả chỉ để đạt line-count.
+- Không đụng engine calc, route/auth/payment/voucher/charts logic.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`.
 
 ---
 
