@@ -1,6 +1,6 @@
 // Ban Menh V2 - KB Worker. Generates reports from private KV data.
 
-import { generateReport, type NarrativeKb } from "@banmenh/shared";
+import { buildSynthesizedReport, generateReport, type NarrativeKb } from "@banmenh/shared";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { verifyFirebaseToken } from "./lib/auth";
@@ -16,6 +16,7 @@ type Env = {
 type ReportBody = {
   fullName: string;
   dob: string;
+  includeSections?: boolean;
 };
 
 const app = new Hono<{ Bindings: Env }>();
@@ -38,7 +39,7 @@ function validateBody(body: unknown): ReportBody | null {
   const dob = typeof record.dob === "string" ? record.dob.trim() : "";
   if (!fullName || fullName.length > 200) return null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) return null;
-  return { fullName, dob };
+  return { fullName, dob, includeSections: record.includeSections === true };
 }
 
 function escapeHtml(value: string): string {
@@ -117,6 +118,7 @@ app.post("/numerology/report", async (c) => {
       loadNarrative(c.env.BANMENH_KB_DEV),
     ]);
     const report = await generateReport(body, kb);
+    const sections = body.includeSections ? buildSynthesizedReport({ report, narrative, kb }) : undefined;
     const nameVars = { name: body.fullName };
     const personalYearVars = {
       ...nameVars,
@@ -163,6 +165,7 @@ app.post("/numerology/report", async (c) => {
         pyramidChallenges: report.pyramidChallenges.map((item) =>
           attachNarrative(item, narrative, "pyramidChallenge", { ...nameVars, period: item.period }),
         ),
+        ...(sections ? { sections } : {}),
       },
     });
   } catch (err) {
