@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-29 11:14 +07 | T-0609 | Port V1 pyramid + 3x3 numerology charts | `Task` |
 | 2026-05-29 10:22 +07 | T-0608 | V1-style numerology details synthesizer | `Task` |
 | 2026-05-29 00:34 +07 | T-0607b | Personality bars 2-col + 11 aspect cards | `Task` |
 | 2026-05-29 00:09 +07 | T-0607a | Fix V1 chart math + locked grid icons | `Task` |
@@ -99,6 +100,36 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-29 11:14 +07] - T-0609: Port V1 pyramid + 3x3 numerology charts
+
+**Loại:** `Task`
+**Ref:** T-0609
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Bổ sung 4 chart V1 còn thiếu trong `/than-so-hoc/result/details` unlocked: kim tự tháp, biểu đồ ngày sinh, biểu đồ tên và biểu đồ tổng hợp.
+
+### Thay đổi
+- `packages/shared/src/numerology/charts.ts`: thêm helper tính grid 3x3, detect arrows, isolated numbers và compensation.
+- `PyramidSvgChart`: port SVG 700x600 theo V1, gồm 4 đỉnh, 4 thử thách và 3 base nodes tháng/ngày/năm.
+- `BirthChartGrid`: component 3x3 dùng chung cho DOB và name.
+- `CombinedChartGrid`: grid tổng hợp overlay arrows, isolated marker và compensation highlight.
+- `FullReport` unlocked details chèn pyramid chart vào section `time-cycles`, và 3 biểu đồ 3x3 vào section `lessons`.
+- Free preview không show 4 chart, giữ paywall/CTA hiện tại.
+
+### Verify
+- `npm.cmd run kb:test-charts` pass.
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+- File count: `PyramidSvgChart.tsx` 123 dòng, `BirthChartGrid.tsx` 45 dòng, `CombinedChartGrid.tsx` 106 dòng, `FullReport.tsx` 117 dòng.
+
+### Không làm
+- Không đổi engine calc, `NumerologyReport` type, KB schema, narrative, KB Worker, summary dashboard hoặc payment/auth flow.
+- Chưa chạy browser Incognito DOB `15/08/1992` với account unlocked trong phiên này.
 
 ---
 

@@ -2459,6 +2459,39 @@ Update khi xong:
 - Tình yêu & Hôn nhân gộp một card vì KB V1 không tách marriage riêng.
 - Verify đã chạy: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run qa:responsive-audit`.
 
+### T-0609 - Port V1 pyramid and 3x3 numerology charts
+
+Status: Done
+
+Bối cảnh:
+
+- V2 details unlocked còn thiếu 4 chart quan trọng từ V1: kim tự tháp, biểu đồ ngày sinh, biểu đồ tên và biểu đồ tổng hợp.
+- Các chart phải là pure SVG/CSS, không thêm chart library và không đổi engine numerology.
+
+Yêu cầu:
+
+- Thêm helper grid trong `packages/shared/src/numerology/charts.ts`: birth cells, name cells, combined cells, arrow detection, isolated numbers, compensation.
+- Thêm `PyramidSvgChart`, `BirthChartGrid`, `CombinedChartGrid`.
+- Chèn 4 chart vào details unlocked; free preview giữ paywall và không show chart.
+- Giữ summary dashboard/charts T-0607 không đổi.
+
+Điều kiện Done:
+
+- `npm run kb:test-charts`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không đổi `NumerologyReport` type, engine calc, KB schema/narrative hoặc Worker.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-29: thêm grid helpers trong `packages/shared/src/numerology/charts.ts`: `calcBirthChartCells`, `calcNameChartCells`, `calcCombinedCells`, `detectArrows`, `detectIsolatedNumbers`, `findCompensated`.
+- Thêm chart components:
+  - `PyramidSvgChart.tsx` - 123 dòng.
+  - `BirthChartGrid.tsx` - 45 dòng.
+  - `CombinedChartGrid.tsx` - 106 dòng.
+- `FullReport` unlocked details chèn pyramid chart trong section `time-cycles` và 3 biểu đồ 3x3 trong section `lessons`.
+- Free preview không render 4 chart, giữ lock/CTA như cũ.
+- `tools/kb-import/test-charts.mjs` cover thêm DOB `15/08/1992`, arrow `147`, isolated numbers, combined/compensation.
+- Verify đã chạy: `npm.cmd run kb:test-charts`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done
