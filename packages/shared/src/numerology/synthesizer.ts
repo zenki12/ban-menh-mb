@@ -1,11 +1,11 @@
 import type { NarrativeKb, NumerologyKb } from "../schemas/numerology-kb";
 import {
+  buildLifeCyclesSection,
   buildYearDomainBlock,
   destinyCtxBlock,
   escapeHtml,
   generic,
   LIFE_PATH_EXTRA,
-  lifeCycleNarrative,
   lifePathCtxBlock,
   maturityCtxBlock,
   personalMonthDeep,
@@ -155,19 +155,6 @@ function careerHtml(report: NumerologyReport, name: string): string {
   return `<p class="nar">Nhóm ngành nghề phù hợp của <strong>${escapeHtml(name)}</strong> được tổng hợp từ các chỉ số cốt lõi, đặc biệt là Đường đời, Sứ mệnh và Ngày sinh.</p><div class="career-cards-grid">${cards}</div><!-- CHART:career-bars -->${detail}`;
 }
 
-function lifeCyclesHtml(report: NumerologyReport, name: string): string {
-  const circles = report.lifeCycles
-    .map(
-      (cycle, index) =>
-        `<div class="cycle-circle"><span>${cycle.number}</span><strong>${["GIEO HẠT", "CHÍN", "THU HOẠCH"][index]}</strong><em>${escapeHtml(cycle.period)}</em></div>`,
-    )
-    .join("");
-  const detail = report.lifeCycles
-    .map((cycle, index) => lifeCycleNarrative(index + 1, cycle.number, cycle.period, name, cycle.data))
-    .join("");
-  return `<div class="cycle-circles-row">${circles}</div>${detail}`;
-}
-
 function relationshipHtml(titleText: string, first: number, second: number, name: string): string {
   const harmony = first === second ? "hoàn toàn đồng nhất" : Math.abs(first - second) <= 2 ? "có độ cộng hưởng tốt" : "tạo ra hai lực kéo khác nhau cần được dung hòa";
   return `<p class="nar">${titleText} của <strong>${escapeHtml(name)}</strong> là cặp số <strong>${first}</strong> và <strong>${second}</strong>. Hai năng lượng này ${harmony}, vì vậy nên đọc cùng nhau thay vì tách rời.</p><div class="insight-box">📌 <strong>Lời khuyên:</strong> Khi hai chỉ số bổ trợ, hãy dùng chúng như lực đẩy. Khi chúng căng nhau, hãy xem đó là tín hiệu cần cân bằng giữa điều bạn muốn, cách bạn hành động và vai trò bạn đang sống.</div>`;
@@ -252,7 +239,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
         section("5", "Chỉ số Đường Đời (Số Chủ Đạo)", lifePathHtml(report, narrative, ctx, name), {
           intro: readString(report.lifePath.data, ["title"]) ? `${report.lifePath.number} · ${readString(report.lifePath.data, ["title"])}` : String(report.lifePath.number),
         }),
-        section("6", "Chu Kỳ Đường Đời", lifeCyclesHtml(report, name)),
+        section("6", "Chu Kỳ Đường Đời", buildLifeCyclesSection(report, name)),
         section(
           "7",
           "Biểu đồ Kim Tự Tháp — Đỉnh cao & Thử thách",
