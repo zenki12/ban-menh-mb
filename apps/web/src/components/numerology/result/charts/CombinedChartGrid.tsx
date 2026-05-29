@@ -24,7 +24,15 @@ const GRID = [3, 6, 9, 2, 5, 8, 1, 4, 7];
 
 function value(num: number, count: number) {
   if (!count) return "·";
-  return count === 1 ? String(num) : `${num}×${count}`;
+  if (count > 6) return `${num}×${count}`;
+  return String(num).repeat(count);
+}
+
+function cellTextClass(count: number) {
+  if (count >= 6) return "text-xs";
+  if (count >= 4) return "text-sm";
+  if (count >= 3) return "text-base";
+  return "text-lg";
 }
 
 export function CombinedChartGrid({
@@ -66,7 +74,8 @@ export function CombinedChartGrid({
             return (
               <div
                 className={[
-                  "relative z-20 flex aspect-square flex-col items-center justify-center rounded-lg border text-lg font-bold",
+                  "relative z-20 flex aspect-square flex-col items-center justify-center rounded-lg border font-bold",
+                  cellTextClass(count),
                   count
                     ? "border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] text-[var(--bm-gold-bright)]"
                     : "border-dashed border-[var(--bm-border-subtle)] text-[var(--bm-text-muted)]",
