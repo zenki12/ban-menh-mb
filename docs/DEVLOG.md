@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-30 00:34 +07 | T-0610c-section7 | Literal V1 pyramid section | `Task` |
 | 2026-05-30 00:08 +07 | T-0610c-section6 | Literal V1 life cycles section | `Task` |
 | 2026-05-29 23:43 +07 | T-0610c-section5 | Literal V1 life path section + career detail | `Task` |
 | 2026-05-29 17:48 +07 | T-0610c-year | Literal V1 personal year deep narrative | `Task` |
@@ -104,6 +105,34 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-30 00:34 +07] - T-0610c-section7: Literal V1 pyramid section
+
+**Loại:** `Task`
+**Ref:** T-0610c-section7
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 cho section 7 "Biểu đồ Kim Tự Tháp — Đỉnh cao & Thử thách": intro, chart marker, 4 period blocks 7.1-7.4 và phần phân tích chi tiết từng đỉnh với 4 colored boxes.
+
+### Thay đổi
+- `narrative-deep.ts` thay `pyramidPeakAnalysis` rút gọn bằng nội dung V1 với `peakDeepNarratives`, `challengeDeepNarratives` và `peakAnalysisData`.
+- Thêm `buildPyramidSection(report, name, narrative)` để build section 7 server-side từ V2 `NumerologyReport`, giữ marker `<!-- CHART:pyramid -->`.
+- `synthesizer.ts` chuyển section 7 sang `buildPyramidSection(report, name, narrative)`.
+- `FullReport` tách HTML tại marker để inject `PyramidSvgChart` đúng vị trí trong flow section 7.
+- `numerology-narrative.css` thêm `.pyramid-*` và `.peak-*` cho period blocks, 4 aspect boxes, negatives và reflection.
+
+### Verify
+- Spot-check V1 strings trong `narrative-deep.ts`: "Người Biểu Đạt — Năng Lượng Sáng Tạo", "Câu hỏi sâu nhất của giai đoạn này", "Các khía cạnh tiêu cực cần tránh", "Đỉnh cao của bạn trong giai đoạn này", "Kim Tự Tháp cho thấy".
+- `narrative-deep.ts`: 2345 dòng sau task; section 7 fixture `Nông Xuân Thái / 1996-09-03` dài 29561 chars.
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run kb:test-engine`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- V1 app source thực tế chia logic section 7 giữa `buildPyramidSection` và phần compose trong `buildDetailedReport`; V2 gom vào `buildPyramidSection` để section 7 tự chứa intro + period blocks + detailed peak analysis.
+- Không đụng engine calc, route/auth/payment/voucher hoặc component `PyramidSvgChart`.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`.
 
 ---
 

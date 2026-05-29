@@ -479,14 +479,103 @@
 }
 
 .pyramid-period-heading {
-  @apply mb-3 text-base font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+  @apply mb-4 border-b border-[var(--bm-border-subtle)] pb-3 text-lg font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
 
-.pyramid-note {
-  @apply mb-4 text-sm text-[var(--bm-text-soft)];
+.pyramid-period {
+  @apply mb-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
 }
 
-.pyramid-advice,
+.pyramid-periods-wrap { @apply mt-6; }
+
+.pyramid-sub-heading {
+  @apply my-4 text-base font-bold text-[var(--bm-text-main)];
+}
+
+.pyramid-sub-heading.challenge { @apply text-red-300; }
+
+.pyramid-note { @apply font-semibold text-[var(--bm-gold-bright)]; }
+
+.pyramid-advice { @apply font-semibold text-[var(--bm-primary-soft)]; }
+
+.pyramid-keywords { @apply text-sm italic text-[var(--bm-text-soft)]; }
+
+.pyramid-analysis-heading {
+  @apply my-8 text-lg font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.peak-analysis-block {
+  @apply mb-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+}
+
+.peak-analysis-header {
+  @apply mb-4 flex items-center gap-4;
+}
+
+.peak-analysis-num {
+  @apply grid size-10 shrink-0 place-items-center rounded-full bg-[var(--bm-gold-bright)] text-lg font-extrabold text-[var(--bm-bg-void)];
+}
+
+.peak-analysis-kicker { @apply mb-1 text-xs font-bold uppercase tracking-wider text-[var(--bm-text-muted)]; }
+
+.peak-analysis-title { @apply text-base font-bold text-[var(--bm-text-main)]; }
+
+.peak-analysis-age { @apply mt-1 text-sm italic text-[var(--bm-text-soft)]; }
+
+.peak-aspect-grid {
+  @apply my-5 grid gap-4 sm:grid-cols-2;
+}
+
+.peak-aspect-box {
+  @apply rounded-lg border-l-[3px] p-4;
+}
+
+.peak-aspect-box.career { @apply border-l-yellow-400 bg-yellow-500/10; }
+
+.peak-aspect-box.opportunity { @apply border-l-green-400 bg-green-500/10; }
+
+.peak-aspect-box.love { @apply border-l-pink-400 bg-pink-500/10; }
+
+.peak-aspect-box.health { @apply border-l-orange-400 bg-orange-500/10; }
+
+.peak-aspect-label {
+  @apply mb-2 text-xs font-bold uppercase tracking-wider text-[var(--bm-text-main)];
+}
+
+.peak-aspect-text {
+  @apply m-0 text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.peak-negatives {
+  @apply my-4 rounded-lg border border-red-400/30 bg-red-500/10 p-4;
+}
+
+.peak-negatives-label {
+  @apply mb-2 text-xs font-bold uppercase tracking-wider text-red-300;
+}
+
+.peak-negatives ul {
+  @apply list-disc space-y-2 pl-5;
+}
+
+.peak-negatives li {
+  @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.peak-negatives strong { @apply text-[var(--bm-text-main)]; }
+
+.peak-reflection {
+  @apply mt-4 rounded-lg border-l-[3px] border-l-[var(--bm-primary-soft)] bg-[rgba(124,58,237,0.08)] p-4 italic text-[var(--bm-text-soft)];
+}
+
+.peak-reflection-label {
+  @apply mb-2 text-xs font-bold uppercase tracking-wider text-[var(--bm-primary-soft)];
+}
+
+.peak-reflection p {
+  @apply m-0 text-sm leading-relaxed;
+}
+
 .karmic-debt-box,
 .cross-context-box {
   @apply mt-4 rounded-lg border border-[var(--bm-border-purple)] bg-[rgba(124,58,237,0.1)] p-4;

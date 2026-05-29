@@ -2618,6 +2618,38 @@ Update khi xong:
 - CSS narrative thêm `.lc-*` cho circle row, intro box, phase block, advice grid và avoid callout.
 - Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build`.
 
+### T-0610c-section7 - Literal V1 pyramid section
+
+Status: Done
+
+Bối cảnh:
+
+- T-0610 section 7 còn dùng `pyramidPeakAnalysis` rút gọn và chart slot append ngoài flow.
+- V1 section 7 có intro, chart, 4 period blocks 7.1-7.4 và "Phân Tích Chi Tiết Từng Đỉnh Cao" với 4 colored boxes mỗi peak.
+
+Yêu cầu:
+
+- Port literal `pyramidPeakAnalysis` từ `kb-private/numerology/narrative_v1_full.js`.
+- Port/adapt `buildPyramidSection` từ `kb-private/numerology/app_v1_full.js` sang V2 `NumerologyReport`.
+- Section 7 dùng `buildPyramidSection(report, name)`, không dùng `generic()` fallback cho nội dung chính.
+- FullReport inject `PyramidSvgChart` tại marker `<!-- CHART:pyramid -->`.
+- Thêm CSS cho pyramid period, peak analysis block, 4 aspect boxes, negatives và reflection.
+
+Điều kiện Done:
+
+- Spot-check 5 chuỗi tiếng Việt V1 tồn tại trong `narrative-deep.ts`.
+- `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- Port `pyramidPeakAnalysis` V1 vào `narrative-deep.ts` với `peakDeepNarratives`, `challengeDeepNarratives` và 4 colored-box analysis data.
+- Thêm `buildPyramidSection(report, name, narrative)` để render intro, marker chart, 4 period blocks 7.1-7.4 và "Phân Tích Chi Tiết Từng Đỉnh Cao".
+- Section 7 trong `synthesizer.ts` chuyển sang dùng `buildPyramidSection`, không dùng `generic()` fallback cho nội dung chính.
+- `FullReport` inject `PyramidSvgChart` inline tại marker `<!-- CHART:pyramid -->` thay vì append ngoài flow.
+- CSS narrative thêm `.pyramid-*` và `.peak-*` cho period blocks, peak analysis, 4 aspect boxes, negatives và reflection.
+- Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build`; section 7 HTML fixture dài 29561 chars.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done
