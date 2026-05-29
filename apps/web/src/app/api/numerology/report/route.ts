@@ -100,6 +100,12 @@ export async function POST(request: Request) {
           : responsePayload.report;
       if (!unlocked && report && typeof report === "object") {
         delete (report as Record<string, unknown>).sections;
+        delete (report as Record<string, unknown>).phases;
+        delete (report as Record<string, unknown>).profileHeader;
+      }
+      if (!unlocked && payload && typeof payload === "object") {
+        delete (payload as Record<string, unknown>).phases;
+        delete (payload as Record<string, unknown>).profileHeader;
       }
       return NextResponse.json({ ...payload, report, unlocked, entitlement }, { status: response.status });
     }

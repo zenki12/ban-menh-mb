@@ -59,6 +59,15 @@ for (const testCase of cases) {
   if (report.destiny.number !== destiny) {
     throw new Error(`${testCase.fullName}: destiny mismatch`);
   }
+  if (!report.tensionNumber || typeof report.tensionNumber.number !== "number") {
+    throw new Error(`${testCase.fullName}: missing tensionNumber`);
+  }
+  if (report.personalYearsRange?.length !== 3) {
+    throw new Error(`${testCase.fullName}: personalYearsRange must contain 3 entries`);
+  }
+  if (report.personalMonthsRange?.length !== 3) {
+    throw new Error(`${testCase.fullName}: personalMonthsRange must contain 3 entries`);
+  }
 
   console.log(JSON.stringify(report, null, 2));
 }

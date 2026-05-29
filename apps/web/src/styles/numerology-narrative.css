@@ -109,3 +109,121 @@
 .pn-val {
   @apply font-bold text-[var(--bm-gold-bright)];
 }
+
+.phase-divider {
+  @apply rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] px-5 py-4 text-center uppercase tracking-[0.18em] shadow-[var(--bm-shadow-gold)];
+}
+
+.phase-divider span {
+  @apply mr-2 text-sm font-bold text-[var(--bm-gold-bright)];
+}
+
+.phase-divider strong {
+  @apply text-sm font-bold text-[var(--bm-text-main)] md:text-base;
+}
+
+.v1-section-header {
+  @apply flex flex-wrap items-center gap-3 border-b border-[var(--bm-border-subtle)] pb-4;
+}
+
+.v1-section-header span {
+  @apply flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--bm-primary)] text-base font-bold text-white;
+}
+
+.v1-section-header h3 {
+  @apply text-lg font-bold uppercase tracking-[0.08em] text-[var(--bm-text-main)] md:text-xl;
+}
+
+.v1-report-section {
+  @apply border-[var(--bm-border-subtle)];
+}
+
+.profile-card-v1 {
+  @apply grid gap-6 md:grid-cols-[auto_1fr];
+}
+
+.profile-avatar-v1 {
+  @apply flex size-32 flex-col items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[image:var(--bm-gradient-gold-text)] text-[var(--bm-bg-void)] shadow-[var(--bm-shadow-gold)];
+}
+
+.profile-avatar-v1 span {
+  @apply text-5xl font-bold leading-none;
+}
+
+.profile-avatar-v1 small {
+  @apply mt-1 text-xs font-bold uppercase tracking-wider;
+}
+
+.career-grid,
+.lc-advice-grid {
+  @apply my-5 grid gap-4 md:grid-cols-2;
+}
+
+.career-item,
+.lc-advice-item {
+  @apply rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.career-lbl,
+.lc-advice-label {
+  @apply mb-2 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.lc-advice-text {
+  @apply text-[var(--bm-text-soft)];
+}
+
+.year-card-deep,
+.cycle-block,
+.pyramid-period {
+  @apply my-6 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-5;
+}
+
+.year-card-deep-head,
+.cycle-header {
+  @apply mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] px-4 py-3 text-sm;
+}
+
+.year-card-deep-head strong,
+.cycle-header strong {
+  @apply text-[var(--bm-gold-bright)];
+}
+
+.year-card-deep-head em,
+.cycle-header em {
+  @apply text-[var(--bm-text-soft)];
+}
+
+.cycle-circles-row {
+  @apply my-6 grid gap-4 md:grid-cols-3;
+}
+
+.cycle-circle {
+  @apply flex aspect-square flex-col items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] p-5 text-center shadow-[var(--bm-shadow-gold)];
+}
+
+.cycle-circle span {
+  @apply text-5xl font-bold text-gradient-purple;
+}
+
+.cycle-circle strong {
+  @apply mt-2 text-xs uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.cycle-circle em {
+  @apply mt-1 text-xs text-[var(--bm-text-soft)];
+}
+
+.pyramid-period-heading {
+  @apply mb-3 text-base font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.pyramid-note {
+  @apply mb-4 text-sm text-[var(--bm-text-soft)];
+}
+
+.pyramid-advice,
+.karmic-debt-box,
+.cross-context-box {
+  @apply mt-4 rounded-lg border border-[var(--bm-border-purple)] bg-[rgba(124,58,237,0.1)] p-4;
+}

@@ -8,15 +8,18 @@ import {
   findCompensated,
   PYTHAGORAS_CHART,
   type NumerologyReport,
-  type SectionBlock,
+  type Phase,
+  type SynthesizedReport,
 } from "@banmenh/shared";
 import { Card } from "../../ui";
 import { BirthChartGrid } from "./charts/BirthChartGrid";
 import { CombinedChartGrid } from "./charts/CombinedChartGrid";
 import { PyramidSvgChart } from "./charts/PyramidSvgChart";
+import { PhaseDivider, ProfileHeaderCard, SectionHeader } from "./v1";
 
 export type NumerologyReportWithSections = NumerologyReport & {
-  sections?: SectionBlock[];
+  profileHeader?: SynthesizedReport["profileHeader"];
+  phases?: Phase[];
 };
 
 type FullReportProps = {
@@ -35,25 +38,15 @@ function EmptySections({ userName }: { userName: string }) {
   );
 }
 
-function IndicatorEssay({ indicator }: { indicator: SectionBlock["indicators"][number] }) {
+function BirthGridSlot({ report }: { report: NumerologyReport }) {
   return (
-    <Card
-      as="article"
-      className="border-[var(--bm-border-subtle)]"
-      id={`indicator-${indicator.key}`}
-      variant="glass"
-      padding="lg"
-    >
-      <div className="index-title">
-        <span className="number">{indicator.label}</span>
-        {indicator.number !== "" ? <span className="num-badge">{indicator.number}</span> : null}
-      </div>
-      <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: indicator.html }} />
-    </Card>
+    <div className="mt-6 max-w-md">
+      <BirthChartGrid cells={calcBirthChartCells(report.input.dobParts)} source="dob" title="Biểu đồ Ngày Sinh" />
+    </div>
   );
 }
 
-function GridCharts({ report }: { report: NumerologyReport }) {
+function CombinedGridSlot({ report }: { report: NumerologyReport }) {
   const dobCells = calcBirthChartCells(report.input.dobParts);
   const nameCells = calcNameChartCells(report.input.fullName, PYTHAGORAS_CHART);
   const combinedCells = calcCombinedCells(dobCells, nameCells);
@@ -63,53 +56,61 @@ function GridCharts({ report }: { report: NumerologyReport }) {
   const compensated = findCompensated(dobCells, nameCells);
 
   return (
-    <section className="mt-8 grid gap-6">
-      <div className="section-header">BIỂU ĐỒ NGÀY SINH, TÊN & TỔNG HỢP</div>
-      <p className="text-[var(--bm-text-soft)]">
-        Ba biểu đồ 3×3 cho thấy các con số hiện diện trong ngày sinh, trong tên gọi và phần tổng hợp giữa hai nguồn.
-      </p>
-      <div className="grid gap-5 lg:grid-cols-3">
-        <BirthChartGrid cells={dobCells} source="dob" title="Biểu đồ ngày sinh" />
-        <BirthChartGrid cells={nameCells} source="name" title="Biểu đồ tên" />
-        <CombinedChartGrid
-          combinedCells={combinedCells}
-          compensated={compensated}
-          detectedArrows={arrows}
-          dobCells={dobCells}
-          isolated={isolated}
-          nameCells={nameCells}
-        />
-      </div>
-    </section>
+    <div className="mt-6 grid gap-5 lg:grid-cols-2">
+      <BirthChartGrid cells={nameCells} source="name" title="Biểu đồ Tên" />
+      <CombinedChartGrid
+        combinedCells={combinedCells}
+        compensated={compensated}
+        detectedArrows={arrows}
+        dobCells={dobCells}
+        isolated={isolated}
+        nameCells={nameCells}
+      />
+    </div>
   );
 }
 
+function ChartSlot({ slot, report }: { slot?: Phase["sections"][number]["chartSlot"]; report: NumerologyReport }) {
+  if (slot === "pyramid") {
+    return (
+      <PyramidSvgChart
+        challenges={report.pyramidChallenges}
+        dobParts={report.input.dobParts}
+        peaks={report.pyramidPeaks}
+      />
+    );
+  }
+  if (slot === "birth-grid") return <BirthGridSlot report={report} />;
+  if (slot === "combined-grid") return <CombinedGridSlot report={report} />;
+  return null;
+}
+
 export function FullReport({ report, userName }: FullReportProps) {
-  const sections = report.sections ?? [];
-  if (!sections.length) return <EmptySections userName={userName} />;
+  const phases = report.phases ?? [];
+  const profileHeader =
+    report.profileHeader ?? {
+      name: userName,
+      dob: report.input.dob,
+      lifePathNumber: report.lifePath.number,
+      chips8: [],
+    };
+
+  if (!phases.length) return <EmptySections userName={userName} />;
 
   return (
     <div className="grid gap-12">
-      <p className="text-[var(--bm-text-soft)]">
-        Báo cáo đầy đủ cho {userName}: toàn bộ phần luận giải chi tiết đã được mở khóa trong tài khoản.
-      </p>
-      {sections.map((section) => (
-        <section className="grid gap-6" id={`section-${section.id}`} key={section.id}>
-          <div className="section-header">{section.title}</div>
-          {section.intro ? <p className="text-[var(--bm-text-soft)]">{section.intro}</p> : null}
-          {section.id === "time-cycles" ? (
-            <PyramidSvgChart
-              challenges={report.pyramidChallenges}
-              dobParts={report.input.dobParts}
-              peaks={report.pyramidPeaks}
-            />
-          ) : null}
-          <div className="grid gap-6">
-            {section.indicators.map((indicator) => (
-              <IndicatorEssay indicator={indicator} key={indicator.key} />
-            ))}
-          </div>
-          {section.id === "lessons" ? <GridCharts report={report} /> : null}
+      <ProfileHeaderCard {...profileHeader} />
+      {phases.map((phase) => (
+        <section className="grid gap-6" key={phase.letter}>
+          <PhaseDivider letter={phase.letter} title={phase.title} />
+          {phase.sections.map((item) => (
+            <Card as="article" className="v1-report-section" id={item.id} key={item.id} variant="glass" padding="lg">
+              <SectionHeader number={item.number} title={item.title} />
+              {item.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{item.intro}</p> : null}
+              <ChartSlot report={report} slot={item.chartSlot} />
+              <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: item.html }} />
+            </Card>
+          ))}
         </section>
       ))}
     </div>

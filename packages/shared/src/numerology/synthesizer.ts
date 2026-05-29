@@ -1,5 +1,22 @@
 import type { NarrativeKb, NumerologyKb } from "../schemas/numerology-kb";
-import type { IndicatorResult, KarmicLessonsResult, NumerologyReport, PeriodIndicatorResult } from "./report";
+import {
+  buildYearDomainBlock,
+  destinyCtxBlock,
+  escapeHtml,
+  generic,
+  lifeCycleNarrative,
+  lifePathCtxBlock,
+  maturityCtxBlock,
+  personalMonthDeep,
+  personalPeriod,
+  personalYearDeep,
+  personalityCtxBlock,
+  pyramidPeakAnalysis,
+  readString,
+  soulCtxBlock,
+  type NarrativeContext,
+} from "./narrative-deep";
+import type { IndicatorResult, KarmicLessonsResult, NumerologyReport } from "./report";
 
 export type SynthesizerInput = {
   report: NumerologyReport;
@@ -7,56 +24,32 @@ export type SynthesizerInput = {
   kb: NumerologyKb;
 };
 
-export type IndicatorBlock = {
-  key: string;
-  label: string;
-  number: number | string;
-  html: string;
-};
-
 export type SectionBlock = {
   id: string;
+  number: string;
   title: string;
   intro?: string;
-  indicators: IndicatorBlock[];
+  html: string;
+  chartSlot?: "pyramid" | "birth-grid" | "combined-grid";
+};
+
+export type Phase = {
+  letter: "A" | "B" | "C" | "D";
+  title: string;
+  sections: SectionBlock[];
+};
+
+export type SynthesizedReport = {
+  profileHeader: {
+    name: string;
+    dob: string;
+    lifePathNumber: number;
+    chips8: Array<{ label: string; num: number }>;
+  };
+  phases: Phase[];
 };
 
 type NarrativeGroup = keyof NarrativeKb;
-type Context = {
-  lifePath: number;
-  soul: number;
-  destiny: number;
-  personality: number;
-  maturity: number;
-  birthday: number;
-  attitude: number;
-};
-
-const DEFAULT_NAME = "Bạn";
-
-const OVERVIEW_DEFS = [
-  ["lifePath", "Số đường đời"],
-  ["destiny", "Số sứ mệnh"],
-  ["soul", "Số linh hồn"],
-  ["personality", "Số cá tính"],
-  ["birthday", "Số ngày sinh"],
-  ["attitude", "Số thái độ"],
-  ["maturity", "Số trưởng thành"],
-  ["personalYear", "Năm cá nhân"],
-  ["personalMonth", "Tháng cá nhân"],
-  ["personalDay", "Ngày cá nhân"],
-  ["cornerstone", "Chữ cái mở đầu"],
-  ["capstone", "Chữ cái đóng"],
-] as const;
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 function replaceVars(html: string, vars: Record<string, string | number>): string {
   let out = html;
@@ -64,55 +57,6 @@ function replaceVars(html: string, vars: Record<string, string | number>): strin
     out = out.replaceAll(`{{${key}}}`, escapeHtml(String(value)));
   }
   return out;
-}
-
-function asRecord(data: unknown): Record<string, unknown> {
-  return data && typeof data === "object" ? (data as Record<string, unknown>) : {};
-}
-
-function readString(data: Record<string, unknown>, keys: string[]): string {
-  for (const key of keys) {
-    const value = data[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
-    if (Array.isArray(value)) {
-      const items = value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
-      if (items.length) return items.join(", ");
-    }
-  }
-  return "";
-}
-
-function titleOf(data: unknown, fallback: string): string {
-  return readString(asRecord(data), ["title"]) || fallback;
-}
-
-function numLabel(indicator: IndicatorResult | PeriodIndicatorResult): string {
-  const chips: string[] = [];
-  if (indicator.isMaster) chips.push("Master");
-  if (indicator.karmicDebt) chips.push(`Nợ nghiệp ${indicator.karmicDebt}`);
-  return chips.length ? chips.join(" · ") : "";
-}
-
-function generic(label: string, num: number | string, name: string, data: unknown): string {
-  const d = asRecord(data);
-  const title = titleOf(d, `${label} ${num}`);
-  const fields = [
-    readString(d, ["description", "meaning", "dynamic", "theme"]),
-    readString(d, ["lesson", "core_lesson", "life_lesson"]),
-    readString(d, ["strengths", "strength", "positive", "gift"]),
-    readString(d, ["weaknesses", "blind_spot", "warning", "trap", "challenge"]),
-    readString(d, ["advice", "growth_path", "how_to_develop", "how_to_overcome"]),
-  ].filter(Boolean);
-
-  if (!fields.length) return noData(label);
-  return [
-    `<p class="nar"><strong>${escapeHtml(name)}</strong> mang <strong>${escapeHtml(label)} ${escapeHtml(String(num))}</strong> - ${escapeHtml(title)}.</p>`,
-    ...fields.map((text) => `<p class="nar">${escapeHtml(text)}</p>`),
-  ].join("");
-}
-
-function noData(label: string): string {
-  return `<p class="synthetic-text" style="color:#94a3b8;font-style:italic;">Dữ liệu chỉ số ${escapeHtml(label)} đang được cập nhật.</p>`;
 }
 
 function fromNarrative(
@@ -125,218 +69,215 @@ function fromNarrative(
   return entry ? replaceVars(entry.html, vars) : null;
 }
 
-function energyMatch(a: number, b: number): boolean {
-  const extro = [1, 3, 5, 9];
-  const stable = [2, 4, 6, 8];
-  return (extro.includes(a) && extro.includes(b)) || (stable.includes(a) && stable.includes(b));
-}
-
-function lifePathCtxBlock(num: number, ctx: Context, name: string): string {
-  const insight =
-    num === ctx.soul
-      ? `Linh hồn số <strong>${ctx.soul}</strong> hoàn toàn đồng nhất với Đường đời. Điều bạn khao khát sâu nhất cũng chính là con đường bạn được mời gọi sống.`
-      : energyMatch(num, ctx.soul)
-        ? `Linh hồn số <strong>${ctx.soul}</strong> cộng hưởng hài hòa với Đường đời số <strong>${num}</strong>, giúp bên trong và bên ngoài dễ đi cùng một hướng.`
-        : `Linh hồn số <strong>${ctx.soul}</strong> tạo một chiều sâu khác với Đường đời số <strong>${num}</strong>; hiểu được độ chênh này giúp ${escapeHtml(name)} sống trọn vẹn hơn.`;
-  return `<div class="insight-box" style="margin-top:1rem;border-color:#7c3aed;">🔗 <strong>Giao điểm Đường đời → Linh hồn (${ctx.soul}) &amp; Ngày sinh (${ctx.birthday}):</strong> ${insight} Ngày sinh số <strong>${ctx.birthday}</strong> bổ sung năng lượng tự nhiên để Đường đời ${num} phát triển theo cách riêng.</div>`;
-}
-
-function soulCtxBlock(num: number, ctx: Context, name: string): string {
-  const text =
-    num === ctx.lifePath
-      ? `Điều ${escapeHtml(name)} khao khát sâu nhất hoàn toàn khớp với Đường đời số <strong>${ctx.lifePath}</strong>.`
-      : energyMatch(num, ctx.lifePath)
-        ? `Linh hồn số <strong>${num}</strong> cộng hưởng với Đường đời số <strong>${ctx.lifePath}</strong>, nên hành động từ trái tim thường cũng là hành động đúng hướng.`
-        : `Linh hồn số <strong>${num}</strong> và Đường đời số <strong>${ctx.lifePath}</strong> tạo hai lực kéo khác nhau, cần được lắng nghe đồng thời.`;
-  return `<p class="nar" style="border-left:3px solid #7c3aed;padding-left:1rem;margin-top:1rem;"><strong>✓ Linh hồn trong tổng thể biểu đồ của ${escapeHtml(name)}:</strong> ${text}</p>`;
-}
-
-function destinyCtxBlock(num: number, ctx: Context, name: string): string {
-  const text =
-    num === ctx.lifePath
-      ? `Sứ mệnh số <strong>${num}</strong> trùng với Đường đời số <strong>${ctx.lifePath}</strong>, làm cho con đường sống và cách đóng góp có sự thống nhất mạnh.`
-      : energyMatch(num, ctx.lifePath)
-        ? `Sứ mệnh số <strong>${num}</strong> cùng hướng với Đường đời số <strong>${ctx.lifePath}</strong>, giúp năng lượng đóng góp được bộc lộ tự nhiên.`
-        : `Sứ mệnh số <strong>${num}</strong> và Đường đời số <strong>${ctx.lifePath}</strong> bổ trợ nhau; một bên định hình hành trình, một bên mở ra cách đóng góp.`;
-  return `<p class="nar" style="border-left:3px solid #2563eb;padding-left:1rem;margin-top:1rem;"><strong>✓ Sứ mệnh trong tổng thể biểu đồ của ${escapeHtml(name)}:</strong> ${text} Ngày sinh số <strong>${ctx.birthday}</strong> là công cụ tự nhiên để hiện thực hóa sứ mệnh này.</p>`;
-}
-
-function personalityCtxBlock(num: number, ctx: Context, name: string): string {
-  const text =
-    num === ctx.soul
-      ? `Cá tính số <strong>${num}</strong> khớp với Linh hồn số <strong>${ctx.soul}</strong>, nên hình ảnh bên ngoài phản ánh khá trung thực nội tâm.`
-      : energyMatch(num, ctx.soul)
-        ? `Cá tính số <strong>${num}</strong> hòa với Linh hồn số <strong>${ctx.soul}</strong>, giúp người khác dễ cảm nhận đúng con người thật.`
-        : `Cá tính số <strong>${num}</strong> khác Linh hồn số <strong>${ctx.soul}</strong>, tạo chiều sâu giữa điều người khác thấy và điều ${escapeHtml(name)} thật sự cần.`;
-  return `<p class="nar" style="border-left:3px solid #d97706;padding-left:1rem;margin-top:1rem;"><strong>✓ Cá tính trong tổng thể biểu đồ:</strong> ${text}</p>`;
-}
-
-function maturityCtxBlock(num: number, ctx: Context, name: string): string {
-  return `<p class="nar" style="border-left:3px solid #059669;padding-left:1rem;margin-top:1rem;"><strong>✓ Số Trưởng thành ${num} trong tổng thể biểu đồ của ${escapeHtml(name)}:</strong> Con số này được hình thành từ Đường đời số <strong>${ctx.lifePath}</strong> và Sứ mệnh số <strong>${ctx.destiny}</strong>. Đây là điểm tích hợp khi kinh nghiệm sống làm rõ phiên bản đầy đủ hơn của chính mình.</p>`;
-}
-
-function synthIndicator(
+function renderIndicator(
   narrative: NarrativeKb,
   group: NarrativeGroup | null,
-  key: string,
   label: string,
-  indicator: IndicatorResult | PeriodIndicatorResult,
+  indicator: IndicatorResult,
   name: string,
-  ctx?: Context,
-  periodVars: Record<string, string | number> = {},
-): IndicatorBlock {
-  const vars = { name, number: indicator.number, ...periodVars };
-  let html = group ? fromNarrative(narrative, group, indicator.number, vars) : null;
-  if (!html) html = indicator.data ? generic(label, indicator.number, name, indicator.data) : noData(label);
-
-  if (ctx) {
-    if (key === "lifePath") html += lifePathCtxBlock(indicator.number, ctx, name);
-    if (key === "soul") html += soulCtxBlock(indicator.number, ctx, name);
-    if (key === "destiny") html += destinyCtxBlock(indicator.number, ctx, name);
-    if (key === "personality") html += personalityCtxBlock(indicator.number, ctx, name);
-    if (key === "maturity") html += maturityCtxBlock(indicator.number, ctx, name);
-  }
-
-  const badge = numLabel(indicator);
-  return { key, label, number: badge ? `${indicator.number} · ${badge}` : indicator.number, html };
+  vars: Record<string, string | number> = {},
+): string {
+  const html = group ? fromNarrative(narrative, group, indicator.number, { name, number: indicator.number, ...vars }) : null;
+  return html ?? generic(label, indicator.number, name, indicator.data);
 }
 
-function overview(report: NumerologyReport, name: string): IndicatorBlock {
-  const record = report as unknown as Record<string, IndicatorResult & { letter?: string }>;
-  const cards = OVERVIEW_DEFS.map(([key, label]) => {
-    const item = record[key];
-    const value = key === "cornerstone" || key === "capstone" ? item?.letter : item?.number;
-    return `<span class="pn-item"><span class="pn-label">${label}</span><span class="pn-val">${escapeHtml(String(value ?? ""))}</span></span>`;
-  }).join("");
-
+function section(
+  number: string,
+  title: string,
+  html: string,
+  options: Pick<SectionBlock, "intro" | "chartSlot"> = {},
+): SectionBlock {
   return {
-    key: "overview",
-    label: "Tổng hợp các chỉ số thần số học",
-    number: "",
-    html: `<div class="profile-card"><div class="profile-avatar"><span class="avatar-number">${report.lifePath.number}</span><span class="avatar-label">Chủ đạo</span></div><div class="profile-info"><div class="profile-name">${escapeHtml(name)}</div><div class="profile-dob">Ngày sinh: ${escapeHtml(report.input.dob)}</div><div class="profile-nums">${cards}</div></div></div><p class="nar">Bản báo cáo này được xây dựng riêng cho <strong>${escapeHtml(name)}</strong>, phân tích đầy đủ các chỉ số dựa trên họ tên khai sinh và ngày sinh theo hệ Pythagoras.</p><p class="nar">Hãy đọc từng phần với tâm thế cởi mở. Thần số học không phải lời tiên tri; đây là tấm gương phản chiếu những lớp năng lượng, khuynh hướng và bài học để bạn quan sát chính mình rõ hơn.</p>`,
+    id: `section-${number.replace(/[^\dA-Za-z]+/g, "-").replace(/^-|-$/g, "")}`,
+    number,
+    title,
+    html,
+    ...options,
   };
 }
 
-function karmicLessons(report: NumerologyReport, narrative: NarrativeKb, name: string): IndicatorBlock {
+function buildProfileHeader(report: NumerologyReport): SynthesizedReport["profileHeader"] {
+  return {
+    name: report.input.fullName,
+    dob: report.input.dob,
+    lifePathNumber: report.lifePath.number,
+    chips8: [
+      { label: "Đường Đời", num: report.lifePath.number },
+      { label: "Sứ Mệnh", num: report.destiny.number },
+      { label: "Linh Hồn", num: report.soul.number },
+      { label: "Nhân Cách", num: report.personality.number },
+      { label: "Trưởng Thành", num: report.maturity.number },
+      { label: "Thái Độ", num: report.attitude.number },
+      { label: "Năm cá nhân", num: report.personalYear.number },
+      { label: "Tháng cá nhân", num: report.personalMonth.number },
+    ],
+  };
+}
+
+function overviewHtml(report: NumerologyReport, name: string): string {
+  const chips = buildProfileHeader(report).chips8
+    .map(
+      (chip) =>
+        `<span class="pn-item"><span class="pn-label">${escapeHtml(chip.label)}</span><span class="pn-val">${chip.num}</span></span>`,
+    )
+    .join("");
+  return `<div class="profile-card"><div class="profile-avatar"><span class="avatar-number">${report.lifePath.number}</span><span class="avatar-label">Chủ Đạo</span></div><div class="profile-info"><div class="profile-name">${escapeHtml(name)}</div><div class="profile-dob">Ngày sinh: ${escapeHtml(report.input.dob)}</div><div class="profile-nums">${chips}</div></div></div>
+  <p class="nar">Bản báo cáo này được xây dựng riêng cho <strong>${escapeHtml(name)}</strong> — phân tích đầy đủ các chỉ số dựa trên <strong>họ tên khai sinh</strong> và <strong>ngày/tháng/năm sinh</strong> theo hệ Pythagoras.</p>
+  <p class="nar">Hãy đọc từng phần với tâm thái cởi mở và suy ngẫm. Thần số học không phải lời tiên tri — đó là tấm gương phản chiếu bản chất sâu xa nhất của bạn, để bạn hiểu rõ hơn về chính mình và đưa ra những lựa chọn có ý thức hơn.</p>`;
+}
+
+function careerHtml(report: NumerologyReport, name: string): string {
+  const sources = [report.lifePath.data, report.destiny.data, report.birthday.data];
+  const rows = sources
+    .map((data, index) => {
+      const text = readString(data, ["career", "career_fit", "mission"]);
+      if (!text) return "";
+      const label = index === 0 ? "Đường đời" : index === 1 ? "Sứ mệnh" : "Ngày sinh";
+      return `<div class="career-item"><div class="career-lbl">${label}</div><p>${escapeHtml(text)}</p></div>`;
+    })
+    .filter(Boolean)
+    .join("");
+  return `<p class="nar">Nhóm ngành nghề phù hợp của <strong>${escapeHtml(name)}</strong> được tổng hợp từ các chỉ số cốt lõi, đặc biệt là Đường đời, Sứ mệnh và Ngày sinh.</p><div class="career-grid">${rows}</div>`;
+}
+
+function lifeCyclesHtml(report: NumerologyReport, name: string): string {
+  const circles = report.lifeCycles
+    .map(
+      (cycle, index) =>
+        `<div class="cycle-circle"><span>${cycle.number}</span><strong>${["GIEO HẠT", "CHÍN", "THU HOẠCH"][index]}</strong><em>${escapeHtml(cycle.period)}</em></div>`,
+    )
+    .join("");
+  const detail = report.lifeCycles
+    .map((cycle, index) => lifeCycleNarrative(index + 1, cycle.number, cycle.period, name, cycle.data))
+    .join("");
+  return `<div class="cycle-circles-row">${circles}</div>${detail}`;
+}
+
+function relationshipHtml(titleText: string, first: number, second: number, name: string): string {
+  const harmony = first === second ? "hoàn toàn đồng nhất" : Math.abs(first - second) <= 2 ? "có độ cộng hưởng tốt" : "tạo ra hai lực kéo khác nhau cần được dung hòa";
+  return `<p class="nar">${titleText} của <strong>${escapeHtml(name)}</strong> là cặp số <strong>${first}</strong> và <strong>${second}</strong>. Hai năng lượng này ${harmony}, vì vậy nên đọc cùng nhau thay vì tách rời.</p><div class="insight-box">📌 <strong>Lời khuyên:</strong> Khi hai chỉ số bổ trợ, hãy dùng chúng như lực đẩy. Khi chúng căng nhau, hãy xem đó là tín hiệu cần cân bằng giữa điều bạn muốn, cách bạn hành động và vai trò bạn đang sống.</div>`;
+}
+
+function karmicLessonsHtml(report: NumerologyReport, narrative: NarrativeKb, name: string): string {
   const lessons = report.karmicLessons as KarmicLessonsResult;
-  const html = lessons.missingNumbers.length
-    ? lessons.data
-        .map((item) => {
-          const tmpl = fromNarrative(narrative, "karmicLesson", item.number, { name, number: item.number });
-          return tmpl ?? generic("Bài học karmic", item.number, name, item.info);
-        })
-        .join("")
-    : `<p class="nar">Không phát hiện số thiếu nổi bật trong biểu đồ tên. Điều này không có nghĩa là hành trình không có bài học, mà là các bài học karmic không hiện lên theo dạng thiếu số rõ rệt.</p>`;
-  return { key: "karmicLessons", label: "Bài học karmic", number: lessons.missingNumbers.join(", ") || "Không thiếu số", html };
+  if (!lessons.missingNumbers.length) {
+    return `<div class="insight-box">✅ <strong>Biểu đồ tên không thiếu số nổi bật.</strong> Điều này không có nghĩa là không có bài học, mà là các bài học nghiệp không hiện lên theo dạng thiếu số rõ rệt.</div>`;
+  }
+  return `<p class="nar">Các số <strong>${lessons.missingNumbers.join(", ")}</strong> vắng mặt trong biểu đồ tên. Mỗi số thiếu tương ứng với một bài học nghiệp cần được nhận diện và rèn luyện.</p>${lessons.data
+    .map((item) => renderIndicator(narrative, "karmicLesson", "Bài học nghiệp", { number: item.number, raw: item.number, isMaster: false, data: item.info }, name))
+    .join("")}`;
 }
 
-function letterBlock(key: "cornerstone" | "capstone", label: string, letter: string | undefined, name: string): IndicatorBlock {
-  const value = letter || "?";
-  return {
-    key,
-    label,
-    number: value,
-    html: `<p class="nar"><strong>${label} ${escapeHtml(value)}</strong> là dấu ấn chữ cái trong tên gọi của ${escapeHtml(name)}.</p><p class="nar">Trong V1, phần này được dùng như một chỉ báo biểu tượng: chữ cái mở đầu nói về ấn tượng ban đầu và cách bắt đầu hành động; chữ cái đóng nói về cách hoàn tất, kết luận và để lại dư âm.</p>`,
-  };
+function karmicDebtHtml(report: NumerologyReport, kb: NumerologyKb, name: string): string {
+  const numbers = [
+    report.lifePath.karmicDebt,
+    report.destiny.karmicDebt,
+    report.soul.karmicDebt,
+    report.personality.karmicDebt,
+    report.maturity.karmicDebt,
+  ].filter((value, index, list): value is NonNullable<typeof value> => Boolean(value) && list.indexOf(value) === index);
+  if (!numbers.length) return `<div class="insight-box">✅ <strong>Không phát hiện nợ nghiệp 13/14/16/19 trong các chỉ số chính.</strong></div>`;
+  return numbers
+    .map((num) => {
+      const data = (kb.karmic_debt as Record<string, unknown>)[String(num)];
+      return `<div class="karmic-debt-box">${generic(`Nợ nghiệp ${num}`, num, name, data)}</div>`;
+    })
+    .join("");
 }
 
-export function buildSynthesizedReport(input: SynthesizerInput): SectionBlock[] {
-  const { report, narrative } = input;
-  const name = report.input.fullName || DEFAULT_NAME;
-  const ctx: Context = {
+function challengeHtml(
+  narrative: NarrativeKb,
+  group: NarrativeGroup,
+  label: string,
+  indicator: IndicatorResult,
+  name: string,
+): string {
+  return renderIndicator(narrative, group, label, indicator, name);
+}
+
+export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedReport {
+  const { report, narrative, kb } = input;
+  const name = report.input.fullName;
+  const ctx: NarrativeContext = {
     lifePath: report.lifePath.number,
     soul: report.soul.number,
     destiny: report.destiny.number,
     personality: report.personality.number,
     maturity: report.maturity.number,
-    birthday: report.input.dobParts.day,
+    birthday: report.birthday.number,
     attitude: report.attitude.number,
   };
 
-  return [
+  const phases: Phase[] = [
     {
-      id: "overview",
-      title: "PHẦN A. TỔNG QUAN & BIỂU ĐỒ VẬN SỐ",
-      intro: "Tổng hợp 12 chỉ số nền trước khi đi vào luận giải chi tiết.",
-      indicators: [overview(report, name)],
-    },
-    {
-      id: "core",
-      title: "PHẦN B. PHÂN TÍCH ĐƯỜNG ĐỜI",
-      intro: "Các chỉ số cốt lõi mô tả hướng phát triển, bản ngã và nguồn năng lượng nền.",
-      indicators: [
-        synthIndicator(narrative, "lifePath", "lifePath", "Số Đường đời", report.lifePath, name, ctx),
-        synthIndicator(narrative, "destiny", "destiny", "Số Sứ mệnh", report.destiny, name, ctx),
-        synthIndicator(narrative, "soul", "soul", "Số Linh hồn", report.soul, name, ctx),
-        synthIndicator(narrative, "personality", "personality", "Số Cá tính", report.personality, name, ctx),
-        synthIndicator(narrative, "birthday", "birthday", "Số Ngày sinh", report.birthday, name, undefined, {
-          rawDay: report.input.dobParts.day,
-        }),
-      ],
-    },
-    {
-      id: "personality-attitude",
-      title: "PHẦN C. CÁ TÍNH & THÁI ĐỘ TIẾP CẬN",
-      intro: "Nhóm này cho thấy cách bạn bước vào tình huống, phản ứng và tiếp cận cuộc sống.",
-      indicators: [
-        synthIndicator(narrative, "attitude", "attitude", "Số Thái độ", report.attitude, name),
-        synthIndicator(narrative, "approachMotivation", "approachMotivation", "Động lực tiếp cận", report.approachMotivation, name),
-        synthIndicator(narrative, "approachAbility", "approachAbility", "Năng lực tiếp cận", report.approachAbility, name),
-        synthIndicator(narrative, "approachAttitude", "approachAttitude", "Thái độ tiếp cận", report.approachAttitude, name),
-      ],
-    },
-    {
-      id: "lessons",
-      title: "PHẦN D. BÀI HỌC & HÀNH TRÌNH",
-      intro: "Các chỉ số trong nhóm này nói về bài học dài hạn, thử thách nội tâm và hướng trưởng thành.",
-      indicators: [
-        synthIndicator(narrative, "maturity", "maturity", "Số Trưởng thành", report.maturity, name, ctx),
-        synthIndicator(narrative, null, "maturityAbility", "Năng lực trưởng thành", report.maturityAbility, name),
-        synthIndicator(narrative, "cognitiveAbility", "cognitiveAbility", "Năng lực nhận thức", report.cognitiveAbility, name),
-        synthIndicator(narrative, null, "overrideDifficulty", "Khó khăn vượt qua", report.overrideDifficulty, name),
-        synthIndicator(narrative, "soulChallenge", "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name),
-        synthIndicator(narrative, "destinyChallenge", "destinyChallenge", "Thử thách Sứ mệnh", report.destinyChallenge, name),
-        synthIndicator(narrative, "personalityChallenge", "personalityChallenge", "Thử thách Cá tính", report.personalityChallenge, name),
-        karmicLessons(report, narrative, name),
-      ],
-    },
-    {
-      id: "time-cycles",
-      title: "PHẦN E. CHU KỲ THỜI GIAN",
-      intro: "Chu kỳ cá nhân, chu kỳ đời và kim tự tháp cho thấy nhịp phát triển theo thời gian.",
-      indicators: [
-        synthIndicator(narrative, "personalYearDomains", "personalYear", `Năm cá nhân ${report.personalYear.year}`, report.personalYear, name, undefined, {
-          year: report.personalYear.year,
-          age: report.personalYear.year - report.input.dobParts.year,
-        }),
-        synthIndicator(narrative, null, "personalMonth", `Tháng cá nhân ${report.personalMonth.month}`, report.personalMonth, name),
-        synthIndicator(narrative, null, "personalDay", `Ngày cá nhân ${report.personalDay.date}`, report.personalDay, name),
-        ...report.lifeCycles.map((item, index) =>
-          synthIndicator(narrative, null, `lifeCycle${index + 1}`, `Chu kỳ đời ${index + 1}`, item, name, undefined, {
-            period: item.period,
-          }),
+      letter: "A",
+      title: "TỔNG QUAN & BIỂU ĐỒ VẬN SỐ",
+      sections: [
+        section("1", "Tổng hợp các chỉ số thần số học", overviewHtml(report, name)),
+        section(
+          "2",
+          "Chu kỳ vận số cá nhân",
+          `<p class="nar">Biểu đồ vận số cá nhân cho thấy dòng năng lượng của các năm gần hiện tại. Phần dưới đây mở rộng 3 năm tới để bạn dễ định hướng.</p>${report.personalYearsRange
+            .map((item) => buildYearDomainBlock(item.number, item.year, item.age, name, item.data))
+            .join("")}`,
         ),
-        ...report.pyramidPeaks.map((item, index) =>
-          synthIndicator(narrative, "pyramidPeak", `pyramidPeak${index + 1}`, `Đỉnh kim tự tháp ${index + 1}`, item, name, undefined, {
-            period: item.period,
-            peakIndex: index + 1,
-          }),
-        ),
-        ...report.pyramidChallenges.map((item, index) =>
-          synthIndicator(narrative, "pyramidChallenge", `pyramidChallenge${index + 1}`, `Thử thách kim tự tháp ${index + 1}`, item, name, undefined, {
-            period: item.period,
-          }),
-        ),
+        section("3", "Nhóm ngành nghề phù hợp", careerHtml(report, name)),
       ],
     },
     {
-      id: "special",
-      title: "PHẦN F. DẤU ẤN ĐẶC BIỆT",
-      intro: "Các dấu ấn chữ cái giúp bổ sung góc nhìn về cách bắt đầu và kết thúc năng lượng tên gọi.",
-      indicators: [
-        letterBlock("cornerstone", "Chữ cái mở đầu", report.cornerstone.letter, name),
-        letterBlock("capstone", "Chữ cái đóng", report.capstone.letter, name),
+      letter: "B",
+      title: "PHÂN TÍCH ĐƯỜNG ĐỜI",
+      sections: [
+        section("5", "Chỉ số Đường Đời (Số Chủ Đạo)", renderIndicator(narrative, "lifePath", "Đường đời", report.lifePath, name) + lifePathCtxBlock(report.lifePath.number, ctx, name)),
+        section("6", "Chu Kỳ Đường Đời", lifeCyclesHtml(report, name)),
+        section(
+          "7",
+          "Biểu đồ Kim Tự Tháp — Đỉnh cao & Thử thách",
+          `<p class="nar">Kim tự tháp thể hiện các giai đoạn đỉnh cao và thử thách song hành trong hành trình trưởng thành.</p>${report.pyramidPeaks
+            .map((peak, index) => pyramidPeakAnalysis(index, peak.number, peak.period, report.pyramidChallenges[index]?.number ?? null, name, peak.data, report.pyramidChallenges[index]?.data))
+            .join("")}`,
+          { chartSlot: "pyramid" },
+        ),
+        section("8", "Chỉ số Năm Cá Nhân", personalPeriod("Năm", report.personalYear.number, report.personalYear.year, name, report.personalYear.data)),
+        section("8.1", "Chu Kỳ Vận Số — Phân Tích Chi Tiết 3 Năm", report.personalYearsRange.map((item) => personalYearDeep(item, name)).join("")),
+        section("9", "Chỉ số Tháng Cá Nhân", personalPeriod(`Tháng ${report.personalMonth.month}`, report.personalMonth.number, `${report.personalMonth.month}/${report.personalYear.year}`, name, report.personalMonth.data)),
+        section("9.1", "Chỉ Số Các Tháng — Phân Tích 3 Tháng", report.personalMonthsRange.map((item) => personalMonthDeep(item, name)).join("")),
+      ],
+    },
+    {
+      letter: "C",
+      title: "PHÂN TÍCH SỨ MỆNH & NỘI TÂM",
+      sections: [
+        section("10", "Chỉ số Sứ Mệnh (Vận Mệnh)", renderIndicator(narrative, "destiny", "Sứ mệnh", report.destiny, name) + destinyCtxBlock(report.destiny.number, ctx, name)),
+        section("11", "Tương quan Đường đời & Sứ mệnh", relationshipHtml("Tương quan Đường đời và Sứ mệnh", report.lifePath.number, report.destiny.number, name)),
+        section("12", "Thử thách Sứ Mệnh", challengeHtml(narrative, "destinyChallenge", "Thử thách Sứ mệnh", report.destinyChallenge, name)),
+        section("13", "Chỉ số Trưởng Thành", renderIndicator(narrative, "maturity", "Trưởng thành", report.maturity, name) + maturityCtxBlock(report.maturity.number, ctx, name)),
+        section("14", "Năng lực trong giai đoạn Trưởng Thành", generic("Năng lực trưởng thành", report.maturityAbility.number, name, report.maturityAbility.data)),
+        section("15", "Chỉ số Linh Hồn (Mong ước sâu thẳm)", renderIndicator(narrative, "soul", "Linh hồn", report.soul, name) + soulCtxBlock(report.soul.number, ctx, name)),
+        section("16", "Tương quan Đường đời & Linh hồn", relationshipHtml("Tương quan Đường đời và Linh hồn", report.lifePath.number, report.soul.number, name)),
+        section("17", "Thử thách Linh Hồn", challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name)),
+        section("18", "Chỉ số Nhân Cách", renderIndicator(narrative, "personality", "Nhân cách", report.personality, name) + personalityCtxBlock(report.personality.number, ctx, name)),
+        section("19", "Thử thách Nhân Cách", challengeHtml(narrative, "personalityChallenge", "Thử thách Nhân cách", report.personalityChallenge, name)),
+        section("20", "Các bài học nghiệp (Karmic Lessons)", karmicLessonsHtml(report, narrative, name)),
+        section("21", "Các chỉ số Nợ Nghiệp (Karmic Debt)", karmicDebtHtml(report, kb, name)),
+      ],
+    },
+    {
+      letter: "D",
+      title: "PHÂN TÍCH NĂNG LỰC & BIỂU ĐỒ SỨC MẠNH",
+      sections: [
+        section("22", "Biểu đồ Sức Mạnh — Lưới Ngày Sinh (Pythagoras)", `<p class="nar">Ma trận 3×3 của Pythagoras đặt từng chữ số trong ngày sinh vào ô tương ứng. Các ô đầy là điểm mạnh năng lượng bẩm sinh; ô trống là những bài học cần được bổ sung.</p>`, { chartSlot: "birth-grid" }),
+        section("23", "Biểu đồ Tên & Biểu đồ Tổng Hợp", `<p class="nar">Biểu đồ tên cho thấy nguồn năng lượng được kích hoạt qua họ tên. Biểu đồ tổng hợp kết hợp ngày sinh và tên để nhận diện mũi tên sức mạnh, số lẻ loi và số được bù.</p>`, { chartSlot: "combined-grid" }),
+        section("24", "Chỉ số Thái Độ", renderIndicator(narrative, "attitude", "Thái độ", report.attitude, name)),
+        section("25", "Chỉ số Ngày Sinh (Tài năng Tự nhiên)", renderIndicator(narrative, "birthday", "Ngày sinh", report.birthday, name)),
+        section("26", "Chỉ số Vượt Khó (Tension Number)", renderIndicator(narrative, "tensionNumber", "Vượt khó", report.tensionNumber, name)),
+        section("27", "Chỉ số Năng Lực Tư Duy", renderIndicator(narrative, "cognitiveAbility", "Năng lực tư duy", report.cognitiveAbility, name)),
+        section("28", "Chỉ số Động Lực Tiếp Cận", renderIndicator(narrative, "approachMotivation", "Động lực tiếp cận", report.approachMotivation, name)),
+        section("29", "Chỉ số Năng Lực Tiếp Cận", renderIndicator(narrative, "approachAbility", "Năng lực tiếp cận", report.approachAbility, name)),
+        section("30", "Chỉ số Thái Độ Tiếp Cận", renderIndicator(narrative, "approachAttitude", "Thái độ tiếp cận", report.approachAttitude, name)),
       ],
     },
   ];
+
+  return { profileHeader: buildProfileHeader(report), phases };
 }

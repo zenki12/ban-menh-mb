@@ -2492,6 +2492,39 @@ Update khi xong:
 - `tools/kb-import/test-charts.mjs` cover thêm DOB `15/08/1992`, arrow `147`, isolated numbers, combined/compensation.
 - Verify đã chạy: `npm.cmd run kb:test-charts`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
 
+### T-0610 - Mechanical port V1 web numerology report details
+
+Status: Done
+
+Bối cảnh:
+
+- T-0608 mới đưa details về dạng essay 6 section, chưa khớp V1 web banmenh.online 4 PHẦN/30 section.
+- User cần `/than-so-hoc/result/details` unlocked giống V1 web hơn, giữ V2 dark theme và không ship raw KB/narrative ra client.
+
+Yêu cầu:
+
+- Mở rộng engine với `tensionNumber`, `personalYearsRange` 3 năm và `personalMonthsRange` 3 tháng.
+- Port helper narrative sâu và cross-context block để synthesizer có thể tạo HTML server-side.
+- Rebuild synthesizer thành `profileHeader` + 4 `phases`, 30+ section đánh số theo V1 web, skip số 4.
+- FullReport render phase divider, section header, profile header 8 chips và chart slots T-0609 đúng vị trí.
+- Giữ free/lock gating, summary dashboard, charts, payment/auth/voucher và KB schema không đổi.
+
+Điều kiện Done:
+
+- `npm run kb:test-engine`, `npm run kb:test-synthesizer`, `npm run kb:test-charts`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-29: thêm `calcTensionNumber`, `tensionNumber`, `personalYearsRange`, `personalMonthsRange`.
+- Thêm `packages/shared/src/numerology/narrative-deep.ts` với helper deep narrative, personal year/month, life cycle, pyramid và 5 cross-context blocks.
+- `buildSynthesizedReport` trả `SynthesizedReport` gồm `profileHeader` và 4 `phases`; test hiện có 31 sections.
+- Worker KB trả `profileHeader/phases` server-side khi `includeSections=true`; Next proxy không trả phases cho free user.
+- `FullReport` render V1-style 4 phần, profile header 8 chips, section headers và chart slots `pyramid`, `birth-grid`, `combined-grid`.
+- CSS narrative mở rộng class cho phase divider, year cards, cycle circles, pyramid period, cross-context box.
+- Verify đã chạy: `npm.cmd run kb:test-synthesizer`, `npm.cmd run kb:test-engine`, `npm.cmd run kb:test-charts`, `npm.cmd run kb:validate-narrative`, `npm.cmd run kb:validate`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run security:smoke`, `npm.cmd run build`, `npm.cmd exec --workspace workers/kb -- tsc --noEmit`.
+- Rủi ro còn lại: chưa port literal toàn bộ 1MB V1 narrative byte-for-byte; chưa chạy browser side-by-side trong phiên này.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done

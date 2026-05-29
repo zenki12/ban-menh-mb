@@ -140,6 +140,10 @@ export function calcMaturity(lifePath: number, destiny: number): IndicatorCalcul
   return result(lifePath + destiny);
 }
 
+export function calcTensionNumber(soulNum: number, personalityNum: number): IndicatorCalculation {
+  return result(Math.abs(soulNum - personalityNum), false);
+}
+
 function nameParts(fullName: string): string[] {
   return normalizeVietnameseName(fullName).trim().split(/\s+/).filter(Boolean);
 }

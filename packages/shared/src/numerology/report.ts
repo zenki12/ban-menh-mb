@@ -24,6 +24,7 @@ import {
   calcPyramidChallenges,
   calcPyramidPeaks,
   calcSoul,
+  calcTensionNumber,
   getFirstName,
 } from "./indicators";
 
@@ -42,6 +43,8 @@ export type IndicatorResult<T = unknown> = {
 };
 
 export type PeriodIndicatorResult<T = unknown> = IndicatorResult<T> & { period: string };
+export type PersonalYearRangeResult<T = unknown> = IndicatorResult<T> & { year: number; age: number };
+export type PersonalMonthRangeResult<T = unknown> = IndicatorResult<T> & { year: number; month: number };
 export type KarmicLessonsResult = {
   missingNumbers: number[];
   data: Array<{ number: number; info: unknown | null }>;
@@ -58,10 +61,13 @@ export type NumerologyReport = {
   personalYear: IndicatorResult & { year: number };
   personalMonth: IndicatorResult & { month: number };
   personalDay: IndicatorResult & { date: string };
+  personalYearsRange: PersonalYearRangeResult[];
+  personalMonthsRange: PersonalMonthRangeResult[];
   destiny: IndicatorResult;
   maturity: IndicatorResult;
   soul: IndicatorResult;
   personality: IndicatorResult;
+  tensionNumber: IndicatorResult;
   soulChallenge: IndicatorResult;
   destinyChallenge: IndicatorResult;
   personalityChallenge: IndicatorResult;
@@ -124,6 +130,33 @@ function withPeriodData(
   return { ...value, data: lookup(kb, section, value.number) };
 }
 
+function buildPersonalYearsRange(
+  kb: NumerologyKb,
+  dob: DobParts,
+  currentYear: number,
+  count = 3,
+): PersonalYearRangeResult[] {
+  return Array.from({ length: count }, (_, index) => {
+    const year = currentYear + index;
+    return { ...withData(kb, "personal_year", calcPersonalYear(dob, year)), year, age: year - dob.year };
+  });
+}
+
+function buildPersonalMonthsRange(
+  kb: NumerologyKb,
+  dob: DobParts,
+  currentYear: number,
+  currentMonth: number,
+  count = 3,
+): PersonalMonthRangeResult[] {
+  return Array.from({ length: count }, (_, index) => {
+    const zeroBased = currentMonth - 1 + index;
+    const year = currentYear + Math.floor(zeroBased / 12);
+    const month = (zeroBased % 12) + 1;
+    return { ...withData(kb, "personal_month", calcPersonalMonth(dob, year, month)), year, month };
+  });
+}
+
 export async function generateReport(
   input: NumerologyInput,
   kb: NumerologyKb,
@@ -142,6 +175,7 @@ export async function generateReport(
   const soul = calcSoul(fullName);
   const personality = calcPersonality(fullName);
   const maturity = calcMaturity(lifePath.number, destiny.number);
+  const tensionNumber = calcTensionNumber(soul.number, personality.number);
   const personalYear = calcPersonalYear(dob, currentYear);
   const personalMonth = calcPersonalMonth(dob, currentYear, currentMonth);
   const personalDay = calcPersonalDay(dob, currentDate);
@@ -163,10 +197,13 @@ export async function generateReport(
       ...withData(kb, "personal_day", personalDay),
       date: currentDate.toISOString().slice(0, 10),
     },
+    personalYearsRange: buildPersonalYearsRange(kb, dob, currentYear),
+    personalMonthsRange: buildPersonalMonthsRange(kb, dob, currentYear, currentMonth),
     destiny: withData(kb, "destiny_number", destiny),
     maturity: withData(kb, "maturity_number", maturity),
     soul: withData(kb, "soul_number", soul),
     personality: withData(kb, "personality_number", personality),
+    tensionNumber: withData(kb, "tension_number", tensionNumber),
     soulChallenge: withData(kb, "soul_challenge", soul),
     destinyChallenge: withData(kb, "destiny_challenge", destiny),
     personalityChallenge: withData(kb, "personality_challenge", personality),

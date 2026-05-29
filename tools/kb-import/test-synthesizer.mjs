@@ -37,18 +37,18 @@ const { buildSynthesizedReport, generateReport } = await loadShared();
 
 for (const testCase of cases) {
   const report = await generateReport(testCase, kb);
-  const sections = buildSynthesizedReport({ report, narrative, kb });
-  const indicators = sections.flatMap((section) => section.indicators);
-  const htmlLength = indicators.reduce((sum, item) => sum + item.html.length, 0);
+  const synthesized = buildSynthesizedReport({ report, narrative, kb });
+  const sections = synthesized.phases.flatMap((phase) => phase.sections);
+  const htmlLength = sections.reduce((sum, item) => sum + item.html.length, 0);
 
-  if (sections.length !== 6) throw new Error(`${testCase.fullName}: expected 6 sections`);
-  if (indicators.length < 33) throw new Error(`${testCase.fullName}: expected at least 33 indicators`);
-  if (!indicators.some((item) => item.key === "lifePath" && item.html.includes(testCase.fullName))) {
+  if (synthesized.phases.length !== 4) throw new Error(`${testCase.fullName}: expected 4 phases`);
+  if (sections.length < 30) throw new Error(`${testCase.fullName}: expected at least 30 sections`);
+  if (!sections.some((item) => item.number === "5" && item.html.includes(testCase.fullName))) {
     throw new Error(`${testCase.fullName}: lifePath narrative missing name`);
   }
 
   console.log(
-    `${testCase.fullName}: sections=${sections.length}, indicators=${indicators.length}, html=${htmlLength}`,
+    `${testCase.fullName}: phases=${synthesized.phases.length}, sections=${sections.length}, html=${htmlLength}`,
   );
 }
 

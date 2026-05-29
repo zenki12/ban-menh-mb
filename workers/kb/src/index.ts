@@ -118,7 +118,7 @@ app.post("/numerology/report", async (c) => {
       loadNarrative(c.env.BANMENH_KB_DEV),
     ]);
     const report = await generateReport(body, kb);
-    const sections = body.includeSections ? buildSynthesizedReport({ report, narrative, kb }) : undefined;
+    const synthesized = body.includeSections ? buildSynthesizedReport({ report, narrative, kb }) : undefined;
     const nameVars = { name: body.fullName };
     const personalYearVars = {
       ...nameVars,
@@ -135,6 +135,7 @@ app.post("/numerology/report", async (c) => {
         destiny: attachNarrative(report.destiny, narrative, "destiny", nameVars),
         personality: attachNarrative(report.personality, narrative, "personality", nameVars),
         maturity: attachNarrative(report.maturity, narrative, "maturity", nameVars),
+        tensionNumber: attachNarrative(report.tensionNumber, narrative, "tensionNumber", nameVars),
         attitude: attachNarrative(report.attitude, narrative, "attitude", nameVars),
         birthday: attachNarrative(report.birthday, narrative, "birthday", nameVars),
         soulChallenge: attachNarrative(report.soulChallenge, narrative, "soulChallenge", nameVars),
@@ -165,8 +166,9 @@ app.post("/numerology/report", async (c) => {
         pyramidChallenges: report.pyramidChallenges.map((item) =>
           attachNarrative(item, narrative, "pyramidChallenge", { ...nameVars, period: item.period }),
         ),
-        ...(sections ? { sections } : {}),
+        ...(synthesized ? { profileHeader: synthesized.profileHeader, phases: synthesized.phases } : {}),
       },
+      ...(synthesized ? { profileHeader: synthesized.profileHeader, phases: synthesized.phases } : {}),
     });
   } catch (err) {
     console.error("[kb-worker] report generation failed:", err);

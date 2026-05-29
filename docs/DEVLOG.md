@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-29 17:21 +07 | T-0610 | Mechanical port V1 web numerology details 4 phần | `Task` |
 | 2026-05-29 11:14 +07 | T-0609 | Port V1 pyramid + 3x3 numerology charts | `Task` |
 | 2026-05-29 10:22 +07 | T-0608 | V1-style numerology details synthesizer | `Task` |
 | 2026-05-29 00:34 +07 | T-0607b | Personality bars 2-col + 11 aspect cards | `Task` |
@@ -100,6 +101,42 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-29 17:21 +07] - T-0610: Mechanical port V1 web numerology details 4 phần
+
+**Loại:** `Task`
+**Ref:** T-0610
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Nâng `/than-so-hoc/result/details` unlocked từ 6 section T-0608 sang cấu trúc V1 web 4 PHẦN với 30+ section đánh số, profile header 8 chips và HTML synthesize server-side.
+
+### Thay đổi
+- Engine mở rộng `NumerologyReport`: thêm `tensionNumber`, `personalYearsRange` 3 năm và `personalMonthsRange` 3 tháng.
+- Thêm `narrative-deep.ts`: helper render deep narrative cho chu kỳ đời, năm/tháng cá nhân, kim tự tháp và 5 cross-context block.
+- `synthesizer.ts` đổi output sang `SynthesizedReport` gồm `profileHeader` và 4 `phases`; 31 section theo order V1 web, skip số 4.
+- KB Worker synthesize `profileHeader/phases` server-side khi Next proxy gửi `includeSections=true`; free user không nhận phases.
+- `FullReport` render phase divider, section header, profile header và embed chart slot T-0609 đúng vị trí section 7/22/23.
+- CSS narrative mở rộng class V1-style cho phase divider, year cards, cycle circles, pyramid period, cross-context box và profile header.
+
+### Verify
+- `npm.cmd run kb:test-synthesizer` pass: 3 cases, 4 phases, 31 sections.
+- `npm.cmd run kb:test-engine` pass: verify `tensionNumber`, 3-year range, 3-month range.
+- `npm.cmd run kb:test-charts` pass.
+- `npm.cmd run kb:validate-narrative` pass.
+- `npm.cmd run kb:validate` pass.
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run security:smoke` pass.
+- `npm.cmd run build` pass.
+- `npm.cmd exec --workspace workers/kb -- tsc --noEmit` pass.
+
+### Không làm / rủi ro còn lại
+- Chưa port literal toàn bộ 7 method V1 dài 1MB byte-for-byte; implementation dùng narrative JSON đã extract + KB fields + V1-style wrappers.
+- Chưa chạy browser Incognito side-by-side với V1 PDF trong phiên này.
+- Không đổi summary dashboard, payment/voucher/auth, Tarot, KB schema hoặc chart math.
 
 ---
 
