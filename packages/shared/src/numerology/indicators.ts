@@ -99,10 +99,10 @@ export function calcPyramidPeaks(dob: DobParts): PeriodCalculation[] {
   const p4 = result(rm + ry);
 
   return [
-    { ...p1, period: `0 - ${base} tuoi` },
-    { ...p2, period: `${base + 1} - ${base + 9} tuoi` },
-    { ...p3, period: `${base + 10} - ${base + 18} tuoi` },
-    { ...p4, period: `${base + 19} tuoi tro di` },
+    { ...p1, period: `0 - ${base} tuổi` },
+    { ...p2, period: `${base + 1} - ${base + 9} tuổi` },
+    { ...p3, period: `${base + 10} - ${base + 18} tuổi` },
+    { ...p4, period: `${base + 19} tuổi trở đi` },
   ];
 }
 
@@ -118,10 +118,10 @@ export function calcPyramidChallenges(dob: DobParts): PeriodCalculation[] {
   const c4 = result(Math.abs(rm - ry), false);
 
   return [
-    { ...c1, period: `0 - ${base} tuoi` },
-    { ...c2, period: `${base + 1} - ${base + 9} tuoi` },
-    { ...c3, period: `${base + 10} - ${base + 18} tuoi` },
-    { ...c4, period: "giai doan chu dao cuoi doi" },
+    { ...c1, period: `0 - ${base} tuổi` },
+    { ...c2, period: `${base + 1} - ${base + 9} tuổi` },
+    { ...c3, period: `${base + 10} - ${base + 18} tuổi` },
+    { ...c4, period: "giai đoạn chủ đạo cuối đời" },
   ];
 }
 
@@ -167,9 +167,9 @@ export function calcLifeCycles(dob: DobParts): PeriodCalculation[] {
   const cycle1EndAge = 36 - lifePath;
 
   return [
-    { ...c1, period: `0 - ${cycle1EndAge} tuoi` },
-    { ...c2, period: `${cycle1EndAge + 1} - ${cycle1EndAge + 27} tuoi` },
-    { ...c3, period: `${cycle1EndAge + 28} tuoi tro di` },
+    { ...c1, period: `0 - ${cycle1EndAge} tuổi` },
+    { ...c2, period: `${cycle1EndAge + 1} - ${cycle1EndAge + 27} tuổi` },
+    { ...c3, period: `${cycle1EndAge + 28} tuổi trở đi` },
   ];
 }
 
