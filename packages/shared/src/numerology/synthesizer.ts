@@ -1,6 +1,7 @@
 import type { NarrativeKb, NumerologyKb } from "../schemas/numerology-kb";
 import {
   buildLifeCyclesSection,
+  buildPyramidSection,
   buildYearDomainBlock,
   destinyCtxBlock,
   escapeHtml,
@@ -12,7 +13,6 @@ import {
   personalPeriod,
   personalYearDeep,
   personalityCtxBlock,
-  pyramidPeakAnalysis,
   readString,
   renderLifePathExtra,
   soulCtxBlock,
@@ -243,9 +243,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
         section(
           "7",
           "Biểu đồ Kim Tự Tháp — Đỉnh cao & Thử thách",
-          `<p class="nar">Kim tự tháp thể hiện các giai đoạn đỉnh cao và thử thách song hành trong hành trình trưởng thành.</p>${report.pyramidPeaks
-            .map((peak, index) => pyramidPeakAnalysis(index, peak.number, peak.period, report.pyramidChallenges[index]?.number ?? null, name, peak.data, report.pyramidChallenges[index]?.data))
-            .join("")}`,
+          buildPyramidSection(report, name, narrative),
           { chartSlot: "pyramid" },
         ),
         section("8", "Chỉ số Năm Cá Nhân", personalYearDeep(report.personalYear.number, report.personalYear.year, name)),

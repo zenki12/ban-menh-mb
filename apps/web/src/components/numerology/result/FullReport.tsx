@@ -91,6 +91,19 @@ function ChartSlot({ slot, report }: { slot?: Phase["sections"][number]["chartSl
 }
 
 function SectionBody({ item, report }: { item: Phase["sections"][number]; report: NumerologyReport }) {
+  if (item.chartSlot === "pyramid" && item.html.includes("<!-- CHART:pyramid -->")) {
+    const [beforeChart, afterChart = ""] = item.html.split("<!-- CHART:pyramid -->");
+    return (
+      <>
+        <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: beforeChart }} />
+        <div className="mt-6">
+          <ChartSlot report={report} slot={item.chartSlot} />
+        </div>
+        {afterChart ? <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: afterChart }} /> : null}
+      </>
+    );
+  }
+
   if (item.chartSlot === "career-bars") {
     const [beforeChart, afterChart = ""] = item.html.split("<!-- CHART:career-bars -->");
     return (
