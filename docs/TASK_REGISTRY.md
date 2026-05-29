@@ -2683,6 +2683,37 @@ Update khi xong:
 - CSS narrative thêm class cho personal-year card, dos/donts grid, year cards grid và year detail/domain blocks; block CSS được nén để giữ file dưới 600 dòng.
 - Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build`.
 
+### T-0610c-section9 - Literal V1 personal month 3-month detail
+
+Status: Done
+
+Bối cảnh:
+
+- Section 9.1 hiện còn dùng bản simplified từ `personalPeriod`, chưa render đúng 3 tháng chi tiết theo V1.
+- V1 `personalMonthDeep` có content object 9 entry và 6 domain blocks cho từng tháng cá nhân.
+
+Yêu cầu:
+
+- Port literal V1 `personalMonthDeep` từ `kb-private/numerology/narrative_v1_full.js`.
+- Section 9.1 render 3 tháng detail, mỗi tháng có headline, energy paragraph và 6 domain blocks.
+- Giữ section 9 summary hiện tại; không đụng section 1-8 hoặc 10-30.
+- Thêm CSS cho `.month-detail-block` và `.month-detail-headline`, dùng lại `.year-domain-block`.
+
+Điều kiện Done:
+
+- Spot-check chuỗi tiếng Việt V1 từ `personalMonthDeep` tồn tại byte-for-byte trong V2.
+- `packages/shared/src/numerology/narrative/year-month.ts` dưới 1000 dòng.
+- `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- Port literal V1 `personalMonthDeep` vào `packages/shared/src/numerology/narrative/year-month.ts` với content object 9 entry, 6 domain blocks và headline `CHỈ SỐ THÁNG ...`.
+- `synthesizer.ts` section 9.1 thêm intro italic literal V1, 3-card month grid và 3 detail blocks từ `personalMonthDeep`.
+- `numerology-narrative.css` thêm `.month-detail-block` và `.month-detail-headline`, dùng lại `.year-domain-block`.
+- Verify pass: `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`; fixture `Nông Xuân Thái / 1996-09-03` render 3 month blocks, 18 domain blocks, 3 headlines, intro và grid.
+- Ghi chú: output literal V1 section 9.1 cho fixture dài 11088 chars, thấp hơn ngưỡng prompt 15000; không thêm nội dung ngoài V1 để bơm length.
+
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
 
 Status: Done

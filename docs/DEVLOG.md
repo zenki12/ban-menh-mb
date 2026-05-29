@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-30 01:54 +07 | T-0610c-section9 | Literal V1 personal month 3-month detail | `Task` |
 | 2026-05-30 01:30 +07 | T-0610c-section8 | Literal V1 personal year summary + 3-year cycle | `Task` |
 | 2026-05-30 01:07 +07 | T-0610c-cleanup | Split narrative modules + diacritics test | `Task` |
 | 2026-05-30 00:59 +07 | T-0610c-fix | Vietnamese period strings + pyramid year labels | `Hotfix` |
@@ -108,6 +109,36 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-30 01:54 +07] - T-0610c-section9: Literal V1 personal month 3-month detail
+
+**Loại:** `Task`
+**Ref:** T-0610c-section9
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 section 9.1 "Chỉ Số Các Tháng — Phân Tích 3 Tháng" vào module narrative đã split.
+
+### Thay đổi
+- `year-month.ts` thay `personalMonthDeep` rút gọn bằng V1 content object 9 entry, energy paragraph và 6 domain blocks cho từng tháng.
+- `personalMonthDeep` giữ literal Vietnamese V1, chỉ đổi `${name}` thành `${escapeHtml(name)}` qua `safeName` và escape `year` khi render label.
+- `synthesizer.ts` section 9.1 thêm intro italic literal V1, `year-cards-grid` 3 tháng và 3 detail blocks; section 9 summary giữ nguyên.
+- `numerology-narrative.css` thêm `.month-detail-block` và `.month-detail-headline`, dùng lại `.year-domain-block`.
+- `TASK_REGISTRY.md` thêm và đóng `T-0610c-section9`.
+
+### Verify
+- `year-month.ts` dài 948 dòng, dưới giới hạn 1000 dòng.
+- Spot-check literal V1 bằng `rg`: `Đây là thời điểm lý tưởng để`, `Sức hút cá nhân của`, `Tháng số 1 tổng kết lại`, `Sự nghiệp & Công việc trong tháng này`, `CHỈ SỐ THÁNG`.
+- Case synth thật `Nông Xuân Thái / 1996-09-03`: section 9.1 dài 11088 chars, có 3 `month-detail-block`, 18 `year-domain-block`, 3 headline `CHỈ SỐ THÁNG`, intro và grid.
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- Không sửa section 1-8 hoặc 10-30; không sửa engine/route/auth/payment/charts.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`, `.env.local`.
+- Browser plugin/callable tool không khả dụng trong phiên này; Node REPL MCP vẫn crash với lỗi sandbox, nên đã fallback bằng synth fixture và build.
+- Ngưỡng length trong prompt (`section 9.1 > 15000`) cao hơn output literal V1 thực tế của 3 tháng trong fixture; không bơm/paraphrase thêm nội dung ngoài V1 để đạt length.
 
 ---
 
