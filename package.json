@@ -17,12 +17,13 @@
     "kb:test-engine": "node tools/kb-import/test-engine.mjs",
     "kb:test-charts": "node tools/kb-import/test-charts.mjs",
     "kb:test-synthesizer": "node tools/kb-import/test-synthesizer.mjs",
+    "kb:test-diacritics": "node tools/kb-import/test-diacritics.mjs",
     "kb:extract-narrative": "node tools/kb-import/extract-narrative.mjs",
     "kb:validate-narrative": "node tools/kb-import/validate-narrative.mjs",
     "kb:upload-kv": "node tools/kb-import/upload-to-kv.mjs",
     "security:smoke": "node tools/security-smoke.mjs",
     "qa:responsive-audit": "node tools/responsive-qa-audit.mjs",
-    "check": "npm run typecheck && npm run lint && npm run security:smoke && npm run build"
+    "check": "npm run typecheck && npm run lint && npm run kb:test-diacritics && npm run security:smoke && npm run build"
   },
   "engines": {
     "node": ">=20"
