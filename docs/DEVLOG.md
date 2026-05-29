@@ -37,6 +37,15 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-29 00:34 +07 | T-0607b | Personality bars 2-col + 11 aspect cards | `Task` |
+| 2026-05-29 00:09 +07 | T-0607a | Fix V1 chart math + locked grid icons | `Task` |
+| 2026-05-28 23:52 +07 | T-0607 | Result summary dashboard + V1 charts | `Task` |
+| 2026-05-28 22:59 +07 | T-0606 | Extract 19 nhóm narrative V1 + KB Worker merge | `Task` |
+| 2026-05-28 16:36 +07 | T-0605b | Free unlock qua voucher 100% | `Task` |
+| 2026-05-28 15:50 +07 | T-0604 | Numerology paid unlock check | `Task` |
+| 2026-05-27 23:38 +07 | T-0602c | Strategy B freemium result | `Task` |
+| 2026-05-27 23:18 +07 | T-0602b | Numerology result premium redesign | `Task` |
+| 2026-05-27 00:27 +07 | T-0602 | Numerology free result generation | `Task` |
 | 2026-05-26 22:48 +07 | T-0601 | Numerology input form | `Task` |
 | 2026-05-26 22:40 +07 | T-0407 | Phase 4B KB pipeline hoàn tất | `Phase-Retro` |
 | 2026-05-23 16:11 +07 | T-0407d | Extract V1 narrative lifePath + destiny | `Task` |
@@ -89,6 +98,323 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-29 00:34 +07] - T-0607b: Personality bars 2-col + 11 aspect cards
+
+**Loại:** `Task`
+**Ref:** T-0607b
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Refactor result details để personality bars gọn hơn theo layout V1 và mỗi indicator render theo 11 khía cạnh chuẩn thay vì danh sách field rời rạc.
+
+### Thay đổi
+- `PersonalityBars` chuyển sang grid 2 cột từ `md`, mỗi item có dot màu, rank, label, % và bar fill cùng màu.
+- Thêm `apps/web/src/components/numerology/result/aspects.ts` với 11 aspect cố định và fallback chain.
+- `FreeIndicatorSection` bỏ flat field map 34 field, render aspect card 2-3 cột theo `ASPECT_CONFIG`.
+- Tình yêu & Hôn nhân gộp một card vì KB V1 không tách marriage riêng.
+- Hide-if-empty: aspect card chỉ render khi fallback chain có dữ liệu, không hiển thị placeholder rỗng.
+
+### Verify
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+- `npm.cmd run qa:responsive-audit` pass.
+- File limit pass: `PersonalityBars.tsx` 37 dòng, `aspects.ts` 31 dòng, `FreeIndicatorSection.tsx` 180 dòng.
+
+### Không làm
+- Không đổi `calcPersonalityGroups`, `PERSONALITY_GROUPS`, KB, narrative, schema hoặc `NumerologyReport` type.
+- Chưa chạy browser manual bằng Incognito/DOB `15/08/1992` trong phiên này.
+
+---
+
+## [2026-05-29 00:09 +07] - T-0607a: Fix V1 chart math + locked grid icons
+
+**Loại:** `Task`
+**Ref:** T-0607a
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Fix 2 audit findings từ T-0607: personality chart math phải identical V1 và locked grid details phải dùng emoji group icons.
+
+### Audit findings
+- Finding 1: `calcPersonalityGroups` bị simplify độc lập, làm vỡ cap 40% redistribution và sai ranking trong edge case nhiều số lặp. Đã restore iterative redistribution 4 bước từ V1.
+- Finding 2: `LockedGrid` details dùng digit string `"1"`, `"2"`, `"3"`, `"4"` thay vì emoji. Đã restore 👤 ⏳ 🎯 💎.
+
+### Thay đổi
+- `packages/shared/src/numerology/charts.ts`: bỏ helper normalize dùng chung, inline normalize V1 cho career và rewrite personality theo raw → floor → cap → normalize.
+- `tools/kb-import/test-charts.mjs`: thêm regression test math cho 3 DOB personality và 1 case career.
+- `package.json`: thêm script `kb:test-charts`.
+- `apps/web/src/app/than-so-hoc/result/details/page.tsx`: đổi locked group icons về emoji.
+
+### Verify
+- `npm.cmd run kb:test-charts` pass.
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass sau rerun; lần đầu build worker Windows exit `3221226505` ở collect page data, rerun pass.
+- Test đỏ đã xác nhận trước fix: `01/01/1111` trả sai `1:76%` thay vì V1 `1:40%, 2:39%`.
+
+### Không làm
+- Không đổi `calcLineChartData`.
+- Không đổi route logic hoặc component signature.
+- Không xử lý finding wording/rút gọn text; defer theo scope task.
+
+---
+
+## [2026-05-28 23:52 +07] - T-0607: Result summary dashboard + V1 charts
+
+**Loại:** `Task`
+**Ref:** T-0607
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Flow Thần số học được tách thành `/than-so-hoc/result` cho dashboard tổng quan luôn free và `/than-so-hoc/result/details` cho luận giải preview/full theo entitlement.
+
+### Thay đổi
+- Port V1 chart helpers vào `packages/shared/src/numerology/charts.ts`: `CAREER_TABLE`, `CAREER_GROUPS`, `PERSONALITY_GROUPS`, `calcCareerGroups`, `calcPersonalityGroups`, `calcLineChartData`.
+- `calcCareerGroups` giữ trọng số V1: Life Path 55%, Destiny 45%, fallback master/unknown về `CAREER_TABLE["5"]`, normalize tổng 100.
+- `calcPersonalityGroups` tính từ DOB Pythagoras, floor 3%, cap 40%, normalize 100 và sort giảm dần.
+- Thêm 3 chart component pure SVG/CSS, không thêm dependency: `LineChartVanSo`, `PersonalityBars`, `CareerBars`.
+- Thêm `SummaryDashboard`: mandala số chủ đạo, 6 chip tổng quan, line chart vận số ±5 năm, personality bar, career bar và CTA.
+- `/than-so-hoc/result` chỉ render summary dashboard, giữ fetch report + entitlement check qua API hiện có.
+- `/than-so-hoc/result/details` kế thừa logic gating cũ: unlocked render `FullReport`, free render preview + `LockedGrid` + CTA mua.
+
+### Không làm / skip
+- Không đổi `NumerologyReport` type, `generateReport` signature hoặc numerology engine.
+- Không đổi KB Worker.
+- Không thêm chart library như Recharts/Chart.js/visx.
+- Không đụng `/pricing`, `/payment/*`, `/account/*`.
+
+### Verify
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass; build route list có `/than-so-hoc/result` và `/than-so-hoc/result/details`.
+- File limit: `charts.ts` 118 dòng, chart components 83/37/44 dòng, `SummaryDashboard` 139 dòng, result page 114 dòng, details page 195 dòng.
+
+### Rủi ro còn lại
+- Chưa chạy browser login/submit end-to-end trong phiên này; xác thực bằng typecheck/lint/build trên workspace hiện tại.
+- Worktree vẫn có nhiều file từ các task trước chưa track/commit, gồm các component details cũ mà route details đang import.
+
+---
+
+## [2026-05-28 22:59 +07] - T-0606: Extract 19 nhóm narrative V1 + KB Worker merge
+
+**Loại:** `Task`
+**Ref:** T-0606
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Narrative KB được mở rộng từ 2 nhóm lên 19 nhóm V1 và KB Worker merge narrative HTML cho các indicator đã có trong report V2. UI không đổi.
+
+### Thay đổi
+- `tools/kb-import/extract-narrative.mjs`: refactor sang `GROUP_CONFIG`, extract 19 nhóm, hỗ trợ group cuối file và `personalYearDomains` dạng object nhiều template.
+- 17 nhóm narrative mới ngoài `lifePath`/`destiny`: `soul`, `personality`, `maturity`, `attitude`, `karmicLesson`, `birthday`, `pyramidPeak`, `pyramidChallenge`, `tensionNumber`, `soulChallenge`, `destinyChallenge`, `personalityChallenge`, `cognitiveAbility`, `approachMotivation`, `approachAbility`, `approachAttitude`, `personalYearDomains`.
+- Entry count thực tế: `lifePath` 11, `soul` 11, `destiny` 11, `personality` 10, `maturity` 9, `attitude` 9, `karmicLesson` 9, `birthday` 11, `pyramidPeak` 9, `pyramidChallenge` 10, `tensionNumber` 9, `soulChallenge` 9, `destinyChallenge` 9, `personalityChallenge` 9, `cognitiveAbility` 9, `approachMotivation` 9, `approachAbility` 9, `approachAttitude` 9, `personalYearDomains` 9. Tổng 181 entries.
+- `tools/kb-import/validate-narrative.mjs`: validate schema + semantic placeholder, báo lỗi rõ dạng `group.key.field`.
+- Negative check: sửa thiếu `{{name}}` tạm thời và validator báo `lifePath.1.html: missing {{name}}`; sau đó regenerate `narrative.json`.
+- `packages/shared/src/schemas/numerology-kb.ts`: `NarrativeKbSchema` mở rộng từ 2 lên 19 keys.
+- `workers/kb/src/index.ts`: thêm `mergeNarrative`, `getNarrative`, `attachNarrative` và merge narrative cho `lifePath`, `soul`, `destiny`, `personality`, `maturity`, `attitude`, `birthday`, `soulChallenge`, `destinyChallenge`, `personalityChallenge`, `cognitiveAbility`, `approachMotivation`, `approachAbility`, `approachAttitude`, `personalYear`, `pyramidPeaks[]`, `pyramidChallenges[]`.
+
+### KB Notes
+- `kb-private/numerology/narrative.json`: 78,998 bytes (~77.1 KiB) → 341,553 bytes (~333.5 KiB). File private, không commit.
+- `kb:upload-kv` đã upload `kb-numerology` và `kb-narrative`; `kb-narrative` log 333.5 KiB.
+- Master/missing fallback: nếu source không có key (ví dụ một số master/challenge), Worker trả `narrative: null`, không crash.
+
+### Không làm / skip
+- Không đụng UI components (`FreeIndicatorSection`, `FullReport`, `ResultHero`, ...).
+- Không đổi numerology engine, không đổi `generateReport` signature hoặc `NumerologyReport` type.
+- Skip `karmicLesson` trong Worker vì report V2 hiện là `karmicLessons.missingNumbers[]`, cần task sau để map array.
+- Skip `tensionNumber` vì engine/report V2 chưa tính.
+- Không thêm narrative cho `cornerstone`/`capstone` vì source V1 không có nhóm tương ứng.
+
+### Verify
+- `npm.cmd run kb:extract-narrative` pass: 19 nhóm, tổng 181 entries.
+- `npm.cmd run kb:validate-narrative` pass.
+- Negative placeholder check pass: validator fail đúng path khi thiếu placeholder, rồi đã revert bằng extractor.
+- `npm.cmd run kb:validate` pass.
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+- `npx.cmd tsc --noEmit` trong `workers/kb` pass.
+- `npm.cmd run kb:upload-kv` pass sau escalation vì wrangler cần ghi log ngoài sandbox.
+- Runtime smoke: KB Worker `/health` 200; web `/than-so-hoc/result` 200; script merge dữ liệu thật đạt 22/23 target narratives (>=15).
+
+### Rủi ro còn lại
+- Chưa tự động test được flow login Firebase + submit form trên browser trong phiên terminal này vì cần ID token/user session thật.
+- Size `kb-narrative` thực tế 333.5 KiB, thấp hơn dự đoán 600-800 KiB nhưng schema/semantic validate và entry count đạt yêu cầu.
+
+---
+
+## [2026-05-28 16:36 +07] - T-0605b: Free unlock qua voucher 100%
+
+**Loại:** `Task`
+**Ref:** T-0605b
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Voucher giảm giá về `0đ` giờ bypass PayOS: server tạo purchase confirmed, grant entitlement và tăng usedCount voucher ngay. User không cần quét QR.
+
+### Thay đổi
+- `apps/web/src/lib/voucher/service.ts`: cho phép `finalAmount = 0`; chỉ floor lên PayOS min khi `0 < finalAmount < 1000`.
+- `packages/shared/src/schemas/purchase.ts`: thêm provider `"voucher_free"`.
+- `apps/web/src/app/api/payment/create/route.ts`: branch free unlock khi voucher server-side validate ra `finalAmount === 0`.
+- Free branch tạo orderId deterministic dạng `FREE_<hash>`, tạo purchase `confirmed`, `amount=0`, `provider=voucher_free`, `confirmedAt=now`.
+- Free branch gọi `grantEntitlementFromPurchase(purchase, ctx)` và `firestoreVoucherRepository.incrementUsage(voucherCode, ctx)`.
+- `apps/web/src/app/payment/setup/page.tsx`: nếu response `freeUnlock=true`, chuyển thẳng sang success thay vì checkout QR.
+- `apps/web/src/app/payment/success/page.tsx`: nếu `freeUnlock=true`, không polling `/api/payment/check`; hiển thị success qua voucher.
+
+### Hướng dẫn tạo voucher FREE100
+Admin API:
+```bash
+curl -X POST http://localhost:3000/api/admin/voucher/create \
+  -H "X-Admin-Token: $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"FREE100","discountType":"percent","discountValue":100,"modules":["numerology"],"maxUses":999}'
+```
+
+Hoặc tạo thủ công trong Firestore giống TEST10, đổi `discountValue=100`.
+
+### Verify
+- `npm.cmd run check` pass.
+- Expected flow: nhập `FREE100` ở `/payment/setup` → tổng `0đ` → xác nhận → `/payment/success?freeUnlock=true` → entitlement active → `/than-so-hoc/result` unlock full report.
+
+### Không làm / rủi ro
+- Không cho free unlock nếu không có voucher code.
+- Nếu user đã dùng cùng voucher/product và purchase deterministic đã confirmed, API trả idempotent success và không tăng usedCount lần nữa.
+
+---
+
+## [2026-05-28 15:50 +07] - T-0604: Numerology paid unlock check
+
+**Loại:** `Task`
+**Ref:** T-0604
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> `/than-so-hoc/result` tự chuyển sang full report khi user có entitlement active `single_report` cho product `numerology_single_report`; user chưa có entitlement vẫn thấy free preview + lock + CTA như T-0602c.
+
+### Thay đổi
+- `apps/web/src/app/api/numerology/report/route.ts`: sau khi verify Firebase token và nhận report từ KB Worker, gọi `checkEntitlement(uid, "numerology_single_report")`.
+- API response thêm `unlocked: boolean` và `entitlement`; frontend không tự check entitlement.
+- `apps/web/src/components/numerology/result/FullReport.tsx`: component mới render full report theo 5 nhóm: Chỉ số cốt lõi, Cá tính & Linh hồn, Chu kỳ thời gian, Bài học & Hành trình, Đặc biệt.
+- `ResultHero` có badge `✓ Đã mở khóa` khi paid.
+- `/than-so-hoc/result`: nếu `unlocked=true` render `FullReport`, không render locked grid, MagneticCTA hoặc sticky CTA.
+
+### Security Note
+- MVP hiện vẫn để full report đi qua wire sau khi user đã authenticated; frontend quyết định render theo flag `unlocked` do API server-side trả về.
+- Chấp nhận cho MVP vì Firebase token đã verify ở API proxy và entitlement được check server-side. Sau MVP nếu cần siết hơn, move filter server-side để API chỉ trả free subset cho user chưa paid.
+
+### Test entitlement thủ công
+Firebase Console → Firestore → collection `entitlements` → tạo doc `<your_uid>_TEST_UNLOCK`:
+- `userId`: `<your Firebase UID>`
+- `module`: `"numerology"`
+- `type`: `"single_report"`
+- `purchaseId`: `"TEST_UNLOCK"`
+- `status`: `"active"`
+- `startsAt`: ISO timestamp hiện tại
+- `lifetime`: `true`
+
+Refresh `/than-so-hoc/result`; expected: full report hiện 5 group, hero có `✓ Đã mở khóa`, không có lock grid/CTA.
+
+### Verify
+- `npm.cmd run check` pass.
+- `npm.cmd run qa:responsive-audit` pass.
+- File limits: API route 104 dòng, `FullReport.tsx` 145 dòng, result page 188 dòng, `ResultHero.tsx` 36 dòng.
+
+### Không làm
+- Không tạo Firestore report record.
+- Không implement account report history trong task này.
+
+---
+
+## [2026-05-27 23:38 +07] - T-0602c: Strategy B freemium result
+
+**Loại:** `Task`
+**Ref:** T-0602c
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Result free tier đổi sang Strategy B: đưa identity trước, urgency sau, rồi mới lock paid content theo nhóm rõ ràng.
+
+### Thay đổi
+- Free tier đổi từ `lifePath + destiny + birthday` sang `lifePath` full, `personalYear` partial và karmic tease conditional.
+- Nếu report có karmic debt trong các chỉ số chính, page hiển thị `TeaseSection`; nếu không có thì fallback sang `Birthday` partial.
+- Thêm `PartialIndicatorSection` để giới hạn preview, không show full data grid.
+- Thêm `TeaseSection` cho bài học nghiệp lực với lock message.
+- `LockedGrid` refactor sang 4 group: Cá tính & Linh hồn, Chu kỳ thời gian, Bài học & Hành trình, Đặc biệt.
+- Locked card chỉ show title + lock, không show number/value.
+- `MagneticCTA` cập nhật copy cụ thể: năm cá nhân 2026, linh hồn/cá tính/thái độ, chu kỳ đời/kim tự tháp và karmic.
+
+### Verify
+- `npm.cmd run check` pass.
+- `npm.cmd run qa:responsive-audit` pass.
+- File limits: `PartialIndicatorSection` 84 dòng, `TeaseSection` 37 dòng, `LockedGrid` 53 dòng, `MagneticCTA` 59 dòng, result page 183 dòng.
+
+### Không làm
+- Không đổi KB Worker.
+- Không thêm social proof hoặc voucher banner.
+- Không show value/number trong locked grid.
+
+---
+
+## [2026-05-27 23:18 +07] - T-0602b: Numerology result premium redesign
+
+**Loại:** `Task`
+**Ref:** T-0602b
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Redesign `/than-so-hoc/result` thành report page cao cấp hơn: hero, section chỉ số lớn, locked grid tối giản và CTA rõ hơn, trong khi giữ nguyên logic fetch/auth từ T-0602.
+
+### Thay đổi
+- Tách 5 component trong `apps/web/src/components/numerology/result/`: `ResultHero`, `FreeIndicatorSection`, `LockedGrid`, `MagneticCTA`, `StickyBottomCTA`.
+- Page `/than-so-hoc/result` giảm còn orchestration: fetch/auth/error/loading giữ nguyên, layout dùng component con.
+- Free preview chuyển từ card nhỏ stacked sang 3 section full-width, có badge số lớn, narrative container và data grid tự detect field.
+- Locked card chỉ show title + icon khóa, không show value/number để tránh leak nội dung paid.
+- CTA cuối đổi thành magnetic panel với benefits rõ hơn; mobile có sticky bottom CTA.
+- `numerology-narrative.css` bổ sung `.nar-container` để typography narrative V1 sạch hơn.
+- `tools/security-smoke.mjs` bỏ qua `.claude` scratch/worktree folder để không scan worktree phụ ngoài source chính.
+
+### Verify
+- `npm.cmd run check` pass: typecheck, lint, security smoke, build.
+- `npm.cmd run qa:responsive-audit` pass.
+- File limits: `ResultHero` 30 dòng, `FreeIndicatorSection` 129 dòng, `LockedGrid` 41 dòng, `MagneticCTA` 62 dòng, `StickyBottomCTA` 22 dòng, result page 146 dòng.
+
+### Không làm
+- Không đổi fetch/auth/proxy logic.
+- Không implement paid unlock/full report; vẫn defer task sau.
+
+---
+
+## [2026-05-27 00:27 +07] - T-0602: Numerology free result generation
+
+**Loại:** `Task`
+**Ref:** T-0602
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> User submit form ở `/than-so-hoc` rồi sang `/than-so-hoc/result`; frontend gọi Next.js proxy, proxy gọi KB Worker để lấy report, page chỉ hiển thị preview free và khóa phần còn lại.
+
+### Thay đổi
+- Tạo `apps/web/src/app/api/numerology/report/route.ts` làm proxy server-side tới `KB_WORKER_URL/numerology/report`.
+- API proxy xác thực Firebase bearer token bằng Admin SDK, forward token gốc tới KB Worker, timeout 30s trả `TIMEOUT`.
+- Replace `/than-so-hoc/result` placeholder bằng result page có loading/error/success state.
+- Free preview hiển thị 3 chỉ số: `lifePath`, `destiny`, `birthday`; narrative HTML chỉ render từ KB Worker.
+- Các chỉ số còn lại hiển thị locked card + CTA `/payment/setup?productCode=numerology_single_report`.
+- Thêm `apps/web/src/styles/numerology-narrative.css` để map class V1 narrative (`nar`, `lp-section-title`, `lp-traits`, ...).
+- Thêm `KB_WORKER_URL=http://localhost:8787` vào `apps/web/.env.example`; `.env.local` dev được thêm cùng key.
+
+### Verify
+- `npm.cmd run check` pass: typecheck, lint, security smoke, build.
+- Build route mới có `/api/numerology/report` và `/than-so-hoc/result`.
+- File limits: API route 92 dòng, result page 246 dòng.
+
+### Không làm / rủi ro còn lại
+- Không lưu Firestore report record; defer T-0604.
+- Không implement paid unlock/full report; current page cố ý khóa phần còn lại.
+- Live happy-path cần Next.js dev restart để load `KB_WORKER_URL` và KB Worker dev chạy ở `http://localhost:8787`.
 
 ---
 

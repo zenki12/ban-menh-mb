@@ -2062,7 +2062,7 @@ Update khi xong:
 
 ### T-0602 - Implement numerology free result generation
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -2095,6 +2095,72 @@ Update khi xong:
 - Ghi flow đã test.
 - Ghi API/KB access đã dùng.
 - Ghi rủi ro nội dung nếu có.
+
+- Hoàn tất 2026-05-27: `/than-so-hoc/result` gọi `/api/numerology/report` proxy tới KB Worker, không gọi Worker trực tiếp từ frontend.
+- Free preview hiển thị 3 chỉ số: đường đời, sứ mệnh, ngày sinh; các chỉ số còn lại hiển thị locked card + CTA mua gói `numerology_single_report`.
+- API route xác thực Firebase bearer token bằng Admin SDK, forward token gốc tới KB Worker, timeout 30s trả 504.
+- Không lưu report Firestore trong task này; defer T-0604.
+
+### T-0602b - Redesign numerology result premium UX
+
+Status: Done
+
+Bối cảnh:
+
+- Result page T-0602 đã có fetch/auth/proxy nhưng UI còn đơn điệu.
+
+Yêu cầu:
+
+- Hero premium.
+- Free indicator sections full-width.
+- Locked grid không leak value/number.
+- Magnetic CTA cuối và sticky CTA mobile.
+
+Điều kiện Done:
+
+- Logic fetch/auth giữ nguyên.
+- Mobile 375px không tràn.
+- File component dưới giới hạn task.
+
+Update khi xong:
+
+- Ghi layout/component đã tách.
+- Ghi lock card không show value.
+
+- Hoàn tất 2026-05-27: tách 5 component result premium (`ResultHero`, `FreeIndicatorSection`, `LockedGrid`, `MagneticCTA`, `StickyBottomCTA`).
+- Result page giữ nguyên fetch/auth state từ T-0602, chỉ refactor layout orchestration.
+- Locked grid chỉ show title + lock, không show value/number.
+- Narrative typography có `.nar-container`; CTA mobile sticky chỉ hiện dưới `md`.
+
+### T-0602c - Strategy B freemium result psychology
+
+Status: Done
+
+Bối cảnh:
+
+- Freemium result cần tối ưu identity + urgency nhưng không leak paid content.
+
+Yêu cầu:
+
+- Free tier: lifePath full, personalYear partial, karmic tease conditional hoặc birthday fallback.
+- Locked grid grouped 4 category.
+- CTA copy cụ thể, không social proof, không voucher banner.
+
+Điều kiện Done:
+
+- Không đổi KB Worker.
+- Locked card không show value/number.
+- File limits strict.
+
+Update khi xong:
+
+- Ghi Strategy B free tier.
+- Ghi grouped locked grid và CTA copy.
+
+- Hoàn tất 2026-05-27: free tier đổi sang Life Path full + Personal Year partial + Karmic tease conditional hoặc Birthday partial fallback.
+- Locked grid nhóm 4 category và chỉ show title, không show number/value.
+- Magnetic CTA dùng copy cụ thể cho 2026 forecast, linh hồn/cá tính/thái độ, kim tự tháp và karmic.
+- Không thêm social proof hoặc voucher banner.
 
 ### T-0603 - Build numerology result page và CTA upgrade
 
@@ -2133,7 +2199,7 @@ Update khi xong:
 
 ### T-0604 - Build numerology paid unlock
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -2168,6 +2234,11 @@ Update khi xong:
 - Ghi quyền đã tạo.
 - Ghi edge case còn lại.
 
+- Hoàn tất 2026-05-28: `/api/numerology/report` check entitlement server-side bằng `checkEntitlement(uid, "numerology_single_report")`.
+- Response thêm `unlocked` và `entitlement`; `/than-so-hoc/result` render full report nếu unlocked, giữ free preview nếu chưa unlocked.
+- Full report render 33 chỉ số theo 5 group; hero có badge `✓ Đã mở khóa`.
+- Không tạo Firestore report record/account history trong task này; phần đó vẫn thuộc task sau.
+
 ### T-0605 - Build account report history for numerology
 
 Status: Todo
@@ -2199,6 +2270,194 @@ Goal:
 Update khi xong:
 
 - Ghi account flow đã test.
+
+### T-0605b - Free unlock qua voucher 100% off
+
+Status: Done
+
+Bối cảnh:
+
+- Admin cần cấp quyền miễn phí bằng voucher 100% mà không bắt user quét QR.
+
+Yêu cầu:
+
+- Voucher 100% hoặc finalPrice=0 tạo purchase confirmed và grant entitlement ngay.
+- Không cho bypass payment nếu không có voucher.
+- Voucher usedCount vẫn tăng.
+
+Điều kiện Done:
+
+- Server tự tính amount, không tin frontend.
+- finalAmount=0 skip PayOS.
+- Entitlement grant qua service hiện tại.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-28: voucher finalAmount=0 tạo purchase `confirmed`, provider `voucher_free`, grant entitlement ngay và increment voucher usage.
+- `/payment/setup` chuyển thẳng sang `/payment/success?freeUnlock=true`, không qua checkout QR.
+- `/payment/success` hiển thị trạng thái mở khóa bằng voucher và không polling payment check.
+
+### T-0606 - Extract 17 nhóm narrative V1 còn lại và merge vào KB Worker
+
+Status: Done
+
+Bối cảnh:
+
+- `/than-so-hoc/result` đã render narrative HTML qua field `indicator.narrative`.
+- Narrative KB hiện mới có 2 nhóm `lifePath` và `destiny`, chưa đủ chiều sâu như V1 production.
+- Source narrative V1 nằm trong `kb-private/numerology/narrative_v1_full.js` và chỉ được convert offline, không chạy runtime.
+
+Yêu cầu:
+
+- Refactor extractor để extract đủ 19 nhóm narrative V1 sang `kb-private/numerology/narrative.json`.
+- Mở rộng validator và `NarrativeKbSchema` cho 19 nhóm.
+- Mở rộng KB Worker để merge narrative cho ít nhất 15 indicator trong report.
+- Không đụng UI, không đổi engine numerology, không thêm chỉ số mới.
+- Skip `karmicLesson` và `tensionNumber` trong Worker merge vì report V2 chưa map trực tiếp.
+
+Output cần có:
+
+- `tools/kb-import/extract-narrative.mjs` extract 19 nhóm.
+- `tools/kb-import/validate-narrative.mjs` validate schema và placeholder semantic.
+- `packages/shared/src/schemas/numerology-kb.ts` có `NarrativeKbSchema` 19 nhóm.
+- `workers/kb/src/index.ts` merge narrative cho các indicator hiện có.
+- `kb-private/numerology/narrative.json` được upload KV nhưng không commit.
+
+Goal:
+
+- Báo cáo `/than-so-hoc/result` hiển thị narrative HTML chi tiết cho ít nhất 15 indicator, độ sâu tương đương V1 production.
+
+Điều kiện Done:
+
+- `npm run kb:extract-narrative` log 19 nhóm và tổng ít nhất 180 entries.
+- `npm run kb:validate-narrative` pass và validator báo lỗi rõ khi thiếu placeholder.
+- `npm run kb:validate`, `npm run typecheck`, `npm run lint` pass.
+- `npm run kb:upload-kv` upload `kb-narrative` thành công.
+- KB Worker trả `narrative` cho lifePath, destiny, soul, personality, maturity, attitude, birthday, challenge, approach, personalYear và pyramid indicators khi có template.
+- Missing template trả `narrative: null`, không crash.
+- Không commit `kb-private/*`, `.env.local`, `*.dev.vars`.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-28: extractor tạo 19 nhóm, tổng 181 entries:
+  - `lifePath` 11, `soul` 11, `destiny` 11, `personality` 10, `maturity` 9, `attitude` 9, `karmicLesson` 9, `birthday` 11.
+  - `pyramidPeak` 9, `pyramidChallenge` 10, `tensionNumber` 9, `soulChallenge` 9, `destinyChallenge` 9, `personalityChallenge` 9.
+  - `cognitiveAbility` 9, `approachMotivation` 9, `approachAbility` 9, `approachAttitude` 9, `personalYearDomains` 9.
+- `kb-private/numerology/narrative.json` tăng từ 78,998 bytes (~77.1 KiB) lên 341,553 bytes (~333.5 KiB); file không commit.
+- KB Worker merge narrative cho: `lifePath`, `soul`, `destiny`, `personality`, `maturity`, `attitude`, `birthday`, `soulChallenge`, `destinyChallenge`, `personalityChallenge`, `cognitiveAbility`, `approachMotivation`, `approachAbility`, `approachAttitude`, `personalYear`, `pyramidPeaks[]`, `pyramidChallenges[]`.
+- Skip Worker merge: `karmicLesson` vì report V2 hiện trả `karmicLessons.missingNumbers[]`; `tensionNumber` vì engine/report V2 chưa tính; `cornerstone`/`capstone` vì không có narrative source.
+- Missing template, gồm một số master/challenge case, trả `narrative: null` và không crash.
+- Verify đã chạy: `kb:extract-narrative`, `kb:validate-narrative`, negative placeholder check, `kb:validate`, `typecheck`, `lint`, `build`, Worker `tsc --noEmit`, `kb:upload-kv`, runtime smoke merge 22/23 target narratives.
+
+### T-0607 - Restructure result flow và port V1 charts
+
+Status: Done
+
+Bối cảnh:
+
+- Flow Thần số học hiện đang gộp tổng quan và luận giải chi tiết trong `/than-so-hoc/result`.
+- V1 production có dashboard tổng quan trước khi vào chi tiết: mandala, chu kỳ vận số, nhóm tính cách và nhóm ngành phù hợp.
+- Free/unlocked gating hiện nằm trong result page và cần giữ cho trang chi tiết.
+
+Yêu cầu:
+
+- `/than-so-hoc/result` trở thành summary dashboard luôn xem được.
+- Tạo `/than-so-hoc/result/details` cho free preview hoặc full unlocked report, kế thừa logic gating cũ.
+- Port chart helpers từ V1 sang `packages/shared/src/numerology/charts.ts`, không đổi `NumerologyReport` type.
+- Tạo 3 chart component pure SVG/CSS, không thêm chart library.
+- Không đụng KB Worker, numerology engine, pricing/payment/account routes.
+
+Output cần có:
+
+- `packages/shared/src/numerology/charts.ts` export career/personality tables và helper tính chart.
+- `LineChartVanSo`, `PersonalityBars`, `CareerBars` trong `apps/web/src/components/numerology/result/charts/`.
+- `SummaryDashboard` render mandala, 6 chip tổng quan, 3 chart và CTA.
+- Route `/than-so-hoc/result/details` render lại details free/full hiện tại.
+
+Goal:
+
+- Mạch flow Thần số học khớp V1: input → tổng quan dashboard → chi tiết free lock hoặc unlock full.
+
+Điều kiện Done:
+
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- `/than-so-hoc/result` hiển thị mandala, 6 chip và 3 chart trên desktop/mobile.
+- Free account có CTA preview và unlock; paid account có CTA xem luận giải chi tiết.
+- `/than-so-hoc/result/details` giữ preview/free lock/full report như cũ.
+- File limit: `charts.ts` < 200 dòng, chart components < 100 dòng/file, `SummaryDashboard` < 220 dòng, result page < 130 dòng, details page < 200 dòng.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-28: port chart helpers từ V1 vào `packages/shared/src/numerology/charts.ts` và re-export từ `packages/shared/src/numerology/index.ts`.
+- Chart components:
+  - `apps/web/src/components/numerology/result/charts/LineChartVanSo.tsx` - 83 dòng.
+  - `apps/web/src/components/numerology/result/charts/PersonalityBars.tsx` - 37 dòng.
+  - `apps/web/src/components/numerology/result/charts/CareerBars.tsx` - 44 dòng.
+- `SummaryDashboard` mới tại `apps/web/src/components/numerology/result/SummaryDashboard.tsx` - 139 dòng, render mandala, 6 chip, line chart, personality bars, career bars và CTA.
+- Route `/than-so-hoc/result` mới là summary dashboard free; route `/than-so-hoc/result/details` mới giữ free preview/full unlock gating cũ.
+- Chart helper exports: `CAREER_TABLE`, `CAREER_GROUPS`, `PERSONALITY_GROUPS`, `calcCareerGroups`, `calcPersonalityGroups`, `calcLineChartData`.
+- File limit đã kiểm: `charts.ts` 118 dòng, result page 114 dòng, details page 195 dòng.
+- Verify đã chạy: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### T-0607a - Fix T-0607 audit findings: V1 personality chart math + locked grid icons
+
+Status: Done
+
+Bối cảnh:
+
+- Audit T-0607 phát hiện `calcPersonalityGroups` đã simplify logic V1 nên sai redistribution khi có floor/cap, làm lệch % và ranking.
+- Audit cũng phát hiện `LockedGrid` details dùng digit string `"1"`, `"2"`, `"3"`, `"4"` thay vì emoji V1.
+
+Yêu cầu:
+
+- Restore đúng thuật toán V1 4 bước cho personality bars: raw %, floor 3% trừ từ max, cap 40% cộng vào min, normalize tổng 100.
+- Giữ `calcCareerGroups` match V1, không đổi line chart.
+- Thêm regression test math cho personality/career charts.
+- Restore emoji group icons: 👤 ⏳ 🎯 💎.
+
+Điều kiện Done:
+
+- `npm run kb:test-charts`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- DOB `15/08/1992` cho personality bars top group 1 và 9 tied khoảng 23%.
+- Details locked grid hiển thị emoji, không còn digit string.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-29: `calcPersonalityGroups` đã khôi phục đúng thuật toán V1 4 bước: raw %, floor 3% trừ từ max, cap 40% cộng vào min, normalize tổng 100.
+- Thêm `tools/kb-import/test-charts.mjs` và script `npm run kb:test-charts`.
+- Test cover 3 DOB personality: `01/01/1111` cap edge, `15/08/1992` tied groups 1/9 ở 23%, `05/05/1995` typical.
+- Test cover `calcCareerGroups(1, 5)` để guard V1 normalize career.
+- Restored locked grid icons trong `/than-so-hoc/result/details`: 👤 ⏳ 🎯 💎.
+- Verify đã chạy: `npm.cmd run kb:test-charts`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### T-0607b - Refactor PersonalityBars 2-col layout và aspect breakdown 11 khía cạnh
+
+Status: Done
+
+Bối cảnh:
+
+- User feedback: personality bars đang dài dạng một cột, cần layout 2 cột giống V1 screenshot.
+- Indicator detail card đang render flat field list quá rộng, cần gom theo 11 khía cạnh chuẩn.
+
+Yêu cầu:
+
+- PersonalityBars dùng grid 2 cột từ `md`, mỗi item có dot màu, rank, label, %, và bar fill cùng màu.
+- FreeIndicatorSection bỏ field flat list, render aspect-based theo 11 khía cạnh cố định.
+- Tình yêu & Hôn nhân gộp một card vì KB V1 không tách marriage riêng.
+- Hide-if-empty: aspect card chỉ render nếu fallback chain có dữ liệu.
+
+Điều kiện Done:
+
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- File limit: `PersonalityBars.tsx` < 90 dòng, `aspects.ts` < 60 dòng, `FreeIndicatorSection.tsx` < 200 dòng.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-29: `PersonalityBars` dùng grid 2 cột từ `md`, port cấu trúc V1 dot + rank + label + percent + bar fill.
+- Thêm `aspects.ts` với 11 aspect mapping cố định và `readAspectText` helper.
+- `FreeIndicatorSection` bỏ flat field list, render aspect card theo fallback chain và hide-if-empty.
+- Tình yêu & Hôn nhân gộp một card vì KB V1 không tách marriage riêng.
+- Verify đã chạy: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run qa:responsive-audit`.
 
 ## Phase 7 - Tarot MVP Non-AI
 
