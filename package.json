@@ -16,6 +16,7 @@
     "kb:validate": "node tools/kb-import/validate-numerology-kb.mjs",
     "kb:test-engine": "node tools/kb-import/test-engine.mjs",
     "kb:test-charts": "node tools/kb-import/test-charts.mjs",
+    "kb:test-synthesizer": "node tools/kb-import/test-synthesizer.mjs",
     "kb:extract-narrative": "node tools/kb-import/extract-narrative.mjs",
     "kb:validate-narrative": "node tools/kb-import/validate-narrative.mjs",
     "kb:upload-kv": "node tools/kb-import/upload-to-kv.mjs",
