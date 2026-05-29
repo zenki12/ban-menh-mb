@@ -18,6 +18,15 @@ function line(x1: number, y1: number, x2: number, y2: number, color = LINE, widt
   return <line stroke={color} strokeLinecap="round" strokeWidth={width} x1={x1} x2={x2} y1={y1} y2={y2} />;
 }
 
+function parsePeriodAge(period: string): { start: number | null; end: number | null; isOpen: boolean } {
+  if (!period) return { start: null, end: null, isOpen: false };
+  const rangeM = period.match(/(\d+)\s*[\u2013\-]\s*(\d+)/);
+  if (rangeM) return { start: Number(rangeM[1]), end: Number(rangeM[2]), isOpen: false };
+  const openM = period.match(/(\d+)/);
+  if (openM) return { start: Number(openM[1]), end: null, isOpen: true };
+  return { start: null, end: null, isOpen: false };
+}
+
 function Node({
   cx,
   cy,
@@ -50,24 +59,33 @@ function PeriodLabel({
   y,
   period,
   side,
+  birthYear,
 }: {
   x: number;
   y: number;
   period?: string;
   side: "left" | "right" | "above-right";
+  birthYear: number;
 }) {
   if (!period) return null;
-  const label = period
-    .replace(/\btuoi\b/gi, "tuổi")
-    .replace(/\btro di\b/gi, "trở đi")
-    .replace(/\btoi\b/gi, "tới");
+  const { start, end } = parsePeriodAge(period);
+  if (start === null) return null;
+  const ageText = end !== null ? `${start}–${end} tuổi` : `${start}+ tuổi`;
+  const yearStart = birthYear + start;
+  const yearEnd = end !== null ? birthYear + end : null;
+  const yearText = yearEnd !== null ? `(${yearStart} – ${yearEnd})` : `(${yearStart}+)`;
   const tx = side === "left" ? x - R - 8 : x + R + 8;
   const anchor = side === "left" ? "end" : "start";
   const ty = side === "above-right" ? y - 10 : y - 8;
   return (
-    <text fill={BLUE} fontSize="11" fontWeight="700" textAnchor={anchor} x={tx} y={ty}>
-      {label}
-    </text>
+    <>
+      <text fill={BLUE} fontSize="11" fontWeight="700" textAnchor={anchor} x={tx} y={ty}>
+        {ageText}
+      </text>
+      <text fill={BLUE} fontSize="9.5" fontStyle="italic" opacity="0.78" textAnchor={anchor} x={tx} y={ty + 15}>
+        {yearText}
+      </text>
+    </>
   );
 }
 
@@ -75,6 +93,7 @@ export function PyramidSvgChart({ peaks, challenges, dobParts }: PyramidSvgChart
   const baseMonth = reduce(dobParts.month, false);
   const baseDay = reduce(dobParts.day, false);
   const baseYear = reduce(dobParts.year, false);
+  const birthYear = dobParts.year;
 
   return (
     <div className="overflow-hidden rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-4">
@@ -103,10 +122,10 @@ export function PyramidSvgChart({ peaks, challenges, dobParts }: PyramidSvgChart
         {line(200, 400, 350, 480, "#94a3b8", 1.5)}
         {line(500, 400, 350, 480, "#94a3b8", 1.5)}
         {line(350, 480, 350, 532, "#94a3b8", 1.5)}
-        <PeriodLabel period={peaks[0]?.period} side="left" x={200} y={200} />
-        <PeriodLabel period={peaks[1]?.period} side="right" x={500} y={200} />
-        <PeriodLabel period={peaks[2]?.period} side="left" x={350} y={120} />
-        <PeriodLabel period={peaks[3]?.period} side="above-right" x={350} y={45} />
+        <PeriodLabel birthYear={birthYear} period={peaks[0]?.period} side="left" x={200} y={200} />
+        <PeriodLabel birthYear={birthYear} period={peaks[1]?.period} side="right" x={500} y={200} />
+        <PeriodLabel birthYear={birthYear} period={peaks[2]?.period} side="left" x={350} y={120} />
+        <PeriodLabel birthYear={birthYear} period={peaks[3]?.period} side="above-right" x={350} y={45} />
         <Node cx={200} cy={200} fill={PEAK_FILL} radius={R} stroke="white" textColor="white" value={peaks[0]?.number} />
         <Node cx={500} cy={200} fill={PEAK_FILL} radius={R} stroke="white" textColor="white" value={peaks[1]?.number} />
         <Node cx={350} cy={120} fill={PEAK_FILL} radius={R} stroke="white" textColor="white" value={peaks[2]?.number} />

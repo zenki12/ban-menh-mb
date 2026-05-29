@@ -2650,6 +2650,37 @@ Update khi xong:
 - CSS narrative thêm `.pyramid-*` và `.peak-*` cho period blocks, peak analysis, 4 aspect boxes, negatives và reflection.
 - Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-engine`, `npm run typecheck`, `npm run lint`, `npm run build`; section 7 HTML fixture dài 29561 chars.
 
+### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
+
+Status: Done
+
+Bối cảnh:
+
+- Engine từ T-0407 còn phát period strings ASCII (`tuoi`, `tro di`) cho pyramid/life cycle.
+- `PyramidSvgChart` đang vá bằng replace ở client và chưa hiển thị year range cạnh age range.
+- Rule content yêu cầu mọi text user-facing là tiếng Việt có dấu.
+
+Yêu cầu:
+
+- Fix tại nguồn trong `packages/shared/src/numerology/indicators.ts`.
+- Bỏ client-side replace workaround trong `PyramidSvgChart`.
+- `PyramidSvgChart` render 2 dòng label cho peak: age range + year range.
+- Không đổi chart geometry, engine calculation, route/auth/payment hoặc KB/narrative.
+
+Điều kiện Done:
+
+- Không còn match `tuoi` / `tro di` trong `packages/shared/src/numerology` và chart component.
+- `npm run kb:test-engine`, `npm run kb:test-synthesizer`, `npm run kb:test-charts`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- `calcPyramidPeaks`, `calcPyramidChallenges` và `calcLifeCycles` phát period strings có dấu (`tuổi`, `tuổi trở đi`, `giai đoạn chủ đạo cuối đời`).
+- `PyramidSvgChart` bỏ workaround replace ASCII ở client.
+- `PyramidSvgChart` render 2 dòng label cho peak: age range (`0–33 tuổi`) và year range (`(1990 – 2023)` / `(2042+)`).
+- Regex parse period trong `narrative-deep.ts` không phụ thuộc chữ `tuổi`, nên tương thích với output mới.
+- Verify pass: `npm run kb:test-engine`, `npm run kb:test-synthesizer`, `npm run kb:test-charts`, `npm run typecheck`, `npm run lint`, `npm run build`.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done

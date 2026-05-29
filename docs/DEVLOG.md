@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-30 00:59 +07 | T-0610c-fix | Vietnamese period strings + pyramid year labels | `Hotfix` |
 | 2026-05-30 00:34 +07 | T-0610c-section7 | Literal V1 pyramid section | `Task` |
 | 2026-05-30 00:08 +07 | T-0610c-section6 | Literal V1 life cycles section | `Task` |
 | 2026-05-29 23:43 +07 | T-0610c-section5 | Literal V1 life path section + career detail | `Task` |
@@ -105,6 +106,33 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-30 00:59 +07] - T-0610c-fix: Vietnamese period strings + pyramid year labels
+
+**Loại:** `Hotfix`
+**Ref:** T-0610c-fix
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Fix 2 issue sau T-0610c-section7: period strings trong engine dùng tiếng Việt có dấu, và `PyramidSvgChart` hiển thị thêm year range cạnh age range.
+
+### Thay đổi
+- `indicators.ts` đổi `calcPyramidPeaks`, `calcPyramidChallenges` và `calcLifeCycles` từ `tuoi/tro di` sang `tuổi/trở đi`.
+- `calcPyramidChallenges` đổi period cuối từ `giai doan chu dao cuoi doi` sang `giai đoạn chủ đạo cuối đời`.
+- `PyramidSvgChart` bỏ client-side replace workaround và parse period trực tiếp từ engine output.
+- `PyramidSvgChart` render 2 dòng label cho mỗi peak: age range và year range tính từ `dobParts.year`.
+
+### Verify
+- `rg -n "\btuoi\b|\btro di\b" packages\shared\src packages\shared\dist apps\web\src\components\numerology\result\charts` không còn match.
+- `npm.cmd run kb:test-engine` output có `0 - 33 tuổi`, `52 tuổi trở đi`, `giai đoạn chủ đạo cuối đời`.
+- Đã chạy pass: `npm.cmd run kb:test-engine`, `npm.cmd run kb:test-synthesizer`, `npm.cmd run kb:test-charts`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- Root cause nằm ở engine T-0407 phát period ASCII; fix tại nguồn, không vá downstream.
+- `buildPyramidSection` và `buildLifeCyclesSection` parse period bằng regex số nên không bị ảnh hưởng bởi dấu tiếng Việt.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`.
 
 ---
 
