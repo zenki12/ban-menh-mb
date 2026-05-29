@@ -57,12 +57,16 @@ function PeriodLabel({
   side: "left" | "right" | "above-right";
 }) {
   if (!period) return null;
+  const label = period
+    .replace(/\btuoi\b/gi, "tuổi")
+    .replace(/\btro di\b/gi, "trở đi")
+    .replace(/\btoi\b/gi, "tới");
   const tx = side === "left" ? x - R - 8 : x + R + 8;
   const anchor = side === "left" ? "end" : "start";
   const ty = side === "above-right" ? y - 10 : y - 8;
   return (
     <text fill={BLUE} fontSize="11" fontWeight="700" textAnchor={anchor} x={tx} y={ty}>
-      {period}
+      {label}
     </text>
   );
 }
