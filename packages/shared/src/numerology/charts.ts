@@ -1,4 +1,4 @@
-import { reduce } from "./calculator";
+import { normalizeVietnameseName, reduce } from "./calculator";
 import type { DobParts } from "./indicators";
 import type { NumerologyReport } from "./report";
 
@@ -13,6 +13,27 @@ export type PersonalityGroup = {
 };
 export type PersonalityChartGroup = PersonalityGroup & { raw: number };
 export type LineChartPoint = { year: number; value: number; isCurrent: boolean };
+export type GridSource = "dob" | "name" | "combined";
+export type GridCells = Record<number, number>;
+export type ArrowEntry = string | { name?: string; description?: string };
+export type DetectedArrow = {
+  key: string;
+  cells: [number, number, number];
+  name: string;
+  description: string;
+  present: boolean;
+};
+
+export const DEFAULT_GRID_ARROWS: Record<string, ArrowEntry> = {
+  "1_2_3": "Mũi tên lập kế hoạch - Khả năng lập kế hoạch và thực hiện.",
+  "4_5_6": "Mũi tên ý chí - Giàu ý chí, không ngại khó khăn.",
+  "7_8_9": "Mũi tên hành động - Tính hành động và chủ động cao.",
+  "1_4_7": "Mũi tên thực tế - Năng lượng vật chất và tổ chức.",
+  "2_5_8": "Mũi tên cân bằng tinh thần - Cảm xúc ổn định, trực giác tốt.",
+  "3_6_9": "Mũi tên trí tuệ - Trí nhớ, tư duy và lý trí.",
+  "1_5_9": "Mũi tên quyết tâm - Năng lượng hành động cao, không trì hoãn.",
+  "3_5_7": "Mũi tên trí tuệ - Trí nhớ tốt, khả năng học tập và phân tích.",
+};
 
 export const CAREER_TABLE: Record<string, CareerTableRow> = {
   "1": { KT: 5, KD: 58, XH: 8, ST: 5, NC: 4 },
@@ -144,4 +165,89 @@ export function calcLineChartData(
       isCurrent: offset === 0,
     };
   });
+}
+
+function emptyCells(): GridCells {
+  const cells: GridCells = {};
+  for (let i = 1; i <= 9; i++) cells[i] = 0;
+  return cells;
+}
+
+export function calcBirthChartCells(dobParts: DobParts): GridCells {
+  const cells = emptyCells();
+  const digits = `${String(dobParts.day).padStart(2, "0")}${String(dobParts.month).padStart(2, "0")}${String(dobParts.year).padStart(4, "0")}`;
+  for (const digit of digits) {
+    const num = Number(digit);
+    if (num >= 1 && num <= 9) cells[num] += 1;
+  }
+  return cells;
+}
+
+export function calcNameChartCells(fullName: string, letterMap: Record<string, number>): GridCells {
+  const cells = emptyCells();
+  for (const char of normalizeVietnameseName(fullName)) {
+    const num = letterMap[char];
+    if (num >= 1 && num <= 9) cells[num] += 1;
+  }
+  return cells;
+}
+
+function cellsFromArrowKey(key: string): [number, number, number] | null {
+  const digits = key.match(/[1-9]/g)?.map(Number) ?? [];
+  if (digits.length < 3) return null;
+  return [digits[0], digits[1], digits[2]];
+}
+
+function arrowText(entry: ArrowEntry): { name: string; description: string } {
+  if (typeof entry !== "string") {
+    return {
+      name: entry.name ?? "Mũi tên",
+      description: entry.description ?? "",
+    };
+  }
+  const [name, ...rest] = entry.split(/\s+-\s+/);
+  return { name: name.trim(), description: rest.join(" - ").trim() };
+}
+
+export function detectArrows(
+  cells: GridCells,
+  arrowsKb: Record<string, ArrowEntry> = DEFAULT_GRID_ARROWS,
+): DetectedArrow[] {
+  return Object.entries(arrowsKb)
+    .map(([key, entry]) => {
+      const arrowCells = cellsFromArrowKey(key);
+      if (!arrowCells) return null;
+      const text = arrowText(entry);
+      return {
+        key,
+        cells: arrowCells,
+        name: text.name,
+        description: text.description,
+        present: arrowCells.every((num) => (cells[num] ?? 0) > 0),
+      };
+    })
+    .filter((item): item is DetectedArrow => item !== null);
+}
+
+export function detectIsolatedNumbers(cells: GridCells, presentArrows: DetectedArrow[]): number[] {
+  const connected = new Set<number>();
+  for (const arrow of presentArrows) {
+    if (arrow.present) arrow.cells.forEach((num) => connected.add(num));
+  }
+  return Object.entries(cells)
+    .filter(([, count]) => count > 0)
+    .map(([num]) => Number(num))
+    .filter((num) => !connected.has(num));
+}
+
+export function calcCombinedCells(dobCells: GridCells, nameCells: GridCells): GridCells {
+  const cells = emptyCells();
+  for (let i = 1; i <= 9; i++) cells[i] = (dobCells[i] ?? 0) + (nameCells[i] ?? 0);
+  return cells;
+}
+
+export function findCompensated(dobCells: GridCells, nameCells: GridCells): number[] {
+  return Array.from({ length: 9 }, (_, index) => index + 1).filter(
+    (num) => (dobCells[num] ?? 0) === 0 && (nameCells[num] ?? 0) > 0,
+  );
 }
