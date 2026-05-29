@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../styles/numerology-narrative.css";
 
 * {
   box-sizing: border-box;
@@ -93,7 +94,7 @@ select option {
   color: var(--bm-text-main);
 }
 
-.text-gradient-purple {
+@utility text-gradient-purple {
   background: var(--bm-gradient-purple-text);
   -webkit-background-clip: text;
   background-clip: text;
