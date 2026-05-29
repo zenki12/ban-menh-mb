@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-30 01:07 +07 | T-0610c-cleanup | Split narrative modules + diacritics test | `Task` |
 | 2026-05-30 00:59 +07 | T-0610c-fix | Vietnamese period strings + pyramid year labels | `Hotfix` |
 | 2026-05-30 00:34 +07 | T-0610c-section7 | Literal V1 pyramid section | `Task` |
 | 2026-05-30 00:08 +07 | T-0610c-section6 | Literal V1 life cycles section | `Task` |
@@ -106,6 +107,34 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-30 01:07 +07] - T-0610c-cleanup: Split narrative modules + diacritics test
+
+**Loại:** `Task`
+**Ref:** T-0610c-cleanup
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Refactor cơ học `narrative-deep.ts` thành barrel + 5 module narrative nhỏ hơn, đồng thời thêm integration test chặn rò ASCII Vietnamese như `tuoi/tro di`.
+
+### Thay đổi
+- `narrative-deep.ts` còn barrel export 5 dòng, giữ public import cũ cho `synthesizer.ts` và Worker.
+- Thêm `packages/shared/src/numerology/narrative/common.ts` cho helper/type chung.
+- Thêm `life-path.ts`, `cycle.ts`, `pyramid.ts`, `year-month.ts` để tách section 5/6/7 và year/month narrative.
+- Thêm `tools/kb-import/test-diacritics.mjs`.
+- Root `package.json` thêm script `kb:test-diacritics` và đưa test này vào `npm run check`.
+
+### Verify
+- File line counts: `common.ts` 48, `year-month.ts` 499, `cycle.ts` 772, `pyramid.ts` 359, `life-path.ts` 674, `narrative-deep.ts` 5.
+- Snapshot synthesized output 4 fixture trước/sau split identical byte-for-byte: 494570 bytes.
+- Đã chạy pass: `npm.cmd run kb:test-diacritics`, `npm.cmd run kb:test-synthesizer`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check`.
+
+### Ghi chú
+- Pure refactor: không đổi function signature, không đổi consumer import, không đổi output HTML.
+- Test diacritics kiểm tra cả synthesized HTML và period strings trong report để bắt lại lỗi như `tuoi/tro di`.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`.
 
 ---
 

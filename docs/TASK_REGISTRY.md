@@ -2681,6 +2681,40 @@ Update khi xong:
 - Regex parse period trong `narrative-deep.ts` không phụ thuộc chữ `tuổi`, nên tương thích với output mới.
 - Verify pass: `npm run kb:test-engine`, `npm run kb:test-synthesizer`, `npm run kb:test-charts`, `npm run typecheck`, `npm run lint`, `npm run build`.
 
+### T-0610c-cleanup - Split narrative-deep modules and diacritics integration test
+
+Status: Done
+
+Bối cảnh:
+
+- `packages/shared/src/numerology/narrative-deep.ts` đã vượt 2000 dòng sau T-0610c-section5/6/7.
+- Rule repo yêu cầu file > 1000 dòng phải tách.
+- Issue ASCII `tuoi/tro di` cần test tự động để không tái diễn.
+
+Yêu cầu:
+
+- Split narrative rendering thành các module trong `packages/shared/src/numerology/narrative/`.
+- Giữ `narrative-deep.ts` làm barrel export để không đổi public import.
+- Không đổi function signature hoặc output HTML.
+- Thêm integration test `kb:test-diacritics` và đưa vào `npm run check`.
+
+Điều kiện Done:
+
+- Mỗi file trong `packages/shared/src/numerology/narrative/*.ts` < 1000 dòng.
+- `narrative-deep.ts` < 30 dòng.
+- Snapshot synthesized output trước/sau split identical byte-for-byte.
+- `npm run kb:test-synthesizer`, `npm run kb:test-diacritics`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- Tách `narrative-deep.ts` thành barrel export 5 dòng.
+- Tạo `narrative/common.ts`, `life-path.ts`, `cycle.ts`, `pyramid.ts`, `year-month.ts`.
+- File lớn nhất sau split: `cycle.ts` 772 dòng; tất cả module < 1000 dòng.
+- Snapshot 4-case synthesized output trước/sau split identical: 494570 bytes.
+- Thêm `tools/kb-import/test-diacritics.mjs`, script `kb:test-diacritics` và thêm vào `npm run check`.
+- Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-diacritics`, `npm run typecheck`, `npm run lint`, `npm run build`.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done
