@@ -269,7 +269,20 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
               .join(""),
         ),
         section("9", "Chỉ số Tháng Cá Nhân", personalPeriod(`Tháng ${report.personalMonth.month}`, report.personalMonth.number, `${report.personalMonth.month}/${report.personalYear.year}`, name, report.personalMonth.data)),
-        section("9.1", "Chỉ Số Các Tháng — Phân Tích 3 Tháng", report.personalMonthsRange.map((item) => personalMonthDeep(item, name)).join("")),
+        section(
+          "9.1",
+          "Chỉ Số Các Tháng — Phân Tích 3 Tháng",
+          `<p class="nar" style="font-style:italic;">Những con số này cho biết ở mỗi tháng sẽ có những điều gì có khả năng xảy ra và bạn nên tập trung làm việc theo con số nào, theo con số này nào sẽ ở mức độ sâu hơn so với chỉ số năm.</p>` +
+            `<div class="year-cards-grid">` +
+            report.personalMonthsRange
+              .map(
+                (item) =>
+                  `<div class="year-card-tab"><div class="year-card-label">THÁNG ${item.month}/${item.year}</div><div class="year-card-num">${item.number}</div></div>`,
+              )
+              .join("") +
+            `</div>` +
+            report.personalMonthsRange.map((item) => personalMonthDeep(item, name)).join(""),
+        ),
       ],
     },
     {

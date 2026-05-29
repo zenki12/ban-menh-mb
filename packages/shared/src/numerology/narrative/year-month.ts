@@ -1,4 +1,3 @@
-import type { IndicatorResult } from "../report";
 import { escapeHtml } from "./common";
 
 export type PersonalPeriodKbData = {
@@ -820,9 +819,130 @@ export function buildYearDomainBlock(num: number, year: number, age: number, nam
     </div>`;
   }
 
-export function personalMonthDeep(item: IndicatorResult & { year: number; month: number }, name: string): string {
-  return `<article class="year-card-deep">
-    <div class="year-card-deep-head"><span>THÁNG ${item.month}/${item.year}</span><strong>VẬN SỐ ${item.number}</strong></div>
-    ${personalPeriod(`Tháng ${item.month}`, item.number, `${item.month}/${item.year}`, name, item.data)}
-  </article>`;
+type MonthDeepContent = {
+  energy: string;
+  congviec: string;
+  tinhyeu: string;
+  taichinh: string;
+  giaotiep: string;
+  hoctap: string;
+  tongket: string;
+};
+
+export function personalMonthDeep(item: { number: number; year: number; month: number }, name: string): string {
+    const num = item.number;
+    const month = item.month;
+    const year = item.year;
+    const n = num % 9 || 9;
+    const safeName = escapeHtml(name);
+    const safeYear = escapeHtml(String(year));
+    const monthNames = ['', 'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+      'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+    const label = `${monthNames[month] || 'Tháng ' + month}/${safeYear}`;
+
+    const content: Record<number, MonthDeepContent> = {
+      1: {
+        energy: `Tháng cá nhân số <strong>1</strong> là tháng của <em>sự khởi đầu và tiên phong</em> cho <strong>${safeName}</strong>. Vũ trụ đang trao cho bạn một trang trắng hoàn toàn mới — năng lượng số 1 thôi thúc bạn hành động, ra quyết định và dứt khoát với những điều chưa làm được. Đây là tháng gieo hạt quan trọng cho cả chu kỳ phía trước.`,
+        congviec: `Đây là thời điểm lý tưởng để <strong>${safeName}</strong> khởi động những dự án mới, đề xuất sáng kiến hoặc đảm nhận trách nhiệm lớn hơn. Năng lượng số 1 hỗ trợ mạnh cho việc tự lập và hành động độc lập — những quyết định được đưa ra trong tháng này có thể định hình cả quý tiếp theo. Đừng chờ đợi — hãy là người đầu tiên đề xuất, đầu tiên thử nghiệm và đầu tiên bước vào cơ hội mới.`,
+        tinhyeu: `Trong chuyện tình cảm, <strong>${safeName}</strong> có thể cảm thấy mạnh mẽ và tự tin hơn bình thường — và đây chính là lúc tốt để bày tỏ cảm xúc hoặc chủ động làm mới mối quan hệ. Với người đang độc thân, tháng số 1 có thể mang đến cơ hội gặp gỡ bất ngờ. Với người đã có đôi, hãy dẫn đầu trong việc tạo ra những trải nghiệm mới và phá vỡ sự tẻ nhạt quen thuộc.`,
+        taichinh: `Tháng số 1 thích hợp để <strong>${safeName}</strong> bắt đầu kế hoạch tài chính mới, mở tài khoản tiết kiệm có mục tiêu, hoặc đưa ra quyết định đầu tư đã suy nghĩ từ lâu. Hãy chủ động — cơ hội tài chính đến với những ai đứng dậy trước. Tuy nhiên tránh chi tiêu bốc đồng vì muốn thể hiện hay chứng tỏ bản thân.`,
+        giaotiep: `Sức hút cá nhân của <strong>${safeName}</strong> rất mạnh trong tháng này. Người khác tự nhiên chú ý đến bạn và muốn nghe bạn nói — hãy tận dụng điều đó để xây dựng mạng lưới mới, tạo ấn tượng ban đầu tốt hoặc dẫn dắt nhóm. Tháng số 1 không phải thời điểm để thu mình — hãy hiện diện và để bản thân được nhìn thấy.`,
+        hoctap: `<strong>${safeName}</strong> có thể cảm thấy đặc biệt hứng khởi với việc học những kỹ năng hoàn toàn mới trong tháng này. Đây là lúc tốt để đăng ký khóa học, thử phương pháp học mới, hoặc nghiên cứu lĩnh vực mà bạn muốn phát triển. Não bộ đang trong trạng thái tiếp nhận mạnh — hãy tận dụng.`,
+        tongket: `Tháng số 1 tổng kết lại bằng một lời hứa với bản thân: <em>hành động sớm hơn, quyết đoán hơn và tin tưởng vào bản ngã cốt lõi của mình</em>. Nếu trong tháng này có điều gì trì hoãn — hãy xem đó là tín hiệu cần vượt qua ngay. Những gì <strong>${safeName}</strong> bắt đầu trong tháng số 1 sẽ có sức lan tỏa vào các tháng tiếp theo của năm.`
+      },
+      2: {
+        energy: `Tháng cá nhân số <strong>2</strong> mang đến cho <strong>${safeName}</strong> năng lượng của <em>sự hợp tác, lắng nghe và kiên nhẫn chiến lược</em>. Đây không phải thời điểm của hành động ồ ạt mà là thời điểm để nuôi dưỡng các mối quan hệ, xây dựng cây cầu kết nối và chuẩn bị nền móng cho những điều lớn hơn.`,
+        congviec: `Tháng số 2 thích hợp để <strong>${safeName}</strong> tập trung vào hợp tác và làm việc nhóm hơn là thi đua cá nhân. Những thỏa thuận, đàm phán và tìm kiếm đồng thuận đều được hỗ trợ trong tháng này. Hãy kiên nhẫn — quyết định được đưa ra cùng người khác sẽ bền vững hơn quyết định đơn phương. Đây cũng là lúc tốt để hoàn thiện những chi tiết nhỏ mà tháng trước chưa giải quyết.`,
+        tinhyeu: `Trong tình cảm, <strong>${safeName}</strong> đang ở trong tháng được thiên nhiên ủng hộ nhất cho sự kết nối sâu sắc. Những cuộc trò chuyện thành thật, những khoảnh khắc lắng nghe thực sự và sự chia sẻ nhẹ nhàng sẽ tạo ra chiều sâu mới trong mối quan hệ. Với người độc thân, hãy chú ý đến những ai đang ở cạnh bạn nhưng chưa được nhìn thấy đúng mức.`,
+        taichinh: `Hãy tránh đưa ra những quyết định tài chính lớn một mình trong tháng số 2. <strong>${safeName}</strong> sẽ lợi hơn nếu tham khảo ý kiến của người có kinh nghiệm hoặc hợp tác tài chính với người tin cậy. Đây cũng là tháng thích hợp để xem lại ngân sách, rà soát các khoản chi và chuẩn bị tài chính một cách thầm lặng và cẩn thận.`,
+        giaotiep: `<strong>${safeName}</strong> tỏa ra sự ấm áp và dễ tiếp cận đặc biệt trong tháng này — người ta tự nhiên muốn chia sẻ với bạn. Hãy lắng nghe nhiều hơn nói, quan sát nhiều hơn hành động. Những thông tin quý giá và cơ hội ẩn thường đến qua những cuộc trò chuyện tưởng như bình thường khi bạn thực sự chú tâm lắng nghe.`,
+        hoctap: `Tháng số 2 rất thích hợp để <strong>${safeName}</strong> học theo cặp hoặc nhóm nhỏ. Các khóa học về kỹ năng giao tiếp, tư vấn, trị liệu, ngoại ngữ hoặc bất kỳ kiến thức nào liên quan đến con người đều đặc biệt phù hợp. Hãy tìm người thầy hoặc mentor — giai đoạn này bạn học tốt nhất từ người khác chứ không phải từ sách vở một mình.`,
+        tongket: `Tháng số 2 nhắc nhở <strong>${safeName}</strong> rằng <em>sức mạnh thật sự không phải là đi một mình nhanh hơn — mà là đi cùng người khác xa hơn</em>. Hãy trân trọng những liên minh bạn đang xây dựng. Bất kỳ mối quan hệ nào được vun đắp trong tháng này đều có tiềm năng phát triển lâu dài và sâu sắc.`
+      },
+      3: {
+        energy: `Tháng cá nhân số <strong>3</strong> là <em>mùa hoa nở</em> trong hành trình của <strong>${safeName}</strong>. Năng lượng sáng tạo và biểu đạt đang ở đỉnh cao — vũ trụ không chỉ cho phép bạn thể hiện bản thân mà còn <em>yêu cầu</em> bạn làm điều đó. Niềm vui, kết nối xã hội và những ý tưởng mới liên tục xuất hiện.`,
+        congviec: `<strong>${safeName}</strong> có thể tỏa sáng đặc biệt trong các cuộc họp, thuyết trình và giao tiếp với khách hàng trong tháng này. Những ý tưởng sáng tạo đang chín muồi — hãy mạnh dạn đề xuất, viết ra và chia sẻ. Các dự án liên quan đến nội dung, truyền thông, giảng dạy hay bất kỳ thứ gì cần biểu đạt đều có lợi thế lớn trong tháng số 3.`,
+        tinhyeu: `Tháng này <strong>${safeName}</strong> rất hấp dẫn và thu hút — người mới có thể xuất hiện, mối quan hệ cũ có thể được làm mới bằng sự vui vẻ và tự phát. Hãy đưa người thân ra ngoài, thử trải nghiệm mới cùng nhau, tạo ra những kỷ niệm đẹp. Tuy nhiên, đừng để sự phấn khích bề mặt che lấp những cuộc trò chuyện quan trọng cần có chiều sâu.`,
+        taichinh: `Tháng số 3 thường mang đến những cơ hội tài chính qua kết nối xã hội và mạng lưới quan hệ của <strong>${safeName}</strong>. Bạn có thể nhận được lời mời hợp tác, cơ hội phụ thu nhập hoặc khách hàng mới qua giới thiệu. Tuy nhiên hãy cẩn thận với chi tiêu bốc hứng — tháng số 3 dễ khiến bạn mua sắm không có kế hoạch vì đang ở trạng thái phấn khích.`,
+        giaotiep: `<strong>${safeName}</strong> là tâm điểm của mọi cuộc tụ họp xã hội trong tháng này. Năng lượng giao tiếp của bạn mạnh đến mức người ta tự nhiên muốn ở quanh bạn. Đây là thời điểm lý tưởng để mở rộng mạng lưới, tham gia các sự kiện và kết nối với những người sáng tạo — một cuộc gặp gỡ tưởng như tình cờ có thể thay đổi hướng đi của bạn.`,
+        hoctap: `Tháng số 3 rất thích hợp để <strong>${safeName}</strong> học những kỹ năng sáng tạo và biểu đạt. Viết lách, thiết kế, nhiếp ảnh, diễn xuất, kể chuyện — bất kỳ nghệ thuật nào giúp bạn bày tỏ nội tâm đều phát triển nhanh trong giai đoạn này. Đây cũng là lúc tốt để dạy lại những gì bạn biết — dạy người khác là cách học sâu nhất.`,
+        tongket: `Tháng số 3 kết thúc với thông điệp: <em>hãy để bản thân được tỏa sáng theo cách chỉ bạn mới có thể làm được</em>. <strong>${safeName}</strong> không cần phải hoàn hảo mới bắt đầu biểu đạt — giọng nói, câu chuyện và góc nhìn độc đáo của bạn là thứ thế giới đang cần. Năng lượng vui vẻ và sáng tạo của tháng này — hãy chia sẻ nó trước khi nó qua đi.`
+      },
+      4: {
+        energy: `Tháng cá nhân số <strong>4</strong> yêu cầu <strong>${safeName}</strong> tập trung vào <em>kỷ luật, tổ chức và xây dựng nền tảng</em>. Đây không phải tháng hào nhoáng hay bứt phá nhanh — đây là tháng làm những việc thực chất và kiên nhẫn. Những gì được xây dựng chắc chắn trong tháng này sẽ đứng vững qua những tháng biến động phía trước.`,
+        congviec: `<strong>${safeName}</strong> nên tập trung hoàn thiện các dự án đang dang dở thay vì mở thêm dự án mới trong tháng số 4. Đây là lúc tốt để lập quy trình, tổ chức lại hệ thống làm việc, xây dựng thói quen nghề nghiệp và đầu tư vào việc nâng cao kỹ năng chuyên môn. Những đồng nghiệp và cấp trên sẽ chú ý đến sự cẩn thận và đáng tin cậy của bạn tháng này.`,
+        tinhyeu: `Trong tháng số 4, <strong>${safeName}</strong> có xu hướng tìm kiếm sự ổn định và chắc chắn trong tình cảm hơn là những khoảnh khắc hào hứng ngắn ngủi. Đây là lúc tốt để xây dựng nền tảng vững chắc cho mối quan hệ — những cuộc trò chuyện thực chất về tương lai, về kỳ vọng và về cam kết. Đừng để sự thực dụng của số 4 giết chết sự lãng mạn hoàn toàn — người thân cần cả hai.`,
+        taichinh: `Tháng số 4 là thời điểm lý tưởng nhất trong năm để <strong>${safeName}</strong> xem xét và tái cơ cấu tài chính. Lập ngân sách, cắt giảm chi tiêu không cần thiết, tăng tiết kiệm, nghiên cứu các lựa chọn đầu tư an toàn dài hạn — tất cả đều được hỗ trợ mạnh. Tránh các quyết định tài chính rủi ro cao trong tháng này.`,
+        giaotiep: `<strong>${safeName}</strong> có thể không phải là người nói chuyện nhiều nhất trong phòng tháng này — và đó là điều tốt. Chất lượng giao tiếp của bạn cao hơn số lượng. Những ai thực sự lắng nghe sẽ nhận ra sự chín chắn và đáng tin cậy toát ra từ bạn. Hãy dồn năng lượng vào những mối quan hệ thực chất thay vì mở rộng xã giao bề mặt.`,
+        hoctap: `Tháng số 4 thuận lợi nhất cho việc học theo kiểu <em>đào sâu có hệ thống</em>. <strong>${safeName}</strong> học tốt hơn khi có bài bản rõ ràng, tài liệu cụ thể và lộ trình được vạch ra từ trước. Các kỹ năng kỹ thuật, tài chính, lập kế hoạch hay bất kỳ chuyên môn nào đòi hỏi tính tỉ mỉ đều đặc biệt phù hợp trong giai đoạn này.`,
+        tongket: `Tháng số 4 nhắc <strong>${safeName}</strong> về giá trị của sự kiên nhẫn — <em>những thứ xây bằng tay, từng viên gạch một, luôn đứng lâu hơn những thứ được dựng lên qua đêm</em>. Đừng nản lòng nếu tiến độ trông chậm chạp. Sự cố gắng âm thầm của bạn trong tháng này đang tạo ra nền móng thực sự cho những gì sắp đến.`
+      },
+      5: {
+        energy: `Tháng cá nhân số <strong>5</strong> mang đến cho <strong>${safeName}</strong> <em>làn gió tươi mới của sự thay đổi và tự do</em>. Những bất ngờ, cơ hội mới và sự điều chỉnh là đặc trưng của tháng này — đừng chống lại chúng. Sự linh hoạt và sẵn sàng thích nghi là tài sản lớn nhất của bạn trong giai đoạn này.`,
+        congviec: `Tháng số 5 có thể mang đến những thay đổi bất ngờ trong môi trường làm việc của <strong>${safeName}</strong> — nhiệm vụ mới, hướng đi mới, thậm chí cơ hội việc làm từ nơi không ngờ tới. Đừng từ chối chúng chỉ vì không nằm trong kế hoạch — một số cánh cửa tốt nhất trong sự nghiệp được mở ra trong những tháng số 5. Hãy giữ tâm thế mở và linh hoạt.`,
+        tinhyeu: `Trong tình cảm, <strong>${safeName}</strong> đang ở tháng của sự hào hứng và tự phát. Những cuộc hẹn ngẫu hứng, trải nghiệm mới cùng nhau, phá bỏ thói quen cũ — tất cả đều được hoan nghênh. Với người độc thân, những cuộc gặp gỡ tình cờ trong tháng này có thể để lại ấn tượng lâu dài. Hãy mở lòng nhưng đừng quên giữ sự sáng suốt trong những quyết định quan trọng.`,
+        taichinh: `Tháng số 5 có thể mang đến những cơ hội tài chính từ hướng bất ngờ cho <strong>${safeName}</strong> — nhưng cũng đi kèm với cám dỗ chi tiêu theo sự hào hứng. Hãy dựng một bộ lọc 24 giờ — bất kỳ chi tiêu lớn nào cũng nên chờ một ngày trước khi quyết định. Đồng thời giữ sẵn một khoản dự phòng nhỏ cho những cơ hội thực sự tốt có thể xuất hiện bất ngờ.`,
+        giaotiep: `<strong>${safeName}</strong> sẽ gặp nhiều người mới thú vị trong tháng này — và những cuộc trò chuyện tưởng như ngắn ngủi có thể mở ra cánh cửa mới. Hãy đặt mình vào những môi trường mới, tham gia sự kiện khác với thói quen và để những cuộc gặp gỡ tình cờ diễn ra. Đừng lên kế hoạch quá chi tiết cho các hoạt động xã hội tháng này.`,
+        hoctap: `Tháng số 5 không phải lúc học theo kiểu ngồi xuống và học từng chương. <strong>${safeName}</strong> học tốt nhất trong tháng này qua trải nghiệm thực tế, thử nghiệm hoặc tiếp xúc với môi trường hoàn toàn mới. Những kỹ năng liên quan đến giao tiếp đa văn hóa, ngôn ngữ và linh hoạt trong môi trường biến đổi nhanh đều phát triển mạnh.`,
+        tongket: `Tháng số 5 kết thúc với câu hỏi: <em>bạn đã sống trọn vẹn tháng này chưa — hay chỉ đang đứng nhìn những điều thú vị đi qua từ phía sau kính?</em> <strong>${safeName}</strong> được vũ trụ mời gọi tham gia — không chỉ quan sát. Tự do thực sự đến từ việc dũng cảm thử những thứ chưa từng thử trước đây.`
+      },
+      6: {
+        energy: `Tháng cá nhân số <strong>6</strong> của <strong>${safeName}</strong> đặt trọng tâm vào <em>gia đình, tình yêu và trách nhiệm sâu sắc</em>. Đây là thời điểm để chăm sóc những mối quan hệ thân thiết nhất và tạo ra sự hài hòa trong không gian sống và làm việc. Vũ trụ giao cho bạn nhiệm vụ thiêng liêng: trở thành chỗ nương tựa.`,
+        congviec: `Tháng số 6 thích hợp để <strong>${safeName}</strong> cải thiện môi trường làm việc, xây dựng văn hóa nhóm tích cực và giải quyết các mâu thuẫn còn tồn đọng. Vai trò người hòa giải, người hỗ trợ và người tạo ra sự gắn kết đang được ủng hộ mạnh. Các nghề liên quan đến chăm sóc, giảng dạy hoặc thiết kế không gian sống đặc biệt thuận lợi trong tháng này.`,
+        tinhyeu: `<strong>${safeName}</strong> đang trong giai đoạn vàng để đầu tư thực sự vào mối quan hệ tình cảm. Những cử chỉ nhỏ — một bữa ăn được nấu với tâm, một cuộc trò chuyện dài, sự hiện diện trọn vẹn — tạo ra ảnh hưởng sâu sắc hơn bất kỳ món quà đắt tiền nào. Đây cũng là tháng để hàn gắn những vết nứt nhỏ trong mối quan hệ trước khi chúng trở nên lớn hơn.`,
+        taichinh: `Tháng số 6 có thể mang đến những chi phí liên quan đến gia đình hoặc cải thiện không gian sống — điều đó là hoàn toàn tự nhiên. <strong>${safeName}</strong> hãy lập kế hoạch ngân sách gia đình dài hạn trong tháng này, bao gồm quỹ dự phòng khẩn cấp. Tránh bỏ bê tài chính cá nhân trong khi chăm lo cho người khác.`,
+        giaotiep: `<strong>${safeName}</strong> được cảm nhận như một người ấm áp, đáng tin cậy và quan tâm thực sự trong xã hội tháng này. Người ta tìm đến bạn để chia sẻ, để được lắng nghe và để cảm thấy an toàn. Hãy cho phép mình trở thành nguồn năng lượng tích cực — nhưng đồng thời học cách đặt ranh giới lành mạnh để không trở thành thùng rác cảm xúc của người khác.`,
+        hoctap: `Tháng số 6 thuận lợi để <strong>${safeName}</strong> học những kỹ năng liên quan đến con người — giao tiếp phi bạo lực, tư vấn tâm lý cơ bản, thiết kế nội thất, ẩm thực, chăm sóc sức khỏe gia đình. Đây cũng là tháng học qua trải nghiệm gia đình — những gì được dạy qua tình huống thực trong cuộc sống thường có chiều sâu hơn những gì học trong sách.`,
+        tongket: `Tháng số 6 nhắc <strong>${safeName}</strong> rằng <em>yêu thương thực sự không yêu cầu sự hoàn hảo — nó chỉ yêu cầu sự hiện diện</em>. Những gì bạn đã cho đi trong tháng này — dù nhỏ bé, dù không ai ghi nhận — đang tạo ra những vòng sóng tình yêu thương lan ra xa hơn bạn tưởng. Hãy nhớ: chăm sóc bản thân cũng là một hành động yêu thương.`
+      },
+      7: {
+        energy: `Tháng cá nhân số <strong>7</strong> mời <strong>${safeName}</strong> vào <em>sự tĩnh lặng và chiều sâu nội tâm</em>. Đây không phải tháng của hành động ồn ào — vũ trụ đang yêu cầu bạn dừng lại, quan sát và lắng nghe những thông điệp tinh tế hơn. Trực giác của bạn đặc biệt nhạy bén trong tháng số 7.`,
+        congviec: `Tháng số 7 không thích hợp để <strong>${safeName}</strong> ra mắt sản phẩm mới hay thực hiện những bước đột phá lớn — nhưng là lúc lý tưởng để nghiên cứu, phân tích và chuẩn bị. Hãy đào sâu vào chuyên môn, đọc những tài liệu đã để dành, nghiên cứu thị trường hoặc xem lại chiến lược tổng thể. Những quyết định chiến lược sau giai đoạn suy nghĩ kỹ lưỡng trong tháng số 7 thường rất chính xác.`,
+        tinhyeu: `Trong tháng số 7, <strong>${safeName}</strong> có thể cần nhiều không gian riêng hơn bình thường — và đó là nhu cầu hoàn toàn tự nhiên, không phải dấu hiệu của sự xa cách. Hãy giải thích điều này cho người thân. Mặt khác, những cuộc trò chuyện sâu sắc về ý nghĩa cuộc sống và giá trị sẽ tạo ra sự kết nối mạnh mẽ hơn bất kỳ hoạt động xã hội nào.`,
+        taichinh: `Tháng số 7 là lúc <strong>${safeName}</strong> nên nghiên cứu kỹ trước mọi quyết định tài chính quan trọng. Đừng bị thúc đẩy bởi áp lực “cơ hội sắp hết” — hãy dành thời gian phân tích, so sánh và hỏi ý kiến chuyên gia nếu cần. Đây cũng là lúc tốt để xem lại hiệu quả của các khoản đầu tư hiện tại và điều chỉnh nếu cần thiết.`,
+        giaotiep: `<strong>${safeName}</strong> không cần phải là trung tâm của mọi cuộc trò chuyện trong tháng số 7. Chất lượng cao hơn số lượng — một cuộc trò chuyện có chiều sâu với một người phù hợp sẽ có giá trị hơn hàng chục cuộc xã giao bề mặt. Hãy chọn lọc người để tâm sự và không ngần ngại từ chối các sự kiện xã hội không cần thiết trong tháng này.`,
+        hoctap: `Đây là một trong những tháng học tập hiệu quả nhất trong năm cho <strong>${safeName}</strong>. Tháng số 7 ủng hộ việc nghiên cứu chuyên sâu, đọc sách triết học hay tâm linh, theo đuổi một chủ đề bạn thực sự tò mò từ lâu. Thiền định, viết nhật ký và các thực hành nội tâm cũng là hình thức học tập quan trọng trong giai đoạn này.`,
+        tongket: `Tháng số 7 kết thúc với lời nhắc: <em>không phải mọi câu hỏi đều cần câu trả lời ngay — và không phải mọi khoảnh khắc yên tĩnh đều cần được lấp đầy bằng hành động</em>. <strong>${safeName}</strong> đang trong quá trình tích lũy nội lực. Những gì bạn học được và cảm nhận được trong tháng 7 sẽ trở thành la bàn dẫn đường cho những tháng hành động sắp tới.`
+      },
+      8: {
+        energy: `Tháng cá nhân số <strong>8</strong> mang đến cho <strong>${safeName}</strong> luồng năng lượng của <em>quyền lực, thịnh vượng và ảnh hưởng</em>. Đây là một trong những tháng mạnh nhất trong chu kỳ 9 tháng — những hành động đúng đắn được thực hiện trong tháng này thường mang lại kết quả vượt mong đợi.`,
+        congviec: `Tháng số 8 là lúc <strong>${safeName}</strong> nên hành động quyết đoán trong sự nghiệp: đàm phán tăng lương, ký kết hợp đồng quan trọng, mở rộng kinh doanh, hoặc đảm nhận vai trò lãnh đạo. Đừng ngần ngại — vũ trụ đang ủng hộ sức mạnh và sự tự tin của bạn. Năng lực và uy tín bạn đã xây dựng từ trước giờ đang được nhìn nhận và đền bù xứng đáng.`,
+        tinhyeu: `Trong tình cảm, <strong>${safeName}</strong> có thể toát ra sức hút và sự tự tin đặc biệt — điều này hấp dẫn người xung quanh. Tuy nhiên hãy chú ý không để sự bận rộn và tập trung vào sự nghiệp làm nguội lạnh mối quan hệ. Hãy đầu tư thời gian có chất lượng cho người thân — không phải thời gian thừa sau khi đã làm xong mọi việc. Bạn yêu mạnh mẽ nhất khi bạn chủ động chứ không phải khi bị nhắc nhở.`,
+        taichinh: `Tháng số 8 là đỉnh cao tài chính trong năm cho <strong>${safeName}</strong>. Đây là lúc để đầu tư, mở rộng nguồn thu nhập, đàm phán các điều khoản có lợi và ra quyết định tài chính táo bạo nhưng có cơ sở. Hãy dùng sức mạnh tháng này để xây dựng nền tảng vật chất dài hạn — không chỉ hưởng thụ ngắn hạn. Những gì bạn xây dựng trong tháng số 8 sẽ phục vụ bạn trong nhiều năm tới.`,
+        giaotiep: `<strong>${safeName}</strong> mang sức hút tự nhiên của người “thành công thực sự” trong tháng này. Người khác tôn trọng và muốn kết nối với bạn — không chỉ vì bạn vui vẻ hay thân thiện, mà vì họ cảm nhận được năng lực và uy quyền. Hãy dùng vị thế này để xây dựng những liên minh có giá trị — nhưng đừng để quyền lực biến thành sự cô lập.`,
+        hoctap: `Tháng số 8 ủng hộ việc học những kỹ năng liên quan đến quản lý, lãnh đạo, tài chính và xây dựng ảnh hưởng. <strong>${safeName}</strong> học tốt nhất trong giai đoạn này khi được áp dụng thực tiễn ngay — lý thuyết kết hợp với thực hành. Tham dự các hội thảo kinh doanh hoặc mentoring với người thành công hơn đều mang lại nhiều giá trị.`,
+        tongket: `Tháng số 8 kết thúc với câu hỏi quan trọng: <em>bạn đang dùng sức mạnh của mình để xây dựng gì — và ai sẽ được hưởng lợi từ điều đó?</em> Thịnh vượng thực sự của <strong>${safeName}</strong> không đến từ những gì bạn tích lũy cho chỉ một mình bạn — mà đến từ sức ảnh hưởng và giá trị bạn tạo ra cho người khác trong quá trình đó.`
+      },
+      9: {
+        energy: `Tháng cá nhân số <strong>9</strong> của <strong>${safeName}</strong> mang năng lượng của <em>sự hoàn thành, buông bỏ và chuẩn bị cho chu kỳ mới</em>. Đây là tháng cuối trong vòng 9 — và giá trị của nó là ở chỗ bạn có thể kết thúc thật tốt đẹp, không phải bắt đầu thật hùng hổ.`,
+        congviec: `<strong>${safeName}</strong> nên tập trung hoàn thành những gì còn dang dở và giải quyết triệt để những vấn đề tồn đọng trong công việc. Đây không phải lúc khởi động dự án lớn mới hay ký cam kết dài hạn quan trọng — những điều đó hãy chờ đến tháng số 1 tiếp theo. Tháng số 9 là lúc tổng kết, học bài học từ những gì đã qua và chuẩn bị tinh thần cho giai đoạn kế tiếp.`,
+        tinhyeu: `Trong tình cảm, tháng số 9 mang đến cho <strong>${safeName}</strong> cơ hội tha thứ và hàn gắn — với người khác và với chính mình. Những mâu thuẫn cũ nếu chưa được giải quyết sẽ nổi lên rõ hơn trong tháng này. Đây là lời mời để giải quyết chúng lần cuối trước khi bước sang chu kỳ mới. Một cuộc tình không lành mạnh cũng có thể đến hồi kết một cách tự nhiên.`,
+        taichinh: `Tháng số 9 không thích hợp cho những quyết định tài chính táo bạo — hãy để dành điều đó cho tháng số 1. <strong>${safeName}</strong> nên dùng tháng này để tổng kết tài chính, giải quyết các khoản nợ còn tồn đọng và đơn giản hóa các cam kết tài chính. Từ thiện và hào phóng với người khác trong tháng số 9 có giá trị đặc biệt — đây là cách tốt nhất để “đóng vòng” năng lượng tài chính.`,
+        giaotiep: `<strong>${safeName}</strong> sẽ tỏa ra sự sâu sắc và lòng trắc ẩn đặc biệt trong các mối quan hệ xã hội tháng này. Người ta cảm nhận được rằng bạn đã trải qua nhiều và hiểu cuộc đời theo cách khác — điều đó tạo ra sức hút khác biệt. Đây là tháng tốt để tha thứ những ai đã làm bạn tổn thương — không phải vì họ xứng đáng được tha, mà vì bạn xứng đáng được tự do.`,
+        hoctap: `Tháng số 9 thuận lợi cho việc học qua <em>phản chiếu và tổng kết</em>. <strong>${safeName}</strong> có thể viết lại những bài học lớn nhất của năm qua, đọc sách về nhân văn và triết học, hoặc tham gia các khóa học có chiều sâu tinh thần. Dạy lại những gì đã học — cho người khác hoặc qua viết lách — là cách học sâu nhất của tháng số 9.`,
+        tongket: `Tháng số 9 kết thúc một chu kỳ với thông điệp đẹp nhất: <em>mọi kết thúc đều là sự chuẩn bị cho một khởi đầu ở tầng cao hơn</em>. <strong>${safeName}</strong> không cần phải cảm thấy buồn khi một chương khép lại — hãy cảm ơn tất cả những gì đã diễn ra, cả tốt lẫn khó, rồi nhẹ nhàng bước qua ngưỡng cửa. Tháng số 1 đang chờ bạn phía trước.`
+      }
+    };
+
+    const c = content[n] || content[9];
+    const domains: Array<{ icon: string; label: string; key: keyof MonthDeepContent }> = [
+      { icon: '💼', label: 'Sự nghiệp & Công việc trong tháng này:', key: 'congviec' },
+      { icon: '💕', label: 'Tình yêu & Mối quan hệ trong tháng này:', key: 'tinhyeu' },
+      { icon: '💰', label: 'Tài chính trong tháng này:', key: 'taichinh' },
+      { icon: '🌟', label: 'Giao tiếp xã hội trong tháng này:', key: 'giaotiep' },
+      { icon: '🎓', label: 'Học tập & Phát triển bản thân trong tháng này:', key: 'hoctap' },
+      { icon: '💫', label: 'Tổng kết & Thông điệp tháng này:', key: 'tongket' },
+    ];
+    const domainsHtml = domains.map(d => c[d.key] ? `
+      <div class="year-domain-block">
+        <div class="domain-title">${d.icon} ${d.label}</div>
+        <p class="nar">${c[d.key]}</p>
+      </div>` : '').join('');
+
+    return `
+    <div class="month-detail-block">
+      <div class="month-detail-headline">CHỈ SỐ THÁNG ${label} CỦA BẠN LÀ: ${n}</div>
+      <p class="nar">${c.energy}</p>
+      ${domainsHtml}
+    </div>`;
 }
