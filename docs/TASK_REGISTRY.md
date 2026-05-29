@@ -2459,6 +2459,38 @@ Update khi xong:
 - Tình yêu & Hôn nhân gộp một card vì KB V1 không tách marriage riêng.
 - Verify đã chạy: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run qa:responsive-audit`.
 
+### T-0608 - Mechanical port V1 numerology details rendering
+
+Status: Done
+
+Bối cảnh:
+
+- T-0607b aspect cards làm details view xa output V1.
+- `/than-so-hoc/result/details` unlocked cần quay về essay literary flowing giống V1 `view-details`.
+
+Yêu cầu:
+
+- Copy V1 `app.js` vào `kb-private/numerology/app_v1_full.js` làm private reference, không commit.
+- Port synthesizer V1 sang TypeScript pure module trong `packages/shared/src/numerology/synthesizer.ts`.
+- Worker synthesize `sections` HTML server-side; Next proxy chỉ trả sections cho user unlocked.
+- FullReport render `SectionBlock[]`, bỏ aspect cards/chips/famous/keywords trong details unlocked.
+- Giữ summary dashboard, charts, auth/payment/voucher/free gating.
+
+Điều kiện Done:
+
+- `npm run kb:test-engine`, `npm run kb:test-charts`, `npm run kb:validate-narrative`, `npm run kb:validate`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*` hoặc `.env.local`.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-29: copy V1 `app.js` vào `kb-private/numerology/app_v1_full.js` làm private reference, file được gitignore.
+- Thêm `packages/shared/src/numerology/synthesizer.ts` pure function, trả `SectionBlock[]` gồm 6 section và 33+ indicator essay blocks.
+- Worker KB synthesize `sections` server-side khi request có `includeSections`.
+- Next proxy check entitlement trước khi gọi Worker; chỉ gửi `includeSections=true` và trả `report.sections` cho user đã unlock.
+- `FullReport` render V1-style essay sections, bỏ aspect cards/chips/famous/keywords trong details unlocked.
+- Free preview/details lock flow giữ nguyên: `FreeIndicatorSection`, `LockedGrid`, `MagneticCTA`, `StickyBottomCTA`.
+- Verify đã chạy: `kb:test-engine`, `kb:test-charts`, `kb:validate-narrative`, `kb:validate`, `kb:test-synthesizer`, `typecheck`, `lint`, `build`, `check`, `qa:responsive-audit`, Worker `tsc --noEmit`.
+
 ## Phase 7 - Tarot MVP Non-AI
 
 ### T-0701 - Chuẩn bị Tarot KB schema non-AI

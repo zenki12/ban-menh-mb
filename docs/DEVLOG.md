@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-29 10:22 +07 | T-0608 | V1-style numerology details synthesizer | `Task` |
 | 2026-05-29 00:34 +07 | T-0607b | Personality bars 2-col + 11 aspect cards | `Task` |
 | 2026-05-29 00:09 +07 | T-0607a | Fix V1 chart math + locked grid icons | `Task` |
 | 2026-05-28 23:52 +07 | T-0607 | Result summary dashboard + V1 charts | `Task` |
@@ -98,6 +99,46 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-29 10:22 +07] - T-0608: V1-style numerology details synthesizer
+
+**Loại:** `Task`
+**Ref:** T-0608
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Đưa details unlocked quay về dạng essay/section giống V1 thay vì aspect cards T-0607b; synthesize HTML ở Worker và chỉ trả sections cho user đã unlock qua Next proxy.
+
+### Thay đổi
+- Copy V1 `app.js` vào `kb-private/numerology/app_v1_full.js` làm private reference; file nằm trong gitignored `kb-private/`.
+- Thêm `packages/shared/src/numerology/synthesizer.ts`: pure function `buildSynthesizedReport({ report, narrative, kb })` trả `SectionBlock[]`.
+- Synthesizer tạo 6 section: overview, core, personality/attitude, lessons, time cycles, special marks; output 33+ indicator essay blocks.
+- Worker KB nhận `includeSections`; chỉ synthesize `report.sections` khi flag này bật.
+- Next proxy check entitlement trước khi gọi Worker; free user không nhận `report.sections`, unlocked user nhận sections.
+- `FullReport` render sections HTML trực tiếp; unlocked details không còn 11 aspect cards, traits chips, famous chips hoặc keywords chips.
+- CSS narrative bổ sung các class V1-style: `section-header`, `index-title`, `num-badge`, `profile-card`, `insight-box`, `synthetic-text`.
+- `security-smoke` bỏ qua thư mục local/private/tooling gitignored (`.agent`, `.agents`, `.kiro`, `_bmad`, `kb-private`) để không false-positive secret trong reference files không commit.
+
+### Verify
+- `npm.cmd run kb:test-engine` pass.
+- `npm.cmd run kb:test-charts` pass.
+- `npm.cmd run kb:validate-narrative` pass.
+- `npm.cmd run kb:validate` pass.
+- `npm.cmd run kb:test-synthesizer` pass: 3 cases, 6 sections, 34 indicator blocks.
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+- `npm.cmd run check` pass.
+- `npm.cmd run qa:responsive-audit` pass.
+- `npx.cmd tsc --noEmit` trong `workers/kb` pass.
+- File limit pass: `synthesizer.ts` 342 dòng, `FullReport.tsx` 64 dòng, `details/page.tsx` 195 dòng, `workers/kb/src/index.ts` 177 dòng.
+
+### Không làm / rủi ro còn lại
+- Chưa chạy browser Incognito DOB `15/08/1992` trong phiên này.
+- Chưa so byte-for-byte với V1 live/PDF bằng snapshot automated; `test-synthesizer` hiện verify shape/section/count/no-crash.
+- Không đổi summary dashboard, charts T-0607, auth/payment/voucher, KB/narrative content hoặc Tarot.
 
 ---
 

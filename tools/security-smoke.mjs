@@ -10,7 +10,17 @@ import {
 import path from "node:path";
 
 const rootDir = process.cwd();
-const ignoredDirs = new Set([".git", ".next", "node_modules"]);
+const ignoredDirs = new Set([
+  ".agent",
+  ".agents",
+  ".claude",
+  ".git",
+  ".kiro",
+  ".next",
+  "_bmad",
+  "kb-private",
+  "node_modules",
+]);
 const textExtensions = new Set([
   ".css",
   ".env",
