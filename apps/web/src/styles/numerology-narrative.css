@@ -194,6 +194,61 @@
   @apply text-[var(--bm-text-soft)];
 }
 
+.year-detail-block {
+  @apply my-6 rounded-xl border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.06)] p-5 shadow-[var(--bm-shadow-gold)];
+}
+
+.year-detail-headline {
+  @apply mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.1)] px-4 py-3;
+}
+
+.year-detail-label {
+  @apply text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.year-detail-subtitle {
+  @apply mb-4 text-base font-medium italic text-[var(--bm-primary-soft)];
+}
+
+.year-domain-block,
+.py-domain,
+.aspect-block {
+  @apply my-4 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-4;
+}
+
+.domain-title,
+.py-domain-title,
+.aspect-label {
+  @apply mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.py-domain-summary,
+.aspect-subtitle {
+  @apply mb-3 text-sm font-medium italic text-[var(--bm-primary-soft)];
+}
+
+.py-domain-body,
+.aspect-paragraph {
+  @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.py-year-block {
+  @apply my-6 rounded-xl border border-[var(--bm-border-gold)] bg-[var(--bm-bg-panel)] p-5 shadow-[var(--bm-shadow-gold)];
+}
+
+.py-year-header {
+  @apply mb-5 grid gap-3 rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.1)] px-4 py-3 text-center sm:grid-cols-3;
+}
+
+.py-year-label,
+.py-year-badge {
+  @apply text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.py-year-age {
+  @apply text-sm font-medium text-[var(--bm-text-soft)];
+}
+
 .cycle-circles-row {
   @apply my-6 grid gap-4 md:grid-cols-3;
 }

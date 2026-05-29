@@ -2525,6 +2525,36 @@ Update khi xong:
 - Verify đã chạy: `npm.cmd run kb:test-synthesizer`, `npm.cmd run kb:test-engine`, `npm.cmd run kb:test-charts`, `npm.cmd run kb:validate-narrative`, `npm.cmd run kb:validate`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run security:smoke`, `npm.cmd run build`, `npm.cmd exec --workspace workers/kb -- tsc --noEmit`.
 - Rủi ro còn lại: chưa port literal toàn bộ 1MB V1 narrative byte-for-byte; chưa chạy browser side-by-side trong phiên này.
 
+### T-0610c-year - Literal V1 personal year deep narrative
+
+Status: Done
+
+Bối cảnh:
+
+- T-0610 còn dùng bản rút gọn cho section 2 và section 8.
+- `/than-so-hoc/result/details` cần section "Phân tích chi tiết 3 năm tới" giống V1 PDF: banner năm/vận số/tuổi và 6 khía cạnh chi tiết.
+
+Yêu cầu:
+
+- Port literal `personalYearDeep` và `buildYearDomainBlock` từ `kb-private/numerology/narrative_v1_full.js`.
+- Section 2 dùng `buildYearDomainBlock` cho `personalYearsRange`.
+- Section 8 dùng `personalYearDeep`, không dùng `generic()` fallback.
+- Thêm CSS/component wrapper cho year card và aspect/domain block.
+
+Điều kiện Done:
+
+- `narrative-deep.ts` >= 600 dòng sau khi port.
+- Spot-check tối thiểu 5 chuỗi tiếng Việt từ V1 tồn tại trong file.
+- `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+
+Update khi xong:
+
+- Hoàn tất 2026-05-29: port literal `personalYearDeep` + `buildYearDomainBlock`; `narrative-deep.ts` hiện 612 dòng.
+- Section 2 đổi thành "Phân tích chi tiết 3 năm tới" và render 3 year cards bằng `buildYearDomainBlock`.
+- Section 8 và 8.1 render deep personal year HTML bằng `personalYearDeep`.
+- Thêm `YearCard`, `AspectBlock` và CSS cho `.py-year-block`, `.py-domain`, `.year-detail-block`, `.year-domain-block`.
+- Spot-check chuỗi V1: "Đây là năm lý tưởng để bắt đầu một dự án mới", "Xây nền tảng bền vững", "Làm tới đâu chắc chắn tới đó", "Tình yêu cần không gian tự do", "Tha thứ và buông bỏ".
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done

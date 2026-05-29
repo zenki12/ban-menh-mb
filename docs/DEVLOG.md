@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-05-29 17:48 +07 | T-0610c-year | Literal V1 personal year deep narrative | `Task` |
 | 2026-05-29 17:21 +07 | T-0610 | Mechanical port V1 web numerology details 4 phần | `Task` |
 | 2026-05-29 11:14 +07 | T-0609 | Port V1 pyramid + 3x3 numerology charts | `Task` |
 | 2026-05-29 10:22 +07 | T-0608 | V1-style numerology details synthesizer | `Task` |
@@ -101,6 +102,34 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-05-29 17:48 +07] - T-0610c-year: Literal V1 personal year deep narrative
+
+**Loại:** `Task`
+**Ref:** T-0610c-year
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal nội dung V1 cho section 2 và section 8 của báo cáo chi tiết: 3 năm tới và năm cá nhân chi tiết dùng HTML deep narrative thay vì fallback rút gọn.
+
+### Thay đổi
+- `personalYearDeep` và `buildYearDomainBlock` trong `narrative-deep.ts` được thay bằng bản port literal từ `narrative_v1_full.js`.
+- Section 2 đổi title thành "Phân tích chi tiết 3 năm tới" và loop `personalYearsRange` qua `buildYearDomainBlock`.
+- Section 8 và 8.1 dùng `personalYearDeep`, không dùng `generic()` cho nội dung năm cá nhân.
+- Thêm `YearCard` và `AspectBlock` trong nhóm component V1; output chính vẫn được synthesize server-side qua HTML.
+- CSS narrative bổ sung `.py-year-block`, `.py-domain`, `.year-detail-block`, `.year-domain-block` và các class subtitle/body tương ứng.
+
+### Verify
+- `narrative-deep.ts` hiện 612 dòng.
+- Spot-check 5 chuỗi V1 đã có trong file: "Đây là năm lý tưởng để bắt đầu một dự án mới", "Xây nền tảng bền vững", "Làm tới đâu chắc chắn tới đó", "Tình yêu cần không gian tự do", "Tha thứ và buông bỏ".
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Không làm
+- Không đụng engine calc, route/auth/payment/voucher/charts.
+- Không đổi free/lock gating hoặc summary dashboard.
+- Không ship raw KB/narrative ra client.
 
 ---
 

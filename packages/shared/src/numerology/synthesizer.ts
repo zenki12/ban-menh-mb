@@ -216,9 +216,9 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
         section("1", "Tổng hợp các chỉ số thần số học", overviewHtml(report, name)),
         section(
           "2",
-          "Chu kỳ vận số cá nhân",
+          "Phân tích chi tiết 3 năm tới",
           `<p class="nar">Biểu đồ vận số cá nhân cho thấy dòng năng lượng của các năm gần hiện tại. Phần dưới đây mở rộng 3 năm tới để bạn dễ định hướng.</p>${report.personalYearsRange
-            .map((item) => buildYearDomainBlock(item.number, item.year, item.age, name, item.data))
+            .map((item) => buildYearDomainBlock(item.number, item.year, item.age, name))
             .join("")}`,
         ),
         section("3", "Nhóm ngành nghề phù hợp", careerHtml(report, name)),
@@ -238,8 +238,8 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
             .join("")}`,
           { chartSlot: "pyramid" },
         ),
-        section("8", "Chỉ số Năm Cá Nhân", personalPeriod("Năm", report.personalYear.number, report.personalYear.year, name, report.personalYear.data)),
-        section("8.1", "Chu Kỳ Vận Số — Phân Tích Chi Tiết 3 Năm", report.personalYearsRange.map((item) => personalYearDeep(item, name)).join("")),
+        section("8", "Chỉ số Năm Cá Nhân", personalYearDeep(report.personalYear.number, report.personalYear.year, name)),
+        section("8.1", "Chu Kỳ Vận Số — Phân Tích Chi Tiết 3 Năm", report.personalYearsRange.map((item) => personalYearDeep(item.number, item.year, name)).join("")),
         section("9", "Chỉ số Tháng Cá Nhân", personalPeriod(`Tháng ${report.personalMonth.month}`, report.personalMonth.number, `${report.personalMonth.month}/${report.personalYear.year}`, name, report.personalMonth.data)),
         section("9.1", "Chỉ Số Các Tháng — Phân Tích 3 Tháng", report.personalMonthsRange.map((item) => personalMonthDeep(item, name)).join("")),
       ],
