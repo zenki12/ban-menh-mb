@@ -1,6 +1,7 @@
 import type { NarrativeKb, NumerologyKb } from "../schemas/numerology-kb";
 import {
   buildLifeCyclesSection,
+  buildPersonalYearFullBlock,
   buildPyramidSection,
   buildYearDomainBlock,
   destinyCtxBlock,
@@ -11,7 +12,6 @@ import {
   maturityCtxBlock,
   personalMonthDeep,
   personalPeriod,
-  personalYearDeep,
   personalityCtxBlock,
   readString,
   renderLifePathExtra,
@@ -246,8 +246,28 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
           buildPyramidSection(report, name, narrative),
           { chartSlot: "pyramid" },
         ),
-        section("8", "Chỉ số Năm Cá Nhân", personalYearDeep(report.personalYear.number, report.personalYear.year, name)),
-        section("8.1", "Chu Kỳ Vận Số — Phân Tích Chi Tiết 3 Năm", report.personalYearsRange.map((item) => personalYearDeep(item.number, item.year, name)).join("")),
+        section(
+          "8",
+          "Chỉ số Năm Cá Nhân",
+          `<p class="nar"><strong>Năm Cá Nhân ${report.personalYear.number}</strong> — ${escapeHtml(readString(report.personalYear.data, ["title"]))} (${report.personalYear.year})</p>` +
+            personalPeriod("Năm", report.personalYear.number, report.personalYear.year, name, report.personalYear.data),
+        ),
+        section(
+          "8.1",
+          "Chu Kỳ Vận Số — Phân Tích Chi Tiết 3 Năm",
+          `<p class="nar" style="font-style:italic;">Mỗi năm trong cuộc đời bạn mang một con số cá nhân riêng biệt, lặp lại theo vòng 9 năm. Những con số này cho biết luồng năng lượng chủ đạo của năm đó — ảnh hưởng toàn diện đến sự nghiệp, tài chính, tình yêu, sức khỏe và các mối quan hệ xã hội. Hiểu và đi theo luồng năng lượng này giúp bạn hành động đúng thời điểm và tránh đi ngược lại dòng chảy tự nhiên.</p>` +
+            `<div class="year-cards-grid">` +
+            report.personalYearsRange
+              .map(
+                (item) =>
+                  `<div class="year-card-tab"><div class="year-card-label">NĂM ${item.year}</div><div class="year-card-num">${item.number}</div><div class="year-card-age">${item.year - report.input.dobParts.year} tuổi</div></div>`,
+              )
+              .join("") +
+            `</div>` +
+            report.personalYearsRange
+              .map((item, idx) => buildPersonalYearFullBlock(item.number, item.year, item.year - report.input.dobParts.year, name, idx + 1))
+              .join(""),
+        ),
         section("9", "Chỉ số Tháng Cá Nhân", personalPeriod(`Tháng ${report.personalMonth.month}`, report.personalMonth.number, `${report.personalMonth.month}/${report.personalYear.year}`, name, report.personalMonth.data)),
         section("9.1", "Chỉ Số Các Tháng — Phân Tích 3 Tháng", report.personalMonthsRange.map((item) => personalMonthDeep(item, name)).join("")),
       ],

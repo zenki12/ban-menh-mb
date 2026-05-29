@@ -1,32 +1,68 @@
-﻿import type { IndicatorResult } from "../report";
-import { escapeHtml, readString } from "./common";
+import type { IndicatorResult } from "../report";
+import { escapeHtml } from "./common";
+
+export type PersonalPeriodKbData = {
+  theme?: string;
+  description?: string;
+  meaning?: string;
+  focus?: string;
+  opportunities?: string;
+  challenges?: string;
+  advice?: string;
+};
 
 export function personalPeriod(
   label: string,
   num: number,
   yearOrMonth: string | number,
   name: string,
-  kbData: unknown,
+  kbData?: PersonalPeriodKbData | unknown,
 ): string {
-  const title = readString(kbData, ["title", "theme"]) || `${label} cá nhân ${num}`;
-  const fields = [
-    ["Chủ đề chính", readString(kbData, ["theme", "focus"])],
-    ["Sự nghiệp", readString(kbData, ["career", "action"])],
-    ["Tài chính", readString(kbData, ["finance"])],
-    ["Tình yêu & quan hệ", readString(kbData, ["love", "relationship"])],
-    ["Sức khỏe & năng lượng", readString(kbData, ["health"])],
-    ["Lời khuyên", readString(kbData, ["advice", "warning", "avoid"])],
-  ].filter((item): item is [string, string] => Boolean(item[1]));
+    const d = kbData as PersonalPeriodKbData | undefined;
+    const safeLabel = escapeHtml(label);
+    const safeYearOrMonth = escapeHtml(String(yearOrMonth));
+    const safeName = escapeHtml(name);
+    const numMeta: Record<number, { icon: string; theme: string; energy: string; dos: string; donts: string }> = {
+      1: { icon: '🌱', theme: 'Khởi đầu & Tiên phong', energy: `Đây là thời điểm vũ trụ trao cho <strong>${safeName}</strong> một trang trắng tinh khôi. Năng lượng số 1 thúc đẩy bạn hành động, khởi xướng và dứt khoát. Mọi thứ bạn gieo hạt trong giai đoạn này sẽ định hình cả chu kỳ 9 năm hoặc 9 tháng tiếp theo.`, dos: 'Bắt đầu dự án mới, thể hiện bản thân, đưa ra quyết định táo bạo, tự học kỹ năng mới', donts: 'Trì hoãn, phụ thuộc vào người khác để ra quyết định' },
+      2: { icon: '🤝', theme: 'Hợp tác & Kiên nhẫn', energy: `Giai đoạn này dành cho sự kết nối và lắng nghe. Năng lượng số 2 yêu cầu <strong>${safeName}</strong> phải chậm lại, quan tâm đến người khác và xây dựng những cây cầu kết nối. Đây không phải thời điểm của hành động ồ ạt — mà là thời điểm của sự kiên nhẫn chiến lược.`, dos: 'Xây dựng và củng cố mối quan hệ, lắng nghe sâu, chiến lược dài hạn, chăm sóc sức khỏe', donts: 'Hấp tấp, cưỡng cầu, đối đầu không cần thiết' },
+      3: { icon: '✨', theme: 'Sáng tạo & Biểu đạt', energy: `Đây là mùa xuân của cuộc đời. Năng lượng số 3 mang đến cho <strong>${safeName}</strong> nguồn cảm hứng sáng tạo và khát khao biểu đạt bản thân. Giao lưu, học hỏi, thử những điều mới — tất cả đều được universe ủng hộ trong giai đoạn này.`, dos: 'Sáng tạo, kết nối xã hội, học kỹ năng mới, du lịch, viết lách, âm nhạc, nghệ thuật', donts: 'Phân tán năng lượng, bỏ cuộc giữa chừng' },
+      4: { icon: '🏗️', theme: 'Xây dựng & Kỷ luật', energy: `Thực tế và kỷ luật là từ khóa của giai đoạn này. Năng lượng số 4 yêu cầu <strong>${safeName}</strong> xây dựng nền tảng vững chắc — trong công việc, tài chính, sức khỏe và các mối quan hệ. Không phải thời điểm hào nhoáng, nhưng là thời điểm tạo ra sự khác biệt thực sự.`, dos: 'Lập kế hoạch chi tiết, tiết kiệm, chăm sóc sức khỏe, hoàn thiện kỹ năng, tổ chức lại cuộc sống', donts: 'Trì hoãn, chi tiêu bốc đồng, bỏ qua chi tiết' },
+      5: { icon: '🌊', theme: 'Thay đổi & Tự do', energy: `Những bất ngờ và cơ hội mới đang ở ngưỡng cửa. Năng lượng số 5 mang đến cho <strong>${safeName}</strong> làn gió của sự thay đổi — đôi khi được lên kế hoạch, đôi khi hoàn toàn bất ngờ. Hãy giữ sự linh hoạt và sẵn sàng cho những cánh cửa mà bạn chưa từng nghĩ đến.`, dos: 'Đón nhận thay đổi, thử nghiệm, mở rộng kết nối, du lịch, học thêm', donts: 'Cứng nhắc, sợ thay đổi, cam kết vội vàng' },
+      6: { icon: '💗', theme: 'Tình yêu & Trách nhiệm', energy: `Gia đình và các mối quan hệ thân thiết đòi hỏi sự chú ý đặc biệt trong giai đoạn này. Năng lượng số 6 mời <strong>${safeName}</strong> quay về với những gì thực sự quan trọng — không phải thành công bên ngoài, mà là chất lượng của những kết nối bên trong.`, dos: 'Chăm sóc gia đình, hàn gắn mối quan hệ, tạo môi trường sống tốt đẹp hơn, phục vụ cộng đồng', donts: 'Bỏ qua gia đình, ôm đồm trách nhiệm không phải của mình' },
+      7: { icon: '🔮', theme: 'Nội tâm & Tâm linh', energy: `Đây là năm/tháng của sự tự vấn và chiều sâu. Năng lượng số 7 dẫn <strong>${safeName}</strong> về với nội tâm — học hỏi, nghiên cứu, thiền định và lắng nghe những thông điệp từ bên trong. Nghỉ ngơi và tiếp nạp là những hành động tiến bộ trong giai đoạn này.`, dos: 'Meditation, học hỏi chuyên sâu, viết nhật ký, đọc sách, nghỉ ngơi có chủ đích', donts: 'Ép buộc hành động bên ngoài, bỏ qua trực giác, so sánh bản thân với người khác' },
+      8: { icon: '👑', theme: 'Quyền lực & Thịnh vượng', energy: `Năng lượng số 8 đang chiếu sáng con đường thành công và thịnh vượng cho <strong>${safeName}</strong>. Đây là thời điểm để thu hoạch những gì đã gieo, đàm phán, mở rộng và khẳng định vị thế của mình. Tiền bạc và cơ hội đang sẵn sàng — vấn đề là bạn có đủ can đảm để đón nhận hay không.`, dos: 'Đàm phán và ký kết hợp đồng, đầu tư, mở rộng sự nghiệp, yêu cầu mức lương xứng đáng', donts: 'Từ chối cơ hội vì sợ thất bại, chi tiêu liều lĩnh' },
+      9: { icon: '🦋', theme: 'Hoàn thành & Buông bỏ', energy: `Một chương quan trọng đang khép lại. Năng lượng số 9 mời <strong>${safeName}</strong> nhìn lại, cảm ơn và buông bỏ những gì không còn phục vụ hành trình của mình nữa. Đây là giai đoạn giải phóng sâu sắc — và nếu được thực hiện đúng cách, sẽ mở ra không gian cho một khởi đầu hoàn toàn mới.`, dos: 'Tổng kết, từ thiện, buông bỏ mối quan hệ/công việc cũ không còn phù hợp, du lịch dài ngày', donts: 'Bắt đầu dự án mới lớn, cưỡng cầu giữ lại những gì đã hết vai trò' }
+    };
 
-  return [
-    `<p class="nar"><strong>${escapeHtml(label)} ${escapeHtml(String(yearOrMonth))}</strong> của <strong>${escapeHtml(name)}</strong> mang vận số <strong>${num}</strong> — ${escapeHtml(title)}.</p>`,
-    `<div class="lc-advice-grid">${fields
-      .map(
-        ([field, text]) =>
-          `<div class="lc-advice-item"><div class="lc-advice-label">${escapeHtml(field)}</div><div class="lc-advice-text">${escapeHtml(text)}</div></div>`,
-      )
-      .join("")}</div>`,
-  ].join("");
+    const meta = numMeta[num] || numMeta[num % 9 || 9];
+
+    let txt = `
+    <div class="personal-year-card">
+      <div class="py-icon">${meta?.icon || '⭐'}</div>
+      <div class="py-content">
+        <div class="py-title">${safeLabel} <strong>${safeYearOrMonth}</strong> của <strong>${safeName}</strong></div>
+        <div class="py-num-badge">${num}</div>
+        <div class="py-theme">${meta?.theme || ''}</div>
+      </div>
+    </div>`;
+
+    txt += `<p class="nar">${meta?.energy || ''}</p>`;
+
+    if (d?.description || d?.theme || d?.meaning) {
+      txt += `<p class="nar">${d.description || d.theme || d.meaning}</p>`;
+    }
+    if (d?.focus) txt += `<p class="nar"><strong>✦ Trọng tâm cần hướng đến:</strong> ${d.focus}</p>`;
+    if (d?.opportunities) txt += `<p class="nar"><strong>✦ Cơ hội đang mở ra:</strong> ${d.opportunities}</p>`;
+    if (d?.challenges) txt += `<p class="nar"><strong>✦ Thử thách cần vượt qua:</strong> ${d.challenges}</p>`;
+
+    if (meta?.dos || meta?.donts) {
+      txt += `<div class="dos-donts-grid">
+        <div class="dos-block"><strong>✅ Nên làm:</strong><br>${meta.dos}</div>
+        <div class="donts-block"><strong>❌ Tránh:</strong><br>${meta.donts}</div>
+      </div>`;
+    }
+    if (d?.advice) txt += `<div class="insight-box">💡 <strong>Lời khuyên đặc biệt:</strong> ${d.advice}</div>`;
+    return txt;
 }
 
 const PERSONAL_YEAR_DOMAINS: Record<number, (name: string, year: string, age: string) => Record<string, string>> = {
@@ -286,28 +322,25 @@ const PERSONAL_YEAR_DOMAINS: Record<number, (name: string, year: string, age: st
     }),
   }
 
-  // Gọi: NT.personalYearDeep(num, year, name)
-  // ════════════════════════════════════════════════════════════════════
+  export type YearDeepContent = {
+  title: string;
+  subtitle: string;
+  intro: string;
+  congviec: string;
+  quanhe: string;
+  suckhoe: string;
+  taichinhthanhoc?: string;
+  taichinhthanhhoc?: string;
+  taichinhhoatap?: string;
+  banthan: string;
+  tonket: string;
+};
+
 export function personalYearDeep(num: number, year: number, name: string): string {
     const safeName = escapeHtml(name);
     const safeYear = escapeHtml(String(year));
     const n = num % 9 || 9;
-    const content: Record<
-      number,
-      {
-        [key: string]: string | undefined;
-        title: string;
-        subtitle: string;
-        intro: string;
-        congviec: string;
-        quanhe: string;
-        suckhoe: string;
-        taichinhthanhoc?: string;
-        taichinhhoatap?: string;
-        banthan: string;
-        tonket: string;
-      }
-    > = {
+    const content: Record<number, YearDeepContent> = {
       1: {
         title: 'Khởi đầu mới &amp; Tiên phong',
         subtitle: 'Năm của những bước đột phá và khởi đầu',
@@ -439,7 +472,238 @@ export function personalYearDeep(num: number, year: number, name: string): strin
       </div>
       <div class="insight-box" style="margin-top:1rem;">📌 <strong>Tóm lại:</strong> ${c.tonket}</div>
     </div> `;
+}
+
+
+function yearContent(num: number, name: string): Omit<YearDeepContent, "title" | "subtitle" | "intro"> {
+    const safeName = escapeHtml(name);
+    const n = num % 9 || 9;
+    const YEAR_DATA: Record<number, Omit<YearDeepContent, "title" | "subtitle" | "intro">> = {
+      1: {
+        congviec: `Đây là năm lý tưởng để bắt đầu một dự án mới, thay đổi hướng đi sự nghiệp hoặc khởi động doanh nghiệp riêng.Năng lượng số 1 ủng hộ sự tự lập và dám nghĩ dám làm.Nếu bạn có ý tưởng đã nung nấu lâu nay, đây là thời điểm thực hiện nó.Hãy đặt mục tiêu cụ thể cho 12 tháng tới và bắt đầu từ bước nhỏ nhất ngay hôm nay.Tránh để người khác quyết định thay bạn trong những vấn đề quan trọng với sự nghiệp.\n\nTuy nhiên, hãy cẩn thận không để tính độc lập trở thành sự cứng đầu.Hợp tác vẫn cần thiết nhưng hãy đảm bảo bạn đang chọn người cộng tác đúng đắn — người phù hợp với tầm nhìn của bạn.`,
+        quanhe: `Trong các mối quan hệ, bạn có thể cảm thấy cần không gian và sự độc lập hơn thường lệ.Đây là điều bình thường với năng lượng số 1. Tuy nhiên, hãy cẩn thận không để sự tự lập trở thành cô lập.Các mối quan hệ bắt đầu trong năm này thường mang năng lượng mạnh mẽ và định hình lại con người bạn.\n\nNếu đang trong mối quan hệ, đây là năm để tái định nghĩa vai trò của bạn trong đó — theo hướng lành mạnh và trưởng thành hơn.Hãy nói ra những điều bạn thực sự muốn thay vì chờ đợi người kia tự hiểu.`,
+        taichinhthanhoc: `Về tài chính, đây là năm tốt để bắt đầu những kế hoạch đầu tư mới và tạo ra nguồn thu nhập mới.Tuy nhiên, hãy hành động với sự chuẩn bị kỹ lưỡng thay vì bốc đồng.Đây cũng là năm để học một kỹ năng tài chính mới: đọc báo cáo, hiểu về đầu tư, hoặc tạo quỹ khẩn cấp cá nhân.\n\nHãy xây dựng ngân sách rõ ràng và bám sát kế hoạch chi tiêu.Các khoản tiết kiệm bắt đầu trong năm này sẽ có hiệu quả kép trong vài năm tới.`,
+        banthan: `Đây là năm của sự tự khám phá sâu sắc.Hãy dành thời gian định nghĩa lại: bạn muốn trở thành ai trong chu kỳ 9 năm tiếp theo ? Những quyết định bạn đưa ra năm nay sẽ định hướng cả một giai đoạn dài của cuộc đời.\n\nHãy mở rộng mạng lưới quan hệ một cách có chủ đích.Tìm kiếm những người có thể truyền cảm hứng và kết nối bạn với cơ hội mới.Đồng thời, hãy sẵn sàng buông bỏ những mối quan hệ không còn phù hợp với con người bạn đang trở thành.`,
+        suckhoe: `Sức khỏe năm nay có xu hướng tốt nếu bạn duy trì năng lượng một cách có kỷ luật.Hãy bắt đầu một thói quen tập luyện mới, điều chỉnh chế độ ăn uống hoặc cải thiện giấc ngủ.Tránh kiệt sức do làm việc quá sức — đây là nguy cơ phổ biến với năng lượng số 1.\n\nDành thời gian cho bản thân học điều mới là đầu tư thông minh nhất trong năm 1. Bạn có tinh thần học hỏi rất cao — hãy tận dụng điều này để nâng cao năng lực.`,
+        tonket: `Thành công của <strong>${safeName}</strong> trong năm này không được đo bằng những gì người khác nhìn thấy — mà bằng mức độ bạn đã dám là chính mình. Năm số 1 trao cho bạn một đặc ân hiếm có: trang giấy trắng. Được viết lại, được chọn lại, được bắt đầu không phải từ con số không — mà từ tất cả những gì bạn đã tích lũy.
+
+Hãy nhớ rằng: mọi bước đi lớn đều bắt đầu từ một quyết định nhỏ được đưa ra trong im lặng. <strong>${safeName}</strong> đang ở ngay tại giao lộ đó. Những gì bạn chọn trong năm này — dù lớn hay nhỏ — đều mang năng lượng của người tiênen phong. Không phải ai cũng có cơ hội này. Hãy trân trọng nó.
+
+Năm số 1 sẽ đi qua — nhưng những cánh cửa bạn mở ra trong năm này sẽ ở lại rất lâu. Hãy dũng cảm bước qua chúng.`,
+      },
+      2: {
+        congviec: `Năm 2 là năm của sự hợp tác và xây dựng mối quan hệ nghề nghiệp.Đây không phải thời điểm tốt để hành động đơn độc — hãy tìm kiếm đối tác, cộng sự và người cố vấn.Những kết nối bạn xây dựng năm nay sẽ mang lại quả ngọt trong tương lai.\n\nHãy kiên nhẫn với tiến độ công việc — số 2 không ủng hộ sự vội vàng.Tập trung vào việc cải thiện kỹ năng giao tiếp và lắng nghe.Đây là năm để làm nền tảng, không phải để thu hoạch lớn.`,
+        quanhe: `Đây là năm lý tưởng cho các mối quan hệ — tình yêu, gia đình và bạn bè đều cần được chú tâm.Năng lượng số 2 tăng cường sự nhạy cảm cảm xúc, giúp bạn hiểu người khác sâu sắc hơn.\n\nNếu đang tìm kiếm tình yêu, bạn có thể gặp người quan trọng trong năm này.Nếu đang trong mối quan hệ, đây là thời điểm để củng cố và làm sâu sắc thêm sự gắn kết.Hãy thể hiện sự quan tâm qua hành động nhỏ hàng ngày.`,
+        taichinhthanhoc: `Tài chính năm 2 thường ổn định nhưng không có đột phá lớn.Đây là thời điểm tốt để tiết kiệm và tránh các khoản đầu tư rủi ro cao.Hãy tập trung vào việc thanh toán các khoản nợ hiện tại và xây dựng quỹ dự phòng.\n\nCác quyết định tài chính quan trọng nên được thảo luận kỹ với người có chuyên môn hoặc người bạn tin tưởng thay vì quyết định một mình.`,
+        banthan: `Năm 2 là năm để xây dựng và duy trì các mối quan hệ xã hội có chiều sâu.Thay vì mở rộng số lượng, hãy tập trung vào chất lượng.Dành thời gian cho những người thực sự quan trọng với bạn.\n\nHãy tham gia các nhóm cộng đồng hoặc câu lạc bộ phù hợp với sở thích.Sự kết nối xã hội sẽ mang lại cho bạn cảm giác an toàn và được hỗ trợ trong suốt năm này.`,
+        suckhoe: `Sức khỏe cần được chú ý đặc biệt về mặt cảm xúc và tinh thần.Năng lượng số 2 làm tăng nhạy cảm — hãy học cách bảo vệ năng lượng bản thân trước các tình huống căng thẳng.\n\nNăm 2 là thời điểm tốt để học các kỹ năng tự nhận thức và quản lý cảm xúc.Thiền định, yoga hoặc ghi nhật ký có thể giúp bạn duy trì cân bằng tâm lý.`,
+        tonket: `Năm số 2 dạy <strong>${safeName}</strong> một bài học mà xã hội hiện đại thường quên mất: không phải mọi thứ đều cần được đẩy nhanh. Đôi khi, đi chậm là cách đi xa nhất. Hãy để những kết nối bạn gây dựng trong năm này được tưới tắm bằng sự kiên nhẫn và chân thành.
+
+Thành công thực sự của năm 2 không nằm ở những gì bạn đạt được một mình — mà ở những mối quan hệ được củng cố, những hạt giống hợp tác được gieo xuống, và những cuộc đối thoại chân thực được mở ra. Nốu đo được những điều này, bạn sẽ thấy năm này giàu có hơn bất kỳ năm nào.
+
+<strong>${safeName}</strong>, hãy kết thúc năm 2 với câu hỏi: <em>"Ai trong cuộc đời mình đang cần mình hơn mình nghĩ?"</em> Rồi hãy thực hiện đớu nhỏ nhất vào ngày mai.`,
+      },
+      3: {
+        congviec: `Năm 3 là năm của sự sáng tạo và biểu đạt trong sự nghiệp.Hãy để bản thân được tỏa sáng — trình bày ý tưởng, đề xuất dự án mới và không ngại thể hiện tài năng.Đây là thời điểm lý tưởng cho các ngành nghề liên quan đến nghệ thuật, truyền thông và giao tiếp.\n\nNăm 3 ủng hộ sự mở rộng và phát triển — hãy nắm bắt cơ hội mới, tham gia sự kiện ngành và kết nối với những người có thể mở ra cánh cửa mới cho sự nghiệp.`,
+        quanhe: `Sức hút xã hội của bạn đạt đỉnh cao trong năm 3. Đây là năm lý tưởng để gặp gỡ người mới, mở rộng vòng tròn quan hệ và tạo ra những kỷ niệm đáng nhớ.\n\nTrong tình yêu, năng lượng lãng mạn và tự nhiên của năm 3 tạo nên những khoảnh khắc đặc biệt.Hãy thể hiện tình cảm một cách sáng tạo và đừng ngại những cử chỉ lãng mạn bất ngờ.`,
+        taichinhthanhoc: `Tài chính có xu hướng tích cực trong năm 3 nhưng cần kiểm soát chi tiêu — năng lượng phong phú của năm này dễ dẫn đến việc tiêu xài hoang phí.Hãy dành một phần thu nhập cho những trải nghiệm có giá trị thay vì chỉ vật dụng.\n\nCác cơ hội thu nhập bổ sung có thể đến qua các dự án sáng tạo, viết lách hoặc các hoạt động nghệ thuật.Hãy mở mắt với những nguồn thu nhập không truyền thống.`,
+        banthan: `Đây là năm bạn tỏa sáng nhất trong các tương tác xã hội.Năng lượng vui vẻ, lạc quan và hài hước tự nhiên thu hút mọi người đến với bạn.\n\nHãy tham gia các sự kiện xã hội, câu lạc bộ và nhóm cộng đồng.Chia sẻ tài năng và niềm vui với người khác — đây là cách bạn tạo ra tác động lớn nhất trong năm này.`,
+        suckhoe: `Sức khỏe nhìn chung tốt trong năm 3 với nhiều năng lượng và niềm vui.Hãy tận dụng sức sống này cho các hoạt động thể chất vui vẻ như nhảy, bơi lội hoặc thể thao nhóm.\n\nNăm 3 là thời điểm tốt để học bất cứ điều gì khơi dậy niềm vui và sự tò mò.Các khóa học ngắn hạn, hội thảo hoặc chương trình đào tạo mới sẽ mang lại nhiều điều thú vị.`,
+        tonket: `Năm số 3 nhắc nhở <strong>${safeName}</strong> rằng — bạn có một món quà mà nhiều người khác trân trọng khi thấy bạn dũng cảm đem ra: đó là khả năng mang lại ánh sáng. Hãy để mình được vui, được sáng tạo, và được nói thật cảm xúc của mình theo cách chân thực nhất.
+
+Đây là năm để trả lời câu hỏi: <em>"Nếu không có ai phán xét, mình sẽ làm gì?"</em> Rồi hãy thực sự làm điều đó. Những gì <strong>${safeName}</strong> tạo ra, biểu đạt và chia sẻ trong năm 3 đều có tiềm năng lan toả xa hơn bạn tưởng.
+
+Hãy kết năm 3 không phải bằng câu hỏi <em>"Mình đã đạt được gì?"</em> mà bằng câu hỏi <em>"Mình đã cho đi được gì?"</em> Đó mới là thước đo đích thực của một năm số 3 thành công.`,
+      },
+      4: {
+        congviec: `Năm 4 là năm của sự xây dựng nền tảng vững chắc trong sự nghiệp.Đây không phải lúc để mơ mộng mà là lúc để lên kế hoạch cụ thể và thực thi từng bước.Mọi nỗ lực kiên trì trong năm này sẽ tạo ra kết quả bền vững.\n\nHãy tập trung vào việc hoàn thiện kỹ năng chuyên môn, cải thiện quy trình làm việc và xây dựng uy tín nghề nghiệp.Đây là năm để trở thành chuyên gia đáng tin cậy trong lĩnh vực của mình.`,
+        quanhe: `Trong tình yêu và các mối quan hệ, năm 4 đòi hỏi sự ổn định và cam kết thực sự.Đây là thời điểm tốt để định nghĩa rõ ràng về tương lai của mối quan hệ — nếu đang tìm kiếm, hãy tập trung vào sự tương thích lâu dài thay vì cảm xúc nhất thời.\n\nNếu đang trong mối quan hệ, hãy xây dựng những thói quen tốt cùng nhau — từ quản lý tài chính đến các kế hoạch chung dài hạn.`,
+        taichinhthanhoc: `Đây là năm lý tưởng để xây dựng nền tảng tài chính vững chắc.Hãy lập ngân sách chi tiết, tạo quỹ khẩn cấp và bắt đầu các khoản đầu tư dài hạn an toàn.\n\nTránh các quyết định tài chính rủi ro hoặc vay mượn không cần thiết.Kỷ luật tài chính trong năm 4 sẽ mang lại an toàn lâu dài cho bạn.`,
+        banthan: `Năm 4 có thể cảm thấy ít sôi nổi về mặt xã hội hơn các năm khác, nhưng đây là thời điểm để xây dựng những mối quan hệ có chiều sâu thực sự.\n\nHãy tập trung vào những người thực sự hiểu và hỗ trợ bạn.Chất lượng quan trọng hơn số lượng trong năm này.`,
+        suckhoe: `Sức khỏe cần được chú trọng thông qua thói quen ổn định và kỷ luật.Đây là năm tốt để thiết lập một chế độ tập luyện đều đặn, ăn uống lành mạnh và ngủ đủ giấc.\n\nNăm 4 là năm để học những kỹ năng thực tiễn và kỹ thuật — các khóa học cấp chứng chỉ hoặc đào tạo chuyên sâu sẽ rất có giá trị.`,
+        tonket: `<strong>${safeName}</strong> có thể cảm thấy năm số 4 không có nhiều ánh đèn sân khấu — và đúng là như vậy. Năm 4 là năm của hậu trường: nơi những cột trụ vô hình được dựng lên, những hệ thống được xây dựng, và những thói quen sẽ định hình cả một thập kỷ sắp tới. Đừng đánh giá thấp những năm này.
+
+Mọi tòa nhà lớn đều có một giai đoạn đào móng — không ai chụp ảnh giai đoạn đó, nhưng không có nó thì không có gì cả được xây lên. <strong>${safeName}</strong> đang ở trong giai đoạn đó. Hãy làm việc với sự kiên nhẫn và tự hào — vì chính bạn biết giá trị của từng viên đá mình đang đặt xuống.
+
+Hãy kết năm 4 bằng một câu hỏi: <em>"Mình đã xây được những gì sẽ ở lại sau khi mình không còn ở đó nữa?"</em> Câu trả lời sẽ cho bạn thấy năm này có ý nghĩa lớn thế nào.`,
+      },
+      5: {
+        congviec: `Năm 5 mang đến những thay đổi lớn và cơ hội bất ngờ trong sự nghiệp.Hãy chuẩn bị tinh thần đón nhận sự thay đổi — đây có thể là thay đổi công việc, vị trí hoặc hướng đi hoàn toàn mới.\n\nNăm 5 ủng hộ sự linh hoạt và khả năng thích nghi.Đừng bám víu vào những gì không còn phù hợp.Hãy mở lòng với những cơ hội mà bạn trước đây chưa từng xem xét.`,
+        quanhe: `Trong tình yêu, năm 5 mang đến sự hấp dẫn và phiêu lưu.Bạn có thể gặp những người thú vị và đa dạng.Tuy nhiên, hãy cẩn thận với việc theo đuổi sự mới lạ mà bỏ qua sự ổn định cần thiết.\n\nNếu đang trong mối quan hệ, hãy mang lại sự tươi mới và hứng thú — cùng nhau thử những điều mới, du lịch hoặc tạo ra những trải nghiệm chưa từng có.`,
+        taichinhthanhoc: `Tài chính trong năm 5 có thể không ổn định — thu nhập và chi tiêu đều có thể dao động.Hãy chuẩn bị quỹ dự phòng đủ lớn để đối phó với những bất ngờ.\n\nCó thể xuất hiện các cơ hội kiếm tiền từ những hoạt động mới và bất ngờ.Hãy cởi mở nhưng đừng đặt cược tất cả vào những cơ hội chưa được kiểm chứng.`,
+        banthan: `Đây là năm bạn kết nối được với những người rất đa dạng từ nhiều lĩnh vực và văn hóa khác nhau.Mạng lưới quan hệ của bạn có thể mở rộng đáng kể trong năm 5.\n\nHãy tận dụng sự hấp dẫn tự nhiên và khả năng giao tiếp trong năm này để xây dựng những mối quan hệ có thể mở ra cơ hội trong tương lai.`,
+        suckhoe: `Sức khỏe có thể bị ảnh hưởng bởi sự thay đổi quá nhiều và căng thẳng do biến động.Hãy duy trì thói quen lành mạnh cơ bản ngay cả khi mọi thứ xung quanh thay đổi.\n\nNăm 5 là thời điểm tốt để học bằng cách trải nghiệm thực tế — các chuyến đi học hỏi, thực tập hoặc làm việc trong môi trường mới sẽ rất có giá trị.`,
+        tonket: `Nếu có một từ để tóm gọn năm số 5 của <strong>${safeName}</strong>, đó là: <em>thích nghi</em>. Không phải ai cũng có thể đứng vững giữa sóng gió mà không bị cuốn trôi. Nhưng bạn có thể học được cách đó. Và đó chính là hành trang quý giá nhất mà năm 5 dành tặng cho bạn.
+
+Hãy nhìn lại những thay đổi trong năm này — cả những thứ bạn chọn và những thứ ập đến mà không báo trước. Điều gì trong số đó đã dạy cho <strong>${safeName}</strong> về sức mạnh thực sự của mình? Đó là câu trả lời bạn sẽ mang theo suốt cả phần đời còn lại.
+
+Năm 5 có thể đã xào trộn cuộc sống của bạn. Nhưng giữa tất cả sự xao động đó, hãy tìm xem: điều gì đã tọn tại qua tất cả? Đứa con người thực sự của <strong>${safeName}</strong> — vẫn ở đó, vẫn vững vàng hơn bước vào.`,
+      },
+      6: {
+        congviec: `Năm 6 là năm của trách nhiệm và phục vụ trong sự nghiệp.Đây là thời điểm để thể hiện vai trò lãnh đạo có tâm — không chỉ đạt kết quả mà còn chăm lo cho đồng nghiệp và cộng đồng.\n\nCác ngành nghề liên quan đến y tế, giáo dục, tư vấn và phục vụ cộng đồng sẽ đặc biệt phù hợp trong năm này.Sự toàn tâm toàn ý của bạn sẽ được ghi nhận và đền đáp.`,
+        quanhe: `Đây là năm lý tưởng để đầu tư vào gia đình và các mối quan hệ thân thiết.Năng lượng số 6 đặt gia đình lên hàng đầu — hãy dành thời gian chất lượng cho những người bạn yêu thương.\n\nNếu đang tìm kiếm tình yêu, bạn thu hút những người tìm kiếm sự ổn định và chăm sóc.Mối quan hệ bắt đầu trong năm 6 thường nghiêm túc và hướng đến kết hôn.`,
+        taichinhthanhoc: `Tài chính năm 6 thường ổn định nhưng có thể có những chi tiêu lớn liên quan đến gia đình — nhà cửa, chăm sóc người thân hoặc giáo dục cho con cái.\n\nHãy lập kế hoạch tài chính gia đình cẩn thận.Đây cũng là thời điểm tốt để mua bảo hiểm hoặc đầu tư cho an toàn lâu dài của gia đình.`,
+        banthan: `Năm 6 khiến bạn trở thành người được tin tưởng và tìm đến trong cộng đồng.Bạn có khả năng tạo ra sự hòa hợp và chữa lành trong các nhóm xã hội.\n\nHãy tham gia các hoạt động cộng đồng và tình nguyện.Đóng góp cho xã hội trong năm này sẽ mang lại cho bạn cảm giác thỏa mãn sâu sắc.`,
+        suckhoe: `Hãy chú ý không hy sinh sức khỏe bản thân vì chăm lo quá mức cho người khác — đây là nguy cơ phổ biến trong năm 6. Hãy nhớ rằng bạn cần tự chăm sóc mình trước.`,
+        tonket: `Năm số 6 có một năng lượng hướng về con người rất đặc biệt — và <strong>${safeName}</strong> đang được gọi để sống trong năng lượng đó. Đây là năm để nhận ra rằng chăm sóc người khác không phải sự yếu đuối — đó là một trong những hình thức cường đại nhất mà một con người có thể biểu lộ.
+
+Hãy nhìn lại những gì bạn đã trân trọng trong năm này. Ai đã gõ cửa tâm hồn bạn và được bạn mở? Đó là những mối quan hệ sẽ định nghĩa sự giàu có cuộc đời của <strong>${safeName}</strong> sau này.
+
+Thành công của năm 6 là đạt được sự thấu hiểu về con người và xây dựng được niềm tin lớn của những người xung quanh. Hãy tiếp tục tiếp thêm điều đó — và nhớ tiết chế mức trách nhiệm của mình ở mức vừa đủ, không cho đi quá mức và cũng không giữ lại quá mức.`,
+      },
+      7: {
+        congviec: `Năm 7 là năm của sự nghiên cứu, học tập và phát triển nội tâm trong sự nghiệp.Đây không phải lúc để mở rộng hay tìm kiếm thành công bên ngoài — thay vào đó, hãy đào sâu vào chuyên môn và kiến thức.\n\nHãy dành thời gian cho việc học, nghiên cứu và phát triển kỹ năng đặc biệt.Những người làm việc trong lĩnh vực học thuật, nghiên cứu hay tâm linh sẽ thấy năm này đặc biệt thuận lợi.`,
+        quanhe: `Năm 7 có xu hướng hướng nội — bạn có thể thấy mình cần nhiều không gian riêng hơn.Điều này có thể gây hiểu lầm trong các mối quan hệ nếu không được giải thích rõ ràng.\n\nHãy giao tiếp thẳng thắn với người thân về nhu cầu cần không gian của mình.Các mối quan hệ bắt đầu trong năm 7 thường có chiều sâu trí tuệ và tâm linh đặc biệt.`,
+        taichinhthanhoc: `Tài chính không phải ưu tiên hàng đầu trong năm 7 — đây là năm để tích lũy tri thức hơn là tiền bạc.Hãy tránh các quyết định tài chính lớn và rủi ro.\n\nCác khoản đầu tư vào giáo dục, khóa học hoặc phát triển cá nhân là sáng suốt nhất trong năm này.`,
+        banthan: `Bạn có thể trở nên chọn lọc hơn trong các mối quan hệ xã hội trong năm 7. Đây là điều tự nhiên — hãy tập trung vào những cuộc trò chuyện có chiều sâu thay vì giao tiếp bề mặt.\n\nCác nhóm nghiên cứu, thảo luận hoặc học thuật sẽ phù hợp với bạn hơn trong năm này.`,
+        suckhoe: `Năm 7 là thời điểm tốt nhất trong 9 năm để học và nghiên cứu chuyên sâu.Hãy tận dụng tư duy rõ ràng và khả năng tập trung cao của năm này.\n\nSức khỏe cần chú ý đến căng thẳng tâm lý do suy nghĩ quá nhiều — thiền định và các hoạt động thư giãn tâm trí là cần thiết.`,
+        tonket: `Năm số 7 là năm hiếm hoi mà cuộc sống từ bên trong trở nên rớn ràng hơn thế giới bên ngoài. <strong>${safeName}</strong> có cơ hội đi vào chiều sâu của mình — không phải để lẩn trốn, mà để hiểu rõ hơn ai là mình và mình muốn đi về phía nào.
+
+Những câu trả lời quan trọng nhất trong năm 7 không đến từ google, từ bạn bè, hay từ chuyên gia — chúng đến từ những khoảnh khắc yên tĩnh đủ lâu để bạn thực sự lắng nghe chính mình. Hãy trân trọng những khoảnh khắc đó.
+
+Thành công của <strong>${safeName}</strong> trong năm 7 không nằm ở những gì bạn đạt được — mà nằm ở chiều sâu bạn chạm được. Những gì bạn khám phá được về bản thân sẽ trở thành la bàn dẫn đường cho cả giai đoạn quyền lực sắp tới — năm 8 và những gì theo sau.`,
+      },
+      8: {
+        congviec: `Năm 8 là năm của thành công vật chất và quyền lực trong sự nghiệp.Đây là thời điểm để thực hiện những tham vọng lớn, đàm phán quan trọng và khẳng định vị trí lãnh đạo.\n\nNăng lượng số 8 ủng hộ việc đạt được thành tựu đáng kể — thăng tiến, tăng lương, mở rộng kinh doanh hoặc ký kết hợp đồng lớn.Hãy hành động táo bạo nhưng có tính toán.`,
+        quanhe: `Trong tình yêu, bạn thu hút sự tôn trọng và ngưỡng mộ hơn là sự phụ thuộc.Hãy tìm kiếm người bạn đời có sự độc lập và tham vọng riêng của họ.\n\nNếu đang trong mối quan hệ, hãy đảm bảo sự nghiệp thành công không khiến bạn bỏ bê mối quan hệ.Hãy chia sẻ thành công với người thân thay vì chỉ tập trung vào mục tiêu cá nhân.`,
+        taichinhthanhoc: `Đây là năm tốt nhất để đầu tư, kinh doanh và tăng nguồn thu nhập.Tuy nhiên, hãy tránh lòng tham quá mức — năng lượng số 8 có thể dẫn đến rủi ro tài chính nếu không được kiểm soát.\n\nHãy lên kế hoạch tài chính rõ ràng với mục tiêu cụ thể.Đầu tư có nghiên cứu kỹ lưỡng sẽ mang lại kết quả tốt trong năm này.`,
+        banthan: `Năm 8 mang đến ảnh hưởng xã hội mạnh mẽ — bạn tự nhiên đứng ở vị trí trung tâm và người khác tìm kiếm sự lãnh đạo của bạn.\n\nHãy sử dụng ảnh hưởng này một cách có trách nhiệm.Xây dựng mạng lưới quan hệ nghề nghiệp và tích cực tham gia các sự kiện ngành.`,
+        suckhoe: `Sức khỏe có thể bị ảnh hưởng bởi áp lực công việc cao.Hãy đặt ra giới hạn rõ ràng và không hy sinh sức khỏe cho thành công vật chất.\n\nNăm 8 là thời điểm tốt để học các kỹ năng lãnh đạo và quản lý — đầu tư vào giáo dục lãnh đạo sẽ có giá trị trong các năm tới.`,
+        tonket: `Năm số 8 là năm <strong>${safeName}</strong> đứng dưới ánh đèn — và ánh đèn đó có thể rất có lợi hoặc rất khắc nghiệt, tùy vào cách bạn chuẩn bị. Hãy nhớ rằng quyền lực thực sự không phải là để kiểm soát mà là để ảnh hưởng — và sự ảnh hưởng bền lâu nhất đều đến từ giá trị, không phải từ sức mạnh.
+
+Hãy kết năm 8 bằng câu hỏi: <em>"Mình đã dùng được bao nhiêu trong những gì mình có để giúp ích cho người khác?"</em> Câu trả lời sẽ cho bạn thấy liệu thành công năm nay có ý nghĩa thật sự hay không.
+
+<strong>${safeName}</strong>, đừng để năm quan trọng nhất trong chu kỳ 9 năm trôi qua trong sự rụt rè. Hãy đứng thẳng, tin vào giá trị của mình, và bước ra ánh sáng mà năm số 8 đang chiếu cho bạn.`,
+      },
+      9: {
+        congviec: `Năm 9 là năm hoàn thành chu kỳ và buông bỏ trong sự nghiệp.Đây là thời điểm để kết thúc những dự án dở dang, giải quyết các vấn đề còn tồn đọng và chuẩn bị cho chu kỳ mới.\n\nHãy đánh giá lại hướng đi sự nghiệp — điều gì đã phục vụ tốt cho bạn và điều gì cần thay đổi ? Năm 9 là cơ hội để định hình lại tầm nhìn cho chu kỳ 9 năm tiếp theo.`,
+        quanhe: `Trong các mối quan hệ, năm 9 có thể mang đến sự kết thúc — một số mối quan hệ có thể kết thúc tự nhiên vì chúng đã hoàn thành vai trò của mình.Đây không nhất thiết là điều tiêu cực.\n\nHãy giải quyết những hiểu lầm lâu nay, tha thứ và được tha thứ.Năm 9 là thời điểm để chữa lành những vết thương cũ trong các mối quan hệ.`,
+        taichinhthanhoc: `Tài chính trong năm 9 cần được quản lý cẩn thận — đây không phải năm tốt để bắt đầu đầu tư lớn mới.Thay vào đó, hãy giải quyết các khoản nợ còn lại và chuẩn bị nền tảng tài chính cho chu kỳ mới.\n\nHãy tổng kết lại tình hình tài chính: điều gì hiệu quả, điều gì không ? Bài học này sẽ giúp bạn quản lý tốt hơn trong 9 năm tới.`,
+        banthan: `Năm 9 là lúc để buông bỏ những mối quan hệ xã hội không còn phục vụ cho sự phát triển của bạn.Điều này có thể khó khăn nhưng cần thiết cho sự phát triển tiếp theo.\n\nHãy tập trung vào việc chữa lành và tha thứ trong các mối quan hệ hiện tại.Tham gia các hoạt động nhân đạo hoặc tình nguyện sẽ mang lại ý nghĩa sâu sắc trong năm này.`,
+        suckhoe: `Sức khỏe năm 9 cần sự chú ý đặc biệt đến việc giải phóng căng thẳng và chữa lành — cả về thể xác lẫn tinh thần.Đây là năm tốt để làm các liệu pháp chữa lành, nghỉ dưỡng hoặc tĩnh tâm.\n\nNăm 9 là thời điểm tốt để chia sẻ kiến thức và kinh nghiệm tích lũy — dạy người khác những gì bạn đã học được.`,
+        tonket: `Năm số 9 là một trong những năm được định nghĩa bởi những gì bạn dám bỏ lại — không phải những gì bạn nắm giữ. <strong>${safeName}</strong> đang được mời buông bỏ — con người cũ, thói quen cũ, mối quan hệ cũ, kiểu tư duy cũ. Không phải vì chúng xấu, mà vì bạn đã vượt lên chúng rồi.
+
+Buông bỏ thực sự được bắt đầu từ phía trong: tha thứ những điều bạn đã giữ lâu, bày tỏ lòng biết ơn với những gì cuộc sống đã mang lại (dù tốt hay khó), và đặt niềm tin vào những gì sắp đến dù chưa thấy hình dáng.
+
+<strong>${safeName}</strong>, hành trình 9 năm sắp khép lại. Đừng vội. Hãy dành một khoảnh khắc để cảm ơn tất cả những năm đó — và mỗi thứ bạn buông ra hôm nay là một đôi tay trống để đón nhận điều kỳ diệu phía trước.`,
+      },
+    };
+    return YEAR_DATA[n] || YEAR_DATA[1];
+}
+
+function yearIntro(num: number, year: number, name: string): Pick<YearDeepContent, "title" | "subtitle" | "intro"> {
+    const safeName = escapeHtml(name);
+    const n = num % 9 || 9;
+    // The full content lives inside personalYearDeep — we duplicate only the meta fields here.
+    const META: Record<number, Pick<YearDeepContent, "title" | "subtitle" | "intro">> = {
+      1: {
+        title: 'Khởi đầu mới &amp; Tiên phong', subtitle: 'Năm của những bước đột phá và khởi đầu',
+        intro: `Năm cá nhân số 1 mở ra một chu kỳ hoàn toàn mới cho <strong>${safeName}</strong>. Đây là thời điểm vũ trụ trao cho bạn một trang giấy trắng — hãy viết lên đó những điều bạn thực sự muốn trở thành. Năng lượng năm nay mạnh mẽ, độc lập và tiên phong; mọi sự chần chừ đều có thể khiến bạn bỏ lỡ cơ hội đặc biệt.`
+      },
+      2: {
+        title: 'Hợp tác &amp; Kiên nhẫn chiến lược', subtitle: 'Năm của các mối quan hệ và ngoại giao',
+        intro: `Năm cá nhân số 2 của <strong>${safeName}</strong> là năm của sự chậm lại có chủ đích. Sau sự khởi đầu mạnh mẽ của số 1, vũ trụ mời bạn vào chế độ "trồng cây" — kiên nhẫn chăm sóc những gì đã được gieo, xây dựng liên minh và phát triển qua sự hợp tác thay vì đối đầu.`
+      },
+      3: {
+        title: 'Sáng tạo &amp; Biểu đạt', subtitle: 'Năm của niềm vui, nghệ thuật và giao tiếp',
+        intro: `Năm cá nhân số 3 mang đến cho <strong>${safeName}</strong> làn sóng năng lượng vui tươi, sáng tạo và biểu đạt. Đây là năm để tỏa sáng, kết nối và thể hiện bản thân một cách chân thực. Hãy để niềm vui dẫn đường.`
+      },
+      4: {
+        title: 'Xây dựng &amp; Kỷ luật', subtitle: 'Năm của nền tảng và sự kiên trì',
+        intro: `Năm cá nhân số 4 đặt <strong>${safeName}</strong> vào vai trò người kiến tạo. Đây không phải năm của phiêu lưu hay cảm hứng bốc đồng — mà là năm của nỗ lực bền bỉ, kế hoạch chi tiết và xây dựng nền móng cho tương lai.`
+      },
+      5: {
+        title: 'Chuyển đổi &amp; Tự do', subtitle: 'Năm của thay đổi và trải nghiệm mới',
+        intro: `Năm cá nhân số 5 mang đến cho <strong>${safeName}</strong> gió mới của sự thay đổi. Đây là năm năng động nhất trong chu kỳ, với nhiều biến động, cơ hội bất ngờ và những cuộc gặp gỡ định hình lại con người bạn.`
+      },
+      6: {
+        title: 'Tình yêu &amp; Trách nhiệm', subtitle: 'Năm của gia đình, hôn nhân và sự hy sinh',
+        intro: `Năm cá nhân số 6 được gọi là năm của tình yêu và trách nhiệm đối với <strong>${safeName}</strong>. Cuộc sống sẽ mang đến những sự kiện nhấn mạnh đến gia đình, các mối quan hệ thân thiết và nghĩa vụ với người xung quanh.`
+      },
+      7: {
+        title: 'Chiều sâu nội tâm &amp; Tâm linh', subtitle: 'Năm của sự suy ngẫm, học hỏi và kết nối tâm linh',
+        intro: `Năm cá nhân số 7 mời <strong>${safeName}</strong> chậm lại và đi vào chiều sâu. Đây không phải năm của hành động ồ ạt — mà là năm của sự tích lũy tri thức, phát triển nội tâm và kết nối với trực giác. Những gì bạn học được trong năm này sẽ trở thành nền tảng cho sự thịnh vượng của năm số 8 tiếp theo.`
+      },
+      8: {
+        title: 'Quyền lực &amp; Thịnh vượng', subtitle: 'Năm của thu hoạch, sự nghiệp và tài chính',
+        intro: `Năm cá nhân số 8 là năm thu hoạch và quyền lực của <strong>${safeName}</strong>. Đây là đỉnh cao của chu kỳ 9 năm về mặt thành tựu vật chất và ảnh hưởng xã hội. Những hạt giống bạn đã gieo trong các năm trước đang sẵn sàng cho mùa gặt — vấn đề chỉ là bạn có đủ can đảm để đến đồng ruộng không.`
+      },
+      9: {
+        title: 'Hoàn thành &amp; Buông bỏ', subtitle: 'Năm của sự kết thúc, nhân đạo và giải phóng',
+        intro: `Năm cá nhân số 9 đánh dấu sự kết thúc của một chu kỳ 9 năm trong cuộc đời <strong>${safeName}</strong>. Đây là năm của sự tổng kết, nhìn lại, và quan trọng nhất là buông bỏ những gì không còn phù hợp để chuẩn bị cho một khởi đầu hoàn toàn mới.`
+      },
+    };
+    return META[n] || META[1];
+}
+
+export function buildPersonalYearFullBlock(
+  pyNum: number,
+  year: number,
+  age: number,
+  name: string,
+  sectionIndex = 1,
+): string {
+  const n = pyNum % 9 || 9;
+  const safeName = escapeHtml(name);
+  const safeYear = escapeHtml(String(year));
+  const safeAge = escapeHtml(String(age));
+  const safeNameUpper = safeName.toUpperCase();
+
+  let meta: Pick<YearDeepContent, "title" | "subtitle" | "intro"> | null = null;
+  try { meta = yearIntro(n, year, name); } catch (_error) { }
+
+  let deepData: Omit<YearDeepContent, "title" | "subtitle" | "intro"> | null = null;
+  try { deepData = yearContent(n, name); } catch (_error) { }
+
+  const intro = meta && meta.intro ? meta.intro : '';
+  const title = meta && meta.title ? meta.title : '';
+
+  const DOMAINS = [
+    { key: 'congviec', altKey: null, icon: '💼', label: 'Công việc & Sự nghiệp' },
+    { key: 'quanhe', altKey: null, icon: '💗', label: 'Các mối quan hệ & Tình yêu' },
+    { key: 'suckhoe', altKey: null, icon: '🌿', label: 'Sức khỏe' },
+    { key: 'taichinhthanhhoc', altKey: 'taichinhthanhoc', icon: '💰', label: 'Tài chính & Học tập' },
+    { key: 'banthan', altKey: null, icon: '🌟', label: 'Về bản thân' },
+  ] as const;
+
+  let domainHTML = '';
+  if (deepData) {
+    for (const d of DOMAINS) {
+      const text = deepData[d.key] || (d.altKey && deepData[d.altKey]) || '';
+      if (!text) continue;
+      domainHTML += `
+        <div class="year-domain-block">
+          <div class="domain-title">${d.icon} ${d.label}</div>
+          <p class="nar">${text.replace(/\n/g, '<br>')}</p>
+        </div>`;
+    }
+    if (deepData.tonket) {
+      domainHTML += `<div class="insight-box" style="margin-top:1rem;">📌 <strong>Tóm lại:</strong> ${deepData.tonket.replace(/\n/g, '<br>')}</div>`;
+    }
   }
+
+  const sectionLabel = `8.${sectionIndex}`;
+
+  return `
+    <div class="py-year-block" id="py-year-${safeYear}">
+      <h3 class="py-year-heading">
+        ${sectionLabel}. NĂM ${safeYear}, ${safeNameUpper} ${safeAge} TUỔI CÓ VẬN SỐ ${n}
+      </h3>
+      <div class="py-year-intro">
+        <span class="py-num-badge">${n}</span>
+        <div>
+          <div class="year-detail-block">
+            <div class="year-detail-headline">
+              <span class="year-detail-label">VẬN SỐ NĂM ${safeYear} CỦA BẠN LÀ: ${n}</span>
+            </div>
+            ${title ? `<div class="year-detail-subtitle"><em>${title}</em></div>` : ''}
+            ${intro ? `<p class="nar">${intro}</p>` : ''}
+          </div>
+        </div>
+      </div>
+      ${domainHTML}
+    </div>`;
+}
 
 export function buildYearDomainBlock(num: number, year: number, age: number, name: string): string {
   const safeName = escapeHtml(name);
@@ -562,4 +826,3 @@ export function personalMonthDeep(item: IndicatorResult & { year: number; month:
     ${personalPeriod(`Tháng ${item.month}`, item.number, `${item.month}/${item.year}`, name, item.data)}
   </article>`;
 }
-
