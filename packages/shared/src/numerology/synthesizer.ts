@@ -160,6 +160,27 @@ function relationshipHtml(titleText: string, first: number, second: number, name
   return `<p class="nar">${titleText} của <strong>${escapeHtml(name)}</strong> là cặp số <strong>${first}</strong> và <strong>${second}</strong>. Hai năng lượng này ${harmony}, vì vậy nên đọc cùng nhau thay vì tách rời.</p><div class="insight-box">📌 <strong>Lời khuyên:</strong> Khi hai chỉ số bổ trợ, hãy dùng chúng như lực đẩy. Khi chúng căng nhau, hãy xem đó là tín hiệu cần cân bằng giữa điều bạn muốn, cách bạn hành động và vai trò bạn đang sống.</div>`;
 }
 
+export function buildLifePathDestinyCorrelation(report: NumerologyReport, name: string): string {
+  const lpNum = report.lifePath.number;
+  const destNum = report.destiny.number;
+  const lp_dest_same = lpNum === destNum;
+  const reducedLp = lpNum % 9 || 9;
+  const reducedDest = destNum % 9 || 9;
+  const lp_dest_harmony = ([1, 3, 5, 9].includes(reducedLp) && [1, 3, 5, 9].includes(reducedDest))
+    || ([2, 4, 6, 8].includes(reducedLp) && [2, 4, 6, 8].includes(reducedDest));
+  const compat = lp_dest_same
+    ? `hoàn toàn tương đồng — cực kỳ hiếm gặp và đặc biệt. Con đường bạn đi chính là bản sắc bạn mang, giúp bạn tập trung vào mục tiêu gần như không có mâu thuẫn nội tâm`
+    : (lp_dest_harmony
+      ? `tương hợp tốt. Những điểm mạnh trong tính cách của bạn được thúc đẩy và thể hiện rõ ràng hơn, giúp bạn phát triển mạnh mẽ hơn`
+      : `có những điểm đối đầu nhau. Tuy nhiên bạn vẫn có thể hóa giải nếu nỗ lực học hỏi và phát triển bản thân`);
+  const lpTitle = readString(report.lifePath.data, ["title"]) || `năng lượng số ${lpNum}`;
+  const safeName = escapeHtml(name);
+  return `<p class="nar">Trong thần số học, Chỉ số Đường Đời và Chỉ số Sứ Mệnh là hai yếu tố có mối quan hệ chặt chẽ với nhau, cùng tồn tại trong một người. Chỉ số đường đời cho biết mục đích tổng thể của một người trong cuộc sống, còn chỉ số sứ mệnh cho biết cách thức một người thực hiện mục đích đó.</p>
+<p class="nar">Cặp số <strong>Đường Đời ${lpNum} — Sứ Mệnh ${destNum}</strong> của <strong>${safeName}</strong> ${compat}. Khi chỉ số đường đời và sứ mệnh bổ sung hoặc cộng hưởng với nhau, những điểm mạnh trong tính cách của bạn được thúc đẩy và thể hiện rõ ràng hơn. Ngược lại, nếu đối đầu hoặc mâu thuẫn, một số năng lượng tích cực có thể bị mờ nhạt và bạn có thể cảm thấy bối rối, khó khăn trong việc đưa ra quyết định.</p>
+<p class="nar">Số đường đời <strong>${lpNum}</strong> gắn liền với ${escapeHtml(lpTitle)}. Bạn luôn giữ vững lập trường khi đã xác định một vấn đề là đúng. Bên cạnh đó, số sứ mệnh <strong>${destNum}</strong> định hình cách bạn tính toán, phân tích và thực hiện mục tiêu. Khi cả hai bổ sung cho nhau sẽ giúp bạn ngày càng chắc chắn hơn trong các quyết định và giảm thiểu rủi ro trong cuộc sống.</p>
+<div class="insight-box">📌 <strong>Lưu ý:</strong> Hãy đọc kỹ luận giải về cả hai chỉ số này và kết hợp chúng lại để có bức tranh toàn diện nhất về hành trình của mình.</div>`;
+}
+
 function karmicLessonsHtml(report: NumerologyReport, narrative: NarrativeKb, name: string): string {
   const lessons = report.karmicLessons as KarmicLessonsResult;
   if (!lessons.missingNumbers.length) {
@@ -289,8 +310,14 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
       letter: "C",
       title: "PHÂN TÍCH SỨ MỆNH & NỘI TÂM",
       sections: [
-        section("10", "Chỉ số Sứ Mệnh (Vận Mệnh)", renderIndicator(narrative, "destiny", "Sứ mệnh", report.destiny, name) + destinyCtxBlock(report.destiny.number, ctx, name)),
-        section("11", "Tương quan Đường đời & Sứ mệnh", relationshipHtml("Tương quan Đường đời và Sứ mệnh", report.lifePath.number, report.destiny.number, name)),
+        section(
+          "10",
+          "Chỉ số Sứ Mệnh (Vận Mệnh)",
+          `<p class="nar"><strong>Sứ Mệnh số ${report.destiny.number}</strong> — ${escapeHtml(readString(report.destiny.data, ["title"]))}. Đây là chỉ số thể hiện cách bạn đạt được mục tiêu và đóng góp cho thế giới.</p>` +
+            renderIndicator(narrative, "destiny", "Sứ mệnh", report.destiny, name) +
+            destinyCtxBlock(report.destiny.number, ctx, name),
+        ),
+        section("11", "Tương quan Đường đời & Sứ mệnh", buildLifePathDestinyCorrelation(report, name)),
         section("12", "Thử thách Sứ Mệnh", challengeHtml(narrative, "destinyChallenge", "Thử thách Sứ mệnh", report.destinyChallenge, name)),
         section("13", "Chỉ số Trưởng Thành", renderIndicator(narrative, "maturity", "Trưởng thành", report.maturity, name) + maturityCtxBlock(report.maturity.number, ctx, name)),
         section("14", "Năng lực trong giai đoạn Trưởng Thành", generic("Năng lực trưởng thành", report.maturityAbility.number, name, report.maturityAbility.data)),

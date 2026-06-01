@@ -686,7 +686,17 @@ export function soulCtxBlock(num: number, ctx: NarrativeContext, name: string): 
 }
 
 export function destinyCtxBlock(num: number, ctx: NarrativeContext, name: string): string {
-  return `<div class="insight-box cross-context-box">🔗 <strong>Sứ mệnh ${num} trong tổng thể biểu đồ:</strong> Đường đời ${ctx.lifePath} chỉ hướng đi, còn Sứ mệnh ${num} mô tả cách <strong>${escapeHtml(name)}</strong> đóng góp. Khi hai chỉ số này được đọc cùng nhau, bức tranh hành động trở nên rõ hơn.</div>`;
+  const lp = ctx.lifePath;
+  const bday = ctx.birthday;
+  const same = num === lp;
+  const energyMatch = ([1, 3, 5, 9].includes(num) && [1, 3, 5, 9].includes(lp)) ||
+    ([2, 4, 6, 8].includes(num) && [2, 4, 6, 8].includes(lp));
+  const interactionDesc = same
+    ? `Hiếm gặp — Sứ mệnh số <strong>${num}</strong> hoàn toàn trùng với Đường đời số <strong>${lp}</strong>. Không có mâu thuẫn giữa việc bạn là ai và bạn được giao làm gì — đây là sự thống nhất hoàn hảo, giúp bạn hành động từ trạng thái nguyên vẹn và không chia cắt.`
+    : energyMatch
+      ? `Sứ mệnh số <strong>${num}</strong> cộng hưởng tốt với Đường đời số <strong>${lp}</strong> — cùng dòng năng lượng, giúp bạn lan tỏa sứ mệnh một cách tự nhiên và mạnh mẽ qua chính con người của mình.`
+      : `Sứ mệnh số <strong>${num}</strong> và Đường đời số <strong>${lp}</strong> mang hai năng lượng bổ trợ nhau. Đường đời định hình cách bạn tiếp cận cuộc sống, Sứ mệnh mở ra chiều kích đóng góp rộng hơn. Hãy để cả hai hướng dẫn nhau — không phải cạnh tranh nhau.`;
+  return `<p class="nar" style="border-left:3px solid #2563eb;padding-left:1rem;margin-top:1rem;"><strong>🔗 Sứ mệnh trong tổng thể biểu đồ của ${escapeHtml(name)}:</strong> ${interactionDesc} Năng lực tự nhiên từ ngày sinh số <strong>${bday}</strong> là một trong những công cụ quý giá để bạn hiện thực hóa sứ mệnh này.</p>`;
 }
 
 export function personalityCtxBlock(num: number, ctx: NarrativeContext, name: string): string {
