@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-01 23:57 +07 | T-0610c-section16-17-18 | Literal V1 sections 16-17-18 inline render | `Task` |
 | 2026-06-01 23:41 +07 | T-0610c-section12-13-14 | Literal V1 sections 12-14 inline render | `Task` |
 | 2026-06-01 23:06 +07 | T-0606b | Detect V1 narrative OVERRIDE assignments | `Task` |
 | 2026-06-01 17:37 +07 | T-0610c-section10-finalize | Expand destiny extra narratives to V1-length parity | `Task` |
@@ -116,6 +117,26 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-01 23:57 +07] - T-0610c-section16-17-18: Literal V1 sections 16-17-18 inline render
+
+**Loại:** `Task`
+**Ref:** T-0610c-section16-17-18
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 inline render cho section 16, prepend intro cho section 17 và thay personality context của section 18 bằng `_personalityCtxBlock` V1.
+
+### Thay đổi
+- Thêm `buildLifePathSoulCorrelation(...)` trong `synthesizer.ts` và wire section 16 từ `relationshipHtml(...)` sang inline V1 literal.
+- Section 17 prepend intro V1 trước `challengeHtml(...)`.
+- `personalityCtxBlock` được thay bằng literal V1 `_personalityCtxBlock` với border-left `#d97706` và escape tên user.
+- `TASK_REGISTRY.md` đóng `T-0610c-section16-17-18`.
+
+### Verify
+- Spot-check fixture `Nông Xuân Thái / 1996-09-03`: section 16 có `Chỉ số đường đời và chỉ số linh hồn là hai yếu tố`; section 17 có `Mọi linh hồn đều mang theo những bóng tối`; section 18 có `Nhân cách trong tổng thể biểu đồ`.
+- Spot-check lengths: section 16 `1385`, section 17 `1148`, section 18 `2556`.
+- Pass: `npm run typecheck`, `npm run lint`, `npm run build`.
 
 ## [2026-06-01 23:41 +07] - T-0610c-section12-13-14: Literal V1 sections 12-14 inline render
 

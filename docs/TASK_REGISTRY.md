@@ -2882,6 +2882,37 @@ Update khi xong:
 - Spot-check fixture `Nông Xuân Thái / 1996-09-03`: section 12 intro pass, section 13 maturity context pass, section 14 dài 822 chars.
 - Verify pass: `npm run typecheck`, `npm run lint`, `npm run build`.
 
+### T-0610c-section16-17-18 - Literal V1 sections 16-17-18 inline render
+
+Status: Done
+
+Bối cảnh:
+
+- Section 16 còn dùng `relationshipHtml(...)` generic.
+- Section 17 thiếu intro V1 trước narrative challenge.
+- Section 18 dùng `personalityCtxBlock` simplified, chưa đúng `_personalityCtxBlock` V1.
+
+Yêu cầu:
+
+- Replace section 16 bằng inline render V1 cho tương quan Đường đời & Linh hồn.
+- Prepend intro V1 cho section 17 `Thử thách Linh Hồn`.
+- Port literal V1 `_personalityCtxBlock` với border-left `#d97706`.
+- Không đụng section khác, engine, route, auth, payment, charts.
+
+Điều kiện Done:
+
+- Section 16 fixture có `Chỉ số đường đời và chỉ số linh hồn là hai yếu tố`.
+- Section 17 fixture có `Mọi linh hồn đều mang theo những bóng tối`.
+- Section 18 fixture có `Nhân cách trong tổng thể biểu đồ`.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+
+Update khi xong:
+
+- `synthesizer.ts` thêm `buildLifePathSoulCorrelation(...)` và wire section 16 sang inline V1 literal.
+- `synthesizer.ts` section 17 prepend intro V1 trước `challengeHtml(...)`.
+- `personalityCtxBlock` trong `packages/shared/src/numerology/narrative/life-path.ts` được thay bằng literal V1, escape tên user.
+- Spot-check fixture `Nông Xuân Thái / 1996-09-03`: section 16 dài 1385 chars, section 17 dài 1148 chars, section 18 dài 2556 chars và đủ marker.
+
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
 
 Status: Done
