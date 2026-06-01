@@ -376,12 +376,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
         section("14", "Năng lực trong giai đoạn Trưởng Thành", renderMaturityAbility(report, name)),
         section("15", "Chỉ số Linh Hồn (Mong ước sâu thẳm)", renderIndicator(narrative, "soul", "Linh hồn", report.soul, name) + soulCtxBlock(report.soul.number, ctx, name)),
         section("16", "Tương quan Đường đời & Linh hồn", buildLifePathSoulCorrelation(report, name)),
-        section(
-          "17",
-          "Thử thách Linh Hồn",
-          `<p class="nar">Mọi linh hồn đều mang theo những bóng tối riêng — không phải để bị đeo đuổi mà để được chiếu sáng. Với <strong>${escapeHtml(name)}</strong>, thử thách linh hồn số <strong>${report.soulChallenge.number}</strong> là lớp vỏ bảo vệ mà bạn đã xây dựng quanh trái tim mình.</p>` +
-            challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name),
-        ),
+        section("17", "Thử thách Linh Hồn", challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name)),
         section("18", "Chỉ số Nhân Cách", renderIndicator(narrative, "personality", "Nhân cách", report.personality, name) + personalityCtxBlock(report.personality.number, ctx, name)),
         section("19", "Thử thách Nhân Cách", challengeHtml(narrative, "personalityChallenge", "Thử thách Nhân cách", report.personalityChallenge, name)),
         section("20", "Các bài học nghiệp (Karmic Lessons)", karmicLessonsHtml(report, narrative, name)),
