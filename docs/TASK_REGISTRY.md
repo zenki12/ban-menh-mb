@@ -2746,6 +2746,40 @@ Update khi xong:
 - Verify pass: `npm run typecheck`, `npm run lint`, `npm run build`; fixture `Nông Xuân Thái / 1996-09-03` section 10 dài 1955 chars, section 11 dài 1369 chars.
 - Ghi chú: lần đầu `typecheck`/`build` gặp stale `.next/dev/types/validator.ts`; đã xóa cache generated `apps/web/.next/dev`, build lại, rồi rerun `typecheck` pass.
 
+### T-0610c-section10-extra - Destiny extra narrative content
+
+Status: Done
+
+Bối cảnh:
+
+- Section 10 cần phần nội dung mở rộng theo mẫu `LIFE_PATH_EXTRA`, nhưng dành riêng cho chỉ số Sứ Mệnh.
+- Sứ Mệnh số 4 có template literal từ V1 PDF; các số 1,2,3,5,6,7,8,9 cần nội dung cùng cấu trúc/tone dựa trên KB `destiny_number`.
+
+Yêu cầu:
+
+- Tạo `packages/shared/src/numerology/narrative/destiny.ts` với `DESTINY_EXTRA` và `renderDestinyExtra`.
+- Destiny 4 giữ literal V1 template được cung cấp.
+- Destiny 1,2,3,5,6,7,8,9 tạo nội dung tiếng Việt có dấu, tone trang trọng/huyền học thương mại, không dùng từ cấm.
+- Wire `renderDestinyExtra` vào section 10 sau narrative và trước `destinyCtxBlock`.
+- Re-export từ `narrative-deep.ts`.
+
+Điều kiện Done:
+
+- `destiny.ts` dưới 1000 dòng.
+- Spot-check destiny 4 có câu `Bạn là một thuật sĩ`.
+- Mỗi entry 1,2,3,5,6,7,8,9 dài tối thiểu 1500 chars.
+- `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không sửa `narrative.json`, section 1-9 hoặc 11-30.
+
+Update khi xong:
+
+- Tạo `packages/shared/src/numerology/narrative/destiny.ts` với `DESTINY_EXTRA`, type `DestinySubSection`/`DestinyExtraEntry`, và `renderDestinyExtra`.
+- Re-export từ `narrative-deep.ts`, wire section 10 để render sau destiny narrative và trước `destinyCtxBlock`.
+- Destiny 4 giữ template được cung cấp với marker `Bạn là một thuật sĩ`; các entry còn lại đều trên 1500 chars.
+- Verify pass: `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`.
+- Fixture `Nông Xuân Thái / 1996-09-03`: section 10 dài 8043 chars, có destiny extra và marker `Bạn là một thuật sĩ`.
+- Ghi chú: không sửa `narrative.json`, section 1-9, section 11-30, engine, route, auth, payment, charts, hoặc theme.
+
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
 
 Status: Done

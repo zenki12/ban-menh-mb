@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-01 16:40 +07 | T-0610c-section10-extra | Destiny extra narrative content | `Task` |
 | 2026-06-01 15:22 +07 | T-0610c-section10-11 | Literal V1 destiny context + section 11 correlation | `Task` |
 | 2026-05-30 01:54 +07 | T-0610c-section9 | Literal V1 personal month 3-month detail | `Task` |
 | 2026-05-30 01:30 +07 | T-0610c-section8 | Literal V1 personal year summary + 3-year cycle | `Task` |
@@ -110,6 +111,36 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-01 16:40 +07] - T-0610c-section10-extra: Destiny extra narrative content
+
+**Loại:** `Task`
+**Ref:** T-0610c-section10-extra
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Bổ sung phần nội dung mở rộng cho section 10 "Chỉ số Sứ Mệnh (Vận Mệnh)", theo cấu trúc tương tự `LIFE_PATH_EXTRA` nhưng dùng dữ liệu riêng cho Sứ Mệnh.
+
+### Thay đổi
+- Tạo `packages/shared/src/numerology/narrative/destiny.ts` với `DESTINY_EXTRA`, type `DestinySubSection`/`DestinyExtraEntry`, và helper `renderDestinyExtra`.
+- Destiny 4 giữ template được cung cấp với marker `Bạn là một thuật sĩ`; các số 1,2,3,5,6,7,8,9 có nội dung mở rộng cùng cấu trúc và tone.
+- Re-export module mới từ `narrative-deep.ts`.
+- Wire `renderDestinyExtra(report.destiny.number, name)` vào section 10 sau destiny narrative và trước `destinyCtxBlock`.
+- `TASK_REGISTRY.md` đóng `T-0610c-section10-extra`.
+
+### Verify
+- `destiny.ts` dài 348 dòng, dưới giới hạn 1000 dòng.
+- Spot-check source có `Bạn là một thuật sĩ`; không có các từ cấm `chữa lành`, `healing`, `rung động`, `vibration`.
+- Entry 1,2,3,5,6,7,8,9 đều trên 1500 chars.
+- Fixture `Nông Xuân Thái / 1996-09-03`: section 10 dài 8043 chars, có extra content và marker destiny 4.
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- Không sửa `narrative.json`, section 1-9 hoặc 11-30.
+- Không sửa engine, route, auth, payment, charts, theme, `kb-private/*`, hoặc `.env.local`.
+- CSS dùng lại class extra narrative hiện có; không thêm styling mới.
 
 ---
 
