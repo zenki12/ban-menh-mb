@@ -2714,6 +2714,38 @@ Update khi xong:
 - Verify pass: `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`; fixture `Nông Xuân Thái / 1996-09-03` render 3 month blocks, 18 domain blocks, 3 headlines, intro và grid.
 - Ghi chú: output literal V1 section 9.1 cho fixture dài 11088 chars, thấp hơn ngưỡng prompt 15000; không thêm nội dung ngoài V1 để bơm length.
 
+### T-0610c-section10-11 - Literal V1 destiny context and life path destiny correlation
+
+Status: Done
+
+Bối cảnh:
+
+- Section 10 cần dùng literal V1 `_destinyCtxBlock` thay bản cross-context simplified.
+- Section 11 hiện còn dùng helper tương quan generic, chưa bám đúng V1 inline render cho Đường đời & Sứ mệnh.
+
+Yêu cầu:
+
+- Port literal V1 `_destinyCtxBlock` từ `kb-private/numerology/app_v1_full.js`.
+- Section 10 prepend intro line V1-style, render destiny narrative, rồi append `destinyCtxBlock`.
+- Thêm helper `buildLifePathDestinyCorrelation` cho section 11 với 3 paragraph + insight-box theo V1.
+- Không đụng section 1-9, 12-30, engine, route, auth, payment, charts hoặc theme.
+
+Điều kiện Done:
+
+- Spot-check chuỗi V1 section 11 tồn tại trong V2.
+- Section 11 fixture dài hơn 1000 chars.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Không commit `kb-private/*`, `.env.local` hoặc `*.dev.vars`.
+
+Update khi xong:
+
+- `destinyCtxBlock` trong `packages/shared/src/numerology/narrative/life-path.ts` được thay bằng literal V1 `_destinyCtxBlock`, có branch same/energyMatch/else và escape tên user.
+- `synthesizer.ts` thêm `buildLifePathDestinyCorrelation` cho section 11 với 3 paragraph + `insight-box` theo V1.
+- Section 10 prepend intro line, render destiny narrative, rồi append `destinyCtxBlock`.
+- Section 11 chuyển từ `relationshipHtml(...)` generic sang `buildLifePathDestinyCorrelation(report, name)`.
+- Verify pass: `npm run typecheck`, `npm run lint`, `npm run build`; fixture `Nông Xuân Thái / 1996-09-03` section 10 dài 1955 chars, section 11 dài 1369 chars.
+- Ghi chú: lần đầu `typecheck`/`build` gặp stale `.next/dev/types/validator.ts`; đã xóa cache generated `apps/web/.next/dev`, build lại, rồi rerun `typecheck` pass.
+
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
 
 Status: Done

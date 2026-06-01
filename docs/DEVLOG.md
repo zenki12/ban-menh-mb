@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-01 15:22 +07 | T-0610c-section10-11 | Literal V1 destiny context + section 11 correlation | `Task` |
 | 2026-05-30 01:54 +07 | T-0610c-section9 | Literal V1 personal month 3-month detail | `Task` |
 | 2026-05-30 01:30 +07 | T-0610c-section8 | Literal V1 personal year summary + 3-year cycle | `Task` |
 | 2026-05-30 01:07 +07 | T-0610c-cleanup | Split narrative modules + diacritics test | `Task` |
@@ -109,6 +110,34 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-01 15:22 +07] - T-0610c-section10-11: Literal V1 destiny context + section 11 correlation
+
+**Loại:** `Task`
+**Ref:** T-0610c-section10-11
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 cho section 10 "Chỉ số Sứ Mệnh" context block và section 11 "Tương quan Đường đời & Sứ mệnh".
+
+### Thay đổi
+- `life-path.ts` thay `destinyCtxBlock` simplified bằng V1 `_destinyCtxBlock` với branch same/energyMatch/else và escape tên user.
+- `synthesizer.ts` thêm `buildLifePathDestinyCorrelation(report, name)` cho section 11 với 3 paragraph và `insight-box`.
+- Section 10 prepend intro line, render destiny narrative, rồi append `destinyCtxBlock`.
+- Section 11 chuyển từ `relationshipHtml(...)` generic sang helper V1-specific.
+- `TASK_REGISTRY.md` thêm và đóng `T-0610c-section10-11`.
+
+### Verify
+- Spot-check source: `hoàn toàn tương đồng — cực kỳ hiếm gặp` tồn tại 1 match trong V2.
+- Case synth thật `Nông Xuân Thái / 1996-09-03`: section 10 dài 1955 chars, section 11 dài 1369 chars; section 10 có marker `Sứ mệnh trong tổng thể biểu đồ`.
+- Đã chạy pass: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- Không sửa section 1-9 hoặc 12-30; không sửa engine/route/auth/payment/charts/theme.
+- Không sửa `kb.json`, `narrative.json`, `kb-private/*`, `.env.local`.
+- Lần đầu `typecheck`/`build` gặp stale `.next/dev/types/validator.ts`; đã xóa cache generated `apps/web/.next/dev`, build lại và rerun `typecheck` pass.
 
 ---
 
