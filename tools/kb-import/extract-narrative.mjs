@@ -40,6 +40,25 @@ function sliceGroup(source, groupName, nextGroupName) {
   return source.slice(groupStart, nextStart);
 }
 
+function findOverrideGroup(source, groupName) {
+  const pattern = new RegExp(`NarrativeTemplates\\.${groupName}\\s*=\\s*\\{`, "g");
+  let match;
+  let latest = null;
+
+  while ((match = pattern.exec(source))) {
+    const braceStart = source.indexOf("{", match.index);
+    if (braceStart === -1) throw new Error(`Cannot locate override body for ${groupName}`);
+    const braceEnd = skipExpression(source, braceStart + 1);
+    latest = {
+      index: match.index,
+      text: source.slice(match.index, braceEnd),
+    };
+    pattern.lastIndex = braceEnd;
+  }
+
+  return latest;
+}
+
 function skipQuoted(source, index, quote) {
   let i = index + 1;
   while (i < source.length) {
@@ -206,11 +225,18 @@ const narrative = {};
 let total = 0;
 
 for (const [groupName, config] of Object.entries(GROUP_CONFIG)) {
-  const groupText = sliceGroup(source, groupName, config.nextGroup);
-  narrative[groupName] = extractGroup(groupText, groupName, config);
+  const overrideGroup = findOverrideGroup(source, groupName);
+  const literalGroupText = sliceGroup(source, groupName, config.nextGroup);
+  const literalEntries = extractGroup(literalGroupText, groupName, config);
+  const overrideEntries = overrideGroup ? extractGroup(overrideGroup.text, groupName, config) : {};
+  narrative[groupName] = { ...literalEntries, ...overrideEntries };
   const count = Object.keys(narrative[groupName]).length;
   total += count;
-  console.log(`${groupName}: ${count} entries`);
+  console.log(
+    `${groupName}: ${count} entries${
+      overrideGroup ? ` (override @ ${overrideGroup.index}, ${Object.keys(overrideEntries).length} entries)` : ""
+    }`,
+  );
 }
 
 fs.writeFileSync(outputPath, `${JSON.stringify(narrative, null, 2)}\n`, "utf8");
