@@ -704,7 +704,9 @@ export function personalityCtxBlock(num: number, ctx: NarrativeContext, name: st
 }
 
 export function maturityCtxBlock(num: number, ctx: NarrativeContext, name: string): string {
-  return `<div class="insight-box cross-context-box">🔗 <strong>Trưởng thành ${num} trong tổng thể biểu đồ:</strong> Con số này được hình thành từ Đường đời ${ctx.lifePath} và Sứ mệnh ${ctx.destiny}; nó mô tả phiên bản chín muồi hơn mà <strong>${escapeHtml(name)}</strong> sẽ dần bước vào.</div>`;
+  const lp = ctx.lifePath;
+  const dest = ctx.destiny;
+  return `<p class="nar" style="border-left:3px solid #059669;padding-left:1rem;margin-top:1rem;"><strong>✦ Số Trưởng Thành ${num} trong tổng thể biểu đồ của ${escapeHtml(name)}:</strong> Con số này được hình thành từ sự tổng hợp của Đường đời số <strong>${lp}</strong> (năng lượng cốt lõi của bạn) và Sứ mệnh số <strong>${dest}</strong> (điều bạn đang theo đuổi). Đây là điểm tiến hóa cuối cùng — khi những bài học từ cả hai chỉ số được tích hợp hoàn toàn, bạn trở thành phiên bản đầy đủ nhất của chính mình. Giai đoạn trưởng thành không phải về việc thay đổi con người — mà là tinh lọc và kết tinh những gì đã luôn hiện hữu trong bạn.</p>`;
 }
 
 export function indicatorHtml(

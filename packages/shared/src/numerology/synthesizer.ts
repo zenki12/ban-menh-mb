@@ -83,6 +83,39 @@ function renderIndicator(
   return html ?? generic(label, indicator.number, name, indicator.data);
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+}
+
+function renderMaturityAbility(report: NumerologyReport, name: string): string {
+  const ma = report.maturityAbility;
+  const data = asRecord(ma.data) as {
+    title?: string;
+    description?: string;
+    meaning?: string;
+    strengths?: string;
+    advice?: string;
+    peak_age?: string;
+    how_to_develop?: string;
+  };
+  const safeName = escapeHtml(name);
+  let html = `<p class="nar">Khi bước qua ngưỡng cửa của tuổi trung niên, <strong>${safeName}</strong> sẽ khám phá ra những nguồn sức mạnh và tài năng mới mà trước đó chưa được phát huy hoàn toàn. Con số <strong>${ma.number}</strong> đóng vai trò như một "bộ khuếch đại" — nó làm cho những phẩm chất đặc biệt của bạn trở nên mạnh mẽ và rõ ràng hơn bao giờ hết.</p>`;
+  if (data.title) html += `<p class="nar"><strong>${escapeHtml(data.title)}</strong></p>`;
+
+  const desc =
+    data.description ||
+    data.meaning ||
+    `Năng lực số ${ma.number} trong giai đoạn trưởng thành mang đến cho bạn khả năng nhìn nhận cuộc sống từ một góc độ mới mẻ và sâu sắc hơn. Những người xung quanh sẽ nhận ra sự thay đổi tích cực này — bạn trở nên điềm tĩnh hơn, sáng suốt hơn và có ảnh hưởng lớn hơn.`;
+  html += `<p class="nar">${escapeHtml(desc)}</p>`;
+
+  const strengths = data.strengths || data.peak_age;
+  const advice = data.advice || data.how_to_develop;
+  if (strengths) html += `<p class="nar"><strong>✦ Thế mạnh đặc biệt giai đoạn này:</strong> ${escapeHtml(strengths)}</p>`;
+  if (advice) html += `<div class="insight-box">💡 <strong>Lời khuyên để phát huy tối đa:</strong> ${escapeHtml(advice)}</div>`;
+
+  return html;
+}
+
 function section(
   number: string,
   title: string,
@@ -318,9 +351,14 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
             destinyCtxBlock(report.destiny.number, ctx, name),
         ),
         section("11", "Tương quan Đường đời & Sứ mệnh", buildLifePathDestinyCorrelation(report, name)),
-        section("12", "Thử thách Sứ Mệnh", challengeHtml(narrative, "destinyChallenge", "Thử thách Sứ mệnh", report.destinyChallenge, name)),
+        section(
+          "12",
+          "Thử thách Sứ Mệnh",
+          `<p class="nar">Không có sứ mệnh nào không đi kèm với thử thách. Với <strong>${escapeHtml(name)}</strong>, thử thách số <strong>${report.destinyChallenge.number}</strong> xuất hiện không phải để ngăn cản bạn — mà để rèn luyện bạn trở thành phiên bản đủ mạnh để thực sự sống đúng sứ mệnh đó.</p>` +
+            challengeHtml(narrative, "destinyChallenge", "Thử thách Sứ mệnh", report.destinyChallenge, name),
+        ),
         section("13", "Chỉ số Trưởng Thành", renderIndicator(narrative, "maturity", "Trưởng thành", report.maturity, name) + maturityCtxBlock(report.maturity.number, ctx, name)),
-        section("14", "Năng lực trong giai đoạn Trưởng Thành", generic("Năng lực trưởng thành", report.maturityAbility.number, name, report.maturityAbility.data)),
+        section("14", "Năng lực trong giai đoạn Trưởng Thành", renderMaturityAbility(report, name)),
         section("15", "Chỉ số Linh Hồn (Mong ước sâu thẳm)", renderIndicator(narrative, "soul", "Linh hồn", report.soul, name) + soulCtxBlock(report.soul.number, ctx, name)),
         section("16", "Tương quan Đường đời & Linh hồn", relationshipHtml("Tương quan Đường đời và Linh hồn", report.lifePath.number, report.soul.number, name)),
         section("17", "Thử thách Linh Hồn", challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name)),
