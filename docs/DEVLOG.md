@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-01 23:06 +07 | T-0606b | Detect V1 narrative OVERRIDE assignments | `Task` |
 | 2026-06-01 17:37 +07 | T-0610c-section10-finalize | Expand destiny extra narratives to V1-length parity | `Task` |
 | 2026-06-01 16:40 +07 | T-0610c-section10-extra | Destiny extra narrative content | `Task` |
 | 2026-06-01 15:22 +07 | T-0610c-section10-11 | Literal V1 destiny context + section 11 correlation | `Task` |
@@ -114,6 +115,31 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-01 23:06 +07] - T-0606b: Detect V1 narrative OVERRIDE assignments
+
+**Loại:** `Task`
+**Ref:** T-0606b
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> T-0606 bỏ sót pattern override `NarrativeTemplates.groupName = { ... }` ở cuối V1 source, khiến 8 nhóm narrative vẫn dùng bản short ở một số key. T-0606b cập nhật extractor để lấy rich V1 literal override, re-extract narrative local và upload KV.
+
+### Thay đổi
+- Extend `tools/kb-import/extract-narrative.mjs` để detect override assignments và merge theo key, giữ key literal khi override partial.
+- Re-extract `kb-private/numerology/narrative.json`: 185 entries, 478,736 bytes (~467.5 KiB), 8 groups dùng rich V1 override.
+- Cập nhật `tools/kb-import/validate-narrative.mjs` theo key set mới: `maturity` có 11/22, `soulChallenge` và `destinyChallenge` có key 0.
+- Xóa `packages/shared/src/numerology/narrative/destiny.ts` AI-generated; bỏ re-export và bỏ `renderDestinyExtra` khỏi section 10 để dùng V1 literal narrative trực tiếp.
+- `TASK_REGISTRY.md` đóng `T-0606b`.
+
+### Verify
+- Pass: `npm run kb:extract-narrative`, `npm run kb:validate-narrative`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run kb:upload-kv`.
+- Spot-check V1: destiny 6 có `Tài năng chăm sóc và lãnh đạo bằng tình yêu thương`; destiny 4 có `Kỹ năng tổ chức của bạn`, `Bạn cứng nhắc`, `Trung thực`.
+- Manual smoke: `Hà Thu Hương / 1996-09-03` ra destiny 6 và section 10 có header V1; `Nông Xuân Thái / 1996-09-03` destiny 4 section 10 dài 7281 chars theo literal V1.
+
+### Không làm
+- Không sửa V1 source.
+- Không padding narrative để đạt ngưỡng ví dụ 8000 chars cho mọi destiny, vì một số entry V1 literal ngắn hơn.
 
 ## [2026-06-01 17:37 +07] - T-0610c-section10-finalize: Expand destiny extra narratives to V1-length parity
 

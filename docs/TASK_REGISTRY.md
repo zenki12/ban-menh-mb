@@ -2349,6 +2349,40 @@ Update khi xong:
 - Missing template, gồm một số master/challenge case, trả `narrative: null` và không crash.
 - Verify đã chạy: `kb:extract-narrative`, `kb:validate-narrative`, negative placeholder check, `kb:validate`, `typecheck`, `lint`, `build`, Worker `tsc --noEmit`, `kb:upload-kv`, runtime smoke merge 22/23 target narratives.
 
+### T-0606b - Detect V1 narrative OVERRIDE assignments
+
+Status: Done
+
+Bối cảnh:
+
+- T-0606 chỉ extract group đầu trong `NarrativeTemplates = { ... }`.
+- V1 còn có các assignment override `NarrativeTemplates.groupName = { ... }` ở cuối `narrative_v1_full.js`.
+- 8 nhóm `destiny`, `destinyChallenge`, `soul`, `maturity`, `soulChallenge`, `personality`, `personalityChallenge`, `karmicLesson` vì vậy vẫn đang dùng bản short ở một số key.
+
+Yêu cầu:
+
+- Extend `tools/kb-import/extract-narrative.mjs` để detect pattern override assignment.
+- Khi cùng group/key có cả bản literal đầu và override, ưu tiên override; với override partial, giữ các key không có trong override.
+- Re-extract `kb-private/numerology/narrative.json` và upload KV.
+- Xóa `packages/shared/src/numerology/narrative/destiny.ts` AI-generated; section 10 dùng rich V1 narrative trực tiếp.
+
+Điều kiện Done:
+
+- `npm run kb:extract-narrative` log đủ 8 override groups.
+- `narrative.destiny[6].html` có marker `Tài năng chăm sóc và lãnh đạo bằng tình yêu thương`.
+- `narrative.destiny[4].html` có marker `Kỹ năng tổ chức của bạn`, `Bạn cứng nhắc`, `Trung thực`.
+- `npm run kb:validate-narrative`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- `npm run kb:upload-kv` upload rich narrative thành công.
+
+Update khi xong:
+
+- `extract-narrative.mjs` detect `NarrativeTemplates.groupName = { ... }` override assignments và merge theo key để override thắng key trùng nhưng không làm mất partial keys.
+- Re-extract `kb-private/numerology/narrative.json`: tổng 185 entries, file tăng lên 478,736 bytes (~467.5 KiB) và vẫn nằm trong `kb-private` gitignored.
+- 8 groups dùng rich V1 override: `destiny`, `destinyChallenge`, `soul`, `maturity`, `soulChallenge`, `personality`, `personalityChallenge`, `karmicLesson`.
+- Xóa `packages/shared/src/numerology/narrative/destiny.ts` AI-generated và bỏ `renderDestinyExtra`; section 10 chỉ render V1 literal narrative qua `renderIndicator(...)` rồi append `destinyCtxBlock`.
+- Verify pass: `kb:extract-narrative`, `kb:validate-narrative`, `kb:test-synthesizer`, `typecheck`, `lint`, `build`, `kb:upload-kv`.
+- Manual smoke: `Hà Thu Hương / 1996-09-03` ra destiny 6 và section 10 có header `Tài năng chăm sóc và lãnh đạo bằng tình yêu thương`; `Nông Xuân Thái / 1996-09-03` destiny 4 section 10 dài 7281 chars theo literal V1, không padding thêm.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done
