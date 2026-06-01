@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-01 23:41 +07 | T-0610c-section12-13-14 | Literal V1 sections 12-14 inline render | `Task` |
 | 2026-06-01 23:06 +07 | T-0606b | Detect V1 narrative OVERRIDE assignments | `Task` |
 | 2026-06-01 17:37 +07 | T-0610c-section10-finalize | Expand destiny extra narratives to V1-length parity | `Task` |
 | 2026-06-01 16:40 +07 | T-0610c-section10-extra | Destiny extra narrative content | `Task` |
@@ -115,6 +116,26 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-01 23:41 +07] - T-0610c-section12-13-14: Literal V1 sections 12-14 inline render
+
+**Loại:** `Task`
+**Ref:** T-0610c-section12-13-14
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 inline render cho sections 12, 13 và 14 trong phần phân tích sứ mệnh/trưởng thành, giữ scope trong shared synthesizer và narrative helper.
+
+### Thay đổi
+- `maturityCtxBlock` được thay bằng literal V1 `_maturityCtxBlock` với border-left `#059669` và escape tên user.
+- Section 12 prepend intro V1 trước `challengeHtml(...)`.
+- Section 14 chuyển từ `generic(...)` sang helper `renderMaturityAbility(...)` theo inline render V1.
+- Do KB hiện tại dùng `peak_age` và `how_to_develop`, helper map thêm 2 field này vào wrapper V1 tương ứng với thế mạnh/lời khuyên để không mất nội dung.
+- `TASK_REGISTRY.md` đóng `T-0610c-section12-13-14`.
+
+### Verify
+- Spot-check fixture `Nông Xuân Thái / 1996-09-03`: section 12 có intro `Không có sứ mệnh nào không đi kèm với thử thách`; section 13 có `✦ Số Trưởng Thành` và `tinh lọc và kết tinh`; section 14 dài 822 chars.
+- Pass: `npm run typecheck`, `npm run lint`, `npm run build`.
 
 ## [2026-06-01 23:06 +07] - T-0606b: Detect V1 narrative OVERRIDE assignments
 

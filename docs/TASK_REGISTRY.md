@@ -2850,6 +2850,38 @@ Update khi xong:
 - Verify pass: `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`.
 - Ghi chú: master numbers 11/22/33 vẫn không fallback sang số rút gọn.
 
+### T-0610c-section12-13-14 - Literal V1 sections 12-14 inline render
+
+Status: Done
+
+Bối cảnh:
+
+- Section 12 thiếu intro paragraph V1 trước narrative challenge.
+- Section 13 dùng `maturityCtxBlock` simplified, chưa đúng `_maturityCtxBlock` V1.
+- Section 14 còn dùng `generic(...)`, chưa render inline V1 cho năng lực trưởng thành.
+
+Yêu cầu:
+
+- Port literal V1 `_maturityCtxBlock` với border-left `#059669`.
+- Prepend intro V1 cho section 12 `Thử thách Sứ Mệnh`.
+- Replace section 14 generic bằng inline render V1 dùng data maturity ability.
+- Không đụng section khác, engine, route, auth, payment, charts.
+
+Điều kiện Done:
+
+- Section 12 fixture có `Không có sứ mệnh nào không đi kèm với thử thách`.
+- Section 13 fixture có `✦ Số Trưởng Thành` và `tinh lọc và kết tinh`.
+- Section 14 fixture dài hơn 800 chars.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+
+Update khi xong:
+
+- `maturityCtxBlock` trong `packages/shared/src/numerology/narrative/life-path.ts` được thay bằng literal V1, escape tên user.
+- `synthesizer.ts` section 12 prepend intro V1 trước `challengeHtml(...)`.
+- `synthesizer.ts` section 14 thêm `renderMaturityAbility(...)` inline theo V1; map thêm `peak_age`/`how_to_develop` từ KB hiện tại vào wrapper V1 tương ứng với thế mạnh/lời khuyên.
+- Spot-check fixture `Nông Xuân Thái / 1996-09-03`: section 12 intro pass, section 13 maturity context pass, section 14 dài 822 chars.
+- Verify pass: `npm run typecheck`, `npm run lint`, `npm run build`.
+
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
 
 Status: Done
