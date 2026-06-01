@@ -136,6 +136,7 @@
 - Entry 1,2,3,5,6,7,8,9 đều trên 1500 chars.
 - Fixture `Nông Xuân Thái / 1996-09-03`: section 10 dài 8043 chars, có extra content và marker destiny 4.
 - Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+- Code review phát hiện master numbers 11/22/33 có thể fallback nhầm sang extra narrative của số rút gọn; đã sửa `renderDestinyExtra` để chỉ render khi có entry exact.
 
 ### Ghi chú
 - Không sửa `narrative.json`, section 1-9 hoặc 11-30.

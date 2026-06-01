@@ -326,7 +326,7 @@ export const DESTINY_EXTRA: Record<number, DestinyExtraEntry> = {
 };
 
 export function renderDestinyExtra(num: number, name: string): string {
-  const entry = DESTINY_EXTRA[num] || DESTINY_EXTRA[num % 9 || 9];
+  const entry = DESTINY_EXTRA[num];
   if (!entry) return "";
   const safeName = escapeHtml(name);
   const replaceVars = (html: string) => html.replaceAll("{{name}}", safeName);

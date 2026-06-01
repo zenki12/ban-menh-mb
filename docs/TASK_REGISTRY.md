@@ -2778,6 +2778,7 @@ Update khi xong:
 - Destiny 4 giữ template được cung cấp với marker `Bạn là một thuật sĩ`; các entry còn lại đều trên 1500 chars.
 - Verify pass: `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`.
 - Fixture `Nông Xuân Thái / 1996-09-03`: section 10 dài 8043 chars, có destiny extra và marker `Bạn là một thuật sĩ`.
+- Review fix: bỏ modulo fallback trong `renderDestinyExtra` để master numbers 11/22/33 không render nhầm extra narrative của số rút gọn.
 - Ghi chú: không sửa `narrative.json`, section 1-9, section 11-30, engine, route, auth, payment, charts, hoặc theme.
 
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
