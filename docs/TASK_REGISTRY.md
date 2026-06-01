@@ -2383,6 +2383,39 @@ Update khi xong:
 - Verify pass: `kb:extract-narrative`, `kb:validate-narrative`, `kb:test-synthesizer`, `typecheck`, `lint`, `build`, `kb:upload-kv`.
 - Manual smoke: `Hà Thu Hương / 1996-09-03` ra destiny 6 và section 10 có header `Tài năng chăm sóc và lãnh đạo bằng tình yêu thương`; `Nông Xuân Thái / 1996-09-03` destiny 4 section 10 dài 7281 chars theo literal V1, không padding thêm.
 
+### T-0606c - Extended soulChallenge content merge
+
+Status: Done
+
+Bối cảnh:
+
+- Audit sau T-0606b phát hiện V1 `NarrativeTemplates.soulChallenge` override chỉ có entry `[1]` rich đúng chuẩn 5-aspect.
+- Các entry `[0, 2-8]` trong override còn ngắn; `[9]` fallback từ original.
+- Claude đã tạo sẵn 9 entry extended static trong `kb-private/numerology/soul-challenge-extended.mjs`.
+
+Yêu cầu:
+
+- Không sửa V1 literal `[1]`.
+- Merge extended `[0, 2-9]` vào output `narrative.json` sau khi extractor đọc V1.
+- Validate đủ 10 entry soulChallenge: length, 5 sub-section headers, `Tóm lại`, `{{name}}`, không leak `${...}`.
+- Không commit `kb-private/*`.
+
+Điều kiện Done:
+
+- `soul-challenge-extended.mjs` có keys `0,2,3,4,5,6,7,8,9`.
+- `node tools/kb-import/extract-narrative.mjs` pass.
+- `npm run kb:validate-narrative`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Smoke section 17 cho soulChallenge 2, 5, 9 có 5 sub-section headers, coined phrase đúng, và không có duplicate intro.
+
+Update khi xong:
+
+- `extract-narrative.mjs` import `SOUL_CHALLENGE_EXTENDED` từ `kb-private` và merge `[0, 2-9]`, giữ V1 `[1]`.
+- Validation trong extractor throw rõ nếu thiếu extended entry, thiếu marker, length < 4500, thiếu `{{name}}`, hoặc còn raw template expression.
+- Re-extract `kb-private/numerology/narrative.json`: soulChallenge 10/10 pass audit; file vẫn gitignored.
+- Groups khác giữ count: destiny 11, soul 11, personality 10, maturity 11, karmicLesson 9, destinyChallenge 10, personalityChallenge 9.
+- Smoke local: `Nong Xuan Thai` soulChallenge 2 có `sự hiện diện có hai bờ`; `Yen` soulChallenge 5 có `tự do có gốc rễ`; `Binh` soulChallenge 9 có `buông không phải mất`.
+- Ghi chú: `workers/kb` không có script `typecheck`; check này không chạy được.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done

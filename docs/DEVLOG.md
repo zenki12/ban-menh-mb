@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 01:24 +07 | T-0606c | Extended soulChallenge content merge | `Task` |
 | 2026-06-01 23:57 +07 | T-0610c-section16-17-18 | Literal V1 sections 16-17-18 inline render | `Task` |
 | 2026-06-01 23:41 +07 | T-0610c-section12-13-14 | Literal V1 sections 12-14 inline render | `Task` |
 | 2026-06-01 23:06 +07 | T-0606b | Detect V1 narrative OVERRIDE assignments | `Task` |
@@ -117,6 +118,34 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-02 01:24 +07] - T-0606c: Extended soulChallenge content merge
+
+**Loại:** `Task`
+**Ref:** T-0606c
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Audit T-0606b phát hiện V1 `soulChallenge` override chỉ rich ở `[1]`. T-0606c merge 9 entry extended static `[0, 2-9]` từ `kb-private` vào extractor output, giữ nguyên V1 `[1]`.
+
+### Thay đổi
+- `extract-narrative.mjs` import `SOUL_CHALLENGE_EXTENDED` từ `kb-private/numerology/soul-challenge-extended.mjs`.
+- Merge logic: V1 override `[1]` giữ nguyên; extended `[0, 2-9]` thay output short/fallback.
+- Thêm validation trong extractor cho 10/10 `soulChallenge`: length >= 4500, 5 sub-section headers, `Tóm lại`, `{{name}}`, không leak `${...}`.
+- Re-extract `kb-private/numerology/narrative.json`; file private vẫn gitignored, không commit.
+- `TASK_REGISTRY.md` đóng `T-0606c`.
+- `ADR.md` thêm quyết định mở rộng narrative offline khi V1 partial-rich.
+
+### Verify
+- `soul-challenge-extended.mjs` keys: `0,2,3,4,5,6,7,8,9`.
+- 10/10 `narrative.soulChallenge` pass audit script; V1 `[1]` dài 5306 chars và giữ rich content.
+- Groups khác giữ count: destiny 11, soul 11, personality 10, maturity 11, karmicLesson 9, destinyChallenge 10, personalityChallenge 9.
+- Smoke section 17: `Nong Xuan Thai` soulChallenge 2 có `sự hiện diện có hai bờ`; `Yen` soulChallenge 5 có `tự do có gốc rễ`; `Binh` soulChallenge 9 có `buông không phải mất`; cả 3 có 5 sub-section headers và không có duplicate intro.
+- Pass: `npm run kb:validate-narrative`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`.
+- Không chạy được `workers/kb` typecheck vì workspace này không có script `typecheck`.
+
+### Rủi ro còn lại
+- Các group khác có thể còn V1 asymmetry tương tự; defer audit sang T-0606d.
 
 ## [2026-06-01 23:57 +07] - T-0610c-section16-17-18: Literal V1 sections 16-17-18 inline render
 

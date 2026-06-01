@@ -295,3 +295,52 @@ Dùng **Hono** làm framework cho cả 3 Worker (`workers/payment`, `workers/kb`
 
 - Nếu Hono breaking change nặng và migration cost cao.
 - Nếu sau MVP cần GraphQL hoặc tRPC end-to-end type-safe cho admin dashboard.
+
+---
+
+## ADR-007 - Numerology narrative extension khi V1 partial-rich
+
+| Field | Value |
+|---|---|
+| Status | ACCEPTED |
+| Category | KB/Narrative |
+| Owner | Codex |
+| Liên quan | T-0606c, tools/kb-import/extract-narrative.mjs, kb-private/numerology |
+
+### Bối cảnh
+
+T-0606b mở rộng extractor để đọc các `NarrativeTemplates.groupName = { ... }` override trong V1. Audit tiếp theo phát hiện một số override có thể partial-rich: ví dụ `soulChallenge` có entry `[1]` rich theo cấu trúc 5-aspect, nhưng `[0, 2-8]` vẫn ngắn và `[9]` fallback từ original.
+
+Nếu chỉ copy literal V1, chất lượng thương mại giữa các number trong cùng một indicator không đồng đều. Nếu sửa trực tiếp V1 source hoặc sinh nội dung runtime, pipeline sẽ mất tính truy vết và tăng rủi ro vận hành.
+
+### Quyết định
+
+Khi audit phát hiện một nhóm narrative V1 partial-rich, dự án cho phép tạo nội dung mở rộng offline, static, đặt trong `kb-private/numerology/`, rồi để extractor merge V1 literal với extended content.
+
+Quy tắc áp dụng:
+
+- Entry V1 rich giữ nguyên, không paraphrase.
+- Entry extended phải được tạo/duyệt offline, không gọi LLM runtime.
+- File extended nằm trong `kb-private` và không commit.
+- Extractor phải validate length, cấu trúc section, placeholder `{{name}}`, và không leak `${...}` trước khi ghi `narrative.json`.
+- DEVLOG/TASK_REGISTRY phải ghi rõ entry nào là V1 literal, entry nào là extended static.
+
+### Hệ quả
+
+Ưu điểm:
+
+- Chất lượng narrative đồng đều hơn giữa các number.
+- Runtime vẫn chỉ đọc JSON/static content, không phát sinh LLM call.
+- Nguồn gốc nội dung extended được phân biệt rõ với V1 literal.
+
+Đánh đổi:
+
+- Nội dung extended không phải V1 literal, nên cần audit riêng và ghi provenance rõ.
+- Extractor phụ thuộc vào file private tương ứng khi regenerate narrative.
+- Các group khác có thể cần audit tiếp nếu V1 override có pattern partial-rich tương tự.
+
+### Trigger áp dụng
+
+- V1 entry trong cùng group ngắn bất thường, ví dụ dưới 2000 chars trong khi một entry cùng group có cấu trúc rich.
+- Entry thiếu các sub-section headers quan trọng đã được group rich sử dụng.
+- Audit nội dung phát hiện trải nghiệm người dùng không đồng đều giữa các number.
