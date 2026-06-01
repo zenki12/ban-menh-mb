@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-01 17:37 +07 | T-0610c-section10-finalize | Expand destiny extra narratives to V1-length parity | `Task` |
 | 2026-06-01 16:40 +07 | T-0610c-section10-extra | Destiny extra narrative content | `Task` |
 | 2026-06-01 15:22 +07 | T-0610c-section10-11 | Literal V1 destiny context + section 11 correlation | `Task` |
 | 2026-05-30 01:54 +07 | T-0610c-section9 | Literal V1 personal month 3-month detail | `Task` |
@@ -111,6 +112,35 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-01 17:37 +07] - T-0610c-section10-finalize: Expand destiny extra narratives to V1-length parity
+
+**Loại:** `Task`
+**Ref:** T-0610c-section10-finalize
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Mở rộng nội dung static cho các entry Sứ Mệnh 1,2,3,5,6,7,8,9 trong `DESTINY_EXTRA` để đạt độ dài tương xứng hơn với template destiny 4.
+
+### Thay đổi
+- `destiny.ts` bổ sung paragraph/subsection cho 8 entry generated, dùng material từ `kb-private/numerology/kb.json` nhóm `destiny_number`.
+- Không sửa entry destiny 4; hash slice entry 4 giữ nguyên `a97dd392eeb8f12fe0fab29fef3b94639be8ad05640cb98f58a28e92f626fa85`.
+- Output vẫn là TS const static sinh offline; runtime chỉ lookup qua `renderDestinyExtra`, không gọi AI theo user.
+- `TASK_REGISTRY.md` đóng `T-0610c-section10-finalize`.
+
+### Verify
+- `destiny.ts` dài 576 dòng, dưới giới hạn 1000 dòng.
+- Entry 1,2,3,5,6,7,8,9 đều trên 5000 chars.
+- Section 10 fixture cho destiny generated 1,2,3,5,6,7,8,9 đều trên 12000 chars.
+- Không có các từ cấm `chữa lành`, `healing`, `rung động`.
+- Đã chạy pass: `npm.cmd run kb:test-synthesizer`, `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
+### Ghi chú
+- Không sửa destiny 4, `narrative.json`, engine, route, auth, payment, charts, theme, `kb-private/*`, hoặc `.env.local`.
+- `narrative-deep.ts` và `synthesizer.ts` đã được wire ở commit trước, không cần sửa thêm trong finalize.
+- Master numbers 11/22/33 vẫn render empty extra thay vì fallback sang số rút gọn.
 
 ---
 

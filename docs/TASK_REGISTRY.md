@@ -2781,6 +2781,41 @@ Update khi xong:
 - Review fix: bỏ modulo fallback trong `renderDestinyExtra` để master numbers 11/22/33 không render nhầm extra narrative của số rút gọn.
 - Ghi chú: không sửa `narrative.json`, section 1-9, section 11-30, engine, route, auth, payment, charts, hoặc theme.
 
+### T-0610c-section10-finalize - Finalize destiny extra narrative length
+
+Status: Done
+
+Bối cảnh:
+
+- `DESTINY_EXTRA` đã có 9 entry cho section 10, nhưng các entry 1,2,3,5,6,7,8,9 còn ngắn hơn entry destiny 4 template.
+- Task này mở rộng nội dung static TS const offline; runtime chỉ lookup dữ liệu, không gọi AI theo user.
+
+Yêu cầu:
+
+- Không đụng destiny 4.
+- Mở rộng entry 1,2,3,5,6,7,8,9 để mỗi entry đạt tối thiểu 5000 chars.
+- Dựa trên material `kb-private/numerology/kb.json` nhóm `destiny_number`.
+- Không dùng các từ cấm `chữa lành`, `healing`, `rung động`.
+- Stage/commit chỉ 5 file scope: `destiny.ts`, `narrative-deep.ts`, `synthesizer.ts`, `TASK_REGISTRY.md`, `DEVLOG.md`.
+
+Điều kiện Done:
+
+- `destiny.ts` dưới 1000 dòng.
+- Entry 1,2,3,5,6,7,8,9 đều >= 5000 chars.
+- Destiny 4 byte-for-byte không đổi.
+- `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Section 10 fixture dài hơn 12000 chars/user.
+
+Update khi xong:
+
+- Mở rộng static `DESTINY_EXTRA` cho các entry 1,2,3,5,6,7,8,9 dựa trên material `destiny_number` trong KB.
+- Giữ destiny 4 byte-for-byte không đổi; hash slice entry 4: `a97dd392eeb8f12fe0fab29fef3b94639be8ad05640cb98f58a28e92f626fa85`.
+- `destiny.ts` dài 576 dòng; các entry 1,2,3,5,6,7,8,9 đều trên 5000 chars.
+- Section 10 fixture cho các destiny generated 1,2,3,5,6,7,8,9 đều trên 12000 chars.
+- Output là TS const static sinh offline; runtime chỉ lookup, không gọi AI theo user.
+- Verify pass: `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`.
+- Ghi chú: master numbers 11/22/33 vẫn không fallback sang số rút gọn.
+
 ### T-0610c-fix - Fix Vietnamese period strings and pyramid chart year labels
 
 Status: Done
