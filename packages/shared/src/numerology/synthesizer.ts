@@ -14,6 +14,7 @@ import {
   personalPeriod,
   personalityCtxBlock,
   readString,
+  renderDestinyExtra,
   renderLifePathExtra,
   soulCtxBlock,
   type NarrativeContext,
@@ -315,6 +316,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
           "Chỉ số Sứ Mệnh (Vận Mệnh)",
           `<p class="nar"><strong>Sứ Mệnh số ${report.destiny.number}</strong> — ${escapeHtml(readString(report.destiny.data, ["title"]))}. Đây là chỉ số thể hiện cách bạn đạt được mục tiêu và đóng góp cho thế giới.</p>` +
             renderIndicator(narrative, "destiny", "Sứ mệnh", report.destiny, name) +
+            renderDestinyExtra(report.destiny.number, name) +
             destinyCtxBlock(report.destiny.number, ctx, name),
         ),
         section("11", "Tương quan Đường đời & Sứ mệnh", buildLifePathDestinyCorrelation(report, name)),
