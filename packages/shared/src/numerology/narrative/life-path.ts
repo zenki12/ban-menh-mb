@@ -700,7 +700,16 @@ export function destinyCtxBlock(num: number, ctx: NarrativeContext, name: string
 }
 
 export function personalityCtxBlock(num: number, ctx: NarrativeContext, name: string): string {
-  return `<div class="insight-box cross-context-box">🔗 <strong>Nhân cách ${num} trong tương quan với Linh hồn ${ctx.soul}:</strong> Đây là lớp người khác nhìn thấy trước khi chạm tới nội tâm của <strong>${escapeHtml(name)}</strong>. Hiểu khoảng cách này giúp bạn giao tiếp thật hơn.</div>`;
+  const soul = ctx.soul;
+  const same = num === soul;
+  const energyMatch = ([1, 3, 5, 9].includes(num) && [1, 3, 5, 9].includes(soul)) ||
+    ([2, 4, 6, 8].includes(num) && [2, 4, 6, 8].includes(soul));
+  const persDesc = same
+    ? `Nhân cách số <strong>${num}</strong> hoàn toàn khớp với Linh hồn số <strong>${soul}</strong>. Bạn là người hiếm có: hình ảnh bên ngoài phản ánh chân thực thế giới nội tâm — không có khoảng cách giữa "bạn trước mắt người khác" và "bạn thật sự bên trong". Đây là nền tảng của sự xác thực đích thực.`
+    : energyMatch
+      ? `Nhân cách số <strong>${num}</strong> cộng hưởng hài hòa với Linh hồn số <strong>${soul}</strong>. Hình ảnh bạn tạo ra bên ngoài phản ánh khá chân thực những gì bên trong — người ta thường thấy bạn gần với con người thật của mình.`
+      : `Nhân cách số <strong>${num}</strong> khác với Linh hồn số <strong>${soul}</strong> — bên ngoài bạn hiện ra một vẻ khác với tần số bên trong. Đây không phải giả tạo mà là sự đa chiều tự nhiên của một con người có chiều sâu. Khi người xung quanh dần hiểu bạn hơn, khoảng cách này trở thành sức hút bí ẩn đặc biệt.`;
+  return `<p class="nar" style="border-left:3px solid #d97706;padding-left:1rem;margin-top:1rem;"><strong>✦ Nhân cách trong tổng thể biểu đồ của ${escapeHtml(name)}:</strong> ${persDesc}</p>`;
 }
 
 export function maturityCtxBlock(num: number, ctx: NarrativeContext, name: string): string {

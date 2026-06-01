@@ -214,6 +214,21 @@ export function buildLifePathDestinyCorrelation(report: NumerologyReport, name: 
 <div class="insight-box">📌 <strong>Lưu ý:</strong> Hãy đọc kỹ luận giải về cả hai chỉ số này và kết hợp chúng lại để có bức tranh toàn diện nhất về hành trình của mình.</div>`;
 }
 
+function buildLifePathSoulCorrelation(report: NumerologyReport, name: string): string {
+  const lpNum = report.lifePath.number;
+  const soulNum = report.soul.number;
+  const lpSoulSame = lpNum === soulNum;
+  const compat = lpSoulSame
+    ? `hoàn toàn đồng nhất: mục tiêu, tham vọng và những mong muốn sâu bên trong bạn hòa hợp, đồng điệu với nhau, giúp bạn phát triển mạnh mẽ hơn`
+    : `có những điểm giao thoa. Bề ngoài bạn thể hiện năng lượng đường đời ${lpNum}, nhưng sâu bên trong bạn đang khao khát những điều mà linh hồn số ${soulNum} hướng tới`;
+  const lpTitle = readString(report.lifePath.data, ["title"]) || `năng lượng tiêu biểu của số ${lpNum}`;
+  const safeName = escapeHtml(name);
+  return `<p class="nar">Chỉ số đường đời và chỉ số linh hồn là hai yếu tố có mối quan hệ chặt chẽ với nhau. Chỉ số đường đời cho biết năng lượng tổng quát của một người (các điểm mạnh, điểm yếu, xu hướng tính cách, các bài học trong cuộc đời, bản ngã nguyên thủy...); còn chỉ số linh hồn cho biết mong muốn, khao khát sâu bên trong của mỗi người.</p>
+<p class="nar">Cặp số đường đời <strong>${lpNum}</strong> - linh hồn <strong>${soulNum}</strong> của <strong>${safeName}</strong> là ${compat}. Ưu điểm của số đường đời ${lpNum} là ${escapeHtml(lpTitle)}. Khi có thêm chỉ số linh hồn ${soulNum} trong bộ số, tính cách của bạn được bổ sung những nét đặc biệt riêng, tạo ra sự hòa hợp sâu sắc hơn.</p>
+<p class="nar">Khi chỉ số đường đời và linh hồn bổ sung hoặc cộng hưởng với nhau, bạn sẽ cảm thấy hài lòng và thỏa mãn với hầu hết những gì mình đang làm; kiên trì và quyết tâm vượt qua mọi khó khăn để đạt được mục tiêu. Ngược lại, nếu có sự đối đầu, bạn có thể mắc kẹt và gặp khó khăn trong việc đưa ra quyết định. Tuy nhiên, bạn vẫn có thể hóa giải nếu nỗ lực học hỏi, thay đổi và phát triển bản thân.</p>
+<div class="insight-box">📌 <strong>Lời khuyên:</strong> Hãy đọc thêm các luận giải về cả chỉ số Đường Đời và Linh Hồn để hiểu bức tranh tổng quát về cuộc đời mình.</div>`;
+}
+
 function karmicLessonsHtml(report: NumerologyReport, narrative: NarrativeKb, name: string): string {
   const lessons = report.karmicLessons as KarmicLessonsResult;
   if (!lessons.missingNumbers.length) {
@@ -360,8 +375,13 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
         section("13", "Chỉ số Trưởng Thành", renderIndicator(narrative, "maturity", "Trưởng thành", report.maturity, name) + maturityCtxBlock(report.maturity.number, ctx, name)),
         section("14", "Năng lực trong giai đoạn Trưởng Thành", renderMaturityAbility(report, name)),
         section("15", "Chỉ số Linh Hồn (Mong ước sâu thẳm)", renderIndicator(narrative, "soul", "Linh hồn", report.soul, name) + soulCtxBlock(report.soul.number, ctx, name)),
-        section("16", "Tương quan Đường đời & Linh hồn", relationshipHtml("Tương quan Đường đời và Linh hồn", report.lifePath.number, report.soul.number, name)),
-        section("17", "Thử thách Linh Hồn", challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name)),
+        section("16", "Tương quan Đường đời & Linh hồn", buildLifePathSoulCorrelation(report, name)),
+        section(
+          "17",
+          "Thử thách Linh Hồn",
+          `<p class="nar">Mọi linh hồn đều mang theo những bóng tối riêng — không phải để bị đeo đuổi mà để được chiếu sáng. Với <strong>${escapeHtml(name)}</strong>, thử thách linh hồn số <strong>${report.soulChallenge.number}</strong> là lớp vỏ bảo vệ mà bạn đã xây dựng quanh trái tim mình.</p>` +
+            challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name),
+        ),
         section("18", "Chỉ số Nhân Cách", renderIndicator(narrative, "personality", "Nhân cách", report.personality, name) + personalityCtxBlock(report.personality.number, ctx, name)),
         section("19", "Thử thách Nhân Cách", challengeHtml(narrative, "personalityChallenge", "Thử thách Nhân cách", report.personalityChallenge, name)),
         section("20", "Các bài học nghiệp (Karmic Lessons)", karmicLessonsHtml(report, narrative, name)),
