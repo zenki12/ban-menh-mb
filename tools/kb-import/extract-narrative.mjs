@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { SOUL_CHALLENGE_EXTENDED } from "../../kb-private/numerology/soul-challenge-extended.mjs";
 
 const sourcePath = path.join(process.cwd(), "kb-private", "numerology", "narrative_v1_full.js");
 const outputPath = path.join(process.cwd(), "kb-private", "numerology", "narrative.json");
@@ -220,6 +221,47 @@ function extractGroup(groupText, groupName, config) {
   return entries;
 }
 
+function validateSoulChallengeHtml(key, html) {
+  const required = [
+    "Thử thách này biểu hiện như thế nào trong cuộc sống",
+    "Nguồn gốc sâu của Thử thách này",
+    "Biểu hiện trong các mối quan hệ",
+    "Những gì bạn cần thực hành",
+    "Dấu hiệu cho thấy bạn đang vượt qua Thử thách này",
+    "Tóm lại",
+    "{{name}}",
+  ];
+  const missing = required.filter((item) => !html.includes(item));
+  if (html.length < 4500) throw new Error(`T-0606c: soulChallenge[${key}] length ${html.length} < 4500`);
+  if (missing.length > 0) throw new Error(`T-0606c: soulChallenge[${key}] missing ${missing.join(" | ")}`);
+  if (html.includes("${")) throw new Error(`T-0606c: soulChallenge[${key}] has leaked template expression`);
+}
+
+function mergeExtendedSoulChallenge(narrative) {
+  const validKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  for (const key of validKeys) {
+    if (key === "1") {
+      const html = narrative.soulChallenge[key]?.html ?? "";
+      if (!html.includes("Nguồn gốc sâu")) {
+        throw new Error("T-0606c: V1 soulChallenge[1] thiếu rich content - extractor V1 fail");
+      }
+      continue;
+    }
+    const extended = SOUL_CHALLENGE_EXTENDED[Number(key)];
+    if (!extended) {
+      throw new Error(`T-0606c: SOUL_CHALLENGE_EXTENDED missing key ${key}`);
+    }
+    narrative.soulChallenge[key] = {
+      html: extended,
+      variables: ["name"],
+    };
+  }
+
+  for (const key of validKeys) {
+    validateSoulChallengeHtml(key, narrative.soulChallenge[key]?.html ?? "");
+  }
+}
+
 const source = fs.readFileSync(sourcePath, "utf8");
 const narrative = {};
 let total = 0;
@@ -238,6 +280,8 @@ for (const [groupName, config] of Object.entries(GROUP_CONFIG)) {
     }`,
   );
 }
+
+mergeExtendedSoulChallenge(narrative);
 
 fs.writeFileSync(outputPath, `${JSON.stringify(narrative, null, 2)}\n`, "utf8");
 console.log(`total: ${total} entries`);
