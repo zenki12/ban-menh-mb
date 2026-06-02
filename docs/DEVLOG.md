@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
 | 2026-06-02 12:35 +07 | T-0606l | Tension number fallback insight + English cleanup | `Hotfix` |
 | 2026-06-02 12:05 +07 | T-0606k-fix | Section 23 compensation arrow summary fix | `Hotfix` |
 | 2026-06-02 11:45 +07 | T-0606k | Port V1 birth/name grid analysis | `Task` |
@@ -122,6 +123,35 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-02 13:10 +07] - T-0606m: Audit cleanup batch
+
+**Loại:** `Task`
+**Ref:** T-0606m
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Cleanup theo audit toàn dự án: xử lý dev-token exposure, commit T-0606l còn pending, xác minh schema dirty, đóng KARMIC_DEBTS false positive, ignore tooling dirs. Payment/ResultHero bị dừng vì scope chưa rõ.
+
+### Kết quả theo sub-task
+- `T-0606m-1` Done: `/dev-token` route có production `notFound()` gate; dev/preview giữ nguyên.
+- `T-0606m-2` Done: commit T-0606l extractor/doc; narrative đã re-extract, KV upload complete và worker 8787 ready trước batch.
+- `T-0606m-3` Done: `numerology-kb.ts` schema expansion khớp `kb.json`; `npm run kb:validate` pass.
+- `T-0606m-4` Stopped: payment free-voucher flow và untracked `ResultHero` có scope không rõ, không commit, không revert.
+- `T-0606m-5` Done: bỏ `10` khỏi `KARMIC_DEBTS`/`KarmicDebtNumber`; thêm `kb:test-karmic`.
+- `T-0606m-6` Done: ignore `.agent/`, `.agents/`, `.kiro/`, `_bmad/`.
+
+### Verify
+- Pass: `npm run typecheck`, `npm run lint`, `npm run kb:test-challenges`, `npm run kb:test-karmic`.
+- Pass: `NODE_OPTIONS=--max-old-space-size=4096 npm run build`.
+- V1 check: `engine.browser.js` has `KN = [13, 14, 16, 19]`.
+- Tooling dirs no longer appear in `git status --short`.
+
+### Rủi ro còn lại
+- Payment/free-voucher dirty files and untracked `ResultHero` remain in worktree pending user decision.
+- Untracked `apps/web/.env.example` and icon asset also remain outside this task.
 
 ---
 

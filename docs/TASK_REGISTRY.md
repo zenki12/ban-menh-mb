@@ -2605,7 +2605,7 @@ Update khi xong:
 
 ### T-0606m - Audit cleanup batch after project-wide review
 
-Status: In Progress
+Status: Done
 
 Bối cảnh:
 
@@ -2632,6 +2632,16 @@ Yêu cầu:
 - T-0606m-5 karmic debt 10 cleanup Done.
 - T-0606m-6 tooling dirs ignored Done.
 - Final typecheck/lint/build/tests pass; docs updated.
+
+Update khi xong:
+
+- T-0606m-1 Done: `/dev-token` route committed with production `notFound()` gate.
+- T-0606m-2 Done: T-0606l extractor code and docs committed; KV already uploaded and worker restarted.
+- T-0606m-3 Done: schema expansion matched `kb.json` shape; `npm run kb:validate` pass.
+- T-0606m-4 Stopped: payment free-voucher flow and untracked `ResultHero` scope unclear; left dirty, not staged or reverted.
+- T-0606m-5 Done: removed `10` from `KARMIC_DEBTS` and `KarmicDebtNumber`; added `kb:test-karmic`.
+- T-0606m-6 Done: `.agent/`, `.agents/`, `.kiro/`, `_bmad/` ignored in `.gitignore`.
+- Final verify pass: `typecheck`, `lint`, `kb:test-challenges`, `kb:test-karmic`, build with `NODE_OPTIONS=--max-old-space-size=4096`.
 
 ### T-0607 - Restructure result flow và port V1 charts
 
