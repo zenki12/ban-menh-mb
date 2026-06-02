@@ -2416,6 +2416,36 @@ Update khi xong:
 - Smoke local: `Nong Xuan Thai` soulChallenge 2 có `sự hiện diện có hai bờ`; `Yen` soulChallenge 5 có `tự do có gốc rễ`; `Binh` soulChallenge 9 có `buông không phải mất`.
 - Ghi chú: `workers/kb` không có script `typecheck`; check này không chạy được.
 
+### T-0606e - Fix challenge indicator formulas to match V1
+
+Status: Done
+
+Bối cảnh:
+
+- Audit phát hiện V2 đang map `soulChallenge`, `destinyChallenge`, `personalityChallenge` bằng số gốc tương ứng thay vì công thức challenge V1.
+- V1 formulas: `soulChallenge = |soul - lifePath| % 9`, `destinyChallenge = |soul - personality|`, `personalityChallenge = |personality - lifePath| % 9`.
+- Các phép so sánh phải reduce master numbers bằng `reduce(n, false)` để match V1.
+
+Yêu cầu:
+
+- Chỉ sửa 3 challenge indicators trong `packages/shared/src/numerology/report.ts`.
+- Không đổi `reduce` signature, report shape, narrative JSON, hoặc calc khác.
+- Thêm regression test cho công thức challenge.
+
+Điều kiện Done:
+
+- `npm run kb:test-challenges` pass.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Case `Hà Thu Hương / 1996-09-03` có destinyChallenge `2`, không còn `6`.
+
+Update khi xong:
+
+- Thêm `calcChallenge(...)` trong `report.ts`, dùng `reduce(_, false)` và `mod9` theo từng challenge.
+- `generateReport(...)` wire lại 3 indicators: soul/lifePath, soul/personality, personality/lifePath.
+- Thêm `tools/kb-import/test-challenges.mjs` và script `kb:test-challenges`.
+- Regression cases pass: `Hà Thu Hương / 1996-09-03` => `{ soulChallenge: 3, destinyChallenge: 2, personalityChallenge: 1 }`; `Nông Xuân Thái / 1996-01-01` => `{ soulChallenge: 7, destinyChallenge: 0, personalityChallenge: 7 }`.
+- T-0606c narrative content không đổi; chỉ mapping số challenge thay đổi.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done

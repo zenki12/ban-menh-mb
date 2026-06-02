@@ -23,6 +23,7 @@
 | R-011 | Import KB/design sai cách làm lộ tài sản lõi | KB/Security | Critical | Open | Codex/User | KB chỉ import vào private storage/API layer; design asset kiểm tra license/quyền dùng trước khi đưa vào repo |
 | R-012 | Copy nhầm logic/workflow V1 khi chỉ được lấy visual/KB | Process/Architecture | High | Open | Codex/Claude | Design extraction spec và KB extraction plan phải được dùng trước khi code; review diff không cho copy app logic cũ |
 | R-013 | Dùng workflow/asset Tarot tham chiếu vượt quá quyền cho phép | Legal/Content | High | Open | User/Claude | Mystery Tarot/TAROT-vibe chỉ là workflow reference; asset/code/branding cần license rõ trước khi dùng |
+| R-014 | Công thức numerology V2 có thể lệch V1 ngoài 3 challenge indicators đã fix | Numerology/KB | Medium | Open | Codex/Claude | Audit toàn bộ formula report.ts/indicators.ts với V1 engine.browser.js; thêm regression tests theo từng nhóm chỉ số |
 
 ## 3. Review cadence
 

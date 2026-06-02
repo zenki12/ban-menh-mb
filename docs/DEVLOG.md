@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 10:22 +07 | T-0606e | Fix challenge indicator formulas to match V1 | `Task` |
 | 2026-06-02 01:24 +07 | T-0606c | Extended soulChallenge content merge | `Task` |
 | 2026-06-01 23:57 +07 | T-0610c-section16-17-18 | Literal V1 sections 16-17-18 inline render | `Task` |
 | 2026-06-01 23:41 +07 | T-0610c-section12-13-14 | Literal V1 sections 12-14 inline render | `Task` |
@@ -118,6 +119,30 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-02 10:22 +07] - T-0606e: Fix challenge indicator formulas to match V1
+
+**Loại:** `Task`
+**Ref:** T-0606e
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Audit phát hiện V2 đang lấy trực tiếp số gốc cho `soulChallenge`, `destinyChallenge`, `personalityChallenge`. T-0606e đổi về công thức V1 để nội dung challenge rich từ T-0606c map đúng chỉ số.
+
+### Thay đổi
+- `report.ts` thêm `calcChallenge(...)`, reduce hai vế bằng `reduce(_, false)` trước khi so sánh.
+- `soulChallenge = |soul - lifePath| % 9`; `destinyChallenge = |soul - personality|`; `personalityChallenge = |personality - lifePath| % 9`.
+- Thêm `tools/kb-import/test-challenges.mjs` và script `kb:test-challenges`.
+- Giữ nguyên `narrative.json`; T-0606c content không đổi, chỉ mapping số challenge thay đổi.
+- `TASK_REGISTRY.md` đóng `T-0606e`; `RISK_REGISTER.md` thêm risk audit formula còn lại.
+
+### Verify
+- `npm run kb:test-challenges` pass với `Hà Thu Hương / 1996-09-03` => `{ soulChallenge: 3, destinyChallenge: 2, personalityChallenge: 1 }`.
+- `npm run kb:test-challenges` pass với `Nông Xuân Thái / 1996-01-01` => `{ soulChallenge: 7, destinyChallenge: 0, personalityChallenge: 7 }`.
+- Pass: `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`.
+
+### Rủi ro còn lại
+- Còn khả năng một số công thức numerology khác lệch V1; đã ghi `R-014` để audit tiếp theo.
 
 ## [2026-06-02 01:24 +07] - T-0606c: Extended soulChallenge content merge
 
