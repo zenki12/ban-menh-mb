@@ -12,8 +12,9 @@ const EXPECTED_KEYS = {
   pyramidPeak: NINE, pyramidChallenge: ["0", ...NINE], tensionNumber: NINE,
   soulChallenge: ZERO_TO_NINE, destinyChallenge: ZERO_TO_NINE, personalityChallenge: NINE,
   cognitiveAbility: NINE, approachMotivation: NINE, approachAbility: NINE,
-  approachAttitude: NINE, personalYearDomains: NINE,
+  approachAttitude: NINE, personalYearDomains: NINE, karmicDebt: ["13", "14", "16", "19"],
 };
+const NAME_OPTIONAL_GROUPS = new Set(["karmicDebt"]);
 
 async function loadSchema() {
   const { outputFiles } = await build({
@@ -41,6 +42,7 @@ function validateEntry(groupName, key, entry) {
     errors.push(`${prefix}.variables: first variable must be name`);
   }
   for (const variable of entry.variables ?? []) {
+    if (NAME_OPTIONAL_GROUPS.has(groupName) && variable === "name") continue;
     if (!entry.html.includes(`{{${variable}}}`)) errors.push(`${prefix}.html: missing {{${variable}}}`);
   }
   if (entry.html.includes("${")) errors.push(`${prefix}.html: contains raw template expression`);

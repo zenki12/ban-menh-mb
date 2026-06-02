@@ -27,6 +27,13 @@ const GROUP_CONFIG = {
   approachAbility: { params: ["name", "d"], keys: ONE_TO_NINE, nextGroup: "approachAttitude" },
   approachAttitude: { params: ["name", "d"], keys: ONE_TO_NINE, nextGroup: "personalYearDomains" },
   personalYearDomains: { params: ["name", "year", "age"], keys: [...ONE_TO_NINE, "11"], nextGroup: null },
+  karmicDebt: {
+    params: ["name", "d"],
+    keys: ["13", "14", "16", "19"],
+    nextGroup: null,
+    literalOptional: true,
+    nameOptional: true,
+  },
 };
 
 function sliceGroup(source, groupName, nextGroupName) {
@@ -206,9 +213,10 @@ function extractGroup(groupText, groupName, config) {
 
     let html = stripLeadingListDashes(replaceExpressions(template.body));
     html = ensureVisiblePlaceholders(html, groupName);
-    if (!html.includes("{{name}}")) throw new Error(`${groupName}.${key} missing {{name}}`);
+    if (!config.nameOptional && !html.includes("{{name}}")) throw new Error(`${groupName}.${key} missing {{name}}`);
     if (html.includes("${")) throw new Error(`${groupName}.${key} has raw template expressions`);
     for (const param of config.params) {
+      if (config.nameOptional && param === "name") continue;
       if (param !== "d" && !html.includes(`{{${param}}}`)) {
         throw new Error(`${groupName}.${key} missing {{${param}}}`);
       }
@@ -262,14 +270,30 @@ function mergeExtendedSoulChallenge(narrative) {
   }
 }
 
+function validateKarmicDebtHtml(key, html) {
+  if (!html) throw new Error(`karmicDebt[${key}] empty`);
+  if (html.length < 2500) throw new Error(`karmicDebt[${key}] too short: ${html.length}`);
+  const required = ["karmic-title", "🔍", "🛠", "insight-box"];
+  for (const item of required) {
+    if (!html.includes(item)) throw new Error(`karmicDebt[${key}] missing "${item}"`);
+  }
+}
+
 const source = fs.readFileSync(sourcePath, "utf8");
 const narrative = {};
 let total = 0;
 
 for (const [groupName, config] of Object.entries(GROUP_CONFIG)) {
   const overrideGroup = findOverrideGroup(source, groupName);
-  const literalGroupText = sliceGroup(source, groupName, config.nextGroup);
-  const literalEntries = extractGroup(literalGroupText, groupName, config);
+  let literalEntries = {};
+  if (config.literalOptional) {
+    if (!overrideGroup) {
+      throw new Error(`${groupName}: literalOptional=true but no override found`);
+    }
+  } else {
+    const literalGroupText = sliceGroup(source, groupName, config.nextGroup);
+    literalEntries = extractGroup(literalGroupText, groupName, config);
+  }
   const overrideEntries = overrideGroup ? extractGroup(overrideGroup.text, groupName, config) : {};
   narrative[groupName] = { ...literalEntries, ...overrideEntries };
   const count = Object.keys(narrative[groupName]).length;
@@ -282,6 +306,9 @@ for (const [groupName, config] of Object.entries(GROUP_CONFIG)) {
 }
 
 mergeExtendedSoulChallenge(narrative);
+for (const key of ["13", "14", "16", "19"]) {
+  validateKarmicDebtHtml(key, narrative.karmicDebt[key]?.html ?? "");
+}
 
 fs.writeFileSync(outputPath, `${JSON.stringify(narrative, null, 2)}\n`, "utf8");
 console.log(`total: ${total} entries`);

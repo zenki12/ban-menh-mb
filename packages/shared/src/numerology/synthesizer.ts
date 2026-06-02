@@ -239,7 +239,7 @@ function karmicLessonsHtml(report: NumerologyReport, narrative: NarrativeKb, nam
     .join("")}`;
 }
 
-function karmicDebtHtml(report: NumerologyReport, kb: NumerologyKb, name: string): string {
+function karmicDebtHtml(report: NumerologyReport, narrative: NarrativeKb, kb: NumerologyKb, name: string): string {
   const numbers = [
     report.lifePath.karmicDebt,
     report.destiny.karmicDebt,
@@ -250,6 +250,8 @@ function karmicDebtHtml(report: NumerologyReport, kb: NumerologyKb, name: string
   if (!numbers.length) return `<div class="insight-box">✅ <strong>Không phát hiện nợ nghiệp 13/14/16/19 trong các chỉ số chính.</strong></div>`;
   return numbers
     .map((num) => {
+      const narrativeHtml = fromNarrative(narrative, "karmicDebt", num, { name });
+      if (narrativeHtml) return narrativeHtml;
       const data = (kb.karmic_debt as Record<string, unknown>)[String(num)];
       return `<div class="karmic-debt-box">${generic(`Nợ nghiệp ${num}`, num, name, data)}</div>`;
     })
@@ -380,7 +382,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
         section("18", "Chỉ số Nhân Cách", renderIndicator(narrative, "personality", "Nhân cách", report.personality, name) + personalityCtxBlock(report.personality.number, ctx, name)),
         section("19", "Thử thách Nhân Cách", challengeHtml(narrative, "personalityChallenge", "Thử thách Nhân cách", report.personalityChallenge, name)),
         section("20", "Các bài học nghiệp (Karmic Lessons)", karmicLessonsHtml(report, narrative, name)),
-        section("21", "Các chỉ số Nợ Nghiệp (Karmic Debt)", karmicDebtHtml(report, kb, name)),
+        section("21", "Các chỉ số Nợ Nghiệp (Karmic Debt)", karmicDebtHtml(report, narrative, kb, name)),
       ],
     },
     {

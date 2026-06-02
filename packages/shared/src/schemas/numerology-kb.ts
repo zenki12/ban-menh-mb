@@ -213,6 +213,7 @@ export const NarrativeKbSchema = z.object({
   maturity: narrativeGroupSchema,
   attitude: narrativeGroupSchema,
   karmicLesson: narrativeGroupSchema,
+  karmicDebt: narrativeGroupSchema.optional(),
   birthday: narrativeGroupSchema,
   pyramidPeak: narrativeGroupSchema,
   pyramidChallenge: narrativeGroupSchema,
