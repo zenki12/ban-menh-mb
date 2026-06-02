@@ -31,10 +31,34 @@ export const BirthdayNumberSchema = z.object({
   relationship_style: z.string(),
 });
 export type BirthdayNumber = z.infer<typeof BirthdayNumberSchema>;
-export const PyramidPeakSchema = z.string();
+export const PyramidPeakSchema = z.object({
+  title: z.string(),
+  theme: z.string(),
+  opportunity: z.string(),
+  challenge: z.string(),
+  advice: z.string(),
+  keywords: stringArraySchema.optional(),
+});
 export type PyramidPeak = z.infer<typeof PyramidPeakSchema>;
-export const PyramidChallengeSchema = z.string();
+export const PyramidChallengeSchema = z.object({
+  title: z.string(),
+  lesson: z.string(),
+  trap: z.string(),
+  how_to_overcome: z.string(),
+});
 export type PyramidChallenge = z.infer<typeof PyramidChallengeSchema>;
+const PersonalDaySchema = z.object({
+  theme: z.string(),
+  energy: z.string(),
+  focus: z.string(),
+  avoid: z.string(),
+  best_for: z.string(),
+});
+const TensionNumberSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  resolution: z.string(),
+});
 const LifePathSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -178,10 +202,10 @@ export const NumerologyKbSchema = z.object({
   attitude_number: z.record(z.string(), AttitudeNumberSchema),
   personal_year: z.record(z.string(), PersonalYearSchema),
   personal_month: recordWithNote(PersonalMonthSchema),
-  personal_day: z.record(z.string(), z.string()),
+  personal_day: recordWithNote(PersonalDaySchema),
   karmic_lessons: z.record(z.string(), KarmicLessonSchema),
   triads: z.record(z.string(), z.object({ name: z.string(), traits: z.string() })),
-  tension_number: z.record(z.string(), z.string()),
+  tension_number: recordWithNote(TensionNumberSchema),
   birth_chart_grid: BirthChartGridSchema,
   soul_challenge: recordWithNote(ChallengeSchema),
   destiny_challenge: recordWithNote(ChallengeSchema),
