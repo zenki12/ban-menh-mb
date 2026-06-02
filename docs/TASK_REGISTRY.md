@@ -2540,6 +2540,37 @@ Update khi xong:
 - Thêm `kb:test-grid` regression cho DOB `19960202`, tên `Hà Thu Hương`, cell analysis, arrow analysis và compensation analysis.
 - Build lần đầu OOM ở static generation; rerun với `NODE_OPTIONS=--max-old-space-size=4096` pass.
 
+### T-0606k-fix - Fix section 23 compensation arrow summary
+
+Status: Done
+
+Bối cảnh:
+
+- User audit T-0606k phát hiện `buildCompensationAnalysis` giữ lại một bug/UX issue từ V1 trong block `arrowsFromName`.
+- Bug: template `Trục ${a.name}` có thể render duplicate `Trục Trục ...` vì `a.name` đã chứa prefix `Trục`.
+- UX issue: truncate nội dung arrow bằng `substring(0, 150) + "..."` gây cảm giác cũ và trùng với phần arrow analysis ngay bên dưới.
+
+Yêu cầu:
+
+- Chỉ sửa block `arrowsFromName` trong `buildCompensationAnalysis`.
+- Render danh sách `<ul class="nar-list">` chỉ gồm `${a.name} (${a.code})`.
+- Thêm dòng italic dẫn xuống phần "Phân Tích Mũi Tên Sức Mạnh — Biểu đồ Tổng Hợp".
+- Không sửa `CELL_KNOWLEDGE`, `ARROWS`, parser, section 22 hay arrow analysis.
+
+Điều kiện Done:
+
+- `kb:test-grid`, `typecheck`, `lint`, `build` pass.
+- Không còn `Trục ${a.name}` hoặc `.substring(0, 150)` trong compensation block.
+- Regression test xác nhận output không có `Trục Trục`, có `nar-list`, có dòng dẫn italic.
+
+Update khi xong:
+
+- `buildCompensationAnalysis` block `arrowsFromName` đổi sang `<ul class="nar-list">` chỉ liệt kê `${a.name} (${a.code})`.
+- Bỏ prefix `Trục ` trước `${a.name}` để tránh render duplicate `Trục Trục`.
+- Bỏ summary truncate `.substring(0, 150) + "..."`; thêm dòng italic dẫn xuống phần arrow analysis bên dưới.
+- Regression `kb:test-grid` kiểm tra `nar-list`, dòng dẫn, không `Trục Trục`, không leak `substring(0, 150)`.
+- Runtime smoke `Hà Thu Hương / 1999-02-02` section 23: có 5 trục, không duplicate, không truncate cũ, arrow analysis bên dưới vẫn có active/missing arrows.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done

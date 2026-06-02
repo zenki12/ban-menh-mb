@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 12:05 +07 | T-0606k-fix | Section 23 compensation arrow summary fix | `Hotfix` |
 | 2026-06-02 11:45 +07 | T-0606k | Port V1 birth/name grid analysis | `Task` |
 | 2026-06-02 11:15 +07 | T-0606j | Extended karmicDebt content merge | `Task` |
 | 2026-06-02 10:55 +07 | T-0606f | Wire section 21 karmic debt rich V1 narrative | `Task` |
@@ -120,6 +121,32 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-02 12:05 +07] - T-0606k-fix: Section 23 compensation arrow summary fix
+
+**Loại:** `Hotfix`
+**Ref:** T-0606k-fix
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> User audit T-0606k phát hiện block compensation trong section 23 còn giữ bug `Trục Trục ...` và UX truncate 150 ký tự từ V1. Fix theo Option C: chỉ liệt kê tên + code mũi tên mới, rồi dẫn xuống phần arrow analysis chi tiết bên dưới.
+
+### Thay đổi
+- Chỉ sửa block `arrowsFromName` trong `buildCompensationAnalysis`.
+- Bỏ template `Trục ${a.name}` để tránh duplicate khi `a.name` đã chứa `Trục`.
+- Bỏ `.substring(0, 150) + "..."` và phần paste summary từ `a.active`.
+- Render `<ul class="nar-list">` với `${a.name} (${a.code})`, kèm dòng italic dẫn tới "Phân Tích Mũi Tên Sức Mạnh — Biểu đồ Tổng Hợp".
+- Thêm regression trong `tools/kb-import/test-grid.mjs`.
+
+### Verify
+- Pass: `npm run kb:test-grid`, `npm run typecheck`, `npm run lint`.
+- Pass: `NODE_OPTIONS=--max-old-space-size=4096 npm run build`.
+- Runtime smoke `Hà Thu Hương / 1999-02-02` section 23 length `10356`: có `nar-list`, đủ 5 trục, có dòng dẫn italic, không `Trục Trục`, không stale truncate, arrow analysis bên dưới vẫn có active + missing arrows.
+
+### Rủi ro còn lại
+- Không thêm CSS mới cho `nar-list` vì task giới hạn chỉ sửa compensation block; list mặc định vẫn render được trong narrative container.
 
 ---
 
