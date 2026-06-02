@@ -37,6 +37,23 @@ const GROUP_CONFIG = {
   },
 };
 
+const ENGLISH_REPLACEMENTS = [
+  ["cognitive reframing", "tái khung nhận thức"],
+  ["paralysis by analysis", "tê liệt vì phân tích quá đà"],
+  ["brute force", "tiếp cận bằng sức ép thô"],
+  ["sang mindset", "sang tư duy"],
+  ["small talk", "trò chuyện xã giao"],
+  ["voice memo", "ghi âm ngắn"],
+  ["remote work", "làm việc từ xa"],
+  ["flexible hours", "giờ làm linh hoạt"],
+  ["open office", "văn phòng mở"],
+  ["terminal point", "điểm kết thúc"],
+  ["oxygen mask", "mặt nạ dưỡng khí"],
+  ["digital marketing", "tiếp thị số"],
+  ["mission statement", "tuyên bố sứ mệnh"],
+  ["study group", "nhóm học tập"],
+];
+
 function sliceGroup(source, groupName, nextGroupName) {
   const groupStart = source.indexOf(`  ${groupName}: {`);
   if (groupStart === -1) throw new Error(`Cannot locate group ${groupName}`);
@@ -162,6 +179,64 @@ function fallbackFromExpression(expression) {
   return match?.[1] ?? "";
 }
 
+function fallbackLiteralFromOrExpression(expression) {
+  const orIndex = expression.indexOf("||");
+  if (orIndex === -1) return null;
+
+  let i = orIndex + 2;
+  while (/\s/.test(expression[i] ?? "")) i += 1;
+
+  const quote = expression[i];
+  if (quote !== "'" && quote !== '"' && quote !== "`") return null;
+
+  let fallbackText = "";
+  i += 1;
+  while (i < expression.length) {
+    const char = expression[i];
+    if (char === "\\") {
+      fallbackText += expression[i + 1] ?? "";
+      i += 2;
+      continue;
+    }
+    if (char === quote) {
+      const rest = expression.slice(i + 1).trim();
+      return rest.length === 0 ? fallbackText : null;
+    }
+    fallbackText += char;
+    i += 1;
+  }
+
+  return null;
+}
+
+function expandFallbackExpressions(body) {
+  let output = "";
+  let i = 0;
+  while (i < body.length) {
+    if (body[i] !== "$" || body[i + 1] !== "{") {
+      output += body[i];
+      i += 1;
+      continue;
+    }
+
+    const end = skipExpression(body, i + 2);
+    const expression = body.slice(i + 2, end - 1).trim();
+    const fallbackText = fallbackLiteralFromOrExpression(expression);
+    output += fallbackText === null ? body.slice(i, end) : fallbackText;
+    i = end;
+  }
+  return output;
+}
+
+function translateEnglishIdioms(html) {
+  let result = html;
+  for (const [english, vietnamese] of ENGLISH_REPLACEMENTS) {
+    const escaped = english.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    result = result.replace(new RegExp(escaped, "gi"), vietnamese);
+  }
+  return result;
+}
+
 function replaceExpressions(body) {
   const directVariables = new Set(["name", "period", "year", "age", "peakIndex"]);
   let output = "";
@@ -212,7 +287,8 @@ function extractGroup(groupText, groupName, config) {
     if (!config.keys.includes(key)) throw new Error(`${groupName}.${key} is not configured`);
     if (entries[key]) throw new Error(`${groupName}.${key} extracted more than once`);
 
-    let html = stripLeadingListDashes(replaceExpressions(template.body));
+    let html = stripLeadingListDashes(replaceExpressions(expandFallbackExpressions(template.body)));
+    html = translateEnglishIdioms(html);
     html = ensureVisiblePlaceholders(html, groupName);
     if (!config.nameOptional && !html.includes("{{name}}")) throw new Error(`${groupName}.${key} missing {{name}}`);
     if (html.includes("${")) throw new Error(`${groupName}.${key} has raw template expressions`);
