@@ -2446,6 +2446,39 @@ Update khi xong:
 - Regression cases pass: `Hà Thu Hương / 1996-09-03` => `{ soulChallenge: 3, destinyChallenge: 2, personalityChallenge: 1 }`; `Nông Xuân Thái / 1996-01-01` => `{ soulChallenge: 7, destinyChallenge: 0, personalityChallenge: 7 }`.
 - T-0606c narrative content không đổi; chỉ mapping số challenge thay đổi.
 
+### T-0606f - Wire section 21 Karmic Debt rich V1 narrative
+
+Status: Done
+
+Bối cảnh:
+
+- V1 `NarrativeTemplates.karmicDebt` override có 4 entries rich cho nợ nghiệp 13/14/16/19.
+- V2 extractor chưa có group `karmicDebt`, schema narrative chưa khai báo field này, và section 21 còn dùng generic fallback từ structured KB.
+
+Yêu cầu:
+
+- Extend extractor để support override-only group bằng `literalOptional` và group không bắt buộc `{{name}}` bằng `nameOptional`.
+- Re-extract `narrative.json` để có `karmicDebt` 4 keys 13/14/16/19.
+- Schema accept `narrative.karmicDebt`.
+- Synthesizer section 21 ưu tiên render `narrative.karmicDebt` rich V1, fallback generic nếu thiếu.
+- Upload KV sau khi extract.
+
+Điều kiện Done:
+
+- 4/4 karmicDebt entries pass length + `karmic-title` + `🔍` + `🛠` + `insight-box`.
+- `npm run kb:test-synthesizer`, `npm run kb:test-challenges`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- `npm run kb:upload-kv` complete.
+
+Update khi xong:
+
+- `extract-narrative.mjs` support `literalOptional` + `nameOptional`, thêm group `karmicDebt` override-only.
+- `validate-narrative.mjs` accept `karmicDebt` 4 keys và không bắt `{{name}}` cho group này.
+- `NarrativeKbSchema` thêm `karmicDebt` optional.
+- Section 21 ưu tiên `narrative.karmicDebt` rich V1, fallback generic nếu thiếu hoặc debt ngoài 13/14/16/19.
+- Re-extract private `narrative.json`, upload KV remote complete.
+- Smoke runtime: `An / 1970-01-07` có debt 16/13 render rich section 21; `An / 1970-07-14` render fallback sạch nợ nghiệp.
+- Browser plugin bị chặn bởi lỗi runtime asset write trong Codex, nên browser smoke trực tiếp không chạy được; worker/dev server đã restart và worker readiness OK.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done

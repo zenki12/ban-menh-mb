@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 10:55 +07 | T-0606f | Wire section 21 karmic debt rich V1 narrative | `Task` |
 | 2026-06-02 10:22 +07 | T-0606e | Fix challenge indicator formulas to match V1 | `Task` |
 | 2026-06-02 01:24 +07 | T-0606c | Extended soulChallenge content merge | `Task` |
 | 2026-06-01 23:57 +07 | T-0610c-section16-17-18 | Literal V1 sections 16-17-18 inline render | `Task` |
@@ -119,6 +120,33 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-02 10:55 +07] - T-0606f: Wire section 21 karmic debt rich V1 narrative
+
+**Loại:** `Task`
+**Ref:** T-0606f
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Audit phát hiện V1 có `NarrativeTemplates.karmicDebt` override rich cho 4 nợ nghiệp 13/14/16/19, nhưng extractor V2 chưa khai báo group này nên section 21 chỉ render generic fallback.
+
+### Thay đổi
+- `extract-narrative.mjs` thêm group `karmicDebt` với `literalOptional` và `nameOptional`.
+- Extractor validate 4/4 entries có length >= 2500, `karmic-title`, `🔍`, `🛠`, `insight-box`.
+- `validate-narrative.mjs` accept group `karmicDebt` và bỏ check `{{name}}` cho group này.
+- `NarrativeKbSchema` thêm `karmicDebt` optional.
+- Section 21 dùng `narrative.karmicDebt` trước, fallback generic nếu thiếu hoặc debt ngoài V1 rich keys.
+- Re-extract private `narrative.json` và upload KV remote.
+
+### Verify
+- Extract log: `karmicDebt: 4 entries (override @ 793321, 4 entries)`.
+- Narrative verify: keys `13,14,16,19`; lengths `2724`, `2880`, `3104`, `2975`; all OK.
+- Pass: `npm run kb:validate-narrative`, `npm run kb:test-synthesizer`, `npm run kb:test-challenges`, `npm run typecheck`, `npm run lint`, `npm run build`.
+- `npm run kb:upload-kv` uploaded `kb-numerology` and `kb-narrative`; `KV upload complete`.
+- Smoke runtime: `An / 1970-01-07` debts `16,13` render rich section 21 length `5828`; `An / 1970-07-14` clean case renders fallback length `111`.
+
+### Rủi ro còn lại
+- Browser smoke trực tiếp không chạy được vì Browser plugin lỗi `failed to write kernel assets`; worker/dev server đã restart và readiness OK.
 
 ## [2026-06-02 10:22 +07] - T-0606e: Fix challenge indicator formulas to match V1
 
