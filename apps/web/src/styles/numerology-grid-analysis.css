@@ -1,0 +1,23 @@
+.arrow-block {
+  @apply my-3 rounded-lg p-4 text-[var(--bm-text-soft)];
+}
+
+.arrow-block.active-arrow {
+  @apply border-l-4 border-[#22c55e] bg-[rgba(34,197,94,0.10)];
+}
+
+.arrow-block.missing-arrow {
+  @apply border-l-4 border-[#ef4444] bg-[rgba(239,68,68,0.08)];
+}
+
+.arrow-title {
+  @apply mb-2 font-bold;
+}
+
+.arrow-title.arrow-has {
+  @apply text-[#4ade80];
+}
+
+.arrow-title.arrow-no {
+  @apply text-[#f87171];
+}

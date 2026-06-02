@@ -19,6 +19,14 @@ import {
   type NarrativeContext,
 } from "./narrative-deep";
 import type { IndicatorResult, KarmicLessonsResult, NumerologyReport } from "./report";
+import {
+  buildArrowsAnalysis,
+  buildCellAnalysis,
+  buildCompensationAnalysis,
+  combineGridCells,
+  parseDigitGrid,
+  parseNameGrid,
+} from "./grid-analysis";
 
 export type SynthesizerInput = {
   report: NumerologyReport;
@@ -114,6 +122,26 @@ function renderMaturityAbility(report: NumerologyReport, name: string): string {
   if (advice) html += `<div class="insight-box">💡 <strong>Lời khuyên để phát huy tối đa:</strong> ${escapeHtml(advice)}</div>`;
 
   return html;
+}
+
+function buildBirthGridNarrative(report: NumerologyReport, name: string): string {
+  const dobGridData = parseDigitGrid(report.input.dob);
+  return (
+    `<p class="nar">Ma trận 3×3 của Pythagoras đặt từng chữ số trong ngày sinh vào ô tương ứng theo vị trí số học. Ngày sinh của <strong>${escapeHtml(name)}</strong> (${escapeHtml(report.input.dob)}) cho ra biểu đồ sau — các ô đầy là điểm mạnh năng lượng bẩm sinh; ô trống là những bài học cần được bổ sung từ biểu đồ tên.</p>` +
+    buildCellAnalysis(dobGridData, "dob") +
+    buildArrowsAnalysis(dobGridData, "Biểu đồ Ngày Sinh")
+  );
+}
+
+function buildNameCombinedGridNarrative(report: NumerologyReport, name: string): string {
+  const dobGridData = parseDigitGrid(report.input.dob);
+  const nameGridData = parseNameGrid(report.input.fullName);
+  const combinedGridData = combineGridCells(dobGridData, nameGridData);
+  return (
+    buildCellAnalysis(nameGridData, "name") +
+    buildCompensationAnalysis(dobGridData, nameGridData, combinedGridData, name) +
+    buildArrowsAnalysis(combinedGridData, "Biểu đồ Tổng Hợp")
+  );
 }
 
 function section(
@@ -389,8 +417,8 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
       letter: "D",
       title: "PHÂN TÍCH NĂNG LỰC & BIỂU ĐỒ SỨC MẠNH",
       sections: [
-        section("22", "Biểu đồ Sức Mạnh — Lưới Ngày Sinh (Pythagoras)", `<p class="nar">Ma trận 3×3 của Pythagoras đặt từng chữ số trong ngày sinh vào ô tương ứng. Các ô đầy là điểm mạnh năng lượng bẩm sinh; ô trống là những bài học cần được bổ sung.</p>`, { chartSlot: "birth-grid" }),
-        section("23", "Biểu đồ Tên & Biểu đồ Tổng Hợp", `<p class="nar">Biểu đồ tên cho thấy nguồn năng lượng được kích hoạt qua họ tên. Biểu đồ tổng hợp kết hợp ngày sinh và tên để nhận diện mũi tên sức mạnh, số lẻ loi và số được bù.</p>`, { chartSlot: "combined-grid" }),
+        section("22", "Biểu đồ Sức Mạnh — Lưới Ngày Sinh (Pythagoras)", buildBirthGridNarrative(report, name), { chartSlot: "birth-grid" }),
+        section("23", "Biểu đồ Tên & Biểu đồ Tổng Hợp", buildNameCombinedGridNarrative(report, name), { chartSlot: "combined-grid" }),
         section("24", "Chỉ số Thái Độ", renderIndicator(narrative, "attitude", "Thái độ", report.attitude, name)),
         section("25", "Chỉ số Ngày Sinh (Tài năng Tự nhiên)", renderIndicator(narrative, "birthday", "Ngày sinh", report.birthday, name)),
         section("26", "Chỉ số Vượt Khó (Tension Number)", renderIndicator(narrative, "tensionNumber", "Vượt khó", report.tensionNumber, name)),
