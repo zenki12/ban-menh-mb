@@ -2479,6 +2479,38 @@ Update khi xong:
 - Smoke runtime: `An / 1970-01-07` có debt 16/13 render rich section 21; `An / 1970-07-14` render fallback sạch nợ nghiệp.
 - Browser plugin bị chặn bởi lỗi runtime asset write trong Codex, nên browser smoke trực tiếp không chạy được; worker/dev server đã restart và worker readiness OK.
 
+### T-0606j - Replace karmicDebt with extended hand-written content
+
+Status: Done
+
+Bối cảnh:
+
+- User audit T-0606f phát hiện V1 `karmicDebt` override còn chung chung và voice chưa đạt mức T-0606c.
+- Claude đã chuẩn bị `kb-private/numerology/karmic-debt-extended.mjs` với 4 entries 13/14/16/19, voice question-driven, karmic-rooted.
+- Pattern giống T-0606c: giữ V1 override làm fallback, nhưng output `narrative.json` overwrite bằng extended content.
+
+Yêu cầu:
+
+- Không sửa nội dung HTML trong `karmic-debt-extended.mjs`.
+- `extract-narrative.mjs` import `KARMIC_DEBT_EXTENDED` và merge đè `narrative.karmicDebt`.
+- Mỗi entry sau merge có `source: "extended-T-0606j"`, length >= 5000 và đủ các sub-section marker.
+- Re-extract narrative, upload KV, restart worker, chạy regression checks.
+
+Điều kiện Done:
+
+- 4/4 `karmicDebt` entries rebuilt pass validate, source `extended-T-0606j`.
+- `npm run kb:validate-narrative`, `npm run kb:test-synthesizer`, `npm run kb:test-challenges`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- `npm run kb:upload-kv` complete.
+
+Update khi xong:
+
+- `extract-narrative.mjs` thêm merge `KARMIC_DEBT_EXTENDED` sau `mergeExtendedSoulChallenge`.
+- `validateKarmicDebtHtml` giữ minimum guard cho V1 fallback và extended; detailed extended guard nằm trong `mergeExtendedKarmicDebt`.
+- Re-extract `narrative.json`: keys 13/14/16/19 length `5969`, `5933`, `5761`, `5793`, source `extended-T-0606j`.
+- KV upload complete; worker 8787 restarted and ready.
+- Smoke runtime: `Hà Thu Hương / 1999-02-02` debt 13 section 21 length `5981`; karmic 14 case `An / 1970-01-14` length `5915`; clean case `An / 1970-01-02` fallback length `111`.
+- Browser plugin trực tiếp vẫn bị chặn bởi Node/browser sandbox trong Codex, nên browser smoke không chạy được trong turn này.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done

@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 11:15 +07 | T-0606j | Extended karmicDebt content merge | `Task` |
 | 2026-06-02 10:55 +07 | T-0606f | Wire section 21 karmic debt rich V1 narrative | `Task` |
 | 2026-06-02 10:22 +07 | T-0606e | Fix challenge indicator formulas to match V1 | `Task` |
 | 2026-06-02 01:24 +07 | T-0606c | Extended soulChallenge content merge | `Task` |
@@ -120,6 +121,34 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-02 11:15 +07] - T-0606j: Extended karmicDebt content merge
+
+**Loại:** `Task`
+**Ref:** T-0606j
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> User audit T-0606f phát hiện V1 `karmicDebt` rich override còn chung chung. T-0606j giữ V1 làm fallback nhưng merge 4 entry hand-written từ `kb-private/numerology/karmic-debt-extended.mjs` vào output narrative, theo pattern T-0606c.
+
+### Thay đổi
+- `extract-narrative.mjs` import `KARMIC_DEBT_EXTENDED`.
+- Thêm `mergeExtendedKarmicDebt(...)`, overwrite 4 keys `13`, `14`, `16`, `19` sau khi đọc V1 override.
+- Mỗi entry sau merge có `source: "extended-T-0606j"`.
+- `validateKarmicDebtHtml(...)` giữ minimum guard cho cả V1 fallback và extended; detailed guard extended kiểm tra length >= 5000, `{{name}}`, `karmic-title`, `insight-box`, và 4 sub-section marker.
+- Không sửa nội dung trong `kb-private/numerology/karmic-debt-extended.mjs`; không commit `kb-private/*`.
+
+### Verify
+- Source file load OK: keys `13,14,16,19`; lengths `5969`, `5933`, `5761`, `5793`.
+- Extract log: `karmicDebt: 4 entries (override @ 793321, 4 entries)`.
+- Narrative verify: 4/4 keys source `extended-T-0606j`, all length >= 5000.
+- Pass: `npm run kb:validate-narrative`, `npm run kb:test-synthesizer`, `npm run kb:test-challenges`, `npm run typecheck`, `npm run lint`, `npm run build`.
+- `npm run kb:upload-kv` uploaded `kb-narrative` size `556.6 KiB`; `KV upload complete`.
+- Worker 8787 restarted and ready.
+- Smoke runtime: `Hà Thu Hương / 1999-02-02` debt 13 section 21 length `5981`; `An / 1970-01-14` debt 14 length `5915`; `An / 1970-01-02` clean fallback length `111`.
+
+### Rủi ro còn lại
+- Browser smoke trực tiếp không chạy được vì Browser plugin/Node sandbox fail `windows sandbox failed: spawn setup refresh`; runtime HTML smoke đã cover section 21 substitution and fallback.
 
 ## [2026-06-02 10:55 +07] - T-0606f: Wire section 21 karmic debt rich V1 narrative
 
