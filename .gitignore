@@ -38,3 +38,9 @@ Thumbs.db
 # Cloudflare Workers local secrets
 workers/*/.dev.vars
 workers/*/.wrangler/
+
+# Agent tooling caches
+.agent/
+.agents/
+.kiro/
+_bmad/
