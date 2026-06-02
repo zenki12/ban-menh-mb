@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 11:45 +07 | T-0606k | Port V1 birth/name grid analysis | `Task` |
 | 2026-06-02 11:15 +07 | T-0606j | Extended karmicDebt content merge | `Task` |
 | 2026-06-02 10:55 +07 | T-0606f | Wire section 21 karmic debt rich V1 narrative | `Task` |
 | 2026-06-02 10:22 +07 | T-0606e | Fix challenge indicator formulas to match V1 | `Task` |
@@ -119,6 +120,35 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-02 11:45 +07] - T-0606k: Port V1 birth/name grid analysis
+
+**Loại:** `Task`
+**Ref:** T-0606k
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> Port literal V1 `CELL_KNOWLEDGE` và `ARROWS` sang V2, thêm phân tích từng ô, mũi tên sức mạnh, bù trừ biểu đồ cho section 22/23.
+
+### Thay đổi
+- Thêm `packages/shared/src/numerology/grid-kb-data.ts` chứa `CELL_KNOWLEDGE` và `ARROWS` trích xuất cơ học từ `E:/huyen hoc AI/test/numerology_core/app.js`.
+- Thêm `packages/shared/src/numerology/grid-analysis.ts` với `parseDigitGrid`, `parseNameGrid`, `buildCellAnalysis`, `buildArrowsAnalysis`, `buildCompensationAnalysis`.
+- Wire `synthesizer.ts` để section 22 render birth-grid chartSlot kèm cell/arrow analysis; section 23 render combined-grid chartSlot kèm name cell analysis, compensation analysis và combined arrows.
+- Thêm `tools/kb-import/test-grid.mjs` và script `npm run kb:test-grid`.
+- Tách CSS arrow block sang `apps/web/src/styles/numerology-grid-analysis.css` để giữ `numerology-narrative.css` dưới giới hạn 600 dòng.
+- Không sửa các file dirty ngoài scope như payment/voucher/schema.
+
+### Verify
+- Spot-check cơ học: `grid-kb-data.ts` chứa nguyên slice V1 `CELL_KNOWLEDGE` và `ARROWS`; 9 cell entries, 8 arrow data entries.
+- Pass: `npm run kb:test-grid`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`.
+- `npm run build` lần đầu OOM ở static generation; rerun với `NODE_OPTIONS=--max-old-space-size=4096` pass.
+- Runtime smoke `Hà Thu Hương / 1996-02-02`: section 22 length `8703`, section 23 length `11135`, chart slots `birth-grid`/`combined-grid`, markers V1 `Phân Tích Từng Số`, `Phân Tích Mũi Tên Sức Mạnh`, `Khi kết hợp biểu đồ ngày sinh` đều có.
+
+### Rủi ro còn lại
+- Browser plugin trong Codex vẫn không ổn định ở các task trước; turn này dùng runtime smoke thay cho browser smoke trực tiếp.
+- `grid-kb-data.ts` là static premium narrative data được commit theo task, không import từ `kb-private/*`.
 
 ---
 

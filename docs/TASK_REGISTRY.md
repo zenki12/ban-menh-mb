@@ -2511,6 +2511,35 @@ Update khi xong:
 - Smoke runtime: `Hà Thu Hương / 1999-02-02` debt 13 section 21 length `5981`; karmic 14 case `An / 1970-01-14` length `5915`; clean case `An / 1970-01-02` fallback length `111`.
 - Browser plugin trực tiếp vẫn bị chặn bởi Node/browser sandbox trong Codex, nên browser smoke không chạy được trong turn này.
 
+### T-0606k - Port V1 birth/name grid analysis to sections 22-23
+
+Status: Done
+
+Bối cảnh:
+
+- V2 sections 22-23 mới có visual grid và intro ngắn, thiếu phân tích từng ô, mũi tên sức mạnh và bù trừ biểu đồ như V1.
+- V1 `app.js` có `CELL_KNOWLEDGE`, `ARROWS`, `buildCellAnalysis`, `buildArrowsAnalysis`, `buildCompensationAnalysis`, `parseDigitGrid`, `parseNameGrid`.
+
+Yêu cầu:
+
+- Port literal V1 content `CELL_KNOWLEDGE` và `ARROWS`.
+- Implement grid analysis helpers cho section 22 và 23.
+- Wire synthesizer section 22/23 để render cell analysis, arrow analysis và compensation analysis.
+- Thêm regression test grid và CSS class nếu V2 thiếu.
+
+Điều kiện Done:
+
+- `kb:test-grid`, `kb:test-synthesizer`, `typecheck`, `lint`, `build` pass.
+- Section 22 có cell + arrow analysis; section 23 có name cell analysis, compensation analysis và combined arrows.
+
+Update khi xong:
+
+- Port literal V1 `CELL_KNOWLEDGE` và `ARROWS` vào `grid-kb-data.ts`; spot-check cơ học khớp nguyên slice V1.
+- Thêm `grid-analysis.ts` với `parseDigitGrid`, `parseNameGrid`, `buildCellAnalysis`, `buildArrowsAnalysis`, `buildCompensationAnalysis`.
+- Wire synthesizer section 22/23 giữ chartSlot V2 và bổ sung phân tích V1.
+- Thêm `kb:test-grid` regression cho DOB `19960202`, tên `Hà Thu Hương`, cell analysis, arrow analysis và compensation analysis.
+- Build lần đầu OOM ở static generation; rerun với `NODE_OPTIONS=--max-old-space-size=4096` pass.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done
