@@ -9,7 +9,7 @@ import {
 } from "./calculator";
 
 export type DobParts = { day: number; month: number; year: number };
-export type KarmicDebtNumber = 10 | 13 | 14 | 16 | 19;
+export type KarmicDebtNumber = 13 | 14 | 16 | 19;
 export type IndicatorCalculation = {
   number: number;
   raw: number;
@@ -18,7 +18,7 @@ export type IndicatorCalculation = {
 };
 export type PeriodCalculation = IndicatorCalculation & { period: string };
 
-const KARMIC_DEBTS = new Set([10, 13, 14, 16, 19]);
+const KARMIC_DEBTS = new Set([13, 14, 16, 19]);
 const MASTER_NUMBERS = new Set([11, 22, 33]);
 
 function result(raw: number, keepMaster = true): IndicatorCalculation {

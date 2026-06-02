@@ -17,6 +17,7 @@
     "kb:test-engine": "node tools/kb-import/test-engine.mjs",
     "kb:test-charts": "node tools/kb-import/test-charts.mjs",
     "kb:test-grid": "node tools/kb-import/test-grid.mjs",
+    "kb:test-karmic": "node tools/kb-import/test-karmic.mjs",
     "kb:test-challenges": "node tools/kb-import/test-challenges.mjs",
     "kb:test-synthesizer": "node tools/kb-import/test-synthesizer.mjs",
     "kb:test-diacritics": "node tools/kb-import/test-diacritics.mjs",
