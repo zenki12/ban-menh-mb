@@ -132,15 +132,10 @@ export function buildCompensationAnalysis(
   if (arrowsFromName.length > 0) {
     html += `<div class="arrow-block active-arrow">
       <div class="arrow-title arrow-has">✅ Tên của bạn đã tạo thêm ${arrowsFromName.length} mũi tên sức mạnh mới!</div>
-      ${arrowsFromName
-        .map(
-          (a) =>
-            `<p class="nar">• <strong>Trục ${a.name} (${a.code})</strong>: ${a.active
-              .replace(/<div[\s\S]*?<\/div>/g, "")
-              .replace(/<[^>]+>/g, "")
-              .substring(0, 150)}...</p>`,
-        )
-        .join("")}
+      <ul class="nar-list">
+        ${arrowsFromName.map((a) => `<li><strong>${a.name} (${a.code})</strong></li>`).join("")}
+      </ul>
+      <p class="nar" style="font-style:italic;color:#94a3b8;font-size:0.9em;margin-top:0.5rem;">→ Phân tích chi tiết từng trục được trình bày bên dưới ở phần "Phân Tích Mũi Tên Sức Mạnh — Biểu đồ Tổng Hợp".</p>
     </div>`;
   }
 

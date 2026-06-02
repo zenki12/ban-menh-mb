@@ -100,5 +100,17 @@ const compensationHtml = buildCompensationAnalysis(dobGrid, nameGrid, combinedGr
 assertIncludes("compensation intro", compensationHtml, "Khi k\u1ebft h\u1ee3p bi\u1ec3u \u0111\u1ed3 ng\u00e0y sinh v\u00e0 bi\u1ec3u \u0111\u1ed3 t\u00ean");
 assertIncludes("compensation blocks", compensationHtml, "arrow-block");
 assertIncludes("compensation escaped name", compensationHtml, "H\u00e0 Thu H\u01b0\u01a1ng");
+assertIncludes("compensation arrow summary list", compensationHtml, '<ul class="nar-list">');
+assertIncludes(
+  "compensation arrow detail pointer",
+  compensationHtml,
+  "Ph\u00e2n t\u00edch chi ti\u1ebft t\u1eebng tr\u1ee5c \u0111\u01b0\u1ee3c tr\u00ecnh b\u00e0y b\u00ean d\u01b0\u1edbi",
+);
+if (compensationHtml.includes("Tr\u1ee5c Tr\u1ee5c")) {
+  throw new Error("compensation duplicate Truc prefix regression");
+}
+if (compensationHtml.includes("substring(0, 150)")) {
+  throw new Error("compensation stale truncate implementation leaked into output");
+}
 
 console.log("Grid analysis tests pass: V1 CELL_KNOWLEDGE/ARROWS + parse/render cases");
