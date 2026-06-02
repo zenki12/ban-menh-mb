@@ -1,4 +1,5 @@
 import type { NumerologyKb } from "../schemas/numerology-kb";
+import { reduce } from "./calculator";
 import {
   type DobParts,
   type IndicatorCalculation,
@@ -114,6 +115,22 @@ function lookup(kb: NumerologyKb, section: keyof NumerologyKb, key: number | str
   return sectionData?.[String(key)] ?? null;
 }
 
+function calcChallenge(
+  a: number,
+  b: number,
+  options: { mod9: boolean },
+): IndicatorCalculation {
+  const reducedA = reduce(a, false);
+  const reducedB = reduce(b, false);
+  const raw = Math.abs(reducedA - reducedB);
+  const number = options.mod9 ? raw % 9 : raw;
+  return {
+    number,
+    raw,
+    isMaster: false,
+  };
+}
+
 function withData(
   kb: NumerologyKb,
   section: keyof NumerologyKb,
@@ -204,9 +221,21 @@ export async function generateReport(
     soul: withData(kb, "soul_number", soul),
     personality: withData(kb, "personality_number", personality),
     tensionNumber: withData(kb, "tension_number", tensionNumber),
-    soulChallenge: withData(kb, "soul_challenge", soul),
-    destinyChallenge: withData(kb, "destiny_challenge", destiny),
-    personalityChallenge: withData(kb, "personality_challenge", personality),
+    soulChallenge: withData(
+      kb,
+      "soul_challenge",
+      calcChallenge(soul.number, lifePath.number, { mod9: true }),
+    ),
+    destinyChallenge: withData(
+      kb,
+      "destiny_challenge",
+      calcChallenge(soul.number, personality.number, { mod9: false }),
+    ),
+    personalityChallenge: withData(
+      kb,
+      "personality_challenge",
+      calcChallenge(personality.number, lifePath.number, { mod9: true }),
+    ),
     karmicLessons: {
       missingNumbers: karmicLessons,
       data: karmicLessons.map((number) => ({
