@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { SOUL_CHALLENGE_EXTENDED } from "../../kb-private/numerology/soul-challenge-extended.mjs";
+import { KARMIC_DEBT_EXTENDED } from "../../kb-private/numerology/karmic-debt-extended.mjs";
 
 const sourcePath = path.join(process.cwd(), "kb-private", "numerology", "narrative_v1_full.js");
 const outputPath = path.join(process.cwd(), "kb-private", "numerology", "narrative.json");
@@ -273,9 +274,47 @@ function mergeExtendedSoulChallenge(narrative) {
 function validateKarmicDebtHtml(key, html) {
   if (!html) throw new Error(`karmicDebt[${key}] empty`);
   if (html.length < 2500) throw new Error(`karmicDebt[${key}] too short: ${html.length}`);
-  const required = ["karmic-title", "🔍", "🛠", "insight-box"];
+  const required = ["karmic-title", "insight-box"];
   for (const item of required) {
     if (!html.includes(item)) throw new Error(`karmicDebt[${key}] missing "${item}"`);
+  }
+}
+
+function mergeExtendedKarmicDebt(narrative) {
+  const validKeys = ["13", "14", "16", "19"];
+  for (const key of validKeys) {
+    const extended = KARMIC_DEBT_EXTENDED[Number(key)];
+    if (!extended) {
+      throw new Error(`T-0606j: KARMIC_DEBT_EXTENDED missing key ${key}`);
+    }
+    narrative.karmicDebt = narrative.karmicDebt || {};
+    narrative.karmicDebt[key] = {
+      ...(narrative.karmicDebt[key] || {}),
+      html: extended,
+      source: "extended-T-0606j",
+    };
+  }
+
+  for (const key of validKeys) {
+    const html = narrative.karmicDebt[key]?.html ?? "";
+    if (html.length < 5000) {
+      throw new Error(`T-0606j: karmicDebt[${key}] length ${html.length} < 5000`);
+    }
+    const required = [
+      "karmic-title",
+      "🔄 Vòng lặp",
+      "📜 Bản chất karmic",
+      "🛠 Cách trả nợ",
+      "🌅 Dấu hiệu",
+      "📌",
+      "{{name}}",
+      "insight-box",
+    ];
+    for (const item of required) {
+      if (!html.includes(item)) {
+        throw new Error(`T-0606j: karmicDebt[${key}] missing "${item}"`);
+      }
+    }
   }
 }
 
@@ -306,6 +345,7 @@ for (const [groupName, config] of Object.entries(GROUP_CONFIG)) {
 }
 
 mergeExtendedSoulChallenge(narrative);
+mergeExtendedKarmicDebt(narrative);
 for (const key of ["13", "14", "16", "19"]) {
   validateKarmicDebtHtml(key, narrative.karmicDebt[key]?.html ?? "");
 }
