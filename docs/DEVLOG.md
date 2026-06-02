@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-02 12:35 +07 | T-0606l | Tension number fallback insight + English cleanup | `Hotfix` |
 | 2026-06-02 12:05 +07 | T-0606k-fix | Section 23 compensation arrow summary fix | `Hotfix` |
 | 2026-06-02 11:45 +07 | T-0606k | Port V1 birth/name grid analysis | `Task` |
 | 2026-06-02 11:15 +07 | T-0606j | Extended karmicDebt content merge | `Task` |
@@ -121,6 +122,34 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-02 12:35 +07] - T-0606l: Tension number fallback insight + English cleanup
+
+**Loại:** `Hotfix`
+**Ref:** T-0606l
+**Môi trường:** `DEV/TEST`
+
+### Tóm tắt
+> User report section 26 `tensionNumber` có insight-box rỗng và lẫn English idioms. Root cause là extractor drop mất fallback literal trong `${d?.advice || "..."}` và V1 source có một số cụm English inline.
+
+### Thay đổi
+- `extract-narrative.mjs` thêm `expandFallbackExpressions(...)` để giữ literal fallback text trước khi convert placeholder.
+- Thêm `ENGLISH_REPLACEMENTS` và `translateEnglishIdioms(...)` cho các cụm như `cognitive reframing`, `paralysis by analysis`, `brute force`, `small talk`, `remote work`.
+- Re-extract local `kb-private/numerology/narrative.json`; không commit `kb-private/*`.
+- Upload KV narrative sau khi regenerate và restart KB Worker 8787.
+
+### Verify
+- `tensionNumber` 9/9 insight length `245-299`, tất cả > 100.
+- Forbidden English terms audit: `0` hits.
+- Group counts giữ nguyên total `189`.
+- Pass: `npm run kb:validate-narrative`, `npm run kb:test-challenges`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`.
+- `npm run kb:upload-kv` complete; worker ready on `http://127.0.0.1:8787`.
+- Runtime smoke `Hà Thu Hương / 1999-02-02`: section 26 tension `7`, insight length `274`, forbidden hits `[]`.
+
+### Rủi ro còn lại
+- `npm run build` đang được chạy lại trong batch T-0606m vì lượt build trước bị user interrupt khi task audit mới được đưa vào.
 
 ---
 

@@ -2571,6 +2571,68 @@ Update khi xong:
 - Regression `kb:test-grid` kiểm tra `nar-list`, dòng dẫn, không `Trục Trục`, không leak `substring(0, 150)`.
 - Runtime smoke `Hà Thu Hương / 1999-02-02` section 23: có 5 trục, không duplicate, không truncate cũ, arrow analysis bên dưới vẫn có active/missing arrows.
 
+### T-0606l - Fix tensionNumber fallback insight and English idioms
+
+Status: Done
+
+Bối cảnh:
+
+- Section 26 `tensionNumber` đang có `insight-box` rỗng vì extractor strip mất fallback literal trong pattern `${d?.advice || "..."}`.
+- Một số nội dung V1 `tensionNumber` chứa English idioms như `cognitive reframing`, `paralysis by analysis`, `brute force`.
+
+Yêu cầu:
+
+- Patch `extract-narrative.mjs` để expand `${VAR || "fallback"}` thành fallback literal trước placeholder conversion.
+- Thêm replacement English idioms sang tiếng Việt trong extractor.
+- Re-extract `kb-private/numerology/narrative.json`, upload KV.
+- Verify 9/9 `tensionNumber` insight-box có content và không còn forbidden English idioms.
+- Không sửa V1 source, không đụng các group/task khác ngoài output narrative từ extractor.
+
+Điều kiện Done:
+
+- `kb:test-challenges`, `kb:test-synthesizer`, `typecheck`, `lint`, `build` pass.
+- `npm run kb:upload-kv` complete.
+- Smoke section 26 `Hà Thu Hương / 1999-02-02` insight có content, không còn English idioms cũ.
+
+Update khi xong:
+
+- `extract-narrative.mjs` thêm `expandFallbackExpressions` để giữ literal fallback trong `${VAR || "fallback"}`.
+- Thêm `ENGLISH_REPLACEMENTS` và `translateEnglishIdioms` cho các cụm English rõ ràng trong narrative.
+- Re-extract `narrative.json`: 9/9 `tensionNumber` insight length `245-299`, forbidden English terms `0`.
+- Group counts giữ nguyên baseline: total `189` entries.
+- `npm run kb:upload-kv` complete; KB Worker 8787 restarted and ready.
+- Runtime smoke `Hà Thu Hương / 1999-02-02`: section 26 tension `7`, insight length `274`, forbidden hits `[]`.
+
+### T-0606m - Audit cleanup batch after project-wide review
+
+Status: In Progress
+
+Bối cảnh:
+
+- Audit toàn dự án phát hiện 1 Critical, 3 Important, 2 Minor đang làm bẩn worktree hoặc còn rủi ro.
+- C1: `/dev-token` route untracked có nguy cơ expose Firebase ID token nếu lên production.
+- I1: T-0606l extractor fix đã làm nhưng chưa commit.
+- I2/I3/I4: một số dirty schema/payment/ResultHero cần xác minh scope trước khi commit.
+- M1: T-0606h còn deferred remove `10` khỏi `KARMIC_DEBTS`.
+- M4: agent tooling dirs untracked gây noise.
+
+Yêu cầu:
+
+- Mỗi sub-item một commit atomic riêng.
+- Không đụng `kb-private/*`, không regenerate/upload narrative trừ khi cần cho T-0606l.
+- Sub-item nào scope không rõ thì dừng item đó, ghi reason, tiếp tục item khác.
+- Không dùng `--no-verify`, `--force`, `--amend`.
+
+Điều kiện Done:
+
+- T-0606m-1 dev-token production gate Done.
+- T-0606m-2 T-0606l extractor/docs commits Done.
+- T-0606m-3 schema Done hoặc Stopped có reason.
+- T-0606m-4 payment/ResultHero Done hoặc Stopped có reason.
+- T-0606m-5 karmic debt 10 cleanup Done.
+- T-0606m-6 tooling dirs ignored Done.
+- Final typecheck/lint/build/tests pass; docs updated.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done
