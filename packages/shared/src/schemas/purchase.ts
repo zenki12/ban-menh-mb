@@ -19,7 +19,7 @@ export const purchaseStatusSchema = z.enum([
 ]);
 export type PurchaseStatus = z.infer<typeof purchaseStatusSchema>;
 
-export const paymentProviderSchema = z.enum(["payos"]);
+export const paymentProviderSchema = z.enum(["payos", "voucher_free"]);
 export type PaymentProvider = z.infer<typeof paymentProviderSchema>;
 
 export const purchaseSchema = z.object({

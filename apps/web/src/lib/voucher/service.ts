@@ -80,7 +80,7 @@ export async function validateVoucher(
 
   let discountVnd = rawDiscount;
   let finalAmount = Math.max(0, product.priceVnd - discountVnd);
-  if (finalAmount < PAYOS_MIN_AMOUNT) {
+  if (finalAmount > 0 && finalAmount < PAYOS_MIN_AMOUNT) {
     finalAmount = PAYOS_MIN_AMOUNT;
     discountVnd = product.priceVnd - PAYOS_MIN_AMOUNT;
   }

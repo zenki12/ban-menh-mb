@@ -5,11 +5,14 @@ export const runtime = "nodejs";
 // KHÔNG tin amount từ frontend (security-threat-model P1.2).
 
 import { createError, findProduct } from "@banmenh/shared";
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { grantEntitlementFromPurchase } from "../../../../lib/entitlements/service";
 import { adminAuth } from "../../../../lib/firebase/admin";
 import {
   firestorePurchaseRepository,
+  firestoreVoucherRepository,
   updatePurchaseProviderRef,
 } from "../../../../lib/firestore";
 import { generateOrderId } from "../../../../lib/payment/order-id";
@@ -25,6 +28,14 @@ function getBearerToken(request: Request): string | null {
   const auth = request.headers.get("Authorization");
   if (!auth?.startsWith("Bearer ")) return null;
   return auth.slice(7);
+}
+
+function freeOrderId(userId: string, productCode: string, voucherCode: string): string {
+  const hash = createHash("sha256")
+    .update(`${userId}:${productCode}:${voucherCode}`)
+    .digest("hex")
+    .slice(0, 24);
+  return `FREE_${hash}`;
 }
 
 export async function POST(request: Request) {
@@ -81,6 +92,7 @@ export async function POST(request: Request) {
   // 4. Tính amount. Voucher chỉ được validate server-side.
   let amount = product.priceVnd;
   let discountVnd: number | undefined;
+  let normalizedVoucherCode: string | undefined;
   if (voucherCode) {
     const voucherResult = await validateVoucher(voucherCode, productCode, uid);
     if (!voucherResult.valid) {
@@ -91,6 +103,59 @@ export async function POST(request: Request) {
     }
     amount = voucherResult.finalAmount;
     discountVnd = voucherResult.discountVnd;
+    normalizedVoucherCode = voucherResult.voucher.code;
+  }
+
+  const ctx = { userId: uid };
+
+  if (normalizedVoucherCode && amount === 0) {
+    const orderId = freeOrderId(uid, productCode, normalizedVoucherCode);
+    const existing = await firestorePurchaseRepository.getById(orderId, ctx);
+    if (existing?.status === "confirmed") {
+      await grantEntitlementFromPurchase(existing, ctx);
+      return NextResponse.json({
+        orderId,
+        amount: 0,
+        freeUnlock: true,
+        productCode,
+        voucherCode: normalizedVoucherCode,
+        discountVnd: existing.discountVnd ?? discountVnd ?? 0,
+      });
+    }
+
+    try {
+      const now = new Date().toISOString();
+      const purchase = await firestorePurchaseRepository.create(
+        {
+          orderId,
+          userId: uid,
+          module: product.module === "bundle" ? "numerology" : product.module,
+          productCode,
+          amount: 0,
+          currency: "VND",
+          status: "confirmed",
+          provider: "voucher_free",
+          providerRef: normalizedVoucherCode,
+          voucherCode: normalizedVoucherCode,
+          discountVnd,
+          confirmedAt: now,
+        },
+        ctx,
+      );
+      await grantEntitlementFromPurchase(purchase, ctx);
+      await firestoreVoucherRepository.incrementUsage(normalizedVoucherCode, ctx);
+      return NextResponse.json({
+        orderId,
+        amount: 0,
+        freeUnlock: true,
+        productCode,
+        voucherCode: normalizedVoucherCode,
+        discountVnd: discountVnd ?? 0,
+      });
+    } catch (err) {
+      console.error("[payment/create] free unlock failed:", err);
+      return NextResponse.json({ error: createError("INTERNAL_ERROR") }, { status: 500 });
+    }
   }
 
   // 5. Tạo orderId numeric cho PayOS
@@ -101,7 +166,6 @@ export async function POST(request: Request) {
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
   // 6. Tạo purchase document (status: pending)
-  const ctx = { userId: uid };
   try {
     await firestorePurchaseRepository.create(
       {
@@ -113,7 +177,7 @@ export async function POST(request: Request) {
         currency: "VND",
         status: "pending",
         provider: "payos",
-        voucherCode: voucherCode ?? undefined,
+        voucherCode: normalizedVoucherCode ?? undefined,
         discountVnd,
         expiresAt,
       },
@@ -133,7 +197,7 @@ export async function POST(request: Request) {
     payosData = await createPaymentRequest({
       orderCode,
       amount,
-      description: voucherCode ? `${product.name} (${voucherCode})` : product.name,
+      description: normalizedVoucherCode ? `${product.name} (${normalizedVoucherCode})` : product.name,
       items: [{ name: product.name, quantity: 1, price: amount }],
       returnUrl: `${appUrl}/payment/success?orderId=${orderId}`,
       cancelUrl: `${appUrl}/payment/cancel?orderId=${orderId}`,
@@ -166,7 +230,7 @@ export async function POST(request: Request) {
     amount,
     qrCode: payosData.qrCode,
     checkoutUrl: payosData.checkoutUrl,
-    voucherCode: voucherCode ?? null,
+    voucherCode: normalizedVoucherCode ?? null,
     discountVnd: discountVnd ?? 0,
     expiresAt,
   });

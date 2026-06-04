@@ -24,11 +24,13 @@ type VoucherValidateResponse =
 type CreateResponse = {
   orderId: string;
   amount: number;
-  qrCode: string;
+  freeUnlock?: boolean;
+  qrCode?: string;
   checkoutUrl?: string;
   voucherCode?: string | null;
   discountVnd?: number;
-  expiresAt: string;
+  expiresAt?: string;
+  productCode?: string;
 };
 const STORAGE_KEY = "banmenh-payment-pending";
 function StatusBadge({ tone, children }: { tone: "success" | "danger"; children: ReactNode }) {
@@ -150,6 +152,15 @@ function SetupContent() {
           voucherCode: validVoucher ? appliedCode : undefined,
         }),
       });
+      if (data.freeUnlock) {
+        const params = new URLSearchParams({
+          orderId: data.orderId,
+          freeUnlock: "true",
+        });
+        if (data.voucherCode) params.set("voucherCode", data.voucherCode);
+        router.push(`/payment/success?${params.toString()}`);
+        return;
+      }
       sessionStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
