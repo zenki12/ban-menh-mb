@@ -37,9 +37,6 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
-| 2026-06-04 16:47 +07 | T-0702 | Floating report navigation follow-up | `Task` |
-| 2026-06-04 15:11 +07 | T-0702 | Numerology report UI/UX overhaul | `Task` |
-| 2026-06-04 14:56 +07 | T-0701 | CSS narrative visual cleanup | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
 | 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
 | 2026-06-02 12:35 +07 | T-0606l | Tension number fallback insight + English cleanup | `Hotfix` |
@@ -129,80 +126,6 @@
      ============================================================ -->
 
 ---
-
-## [2026-06-04 16:47 +07] - T-0702: Floating report navigation follow-up
-
-**Loại:** `Task`
-**Ref:** T-0702
-
-> Follow-up to align the implemented numerology report UI with the task file. No KB content, synthesizer, narrative JSON, workers, routes, auth, or payment code changed.
-
-Changed:
-
-- Added `apps/web/src/components/numerology/result/FloatingReportNav.tsx` with bottom-right FAB, phase accordion TOC popup, smooth scroll to sections, outside-click close, and scroll-to-top button after 400px.
-- Updated `FullReport` to render `FloatingReportNav` and use `item.id ?? item.number` as section anchor fallback.
-- Updated `numerology-narrative.css` with FAB/TOC popup styles while keeping the file under the 600-line lint limit.
-- Removed the rendered desktop TOC/mobile phase tabs from `FullReport`; their component files remain untouched for now.
-
-Verification:
-
-- `npm run typecheck` pass.
-- `npm run lint` pass.
-- `npm run build` pass.
-
-Notes:
-
-- CSS file is 599 lines after compression.
-- This patch intentionally does not touch KB, `kb-private/*`, synthesizer, `narrative.json`, year/month narrative modules, or workers.
-
----
-
-## [2026-06-04 15:11 +07] - T-0702: Numerology report UI/UX overhaul
-
-**Loại:** `Task`
-**Ref:** T-0702
-
-> UI/UX polish for the generated numerology report. No KB content, synthesizer, narrative JSON, year/month narrative logic, or worker code changed.
-
-Changed:
-
-- `apps/web/src/styles/numerology-narrative.css`: upgraded long-form typography, insight pull-quote style, lighter nested narrative blocks, sticky section header, fade-in animation, top reading progress bar, phase badge colors, desktop TOC, mobile phase tabs, and collapsible CSS.
-- `apps/web/src/components/numerology/result/ReportTOC.tsx`: sticky desktop TOC with active section highlight.
-- `apps/web/src/components/numerology/result/PhaseTabBar.tsx`: mobile A/B/C/D quick-jump tabs.
-- `apps/web/src/components/numerology/result/CollapsibleYearBlock.tsx`: ready component for later year-block collapse; not wired yet by design.
-- `apps/web/src/components/numerology/result/FullReport.tsx`: client-side IntersectionObserver fade-in, reading progress, TOC layout, phase tabs, and phase-aware section header.
-- `SectionHeader` and `PhaseDivider`: phase badge color support and `data-phase` anchor.
-
-Verification:
-
-- `npm run lint` pass.
-- `npm run typecheck` pass.
-- `npm run build` pass.
-
-Notes:
-
-- CSS file remains under the lint limit at 593 lines.
-- CollapsibleYearBlock is intentionally not wired into narrative HTML yet; wire after visual confirmation.
-
-## [2026-06-04 14:56 +07] - T-0701: CSS narrative visual cleanup
-
-**Loại:** `Task`
-**Ref:** T-0701
-
-> Pure CSS visual fixes for KB narrative display; no KB, synthesizer, narrative JSON, or year/month narrative logic changed.
-
-Changed:
-
-- `apps/web/src/styles/numerology-narrative.css`: reduced nested box treatment for personal year/year detail/domain/aspect blocks.
-- Converted `py-year-block` to divider style, domain/aspect blocks to left-accent style, and `py-year-header` to compact flex.
-- Added `max-w-[72ch]` readability constraint, insight spacing, and responsive life-path section title sizing.
-- Kept the file below lint limit at 598 lines.
-
-Verification:
-
-- `npm run lint` pass.
-- `npm run typecheck` pass.
-- `npm run build` pass.
 
 ## [2026-06-04 13:49 +07] - T-0606o/T-0606n: Free voucher commit + security hardening
 
