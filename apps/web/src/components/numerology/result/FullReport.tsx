@@ -20,8 +20,7 @@ import { BirthChartGrid } from "./charts/BirthChartGrid";
 import { CareerBars } from "./charts/CareerBars";
 import { CombinedChartGrid } from "./charts/CombinedChartGrid";
 import { PyramidSvgChart } from "./charts/PyramidSvgChart";
-import { PhaseTabBar } from "./PhaseTabBar";
-import { ReportTOC } from "./ReportTOC";
+import { FloatingReportNav } from "./FloatingReportNav";
 import { PhaseDivider, ProfileHeaderCard, SectionHeader } from "./v1";
 
 export type NumerologyReportWithSections = NumerologyReport & {
@@ -181,20 +180,19 @@ export function FullReport({ report, userName }: FullReportProps) {
 
   return (
     <div className="relative">
-      <PhaseTabBar phases={phases.map((phase) => ({ letter: phase.letter, title: phase.title }))} />
-      <div className="lg:flex lg:gap-10">
-        <ReportTOC phases={phases} />
-        <div className="grid min-w-0 flex-1 gap-12">
-          <ProfileHeaderCard {...profileHeader} />
-          {phases.map((phase) => (
-            <section className="grid gap-6" key={phase.letter}>
-              <PhaseDivider letter={phase.letter} title={phase.title} />
-              {phase.sections.map((item) => (
+      <div className="grid gap-12">
+        <ProfileHeaderCard {...profileHeader} />
+        {phases.map((phase) => (
+          <section className="grid gap-6" key={phase.letter}>
+            <PhaseDivider letter={phase.letter} title={phase.title} />
+            {phase.sections.map((item) => {
+              const sectionId = item.id ?? item.number;
+              return (
                 <Card
                   as="article"
                   className="v1-report-section"
-                  id={item.id}
-                  key={item.id}
+                  id={sectionId}
+                  key={sectionId}
                   variant="glass"
                   padding="lg"
                 >
@@ -202,11 +200,12 @@ export function FullReport({ report, userName }: FullReportProps) {
                   {item.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{item.intro}</p> : null}
                   <SectionBody item={item} report={report} />
                 </Card>
-              ))}
-            </section>
-          ))}
-        </div>
+              );
+            })}
+          </section>
+        ))}
       </div>
+      <FloatingReportNav phases={phases} />
     </div>
   );
 }
