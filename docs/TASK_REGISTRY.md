@@ -2708,6 +2708,30 @@ Yêu cầu:
 - `npm run lint`, `npm run typecheck`, `npm run build` pass.
 - Không đụng KB/synthesizer/narrative/year-month files.
 
+### T-0702 - UI/UX overhaul for Numerology Report
+
+Status: Done
+
+Bối cảnh:
+
+- Numerology report cần polish visual sau khi KB narrative đã đủ dài: typography, nested boxes, sticky navigation, phase color, fade-in, reading progress.
+- Không đụng KB content, synthesizer, `narrative.json`, `year-month.ts`, `kb-private/*`, hoặc worker.
+
+Kết quả:
+
+- CSS narrative polish: long-form typography 15px/1.8, insight left-accent pull quote, nested boxes nhẹ hơn, no inner shadow, sticky section header, fade-in animation, progress bar, phase badge colors, TOC/mobile tab/collapsible styles.
+- Components: `ReportTOC`, `PhaseTabBar`, `CollapsibleYearBlock` tạo mới.
+- `FullReport` wire desktop TOC, mobile phase tabs, IntersectionObserver fade-in, reading progress bar, and phase-aware `SectionHeader`.
+- `PhaseDivider` thêm `data-phase`; `SectionHeader` nhận phase để đổi badge color.
+- `CollapsibleYearBlock` đã tạo sẵn nhưng chưa wire vào year blocks theo scope: wire sau khi visual confirmed.
+
+Điều kiện Done:
+
+- `npm run lint`, `npm run typecheck`, `npm run build` pass.
+- CSS file dưới lint limit: 593 dòng.
+- 3 commits atomic.
+- Không đụng KB/synthesizer/narrative/year-month files.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done

@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-04 15:11 +07 | T-0702 | Numerology report UI/UX overhaul | `Task` |
 | 2026-06-04 14:56 +07 | T-0701 | CSS narrative visual cleanup | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
 | 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
@@ -127,6 +128,33 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-04 15:11 +07] - T-0702: Numerology report UI/UX overhaul
+
+**Loại:** `Task`
+**Ref:** T-0702
+
+> UI/UX polish for the generated numerology report. No KB content, synthesizer, narrative JSON, year/month narrative logic, or worker code changed.
+
+Changed:
+
+- `apps/web/src/styles/numerology-narrative.css`: upgraded long-form typography, insight pull-quote style, lighter nested narrative blocks, sticky section header, fade-in animation, top reading progress bar, phase badge colors, desktop TOC, mobile phase tabs, and collapsible CSS.
+- `apps/web/src/components/numerology/result/ReportTOC.tsx`: sticky desktop TOC with active section highlight.
+- `apps/web/src/components/numerology/result/PhaseTabBar.tsx`: mobile A/B/C/D quick-jump tabs.
+- `apps/web/src/components/numerology/result/CollapsibleYearBlock.tsx`: ready component for later year-block collapse; not wired yet by design.
+- `apps/web/src/components/numerology/result/FullReport.tsx`: client-side IntersectionObserver fade-in, reading progress, TOC layout, phase tabs, and phase-aware section header.
+- `SectionHeader` and `PhaseDivider`: phase badge color support and `data-phase` anchor.
+
+Verification:
+
+- `npm run lint` pass.
+- `npm run typecheck` pass.
+- `npm run build` pass.
+
+Notes:
+
+- CSS file remains under the lint limit at 593 lines.
+- CollapsibleYearBlock is intentionally not wired into narrative HTML yet; wire after visual confirmation.
 
 ## [2026-06-04 14:56 +07] - T-0701: CSS narrative visual cleanup
 
