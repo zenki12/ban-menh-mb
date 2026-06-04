@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect } from "react";
 import {
   calcBirthChartCells,
   calcCombinedCells,
@@ -17,6 +20,8 @@ import { BirthChartGrid } from "./charts/BirthChartGrid";
 import { CareerBars } from "./charts/CareerBars";
 import { CombinedChartGrid } from "./charts/CombinedChartGrid";
 import { PyramidSvgChart } from "./charts/PyramidSvgChart";
+import { PhaseTabBar } from "./PhaseTabBar";
+import { ReportTOC } from "./ReportTOC";
 import { PhaseDivider, ProfileHeaderCard, SectionHeader } from "./v1";
 
 export type NumerologyReportWithSections = NumerologyReport & {
@@ -135,23 +140,73 @@ export function FullReport({ report, userName }: FullReportProps) {
       chips8: [],
     };
 
+  useEffect(() => {
+    const sections = document.querySelectorAll(".v1-report-section");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("bm-in-view");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08 },
+    );
+    sections.forEach((section) => observer.observe(section));
+
+    const existingProgressBar = document.getElementById("bm-reading-progress");
+    const progressBar = existingProgressBar ?? document.createElement("div");
+    progressBar.id = "bm-reading-progress";
+    if (!existingProgressBar) document.body.appendChild(progressBar);
+
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = `${Math.min(progress, 100)}%`;
+    };
+
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    updateProgress();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", updateProgress);
+      if (!existingProgressBar) progressBar.remove();
+    };
+  }, [phases]);
+
   if (!phases.length) return <EmptySections userName={userName} />;
 
   return (
-    <div className="grid gap-12">
-      <ProfileHeaderCard {...profileHeader} />
-      {phases.map((phase) => (
-        <section className="grid gap-6" key={phase.letter}>
-          <PhaseDivider letter={phase.letter} title={phase.title} />
-          {phase.sections.map((item) => (
-            <Card as="article" className="v1-report-section" id={item.id} key={item.id} variant="glass" padding="lg">
-              <SectionHeader number={item.number} title={item.title} />
-              {item.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{item.intro}</p> : null}
-              <SectionBody item={item} report={report} />
-            </Card>
+    <div className="relative">
+      <PhaseTabBar phases={phases.map((phase) => ({ letter: phase.letter, title: phase.title }))} />
+      <div className="lg:flex lg:gap-10">
+        <ReportTOC phases={phases} />
+        <div className="grid min-w-0 flex-1 gap-12">
+          <ProfileHeaderCard {...profileHeader} />
+          {phases.map((phase) => (
+            <section className="grid gap-6" key={phase.letter}>
+              <PhaseDivider letter={phase.letter} title={phase.title} />
+              {phase.sections.map((item) => (
+                <Card
+                  as="article"
+                  className="v1-report-section"
+                  id={item.id}
+                  key={item.id}
+                  variant="glass"
+                  padding="lg"
+                >
+                  <SectionHeader number={item.number} phase={phase.letter} title={item.title} />
+                  {item.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{item.intro}</p> : null}
+                  <SectionBody item={item} report={report} />
+                </Card>
+              ))}
+            </section>
           ))}
-        </section>
-      ))}
+        </div>
+      </div>
     </div>
   );
 }
