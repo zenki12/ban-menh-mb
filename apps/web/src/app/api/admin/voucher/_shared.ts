@@ -8,6 +8,7 @@ import {
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { verifyAdminToken } from "../../../../lib/admin/auth";
+import { adminRateLimitResponse } from "../../../../lib/admin/rate-limit";
 
 const voucherFields = {
   code: voucherSchema.shape.code,
@@ -59,6 +60,9 @@ export const updateVoucherBodySchema = z
   .superRefine(validateDiscountFields);
 
 export function authErrorResponse(request: Request): NextResponse | null {
+  const rateLimitError = adminRateLimitResponse(request);
+  if (rateLimitError) return rateLimitError;
+
   const auth = verifyAdminToken(request);
   return auth.ok ? null : NextResponse.json({ error: auth.error }, { status: auth.status });
 }

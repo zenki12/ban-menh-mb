@@ -16,6 +16,7 @@ import {
   updatePurchaseProviderRef,
 } from "../../../../lib/firestore";
 import { generateOrderId } from "../../../../lib/payment/order-id";
+import { paymentRateLimitResponse } from "../../../../lib/payment/rate-limit";
 import { createPaymentRequest } from "../../../../lib/payos/client";
 import { validateVoucher } from "../../../../lib/voucher/service";
 
@@ -39,6 +40,9 @@ function freeOrderId(userId: string, productCode: string, voucherCode: string): 
 }
 
 export async function POST(request: Request) {
+  const rateLimitError = paymentRateLimitResponse(request);
+  if (rateLimitError) return rateLimitError;
+
   // 1. Auth
   const bearer = getBearerToken(request);
   if (!bearer) {

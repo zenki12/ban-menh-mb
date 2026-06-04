@@ -5,6 +5,7 @@ import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { verifyFirebaseToken } from "./lib/auth";
 import { loadKb, loadNarrative } from "./lib/kb-loader";
+import { checkRateLimit, getClientIp } from "./lib/rate-limit";
 
 type Env = {
   BANMENH_KB_DEV: KVNamespace;
@@ -128,6 +129,15 @@ app.get("/health", (c) =>
 );
 
 app.post("/numerology/report", async (c) => {
+  const rateLimit = checkRateLimit(`numerology:report:${getClientIp(c.req.raw.headers)}`, 60);
+  if (!rateLimit.allowed) {
+    return c.json(
+      { error: { code: "RATE_LIMITED", message: "Bạn đang thao tác quá nhanh, vui lòng đợi một chút." } },
+      429,
+      { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    );
+  }
+
   const token = getBearerToken(c.req.header("Authorization"));
   if (!token) {
     const res = error("AUTH_REQUIRED", "Thiếu Bearer token.", 401);

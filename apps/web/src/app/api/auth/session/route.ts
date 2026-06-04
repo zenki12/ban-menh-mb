@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { adminAuth } from "../../../../lib/firebase/admin";
 import { ensureUser } from "../../../../lib/firestore";
+import { authRateLimitResponse } from "../../../../lib/auth/rate-limit";
 
 /**
  * Body: { credential: string } — Firebase ID token từ client SDK.
@@ -16,6 +17,9 @@ const sessionBodySchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const rateLimitError = authRateLimitResponse(request);
+  if (rateLimitError) return rateLimitError;
+
   let body: unknown;
   try {
     body = await request.json();
