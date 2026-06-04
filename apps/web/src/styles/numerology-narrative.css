@@ -1,10 +1,6 @@
-.nar {
-  @apply mb-4 text-base leading-relaxed text-[var(--bm-text-soft)];
-}
+.nar { @apply mb-4 text-base leading-relaxed text-[var(--bm-text-soft)]; }
 
-.lp-section-title {
-  @apply mb-3 mt-6 text-lg font-bold text-[var(--bm-gold-bright)];
-}
+.lp-section-title { @apply mb-3 mt-6 text-lg font-bold text-[var(--bm-gold-bright)]; }
 
 .lp-traits,
 .lp-strengths,
@@ -18,16 +14,14 @@
   @apply text-[var(--bm-text-main)];
 }
 
-.nar-container {
-  @apply max-w-[72ch] text-base leading-relaxed text-[var(--bm-text-soft)];
-}
+.nar-container { @apply leading-[1.8] text-[var(--bm-text-soft)]; font-size: 0.9375rem; letter-spacing: -0.005em; max-width: 72ch; }
 
-.nar-container .nar {
-  @apply mb-4;
-}
+.nar-container .nar { margin-bottom: 1rem; }
 
 .nar-container .lp-section-title {
-  @apply mb-3 mt-6 text-base font-bold uppercase tracking-wider text-[var(--bm-gold-bright)] md:mb-4 md:mt-8 md:text-lg;
+  @apply mb-4 mt-8 text-base font-bold tracking-wide text-[var(--bm-gold-bright)] md:text-lg;
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
 
 .nar-container .lp-strengths li,
@@ -66,9 +60,7 @@
   @apply mb-4 text-base leading-relaxed text-[var(--bm-text-soft)];
 }
 
-.insight-box {
-  @apply mt-6 rounded-lg border border-[var(--bm-border-purple)] bg-[var(--bm-bg-glass)] p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
-}
+.insight-box { @apply mt-8 rounded-xl border-l-4 border-[var(--bm-primary-soft)] bg-gradient-to-r from-[rgba(124,58,237,0.1)] to-transparent px-5 py-4 text-[0.9375rem] leading-relaxed text-[var(--bm-text-soft)]; border-top: none; border-right: none; border-bottom: none; }
 
 .insight-box strong {
   @apply text-[var(--bm-text-main)];
@@ -126,9 +118,7 @@
   @apply text-sm font-bold text-[var(--bm-text-main)] md:text-base;
 }
 
-.v1-section-header {
-  @apply flex flex-wrap items-center gap-3 border-b border-[var(--bm-border-subtle)] pb-4;
-}
+.v1-section-header { @apply sticky top-0 z-10 -mx-6 flex flex-wrap items-center gap-3 border-b border-[var(--bm-border-subtle)] px-6 py-3; backdrop-filter: blur(16px); background: rgba(12, 8, 22, 0.85); }
 
 .v1-section-header span {
   @apply flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--bm-primary)] text-base font-bold text-white;
@@ -587,12 +577,17 @@
 /* Section 8 summary card */ .personal-year-card { display: flex; align-items: center; gap: 1rem; background: var(--bm-bg-glass); border: 1px solid var(--bm-border-gold); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1rem; } .py-icon { font-size: 2rem; } .py-content { flex: 1; } .py-title { font-weight: 700; color: var(--bm-text-main); font-size: 1.05rem; } .py-num-badge { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--bm-gold-bright); color: var(--bm-bg-void); font-weight: 800; font-size: 1.125rem; margin: 0.25rem 0; } .py-theme { color: var(--bm-text-soft); font-style: italic; font-size: 0.95rem; } /* Nên làm / Tránh grid */ .dos-donts-grid { display: grid; gap: 0.875rem; grid-template-columns: 1fr; margin: 1rem 0; } @media (min-width: 640px) { .dos-donts-grid { grid-template-columns: 1fr 1fr; } } .dos-block { background: rgba(34, 197, 94, 0.08); border-left: 3px solid #22c55e; padding: 0.875rem 1rem; border-radius: 0.5rem; color: var(--bm-text-soft); line-height: 1.6; } .dos-block strong { color: #4ade80; } .donts-block { background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; padding: 0.875rem 1rem; border-radius: 0.5rem; color: var(--bm-text-soft); line-height: 1.6; } .donts-block strong { color: #f87171; } /* Section 8.1 year cards grid */ .year-cards-grid { display: grid; gap: 0.875rem; grid-template-columns: 1fr; margin: 1.25rem 0; } @media (min-width: 640px) { .year-cards-grid { grid-template-columns: repeat(3, 1fr); } } .year-card-tab { background: var(--bm-bg-glass); border: 1px solid var(--bm-border-subtle); border-radius: 0.75rem; padding: 1rem 0.75rem; text-align: center; } .year-card-label { color: var(--bm-text-soft); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; } .year-card-num { font-size: 2rem; font-weight: 800; color: var(--bm-gold-bright); line-height: 1; margin-bottom: 0.5rem; } .year-card-age { color: var(--bm-text-muted); font-size: 0.85rem; font-style: italic; } /* Year block detail */ .py-year-block { background: var(--bm-bg-glass); border: 1px solid var(--bm-border-subtle); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; } .py-year-heading { font-weight: 700; font-size: 1.05rem; color: var(--bm-gold-bright); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--bm-border-subtle); } .py-year-intro { display: flex; gap: 1rem; margin-bottom: 1rem; } .year-detail-block { flex: 1; } .year-detail-headline { background: rgba(247, 201, 72, 0.08); border-left: 3px solid var(--bm-gold-bright); padding: 0.5rem 0.875rem; border-radius: 0.375rem; margin-bottom: 0.5rem; } .year-detail-label { font-weight: 700; color: var(--bm-gold-bright); font-size: 0.9rem; } .year-detail-subtitle { font-style: italic; color: var(--bm-text-soft); font-size: 0.9rem; margin-bottom: 0.5rem; } /* Year domain blocks (5 aspects) */ .year-domain-block { background: var(--bm-bg-panel); border-left: 3px solid var(--bm-primary-soft); border-radius: 0.5rem; padding: 0.875rem 1.125rem; margin-bottom: 0.875rem; } .year-domain-block .domain-title { font-weight: 700; color: var(--bm-text-main); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; } .year-domain-block p.nar { color: var(--bm-text-soft); line-height: 1.7; }
 /* Section 9.1 month detail */ .month-detail-block { background: var(--bm-bg-glass); border: 1px solid var(--bm-border-subtle); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; } .month-detail-headline { font-weight: 700; font-size: 1rem; color: var(--bm-gold-bright); text-transform: uppercase; letter-spacing: 0.08em; padding: 0.5rem 0.875rem; background: rgba(247, 201, 72, 0.08); border-left: 3px solid var(--bm-gold-bright); border-radius: 0.375rem; margin-bottom: 1rem; }
 
-/* T-0701 narrative visual cleanup: keep narrative blocks lighter inside report cards. */
-.nar-container { @apply max-w-[72ch]; }
-.nar-container .lp-section-title { @apply mb-3 mt-6 text-base md:mb-4 md:mt-8 md:text-lg; }
-.insight-box { @apply mt-6; }
-.year-detail-block { @apply my-4; }
-.year-domain-block, .py-domain, .aspect-block { @apply my-4 border-l-2 border-[var(--bm-border-subtle)] bg-transparent pl-4 pr-0; border-bottom: 0; border-right: 0; border-top: 0; border-radius: 0; box-shadow: none; }
-.py-year-block { @apply my-0 border-t border-[var(--bm-border-subtle)] bg-transparent pb-2 pt-6; border-bottom: 0; border-left: 0; border-right: 0; border-radius: 0; box-shadow: none; }
+/* T-0702 narrative UI polish. */
+.year-detail-block { @apply my-4; box-shadow: none !important; }
+.year-domain-block, .py-domain, .aspect-block { @apply my-4 border-l-2 border-[var(--bm-border-subtle)] bg-transparent pl-4 pr-0; border-bottom: 0; border-right: 0; border-top: 0; border-radius: 0; box-shadow: none !important; }
+.py-year-block { @apply my-0 border-t border-[var(--bm-border-subtle)] bg-transparent pb-2 pt-6; border-bottom: 0; border-left: 0; border-right: 0; border-radius: 0; box-shadow: none !important; }
 .py-year-block:first-of-type { @apply border-t-0 pt-0; }
 .py-year-header { @apply mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-[var(--bm-border-gold)] bg-transparent pb-3 text-left; border-left: 0; border-right: 0; border-top: 0; border-radius: 0; box-shadow: none; }
+@keyframes bm-fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.v1-report-section { opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; }
+.v1-report-section.bm-in-view { animation: bm-fade-up 0.45s ease forwards; }
+.phase-badge-A { background: linear-gradient(135deg, #ca8a04, #fde047); } .phase-badge-B { background: linear-gradient(135deg, #1d4ed8, #3b82f6); } .phase-badge-C { background: linear-gradient(135deg, #7c3aed, #a78bfa); } .phase-badge-D { background: linear-gradient(135deg, #065f46, #10b981); }
+#bm-reading-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--bm-primary), var(--bm-gold-bright)); z-index: 9999; transition: width 0.1s linear; pointer-events: none; }
+.bm-collapsible { @apply my-4; } .bm-collapsible-trigger { @apply flex w-full items-center justify-between gap-3 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-4 py-3 text-left text-sm font-semibold text-[var(--bm-gold-bright)] transition-colors hover:bg-[var(--bm-bg-panel)]; cursor: pointer; } .bm-chevron { @apply shrink-0 text-[var(--bm-text-muted)] transition-transform duration-200; } .bm-chevron-open { @apply rotate-180; } .bm-collapsible-body { @apply mt-2 pl-1; }
+.bm-toc { @apply hidden lg:block; position: sticky; top: 5rem; max-height: calc(100vh - 6rem); overflow-y: auto; width: 220px; flex-shrink: 0; font-size: 0.78rem; scrollbar-width: thin; } .bm-toc-phase { @apply mb-4; } .bm-toc-phase-label { @apply mb-1 rounded px-2 py-1 text-[0.65rem] font-bold uppercase tracking-widest text-[var(--bm-bg-void)]; } .bm-toc-phase-A { background: #ca8a04; } .bm-toc-phase-B { background: #1d4ed8; } .bm-toc-phase-C { background: #7c3aed; } .bm-toc-phase-D { background: #065f46; } .bm-toc-item { @apply flex items-start gap-1.5 rounded px-2 py-1.5 no-underline text-[var(--bm-text-muted)] transition-colors hover:bg-[var(--bm-bg-glass)] hover:text-[var(--bm-text-soft)]; line-height: 1.4; } .bm-toc-item-active { @apply bg-[var(--bm-bg-glass)] text-[var(--bm-gold-bright)]; border-left: 2px solid var(--bm-gold-bright); } .bm-toc-num { @apply shrink-0 font-bold text-[var(--bm-text-muted)]; min-width: 1.5rem; } .bm-toc-title { @apply line-clamp-2; }
+.bm-phase-tabs { @apply sticky top-0 z-20 flex gap-1 overflow-x-auto border-b border-[var(--bm-border-subtle)] bg-[rgba(12,8,22,0.9)] px-1 py-2 lg:hidden; backdrop-filter: blur(12px); scrollbar-width: none; } .bm-phase-tabs::-webkit-scrollbar { display: none; } .bm-phase-tab { @apply flex shrink-0 flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[var(--bm-text-muted)] transition-all; border: 1px solid transparent; cursor: pointer; background: transparent; } .bm-phase-tab:active { border-color: var(--phase-color); background: rgba(255,255,255,0.05); } .bm-phase-tab-letter { @apply text-base font-bold; color: var(--phase-color); } .bm-phase-tab-name { @apply text-[0.65rem] font-medium uppercase tracking-wider; }
