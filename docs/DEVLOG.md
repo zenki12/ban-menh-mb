@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-04 14:56 +07 | T-0701 | CSS narrative visual cleanup | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
 | 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
 | 2026-06-02 12:35 +07 | T-0606l | Tension number fallback insight + English cleanup | `Hotfix` |
@@ -126,6 +127,26 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-04 14:56 +07] - T-0701: CSS narrative visual cleanup
+
+**Loại:** `Task`
+**Ref:** T-0701
+
+> Pure CSS visual fixes for KB narrative display; no KB, synthesizer, narrative JSON, or year/month narrative logic changed.
+
+Changed:
+
+- `apps/web/src/styles/numerology-narrative.css`: reduced nested box treatment for personal year/year detail/domain/aspect blocks.
+- Converted `py-year-block` to divider style, domain/aspect blocks to left-accent style, and `py-year-header` to compact flex.
+- Added `max-w-[72ch]` readability constraint, insight spacing, and responsive life-path section title sizing.
+- Kept the file below lint limit at 598 lines.
+
+Verification:
+
+- `npm run lint` pass.
+- `npm run typecheck` pass.
+- `npm run build` pass.
 
 ## [2026-06-04 13:49 +07] - T-0606o/T-0606n: Free voucher commit + security hardening
 

@@ -2687,6 +2687,27 @@ Yêu cầu:
 - T-0606n CORS, middleware, audit fix, and rate limiting complete: `49c1999`, `8acfc16`, `a61ce8b`, `4d63861`.
 - Final typecheck/lint, worker TS, KB tests, and webpack build pass.
 
+### T-0701 - CSS visual fixes for KB narrative display
+
+Status: Done
+
+Bối cảnh:
+
+- KB narrative display có nested boxes quá dày trên mobile, đặc biệt các block năm/tháng và domain trong card.
+- Task chỉ cho phép sửa CSS visual, không đụng KB, synthesizer, `narrative.json`, `year-month.ts`, hoặc HTML.
+
+Yêu cầu:
+
+- Áp 7 CSS fixes cho `apps/web/src/styles/numerology-narrative.css`: `py-year-block`, `year-domain-block`/`py-domain`/`aspect-block`, `year-detail-block`, `py-year-header`, `nar-container`, `insight-box`, và `lp-section-title`.
+- Chạy `npm run lint`, `npm run typecheck`, `npm run build`.
+- Commit CSS và docs thành 2 commit atomic.
+
+Điều kiện Done:
+
+- 7 fixes applied in `apps/web/src/styles/numerology-narrative.css`.
+- `npm run lint`, `npm run typecheck`, `npm run build` pass.
+- Không đụng KB/synthesizer/narrative/year-month files.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done
