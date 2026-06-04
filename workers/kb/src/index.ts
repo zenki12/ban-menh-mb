@@ -118,8 +118,9 @@ function attachNarrative<T extends { number: number }>(
   narrative: NarrativeKb,
   group: keyof NarrativeKb,
   vars: Record<string, string | number>,
+  lookupNumber = item.number,
 ): T & { narrative: string | null } {
-  return { ...item, narrative: getNarrative(narrative, group, item.number, vars) };
+  return { ...item, narrative: getNarrative(narrative, group, lookupNumber, vars) };
 }
 
 app.get("/", (c) => c.text("Bản Mệnh V2 - KB Worker"));
@@ -183,7 +184,13 @@ app.post("/numerology/report", async (c) => {
       ok: true,
       report: {
         ...report,
-        lifePath: attachNarrative(report.lifePath, narrative, "lifePath", nameVars),
+        lifePath: attachNarrative(
+          report.lifePath,
+          narrative,
+          "lifePath",
+          nameVars,
+          report.lifePath.displayNumber ?? report.lifePath.number,
+        ),
         soul: attachNarrative(report.soul, narrative, "soul", nameVars),
         destiny: attachNarrative(report.destiny, narrative, "destiny", nameVars),
         personality: attachNarrative(report.personality, narrative, "personality", nameVars),

@@ -447,6 +447,57 @@ export const LIFE_PATH_EXTRA: Record<number, LifePathExtraEntry> = {
     </ul>`,
   },
 
+  10: {
+    nguoiNoiTieng: [
+      { name: 'Walt Disney', field: 'Sáng tạo / Kinh doanh', note: 'Biểu tượng của khả năng biến tầm nhìn cá nhân thành một thế giới có ảnh hưởng lâu dài' },
+      { name: 'George Clooney', field: 'Điện ảnh / Hoạt động xã hội', note: 'Kết hợp sức hút cá nhân, bản lĩnh độc lập và tiếng nói có trách nhiệm với cộng đồng' },
+      { name: 'Sofia Vergara', field: 'Giải trí / Kinh doanh', note: 'Tinh thần tự chủ, linh hoạt và khả năng xây dựng thương hiệu cá nhân mạnh mẽ' },
+      { name: 'Kate Winslet', field: 'Điện ảnh', note: 'Bền bỉ, độc lập và không ngại khẳng định bản sắc riêng trong sự nghiệp' },
+      { name: 'Usain Bolt', field: 'Thể thao', note: 'Tinh thần tiên phong, tự tin và khả năng tỏa sáng bằng năng lượng rất riêng' },
+      { name: 'Tiger Woods', field: 'Thể thao', note: 'Ý chí mạnh, tham vọng lớn và năng lực tập trung vào đỉnh cao cá nhân' },
+    ],
+    tuongThich: {
+      tot: [2, 3, 7, 8, 11],
+      khong: [4, 6, 22],
+      moTaTot: 'Số 2 giúp số 10 mềm lại và biết kết nối. Số 3 mở thêm niềm vui sáng tạo. Số 7 tạo chiều sâu trí tuệ. Số 8 cộng hưởng tham vọng thực thi. Số 11 giúp số 10 nâng tầm trực giác và tầm nhìn.',
+      moTaKhong: 'Số 4 và số 6 có thể cảm thấy số 10 quá mạnh, quá nhanh hoặc khó đoán. Số 22 cùng có tầm nhìn lớn nhưng dễ va chạm quyền kiểm soát nếu cả hai chưa biết phân vai.',
+      chiTiet: `<ul>
+        <li><strong>Số 2:</strong> Mang đến sự tinh tế và khả năng lắng nghe, giúp số 10 không chỉ dẫn đầu mà còn biết đồng hành.</li>
+        <li><strong>Số 3:</strong> Kích hoạt mặt vui vẻ, linh hoạt và sáng tạo, giúp số 10 bớt căng cứng trong mục tiêu.</li>
+        <li><strong>Số 7:</strong> Tạo không gian cho chiều sâu, suy ngẫm và trí tuệ nội tâm — điều số 10 rất cần khi đi quá nhanh.</li>
+        <li><strong>Số 8:</strong> Cộng hưởng mạnh trong công việc, kinh doanh và xây dựng thành tựu cụ thể.</li>
+      </ul>`,
+    },
+    tinhDuyen: `<ul>
+      <li><strong>Phong cách yêu:</strong> Số 10 yêu chủ động, rõ ràng và có xu hướng muốn bảo vệ người mình thương. Bạn thích một mối quan hệ có tương lai, có hướng đi và có sự tôn trọng lẫn nhau.</li>
+      <li><strong>Điều bạn cần:</strong> Một người đủ vững để đứng cạnh bạn, không bị lu mờ trước nội lực mạnh của bạn, nhưng cũng đủ mềm để nhắc bạn quay về với sự dịu dàng.</li>
+      <li><strong>Thử thách:</strong> Cái tôi mạnh và kỳ vọng cao có thể khiến bạn vô tình tạo áp lực cho người yêu. Bạn cần học cách lắng nghe mà không lập tức sửa chữa, dẫn dắt hoặc đánh giá.</li>
+      <li><strong>Lời khuyên:</strong> Tình yêu không phải là một dự án cần chiến thắng. Đó là nơi bạn học cách hiện diện, tin tưởng và cho phép người khác bước vào thế giới riêng của mình.</li>
+    </ul>`,
+    baiHocThuThach: `<ul>
+      <li><strong>Bài học về khiêm tốn:</strong> Bạn có năng lực dẫn đầu, nhưng không phải lúc nào cũng cần đi trước tất cả. Đôi khi trưởng thành là biết nhường nhịp cho người khác cùng lớn lên.</li>
+      <li><strong>Thử thách về kiên nhẫn:</strong> Vì nhìn thấy đích đến rất nhanh, bạn dễ khó chịu với tiến trình chậm. Hãy nhớ rằng nền móng bền vững cần thời gian.</li>
+      <li><strong>Thử thách về cái tôi:</strong> Số 10 cần học cách phân biệt giữa tự tin và áp đặt, giữa bản lĩnh và sự cố chấp.</li>
+      <li><strong>Bài học về tái sinh:</strong> Khi một chu kỳ kết thúc, bạn có khả năng bắt đầu lại ở tầng cao hơn. Đừng sợ khép lại điều cũ nếu nó đã hoàn thành nhiệm vụ.</li>
+    </ul>`,
+    banBeGiaDinh: `<ul>
+      <li><strong>Trong tình bạn:</strong> Bạn thường là người truyền động lực, kéo người khác ra khỏi vùng an toàn và khơi dậy tinh thần hành động.</li>
+      <li><strong>Trong gia đình:</strong> Bạn có xu hướng trở thành người quyết định hoặc người gánh trách nhiệm. Điều này đáng quý, nhưng hãy tránh biến tình thương thành kiểm soát.</li>
+      <li><strong>Lưu ý:</strong> Người thân không phải lúc nào cũng theo kịp tốc độ của bạn. Hãy học cách giải thích, lắng nghe và chờ đợi.</li>
+    </ul>`,
+    duLichSoThich: `<ul>
+      <li><strong>Phong cách du lịch:</strong> Hợp với những chuyến đi mở rộng tầm nhìn: thành phố mới, văn hóa mới, hành trình có thử thách hoặc mục tiêu rõ ràng.</li>
+      <li><strong>Sở thích:</strong> Khởi tạo dự án cá nhân, học kỹ năng mới, thể thao cạnh tranh, sáng tạo nội dung, kinh doanh nhỏ, khám phá công nghệ hoặc nghệ thuật ứng dụng.</li>
+      <li><strong>Tái tạo năng lượng:</strong> Bạn cần khoảng thời gian một mình để sắp xếp lại tầm nhìn. Không gian yên tĩnh giúp trực giác của số 0 hòa lại với ý chí của số 1.</li>
+    </ul>`,
+    ngheNghiep: `<ul>
+      <li><strong>Định hướng phù hợp:</strong> Những vai trò cho phép bạn tiên phong, tự chủ, đổi mới và chịu trách nhiệm trước kết quả.</li>
+      <li><strong>Công việc lý tưởng:</strong> Founder, quản lý dự án, nhà sáng tạo nội dung, chiến lược kinh doanh, sản phẩm công nghệ, thiết kế, truyền thông, tư vấn phát triển cá nhân hoặc lãnh đạo nhóm.</li>
+      <li><strong>Môi trường làm việc:</strong> Cần không gian ra quyết định, mục tiêu rõ và cơ hội tạo dấu ấn riêng. Bạn dễ mất năng lượng trong môi trường quá bị kiểm soát hoặc lặp lại.</li>
+      <li><strong>Lưu ý:</strong> Thành công của số 10 bền nhất khi tham vọng đi cùng trách nhiệm, và tốc độ đi cùng khả năng hợp tác.</li>
+    </ul>`,
+  },
+
   11: {
     nguoiNoiTieng: [
       { name: 'Barack Obama', field: 'Chính trị', note: 'Tổng thống Mỹ mang thông điệp hy vọng và thay đổi đến hàng triệu người' },
@@ -568,6 +619,34 @@ export const LIFE_PATH_EXTRA: Record<number, LifePathExtraEntry> = {
 
 };
 
+export function renderLifePathTenLiteral(name: string): string {
+  const safeName = escapeHtml(name);
+  return `<p class="nar"><strong>${safeName}</strong>, bạn mang rung động đặc biệt của <strong>Số 10 (1+0=1) — Con Số Của Sự Hoàn Thành Nghiệp Quả và Khởi Đầu Mới</strong>. Số 10 không chỉ đơn giản là số 1 — nó là số 1 ở một cấp độ cao hơn, mang theo sự hoàn thành của một chu kỳ trước đó. Bạn đến với kiếp này không phải để bắt đầu từ đầu — bạn bắt đầu từ nền tảng đã được xây dựng qua nhiều kiếp sống.</p>
+
+<p class="nar">Bạn mang trong mình <strong>tiềm năng lãnh đạo vượt trội và bản năng tiên phong</strong> giống như năng lượng số 1 thuần khiết, nhưng kết hợp với sự khôn ngoan của số 0 — biểu tượng của vô tận và tiềm năng vũ trụ. Đây là sự kết hợp hiếm gặp tạo nên một cá nhân vừa có tầm nhìn chiến lược, vừa có khả năng trực giác sâu sắc.</p>
+
+<div class="lp-section-title">TÍNH CÁCH NỔI TRỘI CỦA BẠN</div>
+<ul class="lp-traits">
+  <li><strong>Điểm mạnh nổi bật:</strong> Tự lập mạnh mẽ, tư duy đổi mới và cách mạng, bản năng tiên phong, khả năng trực giác kết hợp với lý trí, nội lực phi thường</li>
+  <li><strong>Điểm yếu cần chú ý:</strong> Thiếu kiên nhẫn với tiến trình chậm, cái tôi mạnh, đôi khi bị cô lập vì đi trước thời đại, khó chấp nhận giới hạn của bản thân</li>
+</ul>
+
+<div class="lp-section-title">ĐIỂM MẠNH CỦA BẠN</div>
+<ul class="lp-strengths">
+  <li><p>- Mang năng lượng đường đời số <strong>10</strong>, <strong>${safeName}</strong> có khả năng nhìn thấy những gì chưa tồn tại và dám hành động để biến nó thành hiện thực. Bạn không bị giới hạn bởi những gì đã được làm — bạn liên tục hỏi "điều gì có thể được làm tốt hơn?" và rồi bắt tay vào làm điều đó.</p></li>
+  <li><p>- <strong>Nội lực và tự lực phi thường</strong>: Bạn không cần ai phê chuẩn để hành động theo điều bạn tin là đúng. Đây là sức mạnh cốt lõi cho phép bạn dẫn đầu khi người khác còn đang chờ đợi điều kiện hoàn hảo — điều kiện không bao giờ đến nếu bạn không tạo ra nó.</p></li>
+  <li><p>- <strong>Khả năng phục hồi và tái tạo</strong>: Số 10 mang năng lượng của sự hoàn thành và khởi đầu mới. Khi một chương kết thúc, bạn không bị mắc kẹt trong nó — bạn học từ nó và bước vào chương tiếp theo với sức sống mới. Đây là khả năng hiếm có trong một thế giới mà nhiều người bị tê liệt bởi thất bại.</p></li>
+  <li><p>- <strong>Năng lực tổng hợp trí tuệ và trực giác</strong>: Bạn không chỉ phân tích — bạn cảm nhận. Sự kết hợp giữa tư duy logic và trực giác sâu sắc cho phép bạn đưa ra những quyết định chính xác và thuyết phục ngay cả trong những tình huống thiếu thông tin.</p></li>
+</ul>
+
+<div class="lp-section-title">ĐIỂM YẾU CỦA BẠN</div>
+<ul class="lp-weaknesses">
+  <li><p>- <strong>Thiếu kiên nhẫn với tiến trình</strong> là thách thức của <strong>${safeName}</strong>. Bạn nhìn thấy đích đến rõ ràng đến mức rất khó chịu đựng khi mọi thứ tiến triển chậm hơn tầm nhìn của bạn. Hãy nhớ: không phải vì đường đi chậm mà con đường sai — đôi khi tốc độ chậm chính là bảo vệ bạn khỏi những sai lầm không cần thiết.</p></li>
+  <li><p>- <strong>Cô đơn vì đi trước thời đại</strong> là trải nghiệm quen thuộc: Tầm nhìn của bạn thường vượt quá những gì người xung quanh có thể hiểu ở thời điểm hiện tại. Hãy học cách truyền đạt ý tưởng của mình theo ngôn ngữ mà người khác có thể tiếp cận — đây là kỹ năng cần thiết để biến tầm nhìn thành hiện thực.</p></li>
+  <li><p>- <strong>Khó chấp nhận giới hạn</strong>: Năng lượng số 10 mang cảm giác "không có gì là không thể" — điều này tạo ra sức mạnh nhưng đôi khi cũng tạo ra sự kiêu ngạo và từ chối thực tế. Biết khi nào cần điều chỉnh kỳ vọng là dấu hiệu của sự khôn ngoan, không phải yếu đuối.</p></li>
+</ul>`;
+}
+
 export function renderLifePathExtra(num: number, name: string): string {
   const n = num;
   const data = LIFE_PATH_EXTRA[n];
@@ -667,9 +746,10 @@ export function renderLifePathExtra(num: number, name: string): string {
 export function lifePathCtxBlock(num: number, ctx: NarrativeContext, name: string): string {
   const soul = ctx.soul;
   const bday = ctx.birthday;
-  const same = num === soul;
-  const energyMatch = ([1, 3, 5, 9].includes(num) && [1, 3, 5, 9].includes(soul)) ||
-    ([2, 4, 6, 8].includes(num) && [2, 4, 6, 8].includes(soul));
+  const baseNum = num === 10 ? 1 : num;
+  const same = baseNum === soul;
+  const energyMatch = ([1, 3, 5, 9].includes(baseNum) && [1, 3, 5, 9].includes(soul)) ||
+    ([2, 4, 6, 8].includes(baseNum) && [2, 4, 6, 8].includes(soul));
   let insight = '';
   if (same) {
     insight = `Linh hồn số <strong>${soul}</strong> của bạn hoàn toàn đồng nhất với Đường đời — điều cực kỳ hiếm gặp. Những gì bạn khao khát sâu nhất bên trong chính xác là những gì thiên mệnh dẫn dắt bạn thực sống. Hạnh phúc và bình an đến với bạn tự nhiên hơn khi bạn lắng nghe tiếng gọi nội tâm thay vì chạy theo kỳ vọng bên ngoài.`;

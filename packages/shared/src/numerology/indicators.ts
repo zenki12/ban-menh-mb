@@ -13,6 +13,7 @@ export type KarmicDebtNumber = 13 | 14 | 16 | 19;
 export type IndicatorCalculation = {
   number: number;
   raw: number;
+  displayNumber?: number;
   isMaster: boolean;
   karmicDebt?: KarmicDebtNumber;
 };
@@ -43,7 +44,11 @@ export function detectKarmicDebt(rawSum: number): KarmicDebtNumber | undefined {
 }
 
 export function calcLifePath(dob: DobParts): IndicatorCalculation {
-  return result(reduce(dob.day) + reduce(dob.month) + reduce(dob.year));
+  const raw = reduce(dob.day) + reduce(dob.month) + reduce(dob.year);
+  const calculation = result(raw);
+  const lastTwo = Math.abs(raw) % 100;
+  const lastTwoSum = Math.floor(lastTwo / 10) + (lastTwo % 10);
+  return raw === 10 || lastTwoSum === 10 ? { ...calculation, displayNumber: 10 } : calculation;
 }
 
 export function calcDestiny(fullName: string): IndicatorCalculation {

@@ -38,6 +38,7 @@ export type NumerologyInput = {
 export type IndicatorResult<T = unknown> = {
   number: number;
   raw: number;
+  displayNumber?: number;
   isMaster: boolean;
   karmicDebt?: KarmicDebtNumber;
   data: T | null;
@@ -135,8 +136,9 @@ function withData(
   kb: NumerologyKb,
   section: keyof NumerologyKb,
   value: IndicatorCalculation,
+  lookupKey: number | string = value.number,
 ): IndicatorResult {
-  return { ...value, data: lookup(kb, section, value.number) };
+  return { ...value, data: lookup(kb, section, lookupKey) };
 }
 
 function withPeriodData(
@@ -202,7 +204,7 @@ export async function generateReport(
     input: { ...input, fullName, dobParts: dob },
     birthday: withData(kb, "birthday_number", calcBirthday(dob.day)),
     attitude: withData(kb, "attitude_number", calcAttitude(dob)),
-    lifePath: withData(kb, "life_path", lifePath),
+    lifePath: withData(kb, "life_path", lifePath, lifePath.displayNumber ?? lifePath.number),
     lifeCycles: calcLifeCycles(dob).map((item) => withPeriodData(kb, "life_cycle", item)),
     pyramidPeaks: calcPyramidPeaks(dob).map((item) => withPeriodData(kb, "pyramid_peak", item)),
     pyramidChallenges: calcPyramidChallenges(dob).map((item) =>

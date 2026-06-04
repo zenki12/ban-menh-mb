@@ -15,6 +15,7 @@ import {
   personalityCtxBlock,
   readString,
   renderLifePathExtra,
+  renderLifePathTenLiteral,
   soulCtxBlock,
   type NarrativeContext,
 } from "./narrative-deep";
@@ -159,13 +160,18 @@ function section(
   };
 }
 
+function displayNumber(indicator: IndicatorResult): number {
+  return indicator.displayNumber ?? indicator.number;
+}
+
 function buildProfileHeader(report: NumerologyReport): SynthesizedReport["profileHeader"] {
+  const lpNum = displayNumber(report.lifePath);
   return {
     name: report.input.fullName,
     dob: report.input.dob,
-    lifePathNumber: report.lifePath.number,
+    lifePathNumber: lpNum,
     chips8: [
-      { label: "Đường Đời", num: report.lifePath.number },
+      { label: "Đường Đời", num: lpNum },
       { label: "Sứ Mệnh", num: report.destiny.number },
       { label: "Linh Hồn", num: report.soul.number },
       { label: "Nhân Cách", num: report.personality.number },
@@ -178,13 +184,14 @@ function buildProfileHeader(report: NumerologyReport): SynthesizedReport["profil
 }
 
 function overviewHtml(report: NumerologyReport, name: string): string {
+  const lpNum = displayNumber(report.lifePath);
   const chips = buildProfileHeader(report).chips8
     .map(
       (chip) =>
         `<span class="pn-item"><span class="pn-label">${escapeHtml(chip.label)}</span><span class="pn-val">${chip.num}</span></span>`,
     )
     .join("");
-  return `<div class="profile-card"><div class="profile-avatar"><span class="avatar-number">${report.lifePath.number}</span><span class="avatar-label">Chủ Đạo</span></div><div class="profile-info"><div class="profile-name">${escapeHtml(name)}</div><div class="profile-dob">Ngày sinh: ${escapeHtml(report.input.dob)}</div><div class="profile-nums">${chips}</div></div></div>
+  return `<div class="profile-card"><div class="profile-avatar"><span class="avatar-number">${lpNum}</span><span class="avatar-label">Chủ Đạo</span></div><div class="profile-info"><div class="profile-name">${escapeHtml(name)}</div><div class="profile-dob">Ngày sinh: ${escapeHtml(report.input.dob)}</div><div class="profile-nums">${chips}</div></div></div>
   <p class="nar">Bản báo cáo này được xây dựng riêng cho <strong>${escapeHtml(name)}</strong> — phân tích đầy đủ các chỉ số dựa trên <strong>họ tên khai sinh</strong> và <strong>ngày/tháng/năm sinh</strong> theo hệ Pythagoras.</p>
   <p class="nar">Hãy đọc từng phần với tâm thái cởi mở và suy ngẫm. Thần số học không phải lời tiên tri — đó là tấm gương phản chiếu bản chất sâu xa nhất của bạn, để bạn hiểu rõ hơn về chính mình và đưa ra những lựa chọn có ý thức hơn.</p>`;
 }
@@ -195,6 +202,7 @@ function careerCard(label: string, text: string): string {
 }
 
 function careerHtml(report: NumerologyReport, name: string): string {
+  const lpNum = displayNumber(report.lifePath);
   const lpCareer = readString(report.lifePath.data, ["career", "career_fit", "mission"]);
   const destCareer = readString(report.destiny.data, ["career", "career_fit", "mission"]);
   const bdayCareer = readString(report.birthday.data, ["career_fit", "career", "mission"]);
@@ -205,7 +213,7 @@ function careerHtml(report: NumerologyReport, name: string): string {
   ]
     .filter(Boolean)
     .join("");
-  const lpExtra = LIFE_PATH_EXTRA[report.lifePath.number];
+  const lpExtra = LIFE_PATH_EXTRA[lpNum] ?? LIFE_PATH_EXTRA[report.lifePath.number];
   const detail = lpExtra?.ngheNghiep
     ? `<div class="lp-extra-section">
         <div class="lp-extra-heading">💼 Định Hướng Nghề Nghiệp Chi Tiết</div>
@@ -287,9 +295,12 @@ function karmicDebtHtml(report: NumerologyReport, narrative: NarrativeKb, kb: Nu
 }
 
 function lifePathHtml(report: NumerologyReport, narrative: NarrativeKb, ctx: NarrativeContext, name: string): string {
-  const lpNum = report.lifePath.number;
-  const narrativeHtml = fromNarrative(narrative, "lifePath", lpNum, { name, number: lpNum }) ?? "";
-  return [narrativeHtml, lifePathCtxBlock(lpNum, ctx, name), renderLifePathExtra(lpNum, name)].join("");
+  const lpNum = displayNumber(report.lifePath);
+  const narrativeHtml =
+    fromNarrative(narrative, "lifePath", lpNum, { name, number: lpNum }) ??
+    (lpNum === 10 ? renderLifePathTenLiteral(name) : "");
+  const extraHtml = renderLifePathExtra(lpNum, name);
+  return [narrativeHtml, lifePathCtxBlock(lpNum, ctx, name), extraHtml].join("");
 }
 
 function challengeHtml(
@@ -306,7 +317,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
   const { report, narrative, kb } = input;
   const name = report.input.fullName;
   const ctx: NarrativeContext = {
-    lifePath: report.lifePath.number,
+    lifePath: displayNumber(report.lifePath),
     soul: report.soul.number,
     destiny: report.destiny.number,
     personality: report.personality.number,
@@ -336,7 +347,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
       title: "PHÂN TÍCH ĐƯỜNG ĐỜI",
       sections: [
         section("5", "Chỉ số Đường Đời (Số Chủ Đạo)", lifePathHtml(report, narrative, ctx, name), {
-          intro: readString(report.lifePath.data, ["title"]) ? `${report.lifePath.number} · ${readString(report.lifePath.data, ["title"])}` : String(report.lifePath.number),
+          intro: `<strong>Số Đường Đời ${displayNumber(report.lifePath)}</strong> — Đây là chỉ số cốt lõi định hình toàn bộ hành trình cuộc đời của bạn.`,
         }),
         section("6", "Chu Kỳ Đường Đời", buildLifeCyclesSection(report, name)),
         section(
