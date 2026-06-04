@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-04 16:47 +07 | T-0702 | Floating report navigation follow-up | `Task` |
 | 2026-06-04 15:11 +07 | T-0702 | Numerology report UI/UX overhaul | `Task` |
 | 2026-06-04 14:56 +07 | T-0701 | CSS narrative visual cleanup | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
@@ -126,6 +127,33 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-04 16:47 +07] - T-0702: Floating report navigation follow-up
+
+**Loại:** `Task`
+**Ref:** T-0702
+
+> Follow-up to align the implemented numerology report UI with the task file. No KB content, synthesizer, narrative JSON, workers, routes, auth, or payment code changed.
+
+Changed:
+
+- Added `apps/web/src/components/numerology/result/FloatingReportNav.tsx` with bottom-right FAB, phase accordion TOC popup, smooth scroll to sections, outside-click close, and scroll-to-top button after 400px.
+- Updated `FullReport` to render `FloatingReportNav` and use `item.id ?? item.number` as section anchor fallback.
+- Updated `numerology-narrative.css` with FAB/TOC popup styles while keeping the file under the 600-line lint limit.
+- Removed the rendered desktop TOC/mobile phase tabs from `FullReport`; their component files remain untouched for now.
+
+Verification:
+
+- `npm run typecheck` pass.
+- `npm run lint` pass.
+- `npm run build` pass.
+
+Notes:
+
+- CSS file is 599 lines after compression.
+- This patch intentionally does not touch KB, `kb-private/*`, synthesizer, `narrative.json`, year/month narrative modules, or workers.
 
 ---
 

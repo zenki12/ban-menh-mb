@@ -2719,17 +2719,17 @@ Bối cảnh:
 
 Kết quả:
 
-- CSS narrative polish: long-form typography 15px/1.8, insight left-accent pull quote, nested boxes nhẹ hơn, no inner shadow, sticky section header, fade-in animation, progress bar, phase badge colors, TOC/mobile tab/collapsible styles.
-- Components: `ReportTOC`, `PhaseTabBar`, `CollapsibleYearBlock` tạo mới.
-- `FullReport` wire desktop TOC, mobile phase tabs, IntersectionObserver fade-in, reading progress bar, and phase-aware `SectionHeader`.
+- CSS narrative polish: long-form typography 15px/1.8, insight left-accent pull quote, nested boxes nhẹ hơn, no inner shadow, sticky section header, fade-in animation, progress bar, phase badge colors, FAB/TOC popup, và collapsible styles.
+- Components: `FloatingReportNav` tạo mới với TOC accordion theo phase và nút về đầu trang; `CollapsibleYearBlock` tạo sẵn nhưng chưa wire vào year blocks theo scope.
+- `FullReport` wire `FloatingReportNav`, IntersectionObserver fade-in, reading progress bar, and phase-aware `SectionHeader`.
 - `PhaseDivider` thêm `data-phase`; `SectionHeader` nhận phase để đổi badge color.
-- `CollapsibleYearBlock` đã tạo sẵn nhưng chưa wire vào year blocks theo scope: wire sau khi visual confirmed.
+- `ReportTOC` và `PhaseTabBar` không còn được render trong `FullReport` sau patch align task file; file component giữ nguyên để tránh xóa ngoài scope.
 
 Điều kiện Done:
 
 - `npm run lint`, `npm run typecheck`, `npm run build` pass.
-- CSS file dưới lint limit: 593 dòng.
-- 3 commits atomic.
+- CSS file dưới lint limit: 599 dòng.
+- Commits atomic cho đợt đầu; follow-up patch align file task dùng commit riêng.
 - Không đụng KB/synthesizer/narrative/year-month files.
 
 ### T-0607 - Restructure result flow và port V1 charts
