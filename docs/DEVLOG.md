@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
 | 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
 | 2026-06-02 12:35 +07 | T-0606l | Tension number fallback insight + English cleanup | `Hotfix` |
 | 2026-06-02 12:05 +07 | T-0606k-fix | Section 23 compensation arrow summary fix | `Hotfix` |
@@ -125,6 +126,36 @@
      ============================================================ -->
 
 ---
+
+## [2026-06-04 13:49 +07] - T-0606o/T-0606n: Free voucher commit + security hardening
+
+**Loại:** `Task`
+**Ref:** T-0606o, T-0606n
+
+> Commit pending free-voucher scope from audit and apply T-0606n hardening without touching `kb-private/*`.
+
+Changed:
+
+- Committed free unlock via 100% voucher and `ResultHero` component: stable `FREE_` order id, direct entitlement grant, voucher usage increment, setup/success page free-unlock handling.
+- Added CORS allowlist middleware to KB Worker and Payment Worker with localhost, `dev.banmenh.online`, `banmenh.online`, and optional `CORS_ALLOWED_ORIGINS`.
+- Added `/dev-token` middleware guard for production/non-localhost.
+- Ran non-breaking `npm audit fix`; lockfile moved Next to 16.2.7 and Wrangler/workerd/ws patch versions.
+- Added in-memory rate limits: KB report 60/min, payment create 10/min, auth session 10/min, admin voucher 20/min.
+- Updated `TASK_REGISTRY.md` and `RISK_REGISTER.md`; Firestore rules remain pending outside this task.
+
+Verification:
+
+- `npm run typecheck` pass.
+- `npm run lint` pass.
+- `npx tsc --noEmit -p workers/kb/tsconfig.json` pass.
+- `npx tsc --noEmit -p workers/payment/tsconfig.json` pass.
+- `npm run build` pass.
+- `npm --workspace apps/web exec next build -- --webpack` pass.
+- `npm audit --audit-level=moderate` still reports moderate advisories whose available fixes require `npm audit fix --force`; not run by design.
+
+Notes:
+
+- Next 16.2.7 still warns that `middleware` file convention is deprecated in favor of `proxy`; kept `middleware.ts` because T-0606n explicitly requested middleware hardening.
 
 ## [2026-06-02 13:10 +07] - T-0606m: Audit cleanup batch
 

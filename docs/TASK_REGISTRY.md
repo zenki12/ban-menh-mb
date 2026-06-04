@@ -2643,6 +2643,50 @@ Update khi xong:
 - T-0606m-6 Done: `.agent/`, `.agents/`, `.kiro/`, `_bmad/` ignored in `.gitignore`.
 - Final verify pass: `typecheck`, `lint`, `kb:test-challenges`, `kb:test-karmic`, build with `NODE_OPTIONS=--max-old-space-size=4096`.
 
+### T-0606n - Security hardening after audit
+
+Status: Done
+
+Bối cảnh:
+
+- Audit security sau T-0606m yêu cầu hardening không phá flow hiện tại.
+- Các điểm cần xử lý gồm CORS allowlist, chặn `/dev-token` ngoài localhost, audit fix không breaking, và rate limiting.
+
+Kết quả:
+
+- CORS allowlist đã áp vào KB Worker và Payment Worker: localhost/127.0.0.1, `dev.banmenh.online`, `banmenh.online`, mở rộng bằng `CORS_ALLOWED_ORIGINS`.
+- `/dev-token` đã có `apps/web/src/middleware.ts` chặn production/non-localhost bằng 404 trước khi render route.
+- `npm audit fix` non-breaking đã cập nhật lockfile; advisory còn lại yêu cầu `--force` breaking nên không chạy.
+- Rate limit đã áp: KB report 60/phút, payment create 10/phút, auth session 10/phút, admin voucher 20/phút.
+
+Điều kiện Done:
+
+- Typecheck/lint/worker TS pass.
+- Build webpack pass.
+- Không dùng `--force`, không commit `kb-private/*`.
+
+### T-0606o - Commit free voucher feature and security hardening T-0606n
+
+Status: Done
+
+Bối cảnh:
+
+- Pending dirty files from prior audit now have confirmed scope: free unlock via 100% voucher plus `ResultHero` component.
+- Security hardening T-0606n covers CORS allowlist, `/dev-token` middleware, non-breaking audit fix, and rate limiting.
+
+Yêu cầu:
+
+- Commit pending free-voucher feature first after typecheck/lint/build.
+- Then apply security hardening as separate atomic commits.
+- Do not touch or commit `kb-private/*`.
+- Update `TASK_REGISTRY.md`, `DEVLOG.md`, `RISK_REGISTER.md` at the end.
+
+Điều kiện Done:
+
+- Free voucher feature committed: `745bf75`.
+- T-0606n CORS, middleware, audit fix, and rate limiting complete: `49c1999`, `8acfc16`, `a61ce8b`, `4d63861`.
+- Final typecheck/lint, worker TS, KB tests, and webpack build pass.
+
 ### T-0607 - Restructure result flow và port V1 charts
 
 Status: Done

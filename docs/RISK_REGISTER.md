@@ -25,6 +25,10 @@
 | R-013 | Dùng workflow/asset Tarot tham chiếu vượt quá quyền cho phép | Legal/Content | High | Open | User/Claude | Mystery Tarot/TAROT-vibe chỉ là workflow reference; asset/code/branding cần license rõ trước khi dùng |
 | R-014 | Công thức numerology V2 có thể lệch V1 ngoài 3 challenge indicators đã fix | Numerology/KB | Medium | Open | Codex/Claude | Audit toàn bộ formula report.ts/indicators.ts với V1 engine.browser.js; thêm regression tests theo từng nhóm chỉ số |
 
+| R-015 | API thiếu rate limit cơ bản dẫn tới spam auth/payment/admin/report | Security/API | Medium | Done | Codex | T-0606n-4 thêm in-memory rate limit: KB report 60/phút, payment create 10/phút, auth session 10/phút, admin voucher 20/phút |
+| R-016 | Worker trả CORS quá rộng hoặc thiếu allowlist origin | Security/Worker | Medium | Done | Codex | T-0606n-1 thêm CORS allowlist cho KB/Payment Worker với localhost, dev/prod domain và `CORS_ALLOWED_ORIGINS` |
+| R-017 | Firestore rules/indexes chưa được deploy trước production | Security/Data | High | Pending | User/Codex | Cần Firebase CLI login và deploy `firestore:rules,firestore:indexes`; không nằm trong T-0606n |
+
 ## 3. Review cadence
 
 - Review nhanh sau mỗi task có thay đổi code.
