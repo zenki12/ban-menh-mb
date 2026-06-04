@@ -11,6 +11,7 @@ type Env = {
   FIREBASE_PROJECT_ID: string;
   FIREBASE_CLIENT_EMAIL: string;
   FIREBASE_PRIVATE_KEY: string;
+  CORS_ALLOWED_ORIGINS?: string;
 };
 
 type ReportBody = {
@@ -21,6 +22,48 @@ type ReportBody = {
 
 const app = new Hono<{ Bindings: Env }>();
 app.use("*", logger());
+
+const DEFAULT_ALLOWED_ORIGINS = new Set([
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://dev.banmenh.online",
+  "https://banmenh.online",
+]);
+
+function getAllowedOrigins(env: Env): Set<string> {
+  const origins = new Set(DEFAULT_ALLOWED_ORIGINS);
+  for (const origin of env.CORS_ALLOWED_ORIGINS?.split(",") ?? []) {
+    const trimmed = origin.trim();
+    if (trimmed) origins.add(trimmed);
+  }
+  return origins;
+}
+
+app.use("*", async (c, next) => {
+  const origin = c.req.header("Origin");
+  const allowedOrigin = origin && getAllowedOrigins(c.env).has(origin) ? origin : null;
+  const corsHeaders = {
+    Vary: "Origin",
+    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization,Content-Type",
+  };
+
+  if (c.req.method === "OPTIONS") {
+    if (!allowedOrigin) return c.body(null, 403);
+    return new Response(null, {
+      status: 204,
+      headers: {
+        ...corsHeaders,
+        "Access-Control-Allow-Origin": allowedOrigin,
+      },
+    });
+  }
+
+  await next();
+
+  c.header("Vary", "Origin");
+  if (allowedOrigin) c.header("Access-Control-Allow-Origin", allowedOrigin);
+});
 
 function error(code: string, message: string, status: 400 | 401 | 500) {
   return { body: { error: { code, message } }, status };
