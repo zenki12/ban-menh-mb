@@ -140,6 +140,8 @@
 
 .v1-report-section {
   @apply border-[var(--bm-border-subtle)];
+  opacity: 1;
+  visibility: visible;
 }
 
 .profile-card-v1 {
