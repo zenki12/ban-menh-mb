@@ -44,3 +44,8 @@ workers/*/.wrangler/
 .agents/
 .kiro/
 _bmad/
+
+# Demo routes — local-only, removed pre-production
+apps/web/src/app/demo/
+apps/web/src/app/demo-components/
+apps/web/src/app/demo-shell/
