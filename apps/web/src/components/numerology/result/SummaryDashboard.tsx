@@ -247,7 +247,7 @@ export function SummaryDashboard({
 
           <div className="bm-cta-price-block">
             <div className="bm-cta-price">{PRICE}</div>
-            <div className="bm-cta-anchor">(~ 2 cốc trà sữa, có giá trị cả đời)</div>
+            <div className="bm-cta-anchor">(~ giá 2 bát phở)</div>
           </div>
 
           {unlocked ? (

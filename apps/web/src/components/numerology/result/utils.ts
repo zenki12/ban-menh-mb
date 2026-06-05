@@ -1,6 +1,6 @@
 export const TOTAL_INDICATORS = 33;
-export const PREVIEW_INDICATORS = 2;
-export const LOCKED_COUNT = TOTAL_INDICATORS - PREVIEW_INDICATORS;
+export const PREVIEW_INDICATORS = 3; // Đường Đời + Năm Cá Nhân + Tháng Cá Nhân (full)
+export const LOCKED_COUNT = TOTAL_INDICATORS - PREVIEW_INDICATORS; // 30
 
 export function asRecord(data: unknown): Record<string, unknown> {
   return data && typeof data === "object" ? (data as Record<string, unknown>) : {};
