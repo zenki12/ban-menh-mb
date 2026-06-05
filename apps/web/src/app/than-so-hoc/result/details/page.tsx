@@ -105,7 +105,11 @@ function ResultDetailsContent() {
     return { fullName, dob, gender, nickname };
   }, [searchParams]);
   const summaryHref = buildSummaryHref(searchParams);
-  const openPayment = useCallback(() => router.push("/than-so-hoc/payment"), [router]);
+  const paymentHref = useMemo(() => {
+    const query = searchParams.toString();
+    return query ? `/than-so-hoc/payment?${query}` : "/than-so-hoc/payment";
+  }, [searchParams]);
+  const openPayment = useCallback(() => router.push(paymentHref), [paymentHref, router]);
 
   const fetchReport = useCallback(async () => {
     if (!input.fullName || !input.dob) {
