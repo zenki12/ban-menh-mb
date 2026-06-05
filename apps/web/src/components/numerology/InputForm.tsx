@@ -130,33 +130,37 @@ export function InputForm() {
       <form onSubmit={handleSubmit} noValidate>
         <div className="grid gap-5">
           <div>
-            <label className="text-sm font-bold" htmlFor="fullName">Họ tên đầy đủ</label>
+            <label className="text-sm font-bold" htmlFor="fullName">
+              Họ và tên (đầy đủ và có dấu) <span className="text-[var(--bm-danger)]">*</span>
+            </label>
             <input
               id="fullName"
               className={inputClass}
-              placeholder="Nguyễn Văn A"
+              placeholder="Vui lòng nhập đầy đủ họ tên"
               value={formData.fullName}
               onChange={(event) => setField("fullName", event.target.value)}
             />
-            <p className="mt-2 text-sm text-[var(--bm-text-muted)]">Nhập đúng như giấy khai sinh</p>
             <FieldError message={errors.fullName} />
           </div>
 
           <div>
-            <label className="text-sm font-bold" htmlFor="nickname">Tên thường gọi</label>
+            <label className="text-sm font-bold" htmlFor="nickname">
+              Tên thường gọi (tên gọi hàng ngày, có thể bỏ trống)
+            </label>
             <input
               id="nickname"
               className={inputClass}
-              placeholder="A"
+              placeholder="Ví dụ: Chun, Chin,..."
               value={formData.nickname}
               onChange={(event) => setField("nickname", event.target.value)}
             />
-            <p className="mt-2 text-sm text-[var(--bm-text-muted)]">Tên gọi hàng ngày, có thể bỏ trống</p>
             <FieldError message={errors.nickname} />
           </div>
 
           <fieldset>
-            <legend className="text-sm font-bold">Giới tính</legend>
+            <legend className="text-sm font-bold">
+              Giới tính <span className="text-[var(--bm-danger)]">*</span>
+            </legend>
             <div role="radiogroup" className="mt-3 grid grid-cols-2 gap-3 sm:gap-4">
               {genderOptions.map((option) => {
                 const selected = formData.gender === option.value;
@@ -184,7 +188,9 @@ export function InputForm() {
           </fieldset>
 
           <div>
-            <label className="text-sm font-bold">Ngày sinh</label>
+            <label className="text-sm font-bold">
+              Ngày sinh (dương lịch và theo đúng định dạng) <span className="text-[var(--bm-danger)]">*</span>
+            </label>
             <div className="mt-2 grid grid-cols-3 gap-2 sm:gap-3">
               <select className={inputClass.replace("mt-2 ", "")} value={formData.birthDay} onChange={(event) => setField("birthDay", event.target.value)} aria-label="Ngày sinh">
                 <option value="">Ngày</option>
@@ -199,7 +205,6 @@ export function InputForm() {
                 {years.map((year) => <option key={year} value={year}>{year}</option>)}
               </select>
             </div>
-            <p className="mt-2 text-sm text-[var(--bm-text-muted)]">Theo dương lịch</p>
             <FieldError message={errors.birthDay} />
           </div>
         </div>
