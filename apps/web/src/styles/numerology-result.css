@@ -76,10 +76,158 @@
   @apply mt-4 text-xs italic text-[var(--bm-text-muted)];
 }
 
+/* === LIFE CYCLES SUMMARY === */
+
+.bm-life-cycles-summary {
+  @apply my-10;
+}
+
+.bm-life-cycles-summary > h2,
+.bm-visual-section > h2 {
+  @apply mb-4 text-lg font-bold text-[var(--bm-text-main)] md:text-xl;
+}
+
+.bm-section-intro {
+  @apply mb-6 text-[var(--bm-text-soft)] leading-relaxed;
+}
+
+.bm-cycles-grid {
+  @apply grid gap-4 md:grid-cols-3;
+}
+
+.bm-cycle-summary-card {
+  @apply rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+}
+
+.bm-cycle-summary-header {
+  @apply mb-3 flex items-start gap-3 border-b border-[var(--bm-border-subtle)] pb-3;
+}
+
+.bm-cycle-icon {
+  @apply shrink-0 text-3xl;
+}
+
+.bm-cycle-label {
+  @apply text-xs font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+}
+
+.bm-cycle-phase {
+  @apply mt-0.5 text-xs font-semibold text-[var(--bm-primary-soft)];
+}
+
+.bm-cycle-period {
+  @apply mt-0.5 text-xs text-[var(--bm-text-muted)];
+}
+
+.bm-cycle-number {
+  @apply mt-1 text-sm font-bold text-[var(--bm-text-main)];
+}
+
+.bm-cycle-intro {
+  @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+/* === VISUAL SECTIONS === */
+
+.bm-visual-section {
+  @apply my-8;
+}
+
+/* === PHASE DIVIDER === */
+
+.bm-phase-divider {
+  @apply my-8 flex items-center gap-3 rounded-lg border border-[var(--bm-border-gold)]
+         bg-[rgba(247,201,72,0.06)] px-5 py-3 text-lg font-bold uppercase tracking-wider;
+}
+
+.bm-phase-letter {
+  @apply inline-flex size-8 items-center justify-center rounded-full text-base font-black;
+}
+
+.bm-phase-divider-B .bm-phase-letter {
+  @apply bg-[#1d4ed8] text-white;
+}
+
+.bm-phase-divider-C .bm-phase-letter {
+  @apply bg-[#7c3aed] text-white;
+}
+
+.bm-phase-divider-D .bm-phase-letter {
+  @apply bg-[#065f46] text-white;
+}
+
+.bm-phase-title {
+  @apply text-base text-[var(--bm-text-main)] md:text-lg;
+}
+
+/* === LOCKED SECTION CARD === */
+
+.bm-locked-sections {
+  @apply my-10;
+}
+
+.bm-locked-phase-group {
+  @apply mb-6;
+}
+
+.bm-locked-grid {
+  @apply grid gap-3 md:grid-cols-2;
+}
+
+.bm-locked-card {
+  @apply rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-4
+         transition-all hover:border-[var(--bm-border-gold)];
+}
+
+.bm-locked-card-header {
+  @apply mb-2 flex items-center gap-2;
+}
+
+.bm-locked-card-num {
+  @apply rounded-md bg-[var(--bm-bg-panel)] px-2 py-0.5 text-xs font-bold text-[var(--bm-gold-bright)];
+}
+
+.bm-locked-card-title {
+  @apply flex-1 text-sm font-bold text-[var(--bm-text-main)];
+}
+
+.bm-locked-card-badge {
+  @apply rounded-full border border-[var(--bm-border-gold)] bg-[rgba(247,201,72,0.1)]
+         px-2 py-0.5 text-xs font-bold text-[var(--bm-gold-bright)];
+}
+
+.bm-locked-card-kbtitle {
+  @apply mb-2 text-sm italic text-[var(--bm-primary-soft)];
+}
+
+.bm-locked-card-hint {
+  @apply mb-3 text-xs leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.bm-locked-card-footer {
+  @apply flex items-center justify-between gap-2 border-t border-[var(--bm-border-subtle)] pt-3;
+}
+
+.bm-locked-card-meta {
+  @apply text-xs text-[var(--bm-text-muted)];
+}
+
+.bm-locked-card-button {
+  @apply rounded-md border border-[var(--bm-border-gold)] bg-[rgba(247,201,72,0.08)]
+         px-3 py-1 text-xs font-bold text-[var(--bm-gold-bright)]
+         transition-colors hover:bg-[var(--bm-gold)] hover:text-[var(--bm-bg-void)];
+  cursor: pointer;
+}
+
 /* === CTA CARD === */
 
 .bm-cta-card {
   @apply my-10;
+}
+
+.bm-cta-card-final {
+  @apply border-[var(--bm-border-gold)];
+  background: linear-gradient(135deg, rgba(247, 201, 72, 0.08), rgba(124, 58, 237, 0.04));
 }
 
 .bm-cta-card h2 {
