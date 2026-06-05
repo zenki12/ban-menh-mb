@@ -14,6 +14,7 @@ type PendingPayment = {
   checkoutUrl?: string;
   amount: number;
   productName: string;
+  moduleSlug?: string;
   voucherCode?: string | null;
   discountVnd?: number;
   expiresAt: string;
@@ -48,6 +49,7 @@ function readPendingPayment(orderId: string | null): PendingPayment | null {
       checkoutUrl: parsed.checkoutUrl,
       amount: parsed.amount,
       productName: parsed.productName,
+      moduleSlug: parsed.moduleSlug,
       voucherCode: parsed.voucherCode,
       discountVnd: parsed.discountVnd,
       expiresAt: parsed.expiresAt,
@@ -108,7 +110,8 @@ function CheckoutContent() {
         if (data.status === "confirmed") {
           setStatus("confirmed");
           sessionStorage.removeItem(STORAGE_KEY);
-          router.push(`/payment/success?orderId=${encodeURIComponent(pending.orderId)}`);
+          const successBase = pending.moduleSlug ? `/${pending.moduleSlug}/payment/success` : "/payment/success";
+          router.push(`${successBase}?orderId=${encodeURIComponent(pending.orderId)}`);
         } else if (data.status === "expired" || data.status === "failed") {
           setStatus("expired");
         }

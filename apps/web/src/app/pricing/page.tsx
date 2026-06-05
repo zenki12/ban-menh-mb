@@ -52,6 +52,10 @@ export default function PricingPage() {
   const router = useRouter();
 
   function handleSelectPlan(productCode: string) {
+    if (productCode === "numerology_single_report") {
+      router.push("/than-so-hoc/payment");
+      return;
+    }
     router.push(`/payment/setup?productCode=${encodeURIComponent(productCode)}`);
   }
 

@@ -22,8 +22,6 @@ type ReportResponse = {
   entitlement: unknown;
 };
 
-const PRODUCT_CODE = "numerology_single_report";
-
 function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,10 +39,7 @@ function ResultContent() {
     return { fullName, dob, gender, nickname };
   }, [searchParams]);
 
-  const openPayment = useCallback(
-    () => router.push(`/payment/setup?productCode=${PRODUCT_CODE}`),
-    [router],
-  );
+  const openPayment = useCallback(() => router.push("/than-so-hoc/payment"), [router]);
 
   const fetchReport = useCallback(async () => {
     if (!input.fullName || !input.dob) {

@@ -25,7 +25,6 @@ type ReportResponse = {
 type KarmicTease = { hasKarmic: true; debt: number; sourceIndicator: string } | { hasKarmic: false };
 
 const PRICE = "99.000đ";
-const PRODUCT_CODE = "numerology_single_report";
 const sourceLabels: Record<string, string> = {
   lifePath: "Số đường đời",
   destiny: "Số sứ mệnh",
@@ -106,10 +105,7 @@ function ResultDetailsContent() {
     return { fullName, dob, gender, nickname };
   }, [searchParams]);
   const summaryHref = buildSummaryHref(searchParams);
-  const openPayment = useCallback(
-    () => router.push(`/payment/setup?productCode=${PRODUCT_CODE}`),
-    [router],
-  );
+  const openPayment = useCallback(() => router.push("/than-so-hoc/payment"), [router]);
 
   const fetchReport = useCallback(async () => {
     if (!input.fullName || !input.dob) {

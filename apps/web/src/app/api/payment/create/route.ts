@@ -39,6 +39,17 @@ function freeOrderId(userId: string, productCode: string, voucherCode: string): 
   return `FREE_${hash}`;
 }
 
+function getModuleReturnUrls(productCode: string) {
+  const product = findProduct(productCode);
+  const module = product?.module ?? "numerology";
+  const moduleSlug = module === "numerology" ? "than-so-hoc" : module;
+  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  return {
+    returnUrl: `${base}/${moduleSlug}/payment/success`,
+    cancelUrl: `${base}/${moduleSlug}/payment/cancel`,
+  };
+}
+
 export async function POST(request: Request) {
   const rateLimitError = paymentRateLimitResponse(request);
   if (rateLimitError) return rateLimitError;
@@ -166,7 +177,7 @@ export async function POST(request: Request) {
   const orderCode = generateOrderId();
   const orderId = String(orderCode);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const moduleReturnUrls = getModuleReturnUrls(productCode);
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
   // 6. Tạo purchase document (status: pending)
@@ -203,8 +214,8 @@ export async function POST(request: Request) {
       amount,
       description: normalizedVoucherCode ? `${product.name} (${normalizedVoucherCode})` : product.name,
       items: [{ name: product.name, quantity: 1, price: amount }],
-      returnUrl: `${appUrl}/payment/success?orderId=${orderId}`,
-      cancelUrl: `${appUrl}/payment/cancel?orderId=${orderId}`,
+      returnUrl: `${moduleReturnUrls.returnUrl}?orderId=${orderId}`,
+      cancelUrl: `${moduleReturnUrls.cancelUrl}?orderId=${orderId}`,
     });
   } catch (err) {
     // Log lỗi không chứa secret/raw response
