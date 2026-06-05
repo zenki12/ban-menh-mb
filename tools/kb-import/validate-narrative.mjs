@@ -4,10 +4,11 @@ import { build } from "esbuild";
 
 const narrativePath = path.join(process.cwd(), "kb-private", "numerology", "narrative.json");
 const CORE = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "11", "22"];
+const LIFE_PATH_CORE = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "22"];
 const NINE = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const ZERO_TO_NINE = ["0", ...NINE];
 const EXPECTED_KEYS = {
-  lifePath: CORE, soul: CORE, destiny: CORE, birthday: CORE,
+  lifePath: LIFE_PATH_CORE, soul: CORE, destiny: CORE, birthday: CORE,
   personality: [...NINE, "11"], maturity: CORE, attitude: NINE, karmicLesson: NINE,
   pyramidPeak: NINE, pyramidChallenge: ["0", ...NINE], tensionNumber: NINE,
   soulChallenge: ZERO_TO_NINE, destinyChallenge: ZERO_TO_NINE, personalityChallenge: NINE,

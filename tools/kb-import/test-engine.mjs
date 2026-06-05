@@ -9,6 +9,7 @@ const cases = [
   { fullName: "Nguyễn Văn A", dob: "1990-05-15", expectedLifePath: 3 },
   { fullName: "Trần Thị B", dob: "1985-11-22", expectedLifePath: 11 },
   { fullName: "Lê Hoàng C", dob: "2000-01-01", expectedLifePath: 4 },
+  { fullName: "Nông Xuân Thái", dob: "1990-01-08", expectedLifePath: 1, expectedDisplayNumber: 10 },
 ];
 const v1CompareCase = { fullName: "Le Hoang C", dob: "2000-01-01" };
 
@@ -56,6 +57,12 @@ for (const testCase of cases) {
   if (report.lifePath.number !== testCase.expectedLifePath || lifePath !== testCase.expectedLifePath) {
     throw new Error(`${testCase.fullName}: lifePath mismatch`);
   }
+  if (testCase.expectedDisplayNumber && report.lifePath.displayNumber !== testCase.expectedDisplayNumber) {
+    throw new Error(`${testCase.fullName}: lifePath displayNumber mismatch`);
+  }
+  if (testCase.expectedDisplayNumber && report.lifePath.data?.title !== "Con số của sự hoàn thành & khởi đầu mới") {
+    throw new Error(`${testCase.fullName}: lifePath 10 KB data missing`);
+  }
   if (report.destiny.number !== destiny) {
     throw new Error(`${testCase.fullName}: destiny mismatch`);
   }
@@ -86,4 +93,4 @@ if (
 console.log(
   `V1 compare pass: lifePath=${v2Report.lifePath.number}, destiny=${v2Report.destiny.number}`,
 );
-console.log("Engine test pass: 3 cases generated without crash");
+console.log(`Engine test pass: ${cases.length} cases generated without crash`);

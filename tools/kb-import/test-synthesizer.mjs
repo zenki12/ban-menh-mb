@@ -9,6 +9,7 @@ const cases = [
   { fullName: "Nguyễn Văn A", dob: "1990-05-15" },
   { fullName: "Trần Thị B", dob: "1985-11-22" },
   { fullName: "Lê Hoàng C", dob: "2000-01-01" },
+  { fullName: "Nông Xuân Thái", dob: "1990-01-08", expectedLifePathDisplay: 10 },
 ];
 
 async function loadShared() {
@@ -46,10 +47,19 @@ for (const testCase of cases) {
   if (!sections.some((item) => item.number === "5" && item.html.includes(testCase.fullName))) {
     throw new Error(`${testCase.fullName}: lifePath narrative missing name`);
   }
+  if (testCase.expectedLifePathDisplay) {
+    const lifePathSection = sections.find((item) => item.number === "4");
+    if (!lifePathSection?.html.includes("Số 10 (1+0=1)")) {
+      throw new Error(`${testCase.fullName}: lifePath 10 narrative missing`);
+    }
+    if (synthesized.profileHeader.lifePathNumber !== testCase.expectedLifePathDisplay) {
+      throw new Error(`${testCase.fullName}: profile lifePath display mismatch`);
+    }
+  }
 
   console.log(
     `${testCase.fullName}: phases=${synthesized.phases.length}, sections=${sections.length}, html=${htmlLength}`,
   );
 }
 
-console.log("Synthesizer test pass: 3 cases generated V1-style sections without crash");
+console.log(`Synthesizer test pass: ${cases.length} cases generated V1-style sections without crash`);

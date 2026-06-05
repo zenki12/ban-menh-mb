@@ -6,10 +6,11 @@ import { KARMIC_DEBT_EXTENDED } from "../../kb-private/numerology/karmic-debt-ex
 const sourcePath = path.join(process.cwd(), "kb-private", "numerology", "narrative_v1_full.js");
 const outputPath = path.join(process.cwd(), "kb-private", "numerology", "narrative.json");
 const CORE_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "11", "22"];
+const LIFE_PATH_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "22"];
 const ONE_TO_NINE = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const ZERO_TO_NINE = ["0", ...ONE_TO_NINE];
 const GROUP_CONFIG = {
-  lifePath: { params: ["name"], keys: CORE_KEYS, nextGroup: "soul" },
+  lifePath: { params: ["name"], keys: LIFE_PATH_KEYS, nextGroup: "soul" },
   soul: { params: ["name"], keys: CORE_KEYS, nextGroup: "destiny" },
   destiny: { params: ["name", "d"], keys: CORE_KEYS, nextGroup: "personality" },
   personality: { params: ["name", "d"], keys: CORE_KEYS, nextGroup: "maturity" },
