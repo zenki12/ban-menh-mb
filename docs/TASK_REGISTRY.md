@@ -3480,6 +3480,38 @@ Update khi xong (2026-06-05):
 - Reworked `PersonalMonthFull` to render every string field covered by `FIELD_META`, skipping missing/non-string values.
 - Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
 
+### T-PAY-NUM-3-FIX-2 - Multi-faceted preview from available KB fields
+
+Status: Done
+
+Bối cảnh:
+
+- Free preview vẫn chưa đủ sức thuyết phục vì chỉ hiển thị 1-2 field, trong khi `report.*.data` đã có nhiều field sẵn.
+- Life Path có `positive_traits`, career/love/health/money fields; Personal Year có career/finance/love/health/family.
+
+Yêu cầu:
+
+- Tạo `RichIndicatorPreview` generic/reusable cho preview nhiều field.
+- Life Path preview hiển thị title, description, trait chips, career snippet và locked aspect teaser.
+- Personal Year preview hiển thị theme/title, career + finance snippets và locked aspect teaser.
+- Giữ nguyên `PersonalMonthFull`.
+- Không đụng KB, narrative, synthesizer, workers, API routes, pricing.
+
+Điều kiện Done:
+
+- `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build` pass.
+- Rich preview không crash khi data null hoặc field thiếu.
+- Mobile chip/list không tràn layout.
+
+Update khi xong (2026-06-05):
+
+- Added generic `RichIndicatorPreview` with intro, trait chips, field snippets and locked aspect teaser list.
+- Wired Life Path preview to show KB title/description, up to 6 `positive_traits`, career snippet and 7 locked aspects.
+- Wired Personal Year preview to show theme/description, career + finance snippets and 3 locked aspects.
+- Kept `PersonalMonthFull` unchanged.
+- Added CSS for trait chips, field snippets and locked aspect teaser.
+- Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
 ### T-PAY-NUM-1-DEPLOY - Deploy and smoke numerology payment
 
 Status: Todo

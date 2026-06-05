@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-05 15:00 +07 | T-PAY-NUM-3-FIX-2 | Multi-faceted preview with locked aspect teasers | `Task` |
 | 2026-06-05 14:39 +07 | T-PAY-NUM-3-FIX | Generous free preview from narrative + month fields | `Task` |
 | 2026-06-05 13:53 +07 | T-PAY-NUM-2 | Numerology free preview flow + CTA FAQ | `Task` |
 | 2026-06-05 11:33 +07 | T-PAY-NUM-1 | Numerology payment module-scoped routes | `Task` |
@@ -129,6 +130,33 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-05 15:00 +07] - T-PAY-NUM-3-FIX-2: Multi-faceted preview with locked aspect teasers
+
+**Loai:** `Task`
+**Ref:** T-PAY-NUM-3-FIX-2
+
+> Use more of the available report data in the free preview and make the locked value clearer without touching KB, narrative files, synthesizer, workers, API routes, or pricing.
+
+Changed:
+
+- Added reusable `RichIndicatorPreview` for multi-field preview cards.
+- Life Path preview now shows KB title/intro, up to 6 positive trait chips, a career snippet, and 7 locked aspect teasers.
+- Personal Year preview now shows title/theme intro, career + finance snippets, and 3 locked aspect teasers.
+- Added CSS for trait chips, preview field snippets, and locked-aspect teaser blocks.
+- Kept `PersonalMonthFull` unchanged from the previous fix.
+
+Verification:
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+
+Notes:
+
+- Manual browser visual smoke was not run in this turn; build verification passed.
 
 ---
 
