@@ -1,23 +1,61 @@
 import type { NumerologyReport } from "@banmenh/shared";
 
-import { readString } from "./utils";
-
 type Props = {
   report: NumerologyReport;
 };
 
+type FieldMeta = {
+  icon: string;
+  label: string;
+  tone?: "positive" | "negative" | "neutral";
+};
+
+const FIELD_META: Record<string, FieldMeta> = {
+  description: { icon: "📋", label: "Tổng quan", tone: "neutral" },
+  meaning: { icon: "💭", label: "Ý nghĩa", tone: "neutral" },
+  theme: { icon: "🎯", label: "Chủ đề", tone: "neutral" },
+  energy: { icon: "⚡", label: "Năng lượng", tone: "neutral" },
+  focus: { icon: "🔎", label: "Trọng tâm", tone: "neutral" },
+  action: { icon: "🚀", label: "Hành động gợi ý", tone: "positive" },
+  moon_link: { icon: "🌙", label: "Liên kết Mặt Trăng", tone: "neutral" },
+  best_for: { icon: "✓", label: "Phù hợp", tone: "positive" },
+  warning: { icon: "⚠️", label: "Lưu ý", tone: "negative" },
+  avoid: { icon: "🚫", label: "Nên tránh", tone: "negative" },
+  advice: { icon: "💡", label: "Lời khuyên", tone: "positive" },
+  career: { icon: "💼", label: "Công việc", tone: "neutral" },
+  love: { icon: "❤️", label: "Tình cảm", tone: "neutral" },
+  finance: { icon: "💰", label: "Tài chính", tone: "neutral" },
+  health: { icon: "🌿", label: "Sức khỏe", tone: "neutral" },
+};
+
 export function PersonalMonthFull({ report }: Props) {
   const month = report.personalMonth;
-  const data = month.data as Record<string, unknown> | null;
-  const number = month.number;
+  const data = (month.data ?? {}) as Record<string, unknown>;
   const monthNum = month.month;
-  const title = readString(data, ["title", "theme"]) || `Năng lượng tháng ${monthNum}`;
-  const theme = readString(data, ["theme"]);
-  const energy = readString(data, ["energy"]);
-  const focus = readString(data, ["focus"]);
-  const avoid = readString(data, ["avoid"]);
-  const bestFor = readString(data, ["best_for"]);
-  const description = readString(data, ["description", "meaning"]);
+  const number = month.number;
+  const title = typeof data.title === "string" && data.title.trim() ? data.title.trim() : `Năng lượng tháng ${monthNum}`;
+  const aspects = Object.entries(FIELD_META)
+    .map(([key, meta]) => {
+      const value = data[key];
+      return typeof value === "string" && value.trim() ? { key, meta, value: value.trim() } : null;
+    })
+    .filter((item): item is { key: string; meta: FieldMeta; value: string } => item !== null);
+
+  if (aspects.length === 0) {
+    return (
+      <section className="bm-preview-month-full">
+        <h3>
+          Tháng {monthNum} - Số Cá Nhân {number} - "{title}"
+        </h3>
+        <p className="bm-preview-month-desc">
+          Dữ liệu tháng đang được cập nhật. Báo cáo đầy đủ có chi tiết tất cả 12 tháng và 3 năm tới.
+        </p>
+      </section>
+    );
+  }
+
+  const intro = aspects.find((item) => item.key === "description" || item.key === "meaning");
+  const others = aspects.filter((item) => item.key !== "description" && item.key !== "meaning");
 
   return (
     <section className="bm-preview-month-full">
@@ -26,43 +64,33 @@ export function PersonalMonthFull({ report }: Props) {
         {title ? ` - "${title}"` : ""}
       </h3>
 
-      {description ? (
-        <p className="bm-preview-month-desc">{description}</p>
-      ) : (
-        <p className="bm-preview-month-desc">Dữ liệu tháng đang cập nhật.</p>
+      {intro && <p className="bm-preview-month-desc">{intro.value}</p>}
+
+      {others.length > 0 && (
+        <div className="bm-preview-month-aspects">
+          {others.map(({ key, meta, value }) => (
+            <div
+              className={`bm-preview-aspect ${
+                meta.tone === "positive"
+                  ? "bm-preview-aspect-positive"
+                  : meta.tone === "negative"
+                    ? "bm-preview-aspect-negative"
+                    : ""
+              }`}
+              key={key}
+            >
+              <strong>
+                {meta.icon} {meta.label}:
+              </strong>{" "}
+              {value}
+            </div>
+          ))}
+        </div>
       )}
 
-      <div className="bm-preview-month-aspects">
-        {theme && (
-          <div className="bm-preview-aspect">
-            <strong>🎯 Chủ đề:</strong> {theme}
-          </div>
-        )}
-        {energy && (
-          <div className="bm-preview-aspect">
-            <strong>⚡ Năng lượng:</strong> {energy}
-          </div>
-        )}
-        {focus && (
-          <div className="bm-preview-aspect">
-            <strong>🔎 Trọng tâm:</strong> {focus}
-          </div>
-        )}
-        {bestFor && (
-          <div className="bm-preview-aspect bm-preview-aspect-positive">
-            <strong>✓ Phù hợp:</strong> {bestFor}
-          </div>
-        )}
-        {avoid && (
-          <div className="bm-preview-aspect bm-preview-aspect-negative">
-            <strong>⚠️ Nên tránh:</strong> {avoid}
-          </div>
-        )}
-      </div>
-
       <p className="bm-preview-month-note">
-        Đây là toàn bộ luận giải tháng {monthNum}. Báo cáo đầy đủ có chi tiết cho cả 12 tháng, 3 năm tới và
-        biểu đồ vận số 11 năm.
+        Đây là luận giải đầy đủ tháng {monthNum}. Báo cáo đầy đủ có chi tiết tất cả 12 tháng cá nhân, 3 năm tới
+        và biểu đồ vận số 11 năm.
       </p>
     </section>
   );
