@@ -44,6 +44,11 @@ function displayNumber(indicator: IndicatorResult) {
   return indicator.displayNumber ?? indicator.number;
 }
 
+function formatDOB(dob: string) {
+  const [year, month, day] = dob.split("-");
+  return day && month && year ? `${day}/${month}/${year}` : dob;
+}
+
 export function SummaryDashboard({
   report,
   userName,
@@ -77,7 +82,7 @@ export function SummaryDashboard({
           </div>
           <div>
             <div className="text-white/48">Ngày sinh</div>
-            <div className="mt-1 text-lg font-semibold text-[#f5e8c7]">{dob}</div>
+            <div className="mt-1 text-lg font-semibold text-[#f5e8c7]">{formatDOB(dob)}</div>
           </div>
         </div>
 
