@@ -6,14 +6,26 @@ export type LockedGroup = { label: string; icon: string; items: LockedItem[] };
 
 type LockedGridProps = {
   groups: LockedGroup[];
+  lockedCount: number;
 };
 
-export function LockedGrid({ groups }: LockedGridProps) {
+export function LockedGrid({ groups, lockedCount }: LockedGridProps) {
   return (
-    <section className="mt-16">
+    <section className="bm-locked-section">
       <div className="max-w-2xl">
-        <h2>🔒 30+ chỉ số khác đang chờ bạn</h2>
-        <p className="mt-4 text-[var(--bm-text-soft)]">Mở khóa để xem toàn bộ luận giải.</p>
+        <h2 className="bm-locked-heading">🔒 {lockedCount} chỉ số chi tiết đang chờ bạn</h2>
+        <div className="bm-locked-disclaimer">
+          <p>
+            ⓘ Phần bạn vừa xem chỉ là TỔNG QUAN và 2 CHỈ SỐ KHÁI QUÁT. Báo cáo đầy đủ có:
+          </p>
+          <ul>
+            <li>✓ Luận giải chi tiết cho từng chỉ số</li>
+            <li>✓ Phân tích 5 khía cạnh: tình yêu, sự nghiệp, tài chính, sức khỏe, gia đình</li>
+            <li>✓ Biểu đồ vận số 11 năm và 3 năm tới chi tiết</li>
+            <li>✓ Lưới Pythagoras 3x3 và mũi tên sức mạnh</li>
+            <li>✓ Karmic và Nợ Nghiệp nếu có</li>
+          </ul>
+        </div>
       </div>
       <div className="mt-8 space-y-10">
         {groups.map((group) => (

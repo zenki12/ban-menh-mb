@@ -12,6 +12,7 @@ import { MagneticCTA } from "../../../../components/numerology/result/MagneticCT
 import { PartialIndicatorSection } from "../../../../components/numerology/result/PartialIndicatorSection";
 import { StickyBottomCTA } from "../../../../components/numerology/result/StickyBottomCTA";
 import { TeaseSection } from "../../../../components/numerology/result/TeaseSection";
+import { LOCKED_COUNT } from "../../../../components/numerology/result/utils";
 import { ErrorState, LoadingState } from "../../../../components/ui";
 import { fetchWithAuth } from "../../../../lib/api/client";
 import { useAuth } from "../../../../lib/auth";
@@ -172,7 +173,7 @@ function ResultDetailsContent() {
                 />
               )}
             </section>
-            <LockedGrid groups={lockedGroups} />
+            <LockedGrid groups={lockedGroups} lockedCount={LOCKED_COUNT} />
             <MagneticCTA price={PRICE} onClick={openPayment} />
           </>
         )}
