@@ -12,6 +12,52 @@
   @apply text-[0.95rem] leading-relaxed text-[var(--bm-text-soft)];
 }
 
+/* === PERSONAL MONTH FULL PREVIEW === */
+
+.bm-preview-month-full {
+  @apply my-6 rounded-xl border border-[var(--bm-border-gold)] bg-[rgba(247,201,72,0.05)] p-5;
+}
+
+.bm-preview-month-full h3 {
+  @apply mb-3 text-base font-bold text-[var(--bm-gold-bright)] md:text-lg;
+}
+
+.bm-preview-month-desc {
+  @apply mb-4 text-[0.95rem] leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.bm-preview-month-aspects {
+  @apply space-y-2;
+}
+
+.bm-preview-aspect {
+  @apply rounded-lg border-l-2 border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-3 py-2 text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.bm-preview-aspect strong {
+  @apply mr-1 text-[var(--bm-text-main)];
+}
+
+.bm-preview-aspect-positive {
+  @apply border-l-green-400/60 bg-green-500/[0.04];
+}
+
+.bm-preview-aspect-positive strong {
+  @apply text-green-300;
+}
+
+.bm-preview-aspect-negative {
+  @apply border-l-red-400/60 bg-red-500/[0.04];
+}
+
+.bm-preview-aspect-negative strong {
+  @apply text-red-300;
+}
+
+.bm-preview-month-note {
+  @apply mt-4 text-xs italic text-[var(--bm-text-muted)];
+}
+
 /* === CTA CARD === */
 
 .bm-cta-card {

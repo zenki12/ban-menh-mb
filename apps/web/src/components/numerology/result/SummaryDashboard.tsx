@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Button, Card } from "../../ui";
 import { LockedGrid, type LockedGroup } from "./LockedGrid";
 import { generateOverview } from "./overview";
+import { PersonalMonthFull } from "./PersonalMonthFull";
 import { UNLOCK_CTA_ID } from "./scrollToUnlock";
 import { LOCKED_COUNT, readString, truncateText } from "./utils";
 
@@ -119,6 +120,26 @@ function IndicatorPreview({
   );
 }
 
+function PersonalYearPreview({ report }: { report: NumerologyReport }) {
+  const personalYearTitle = readString(report.personalYear.data, ["title", "theme"]);
+  const personalYearIntro =
+    readString(report.personalYear.data, ["description", "meaning", "summary"]) ||
+    `Năm cá nhân ${report.personalYear.number} mở ra một nhịp vận số riêng cho hiện tại.`;
+
+  return (
+    <Card as="article" variant="glass" padding="lg">
+      <p className="text-sm font-bold uppercase tracking-[0.14em] text-[var(--bm-primary-soft)]">
+        Chỉ số thời gian
+      </p>
+      <h3 className="mt-3">
+        Năm Cá Nhân {report.personalYear.year}: Số {report.personalYear.number}
+        {personalYearTitle ? ` - "${personalYearTitle}"` : ""}
+      </h3>
+      <p className="mt-4 text-[var(--bm-text-soft)]">{truncateText(personalYearIntro, 200)}</p>
+    </Card>
+  );
+}
+
 export function SummaryDashboard({
   report,
   userName,
@@ -189,13 +210,10 @@ export function SummaryDashboard({
           maxLength={200}
           title="Số Đường Đời"
         />
-        <IndicatorPreview
-          indicator={report.birthday}
-          label="Chỉ số phụ"
-          maxLength={150}
-          title="Số Ngày Sinh"
-        />
+        <PersonalYearPreview report={report} />
       </section>
+
+      <PersonalMonthFull report={report} />
 
       <LockedGrid groups={lockedGroups} lockedCount={LOCKED_COUNT} />
 
