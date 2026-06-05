@@ -113,9 +113,9 @@ function ResultContent() {
         unlocked={unlocked}
         userName={input.fullName}
       />
-      <p className="mt-10 text-sm text-[var(--bm-text-muted)]">
-        Nội dung Thần số học chỉ dùng để tham khảo và tự quan sát, không khẳng định tương lai
-        chắc chắn, không thay thế tư vấn chuyên môn hoặc quyết định quan trọng.
+      <p className="mt-10 text-sm leading-6 text-[var(--bm-text-muted)]">
+        Hãy xem bản tổng quan này như một la bàn tự quan sát: giúp bạn nhận ra xu hướng nổi bật,
+        hiểu rõ hơn cách mình vận hành và chọn điều phù hợp để đào sâu trong phần luận giải chi tiết.
       </p>
     </PageShell>
   );
