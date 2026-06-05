@@ -46,6 +46,7 @@ function ResultContent() {
     return query ? `/than-so-hoc/payment?${query}` : "/than-so-hoc/payment";
   }, [searchParams]);
   const openPayment = useCallback(() => router.push(paymentHref), [paymentHref, router]);
+  const showLockedNotice = searchParams.get("notice") === "locked";
 
   const fetchReport = useCallback(async () => {
     if (!input.fullName || !input.dob) {
@@ -91,6 +92,11 @@ function ResultContent() {
 
   return (
     <PageShell title="Tổng quan Thần số học" showBack backHref="/than-so-hoc" backLabel="Nhập lại">
+      {showLockedNotice ? (
+        <div className="mb-6 rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(247,201,72,0.08)] px-4 py-3 text-sm font-semibold text-[var(--bm-gold-bright)]">
+          Báo cáo chi tiết cần mở khóa trước khi xem.
+        </div>
+      ) : null}
       <SummaryDashboard
         dob={input.dob}
         onUnlock={openPayment}
