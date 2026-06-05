@@ -18,6 +18,47 @@
 | ADR-004 | 2026-05-16 | Stack/Styling | Tailwind CSS v4 + design tokens cho UI | ACCEPTED | - |
 | ADR-005 | 2026-05-16 | Stack/Validation | Zod cho runtime validation và schema | ACCEPTED | - |
 | ADR-006 | 2026-05-16 | Stack/API | Hono framework cho Cloudflare Workers | ACCEPTED | - |
+| ADR-007 | 2026-06-05 | Payment/Architecture | Module-scoped payment URL với shared component (Option C hybrid) | ACCEPTED | - |
+
+---
+
+## ADR-007 - Module-scoped payment URL với shared component (Option C hybrid)
+
+| Field | Value |
+|---|---|
+| Status | ACCEPTED |
+| Category | Payment/Architecture |
+| Owner | Zenki / Codex |
+| Liên quan | T-PAY-NUM-1, account-payment |
+
+### Bối cảnh
+
+Numerology unlock flow trước đây dùng URL chung `/payment/setup?productCode=numerology_single_report`. Flow này hoạt động nhưng URL user-facing không nằm trong hành trình module `/than-so-hoc`, khiến success/cancel cũng lệch khỏi ngữ cảnh báo cáo Thần số học.
+
+### Lựa chọn đã cân nhắc
+
+- Giữ payment URL chung cho mọi module.
+- Tạo payment implementation riêng cho từng module.
+- Option C hybrid: route theo module, component payment dùng chung.
+
+### Quyết định
+
+Dùng Option C hybrid. Numerology payment có routes `/than-so-hoc/payment`, `/than-so-hoc/payment/success`, `/than-so-hoc/payment/cancel`. UI và logic client được tách thành shared components `PaymentSetup`, `PaymentSuccess`, `PaymentCancel`; từng module chỉ tạo wrapper route và truyền product/module props.
+
+Legacy routes `/payment/setup`, `/payment/success`, `/payment/cancel` vẫn được giữ bằng wrapper/redirect để không làm gãy link cũ. Backend `/api/payment/create` sinh PayOS return/cancel URL theo `product.module`, không tin URL hoặc amount từ frontend.
+
+### Lý do
+
+- URL user-facing khớp hành trình sản phẩm.
+- Không duplicate payment UI/logic giữa numerology và module sau.
+- Giữ backend pricing/entitlement boundary hiện có.
+- Cho phép backward compatibility trong giai đoạn chuyển tiếp.
+
+### Hệ quả
+
+- Module mới cần wrapper route payment riêng nếu muốn URL scoped.
+- Redirect legacy phải được giữ cho đến khi chắc chắn không còn link cũ.
+- Smoke PayOS/webhook cần kiểm theo route module-scoped sau deploy.
 
 ---
 

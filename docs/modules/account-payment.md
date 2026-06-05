@@ -31,6 +31,16 @@ MVP core
 - Frontend chỉ gọi API/module service đã định nghĩa.
 - Không đọc trực tiếp KB/private storage từ client.
 
+### Module-scoped payment URL pattern
+
+- Numerology payment dùng module-scoped route:
+  - Setup: `/than-so-hoc/payment`
+  - Success: `/than-so-hoc/payment/success`
+  - Cancel: `/than-so-hoc/payment/cancel`
+- Legacy routes `/payment/setup`, `/payment/success`, `/payment/cancel` được giữ bằng wrapper/redirect để không làm gãy link cũ.
+- Option C hybrid: UI payment dùng shared components (`PaymentSetup`, `PaymentSuccess`, `PaymentCancel`), còn route wrapper thuộc từng module để URL user-facing khớp hành trình sản phẩm.
+- `/api/payment/create` vẫn là backend boundary tính amount từ `packages/shared/src/pricing.ts`; PayOS return/cancel URL được sinh từ `product.module`, không từ input amount/order URL phía client.
+
 ## Dependencies
 
 - Auth/account state.

@@ -3344,6 +3344,63 @@ Update khi xong:
 - Free preview/details lock flow giữ nguyên: `FreeIndicatorSection`, `LockedGrid`, `MagneticCTA`, `StickyBottomCTA`.
 - Verify đã chạy: `kb:test-engine`, `kb:test-charts`, `kb:validate-narrative`, `kb:validate`, `kb:test-synthesizer`, `typecheck`, `lint`, `build`, `check`, `qa:responsive-audit`, Worker `tsc --noEmit`.
 
+### T-PAY-NUM-1 - Numerology payment module-scoped routes
+
+Status: Done
+
+Bối cảnh:
+
+- Numerology paid unlock trước đó dùng `/payment/setup?productCode=numerology_single_report`.
+- Product owner chọn Option C hybrid: giữ shared payment components nhưng route thanh toán theo module, bắt đầu với `/than-so-hoc/payment`.
+- Phase D webhook deploy và Phase F PayOS sandbox smoke test được defer sang task riêng `T-PAY-NUM-1-DEPLOY`.
+
+Yêu cầu:
+
+- Tách shared components `PaymentSetup`, `PaymentSuccess`, `PaymentCancel`.
+- Thêm routes `/than-so-hoc/payment`, `/than-so-hoc/payment/success`, `/than-so-hoc/payment/cancel`.
+- Giữ backward compatibility `/payment/setup`, `/payment/success`, `/payment/cancel`.
+- API payment create trả PayOS return/cancel URL theo module slug.
+- CTA numerology đi tới `/than-so-hoc/payment`.
+- Không đụng KB content, narrative, synthesizer, worker hoặc pricing `99000`.
+
+Điều kiện Done:
+
+- `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build` pass.
+- Module-scoped routes build được.
+- Legacy routes vẫn có wrapper/redirect.
+- Phase D/F ghi defer, chưa deploy worker, chưa smoke PayOS sandbox.
+
+Update khi xong (2026-06-05):
+
+- Added shared payment components under `apps/web/src/components/payment/`.
+- Added numerology payment wrapper routes under `apps/web/src/app/than-so-hoc/payment/`.
+- Updated payment create API to generate module-scoped PayOS `returnUrl`/`cancelUrl`.
+- Added Next redirects from legacy payment URLs to numerology module URLs.
+- Updated numerology CTAs to `/than-so-hoc/payment` and preserved result query params into payment/success flow.
+- Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+- Not done by design: worker/webhook deploy and PayOS sandbox smoke test, deferred to `T-PAY-NUM-1-DEPLOY`.
+
+### T-PAY-NUM-1-DEPLOY - Deploy and smoke numerology payment
+
+Status: Todo
+
+Bối cảnh:
+
+- `T-PAY-NUM-1` chỉ refactor web routing/UI and return URLs.
+- Production/dev worker deploy and PayOS sandbox smoke need explicit approval and environment readiness.
+
+Yêu cầu:
+
+- Deploy/update payment worker only after user approval.
+- Run PayOS sandbox smoke for `/than-so-hoc/payment`.
+- Verify webhook confirms purchase and entitlement unlock.
+
+Điều kiện Done:
+
+- User-approved deploy completed.
+- Smoke report records order creation, return URL, cancel URL, webhook confirmation and entitlement state.
+- No secrets committed or logged.
+
 ## Phase 7 - Tarot MVP Non-AI
 
 ### T-0701 - Chuẩn bị Tarot KB schema non-AI

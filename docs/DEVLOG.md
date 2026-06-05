@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-05 11:33 +07 | T-PAY-NUM-1 | Numerology payment module-scoped routes | `Task` |
 | 2026-06-04 23:54 +07 | T-0610c-lifePath10 | Life Path 10 display + narrative KB | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
 | 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
@@ -125,6 +126,40 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-05 11:33 +07] - T-PAY-NUM-1: Numerology payment module-scoped routes
+
+**Loai:** `Task`
+**Ref:** T-PAY-NUM-1
+
+> Refactor numerology payment to module-scoped URLs with shared payment components.
+
+Changed:
+
+- Extracted shared payment UI components: `PaymentSetup`, `PaymentSuccess`, `PaymentCancel`.
+- Added `/than-so-hoc/payment`, `/than-so-hoc/payment/success`, and `/than-so-hoc/payment/cancel` wrapper routes.
+- Kept legacy `/payment/setup`, `/payment/success`, and `/payment/cancel` compatible via thin wrappers and Next redirects.
+- Updated `/api/payment/create` so PayOS `returnUrl` and `cancelUrl` are generated from the product module slug.
+- Updated numerology CTAs to `/than-so-hoc/payment` and preserved report query params through setup/success.
+- Added success fade-in and module-specific retry/report CTAs.
+
+Not changed:
+
+- Did not touch KB content, `narrative.json`, synthesizer, workers, or pricing `99000`.
+- Did not deploy webhook/payment worker.
+- Did not run PayOS sandbox smoke. Phase D/F deferred to `T-PAY-NUM-1-DEPLOY`.
+
+Verification:
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+
+Residual risk:
+
+- Real PayOS/webhook confirmation and entitlement unlock still need deploy/smoke verification in `T-PAY-NUM-1-DEPLOY`.
 
 ---
 
