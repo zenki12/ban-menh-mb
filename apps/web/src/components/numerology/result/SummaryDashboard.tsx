@@ -21,6 +21,7 @@ type SummaryDashboardProps = {
   userName: string;
   dob: string;
   unlocked: boolean;
+  showCta?: boolean;
 };
 
 const indicatorChips = [
@@ -48,6 +49,7 @@ export function SummaryDashboard({
   userName,
   dob,
   unlocked,
+  showCta = true,
 }: SummaryDashboardProps) {
   const searchParams = useSearchParams();
   const detailUrl = detailsHref(searchParams);
@@ -142,16 +144,18 @@ export function SummaryDashboard({
         <CareerBars groups={careerGroups} />
       </section>
 
-      <Card as="section" className="text-center" padding="lg" variant="glass">
-        <h2>Luận giải chi tiết</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-[var(--bm-text-soft)]">
-          Màn chi tiết sẽ mở một số chỉ số miễn phí trước, các phần chuyên sâu còn lại được khóa
-          ngay trong dòng đọc.
-        </p>
-        <Button className="mt-6" href={detailUrl} size="lg" variant="primary">
-          {unlocked ? "Xem báo cáo đầy đủ" : "Xem chi tiết miễn phí"}
-        </Button>
-      </Card>
+      {showCta ? (
+        <Card as="section" className="text-center" padding="lg" variant="glass">
+          <h2>Luận giải chi tiết</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-[var(--bm-text-soft)]">
+            Màn chi tiết sẽ mở một số chỉ số miễn phí trước, các phần chuyên sâu còn lại được khóa
+            ngay trong dòng đọc.
+          </p>
+          <Button className="mt-6" href={detailUrl} size="lg" variant="primary">
+            {unlocked ? "Xem báo cáo đầy đủ" : "Xem chi tiết miễn phí"}
+          </Button>
+        </Card>
+      ) : null}
     </div>
   );
 }

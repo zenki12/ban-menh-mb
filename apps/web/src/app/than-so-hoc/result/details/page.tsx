@@ -6,12 +6,12 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 import { PageShell } from "../../../../components/layout";
 import { FAQSection } from "../../../../components/numerology/result/FAQSection";
-import { FreeIndicatorSection } from "../../../../components/numerology/result/FreeIndicatorSection";
 import { FullReport, type NumerologyReportWithSections } from "../../../../components/numerology/result/FullReport";
 import { LockedSectionsGrouped } from "../../../../components/numerology/result/LockedSectionsGrouped";
 import { MagneticCTA } from "../../../../components/numerology/result/MagneticCTA";
 import { PartialIndicatorSection } from "../../../../components/numerology/result/PartialIndicatorSection";
 import { StickyBottomCTA } from "../../../../components/numerology/result/StickyBottomCTA";
+import { SummaryDashboard } from "../../../../components/numerology/result/SummaryDashboard";
 import { ErrorState, LoadingState, UnauthorizedState, Card } from "../../../../components/ui";
 import { SectionHeader } from "../../../../components/numerology/result/v1";
 import { fetchWithAuth } from "../../../../lib/api/client";
@@ -103,33 +103,22 @@ function FreeFullSection({ report }: { report: NumerologyReportWithSections }) {
 }
 
 function LockedDetailsPreview({
+  dob,
+  name,
   report,
   onUnlock,
 }: {
+  dob: string;
+  name: string;
   report: NumerologyReportWithSections;
   onUnlock: () => void;
 }) {
   return (
     <>
       <section className="grid gap-10">
-        <FreeIndicatorSection
-          hint="Chỉ số cốt lõi định hình hành trình phát triển chính của bạn."
-          indicator={report.lifePath}
-          title="Số Đường Đời"
-        />
+        <SummaryDashboard dob={dob} report={report} showCta={false} unlocked={false} userName={name} />
 
         <FreeFullSection report={report} />
-
-        <PartialIndicatorSection
-          hint="Tài năng tự nhiên và món quà bẩm sinh thể hiện qua ngày sinh."
-          indicator={report.birthday}
-          themeBullets={themeBullets(report.birthday.data, [
-            "Nhìn nhanh năng lực tự nhiên",
-            "Gợi ý cách dùng món quà bẩm sinh",
-            "Phần luận giải sâu đang được khóa",
-          ])}
-          title="Số Ngày Sinh"
-        />
 
         <PartialIndicatorSection
           hint="Chủ đề vận hành chính trong năm hiện tại."
@@ -140,6 +129,17 @@ function LockedDetailsPreview({
             "Giữ năng lượng ổn định qua từng giai đoạn",
           ])}
           title={`Năm cá nhân ${report.personalYear.year}`}
+        />
+
+        <PartialIndicatorSection
+          hint="Chủ đề vận hành trong tháng hiện tại, giúp bạn chọn trọng tâm hành động ngắn hạn."
+          indicator={report.personalMonth}
+          themeBullets={themeBullets(report.personalMonth.data, [
+            "Nhận diện năng lượng chính của tháng",
+            "Chọn trọng tâm hành động phù hợp",
+            "Phần luận giải chi tiết từng tháng đang được khóa",
+          ])}
+          title={`Tháng cá nhân ${report.personalMonth.month}`}
         />
       </section>
 
@@ -225,7 +225,7 @@ function ResultDetailsContent() {
       {unlocked ? (
         <FullReport report={report} userName={input.fullName} />
       ) : (
-        <LockedDetailsPreview onUnlock={openPayment} report={report} />
+        <LockedDetailsPreview dob={input.dob} name={input.fullName} onUnlock={openPayment} report={report} />
       )}
 
       <div className="mt-10 pb-24 text-sm leading-relaxed text-[var(--bm-text-muted)] md:pb-0">
