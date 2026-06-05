@@ -40,6 +40,47 @@ Done        Đã hoàn tất và đối chiếu đủ điều kiện done
 - Nếu task đụng payment, auth, entitlement, KB hoặc legal, bắt buộc audit bảo mật trước khi `Done`.
 - Nếu tạo code mới, phải kiểm tra nguy cơ file phình to, logic trùng, dependency thừa và secret/KB leakage.
 
+## Ad-hoc - Homepage
+
+### T-HOME-1 - Tách homepage monolith thành components
+
+Status: Done
+
+Bối cảnh:
+
+- Homepage chính thức vừa được cập nhật từ demo và đang là file lớn.
+- `apps/web/src/app/page.tsx` và demo homepage cần tránh vượt giới hạn dòng/file.
+
+Yêu cầu:
+
+- Tách homepage thành components dùng chung trong `apps/web/src/components/homepage/`.
+- `/` dùng components share.
+- `/demo/homepage-hub` dùng lại homepage, không duplicate 900+ dòng.
+- Giữ nguyên copy, logic click module, modal sắp ra mắt và styling.
+- Đưa thư mục `logo/` vào public assets.
+
+Output:
+
+- `apps/web/src/components/homepage/`
+- `apps/web/src/app/page.tsx` orchestration ngắn.
+- `apps/web/src/app/demo/homepage-hub/page.tsx` re-export.
+- `apps/web/public/logo/`
+- `apps/web/public/icons/modules/`
+
+Điều kiện Done:
+
+- Mỗi file homepage component dưới ngưỡng 600 dòng.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- `/` và `/demo/homepage-hub` render được.
+
+Cập nhật khi xong:
+
+- Đã tách data, styles và 6 section homepage thành components share.
+- Đã giảm `page.tsx` còn orchestration ngắn.
+- Đã để demo route re-export homepage.
+- Đã move `logo/` vào `apps/web/public/logo/`.
+- Đã giữ icon module tại `apps/web/public/icons/modules/`.
+
 ## Phase 0 - Khóa Nền Tảng Dự Án
 
 ### T-0001 - Chốt tài liệu nền V2

@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-06 00:37 +07 | T-HOME-1 | Homepage shared component refactor | `Task` |
 | 2026-06-05 15:31 +07 | T-PAY-NUM-4 | Free preview Mystical Hub redesign | `Task` |
 | 2026-06-05 15:16 +07 | T-UX-ERR-1 | Auth-aware error states | `Task` |
 | 2026-06-05 15:00 +07 | T-PAY-NUM-3-FIX-2 | Multi-faceted preview with locked aspect teasers | `Task` |
@@ -132,6 +133,38 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-06 00:37 +07] - T-HOME-1: Homepage shared component refactor
+
+**Loại:** Task  
+**Ref:** T-HOME-1
+
+**Đã làm**
+
+- Tách homepage monolith thành `apps/web/src/components/homepage/`.
+- Tách data, style block và các section chính: hero, modules grid, pricing, constellation, callout, trust signals.
+- Rút gọn `apps/web/src/app/page.tsx` còn orchestration.
+- Đổi `apps/web/src/app/demo/homepage-hub/page.tsx` thành re-export để không duplicate homepage.
+- Move source logo folder từ `logo/` sang `apps/web/public/logo/`.
+- Giữ module icons đã chuẩn hóa tại `apps/web/public/icons/modules/`.
+
+**Không làm**
+
+- Không đổi copy, pricing, module status, styling values hoặc logic click module.
+- Không đụng KB, workers, pricing.ts, synthesizer hoặc payment.
+
+**Verify**
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+- `/` và `/demo/homepage-hub` trả `200`.
+
+**Rủi ro còn lại**
+
+- `apps/web/src/app/demo/homepage-hub/page.tsx` đang nằm trong ignored demo route; vẫn hoạt động local/build, nhưng không được git add nếu không thay `.gitignore`.
 
 ---
 
