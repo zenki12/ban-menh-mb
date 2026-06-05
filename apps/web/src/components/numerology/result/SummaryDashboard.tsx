@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Button, Card } from "../../ui";
 import { LockedGrid, type LockedGroup } from "./LockedGrid";
 import { generateOverview } from "./overview";
+import { UNLOCK_CTA_ID } from "./scrollToUnlock";
 import { LOCKED_COUNT, readString, truncateText } from "./utils";
 
 type SummaryDashboardProps = {
@@ -72,6 +73,7 @@ const lockedGroups: LockedGroup[] = [
     items: [{ title: "Chữ cái mở đầu" }, { title: "Chữ cái đóng" }],
   },
 ];
+const PRICE = "99.000đ";
 
 function detailsHref(search: { toString: () => string }) {
   const query = search.toString();
@@ -197,16 +199,51 @@ export function SummaryDashboard({
 
       <LockedGrid groups={lockedGroups} lockedCount={LOCKED_COUNT} />
 
-      <section className="rounded-lg border border-[#f7c948]/24 bg-[#171021]/90 p-5 text-center shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-7">
-        {unlocked ? (
-          <Button href={detailUrl} size="lg">
-            Xem báo cáo chi tiết
-          </Button>
-        ) : (
-          <Button onClick={onUnlock} size="lg">
-            Mở khóa toàn bộ luận giải
-          </Button>
-        )}
+      <section id={UNLOCK_CTA_ID} className="scroll-mt-8">
+        <Card className="bm-cta-card" variant="glass" padding="lg">
+          <h2>Luận giải đầy đủ về {userName}</h2>
+
+          <div className="bm-cta-divider" />
+
+          <h3>🎯 Báo cáo đầy đủ gồm:</h3>
+          <ul>
+            <li>✓ 33 chỉ số phân tích chuyên sâu</li>
+            <li>✓ 5 khía cạnh: tình yêu, sự nghiệp, tài chính, sức khỏe, gia đình</li>
+            <li>✓ Vận số 11 năm tới và chi tiết 3 năm</li>
+            <li>✓ Lưới Pythagoras 3x3 và mũi tên sức mạnh</li>
+            <li>✓ Bài học Karmic và Nợ Nghiệp nếu có</li>
+            <li>✓ Hơn 50.000 chữ luận giải cá nhân hóa</li>
+          </ul>
+
+          <div className="bm-cta-divider" />
+
+          <h3>💵 Bạn nhận được với {PRICE}:</h3>
+          <ul>
+            <li>⏱ Truy cập vĩnh viễn, đọc lại không giới hạn</li>
+            <li>📱 Đọc trên mọi thiết bị</li>
+            <li>🔧 Hỗ trợ sửa thông tin trong 24h</li>
+            <li>🔒 Bảo mật PayOS qua ngân hàng Việt Nam</li>
+          </ul>
+
+          <div className="bm-cta-divider" />
+
+          <div className="bm-cta-price-block">
+            <div className="bm-cta-price">{PRICE}</div>
+            <div className="bm-cta-anchor">(~ 2 cốc trà sữa, có giá trị cả đời)</div>
+          </div>
+
+          {unlocked ? (
+            <Button href={detailUrl} fullWidth size="lg" variant="primary">
+              Xem báo cáo đầy đủ
+            </Button>
+          ) : (
+            <Button fullWidth onClick={onUnlock} size="lg" variant="primary">
+              Khám phá toàn bộ chỉ số →
+            </Button>
+          )}
+
+          <p className="bm-cta-disclaimer">ⓘ Không hoàn tiền sau khi mở khóa</p>
+        </Card>
       </section>
     </div>
   );
