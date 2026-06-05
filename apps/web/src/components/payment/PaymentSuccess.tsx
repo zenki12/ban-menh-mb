@@ -34,6 +34,10 @@ function buildReportHref(module: ProductModule, searchParams: URLSearchParams): 
   return appendSearchParams(buildModulePath(module, "/result/details"), params);
 }
 
+function hasReportInput(searchParams: URLSearchParams): boolean {
+  return Boolean(searchParams.get("fullName")?.trim() && searchParams.get("dob")?.trim());
+}
+
 function SuccessPanel({
   module,
   orderId,
@@ -47,7 +51,11 @@ function SuccessPanel({
 }) {
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const reportHref = useMemo(() => buildReportHref(module, searchParams), [module, searchParams]);
+  const hasInput = hasReportInput(searchParams);
+  const reportHref = useMemo(
+    () => (hasInput ? buildReportHref(module, searchParams) : buildModulePath(module, "")),
+    [hasInput, module, searchParams],
+  );
   const displayName =
     searchParams.get("name") ||
     searchParams.get("fullName") ||
@@ -87,7 +95,7 @@ function SuccessPanel({
         </div>
         <div className="grid w-full gap-3 sm:grid-cols-2">
           <Button href={reportHref} fullWidth variant="primary">
-            Xem báo cáo đầy đủ
+            {hasInput ? "Xem báo cáo đầy đủ" : "Nhập thông tin để tạo báo cáo"}
           </Button>
           <Button href="/account" fullWidth variant="secondary">
             Vào tài khoản
