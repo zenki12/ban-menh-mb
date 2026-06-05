@@ -3415,6 +3415,40 @@ Update khi xong (2026-06-05):
 - Added `numerology-result.css` and imported it through `globals.css`.
 - Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
 
+### T-PAY-NUM-3 - Update free preview indicators + anchor wording
+
+Status: Done
+
+Bối cảnh:
+
+- `/than-so-hoc/result` hiện preview 2 chỉ số: Đường Đời + Ngày Sinh.
+- CTA anchor đang dùng wording `(~ 2 cốc trà sữa, có giá trị cả đời)`.
+- Locked count đang tính `33 - 2 = 31`.
+
+Yêu cầu:
+
+- Đổi free preview thành 3 chỉ số: Đường Đời partial, Năm Cá Nhân partial, Tháng Cá Nhân full.
+- Thêm `PersonalMonthFull` render conditional các field có dữ liệu trong `personal_month`.
+- Đổi anchor wording thành `(~ giá 2 bát phở)`.
+- Đổi `PREVIEW_INDICATORS = 3`, locked count còn 30.
+- Không đụng KB, narrative, synthesizer, workers, API routes, pricing.
+
+Điều kiện Done:
+
+- `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build` pass.
+- Free preview hiển thị Đường Đời + Năm Cá Nhân + Tháng Cá Nhân.
+- Tháng Cá Nhân không crash khi data thiếu field.
+- Locked count hiển thị 30.
+
+Update khi xong (2026-06-05):
+
+- Thay preview Ngày Sinh bằng Năm Cá Nhân partial 200 ký tự.
+- Thêm `PersonalMonthFull` render full Tháng Cá Nhân với field conditional.
+- Đổi anchor wording thành `(~ giá 2 bát phở)`.
+- Đổi `PREVIEW_INDICATORS = 3`, locked count còn 30.
+- Thêm CSS cho month preview trong `numerology-result.css`.
+- Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
 ### T-PAY-NUM-1-DEPLOY - Deploy and smoke numerology payment
 
 Status: Todo

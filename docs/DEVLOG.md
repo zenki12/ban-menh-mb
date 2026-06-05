@@ -39,6 +39,7 @@
 |-----------|-----|---------|------|
 | 2026-06-05 13:53 +07 | T-PAY-NUM-2 | Numerology free preview flow + CTA FAQ | `Task` |
 | 2026-06-05 11:33 +07 | T-PAY-NUM-1 | Numerology payment module-scoped routes | `Task` |
+| 2026-06-05 14:15 +07 | T-PAY-NUM-3 | Free preview indicators + anchor wording | `Task` |
 | 2026-06-04 23:54 +07 | T-0610c-lifePath10 | Life Path 10 display + narrative KB | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
 | 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
@@ -194,6 +195,33 @@ Verification:
 Residual risk:
 
 - Real PayOS/webhook confirmation and entitlement unlock still need deploy/smoke verification in `T-PAY-NUM-1-DEPLOY`.
+
+---
+
+## [2026-06-05 14:15 +07] - T-PAY-NUM-3: Free preview indicators + anchor wording
+
+**Loai:** `Task`
+**Ref:** T-PAY-NUM-3
+
+> Adjust numerology result free preview only; no KB, synthesizer, worker, API route, or pricing changes.
+
+Changed:
+
+- Replaced birthday preview with a personal year partial preview.
+- Added `PersonalMonthFull` for full current personal month preview with conditional field rendering.
+- Updated preview count from 2 to 3 so locked count becomes 30.
+- Changed CTA anchor wording to `(~ giá 2 bát phở)`.
+- Added month preview styles in `numerology-result.css`.
+
+Verification:
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+
+Notes:
+
+- Manual browser visual check was not run in this turn; build verification passed.
 
 ---
 
