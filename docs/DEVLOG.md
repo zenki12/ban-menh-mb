@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-04 23:54 +07 | T-0610c-lifePath10 | Life Path 10 display + narrative KB | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
 | 2026-06-02 13:10 +07 | T-0606m | Audit cleanup batch | `Task` |
 | 2026-06-02 12:35 +07 | T-0606l | Tension number fallback insight + English cleanup | `Hotfix` |
@@ -124,6 +125,39 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-04 23:54 +07] - T-0610c-lifePath10: Life Path 10 display + narrative KB
+
+**Loai:** `Task`
+**Ref:** T-0610c-lifePath10
+
+> Add Life Path 10 as a display/narrative variant while preserving reduced-number calculation behavior.
+
+Changed:
+
+- Added optional `displayNumber` to numerology calculations/results; raw Life Path 10 now reports `number=1` and `displayNumber=10`.
+- Added private KB entry `life_path.10` and extracted `narrative.lifePath.10` from local V1 source.
+- Updated report data lookup so only Life Path uses `displayNumber` for KB/narrative lookup; other indicators remain unchanged.
+- Updated summary dashboard, free indicator badge, profile header, details synthesizer, and Life Path context blocks to display 10 where appropriate.
+- Added raw Life Path 10 coverage to engine and synthesizer tests.
+
+Verification:
+
+- `npm run kb:extract-narrative` pass.
+- `npm run kb:validate` pass.
+- `npm run kb:validate-narrative` pass.
+- `npm run kb:test-engine` pass.
+- `npm run kb:test-synthesizer` pass.
+- `npm run typecheck` pass.
+- `npm run lint` pass.
+- `npm run build` pass.
+
+Notes:
+
+- `kb-private/numerology/kb.json` and `kb-private/numerology/narrative.json` are intentionally private/gitignored. Upload KV again before testing this through the remote KB Worker.
+- The two external pages user provided were used as reference direction only; implementation relies on local V1 source plus Bản Mệnh-style private KB text.
 
 ---
 

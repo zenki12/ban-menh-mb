@@ -3282,6 +3282,36 @@ Update khi xong:
 - Thêm `tools/kb-import/test-diacritics.mjs`, script `kb:test-diacritics` và thêm vào `npm run check`.
 - Verify pass: `npm run kb:test-synthesizer`, `npm run kb:test-diacritics`, `npm run typecheck`, `npm run lint`, `npm run build`.
 
+### T-0610c-lifePath10 - Add Life Path 10 display + narrative KB
+
+Status: Done
+
+Bối cảnh:
+
+- V1 có template riêng cho `lifePath[10]`, nhưng V2 hiện reduce raw 10 thành số 1 và render như Đường đời 1 thuần.
+- User cung cấp ảnh V1 và 2 nguồn tham khảo ngoài để xác nhận nhu cầu hiển thị Đường đời số 10.
+
+Yêu cầu:
+
+- Giữ logic tính toán reduced number = 1 để không phá engine.
+- Khi raw lifePath = 10, thêm `displayNumber = 10` và lookup KB/narrative theo số 10 cho riêng Đường đời.
+- Thêm `kb-private/numerology/kb.json` entry `life_path.10` và extract `narrative.lifePath.10` từ V1 local source.
+- Section 4/profile/summary hiển thị số 10; các tính toán phụ vẫn dùng số 1.
+- Không thêm số 10 vào các nhóm indicator khác.
+
+Điều kiện Done:
+
+- `npm run kb:validate`, `npm run kb:validate-narrative`, `npm run kb:test-engine`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Test case raw lifePath 10 xác nhận `number=1`, `displayNumber=10`, narrative chứa `Số 10 (1+0=1)`.
+
+Update khi xong (2026-06-04):
+
+- Added `displayNumber=10` for raw Life Path 10 while keeping reduced `number=1` for calculation logic.
+- Added private KB lookup `life_path.10` and extracted `narrative.lifePath.10` from local V1 source.
+- Summary/dashboard/profile/details now display Life Path 10; charts and correlation math still use reduced number 1.
+- Added raw 10 coverage to engine and synthesizer tests.
+- Verified: `npm run kb:extract-narrative`, `npm run kb:validate`, `npm run kb:validate-narrative`, `npm run kb:test-engine`, `npm run kb:test-synthesizer`, `npm run typecheck`, `npm run lint`, `npm run build`.
+
 ### T-0608 - Mechanical port V1 numerology details rendering
 
 Status: Done
