@@ -67,7 +67,7 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${bearer}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...parsed.data, includeSections: unlocked }),
+      body: JSON.stringify({ ...parsed.data, includeSections: true }),
       signal: controller.signal,
     });
 
@@ -99,9 +99,23 @@ export async function POST(request: Request) {
           ? { ...(responsePayload.report as Record<string, unknown>) }
           : responsePayload.report;
       if (!unlocked && report && typeof report === "object") {
-        delete (report as Record<string, unknown>).sections;
-        delete (report as Record<string, unknown>).phases;
-        delete (report as Record<string, unknown>).profileHeader;
+        const freePhases = Array.isArray((report as Record<string, unknown>).phases)
+          ? ((report as Record<string, unknown>).phases as Array<Record<string, unknown>>)
+              .map((phase) => ({
+                ...phase,
+                sections: Array.isArray(phase.sections)
+                  ? phase.sections.filter((section) => {
+                      return (
+                        section &&
+                        typeof section === "object" &&
+                        (section as { number?: unknown }).number === "4"
+                      );
+                    })
+                  : [],
+              }))
+              .filter((phase) => Array.isArray(phase.sections) && phase.sections.length > 0)
+          : [];
+        (report as Record<string, unknown>).phases = freePhases;
       }
       if (!unlocked && payload && typeof payload === "object") {
         delete (payload as Record<string, unknown>).phases;

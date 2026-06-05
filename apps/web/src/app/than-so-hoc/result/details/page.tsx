@@ -1,6 +1,6 @@
 "use client";
 
-import { createError, isAppError, type AppError } from "@banmenh/shared";
+import { createError, isAppError, type AppError, type Phase } from "@banmenh/shared";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -12,7 +12,8 @@ import { LockedSectionsGrouped } from "../../../../components/numerology/result/
 import { MagneticCTA } from "../../../../components/numerology/result/MagneticCTA";
 import { PartialIndicatorSection } from "../../../../components/numerology/result/PartialIndicatorSection";
 import { StickyBottomCTA } from "../../../../components/numerology/result/StickyBottomCTA";
-import { ErrorState, LoadingState, UnauthorizedState } from "../../../../components/ui";
+import { ErrorState, LoadingState, UnauthorizedState, Card } from "../../../../components/ui";
+import { SectionHeader } from "../../../../components/numerology/result/v1";
 import { fetchWithAuth } from "../../../../lib/api/client";
 import { useAuth } from "../../../../lib/auth";
 
@@ -60,6 +61,47 @@ function themeBullets(data: unknown, fallback: string[]) {
   return (chunks.length ? chunks : fallback).slice(0, 3);
 }
 
+function findFreeLifePathSection(report: NumerologyReportWithSections): Phase["sections"][number] | null {
+  for (const phase of report.phases ?? []) {
+    const section = phase.sections.find((item) => item.number === "4");
+    if (section) return section;
+  }
+  return null;
+}
+
+function FreeFullSection({ report }: { report: NumerologyReportWithSections }) {
+  const section = findFreeLifePathSection(report);
+  if (!section) return null;
+
+  return (
+    <Card as="article" className="v1-report-section border-[var(--bm-border-gold)]" variant="glass" padding="lg">
+      <div className="mb-4 inline-flex rounded-full border border-[var(--bm-border-gold)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--bm-gold-bright)]">
+        Mở miễn phí
+      </div>
+      <SectionHeader number={section.number} title={section.title} titleBadge={section.titleBadge} />
+      {section.quickIntro ? (
+        <div className="mt-5 border-l-2 border-[var(--bm-gold-bright)] py-1 pl-4">
+          <div className="flex flex-wrap items-baseline gap-2">
+            {section.quickIntro.badge ? (
+              <span className="rounded-full border border-[var(--bm-border-gold)] px-2.5 py-0.5 text-xs font-black text-[var(--bm-gold-bright)]">
+                {section.quickIntro.badge}
+              </span>
+            ) : null}
+            <p className="text-base font-bold leading-7 text-[var(--bm-text-main)]">
+              {section.quickIntro.headline}
+            </p>
+          </div>
+          <p className="mt-2 max-w-[72ch] text-sm leading-7 text-[var(--bm-text-soft)]">
+            {section.quickIntro.summary}
+          </p>
+        </div>
+      ) : null}
+      {section.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{section.intro}</p> : null}
+      <div className="nar-container mt-5" dangerouslySetInnerHTML={{ __html: section.html }} />
+    </Card>
+  );
+}
+
 function LockedDetailsPreview({
   report,
   onUnlock,
@@ -75,6 +117,8 @@ function LockedDetailsPreview({
           indicator={report.lifePath}
           title="Số Đường Đời"
         />
+
+        <FreeFullSection report={report} />
 
         <PartialIndicatorSection
           hint="Tài năng tự nhiên và món quà bẩm sinh thể hiện qua ngày sinh."

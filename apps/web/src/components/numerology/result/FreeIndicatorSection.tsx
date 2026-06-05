@@ -128,9 +128,6 @@ export function FreeIndicatorSection({ indicator, title, hint }: FreeIndicatorSe
             </div>
           ) : null}
           <div className="my-6 h-px bg-[var(--bm-border-subtle)]" />
-          {indicator.narrative ? (
-            <div className="nar-container" dangerouslySetInnerHTML={{ __html: indicator.narrative }} />
-          ) : null}
           {aspects.length > 0 ? (
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {aspects.map((aspect) => (
