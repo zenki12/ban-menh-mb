@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-05 15:16 +07 | T-UX-ERR-1 | Auth-aware error states | `Task` |
 | 2026-06-05 15:00 +07 | T-PAY-NUM-3-FIX-2 | Multi-faceted preview with locked aspect teasers | `Task` |
 | 2026-06-05 14:39 +07 | T-PAY-NUM-3-FIX | Generous free preview from narrative + month fields | `Task` |
 | 2026-06-05 13:53 +07 | T-PAY-NUM-2 | Numerology free preview flow + CTA FAQ | `Task` |
@@ -130,6 +131,31 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-05 15:16 +07] - T-UX-ERR-1: Auth-aware error states
+
+**Loại:** `Task`
+**Ref:** T-UX-ERR-1
+
+Changed:
+
+- Added specific friendly title mapping for shared `ErrorCode` values in `ErrorState`.
+- Routed auth failures (`AUTH_REQUIRED`, `AUTH_INVALID_TOKEN`, `AUTH_SESSION_EXPIRED`) on numerology result, details, and payment setup flows to `UnauthorizedState`.
+- Verified `/account` already used `UnauthorizedState`.
+- Login CTA now includes a `returnUrl` query for the current page.
+
+Not changed:
+
+- No API, KB, narrative, worker, pricing, or entitlement logic changed.
+- Full login success return flow was not changed; this task only passes `returnUrl` to the login destination.
+
+Verification:
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
 
 ---
 

@@ -3533,6 +3533,37 @@ Yêu cầu:
 - Smoke report records order creation, return URL, cancel URL, webhook confirmation and entitlement state.
 - No secrets committed or logged.
 
+### T-UX-ERR-1 - Auth-aware error states for result and payment UX
+
+Status: Done
+
+Background:
+
+- Auth failures on result/payment flows should not look like generic system errors.
+- Existing `UnauthorizedState` provides the right login CTA, but result and payment error branches still used generic `ErrorState`.
+- `ErrorState` also needed friendlier titles per shared `ErrorCode`.
+
+Requirements:
+
+- Show `UnauthorizedState` for `AUTH_REQUIRED`, `AUTH_INVALID_TOKEN`, and `AUTH_SESSION_EXPIRED` on numerology result/detail/payment flows.
+- Keep account page behavior as-is if it already uses `UnauthorizedState`.
+- Add specific error titles for non-auth `ErrorCode` values in `ErrorState`.
+- Keep API, KB, narrative, worker, pricing, and entitlement logic unchanged.
+
+Done criteria:
+
+- `npm.cmd run typecheck`, `npm.cmd run lint`, and `npm.cmd run build` pass.
+- Auth errors show login-focused unauthorized UI instead of generic error copy.
+- Non-auth errors keep `ErrorState` with more specific titles.
+
+Update when done (2026-06-05):
+
+- Added an `ErrorCode` title map in `ErrorState`.
+- Wired `UnauthorizedState` into `/than-so-hoc/result`, `/than-so-hoc/result/details`, and payment setup auth errors.
+- Account page was verified to already use `UnauthorizedState`.
+- Login CTA now carries a `returnUrl` query pointing back to the current page.
+- Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
 ## Phase 7 - Tarot MVP Non-AI
 
 ### T-0701 - Chuẩn bị Tarot KB schema non-AI
