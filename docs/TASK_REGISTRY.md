@@ -3512,6 +3512,39 @@ Update khi xong (2026-06-05):
 - Added CSS for trait chips, field snippets and locked aspect teaser.
 - Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
 
+### T-PAY-NUM-4 - Free preview redesign theo pattern PDF Mystical Hub
+
+Status: Done
+
+Bối cảnh:
+
+- Free preview cần có sức thuyết phục hơn nhưng không được spoil USP của báo cáo trả phí.
+- Pattern cần gần PDF Mystical Hub: có hub free rõ ràng, visual hooks, CTA sớm, locked cards compact và CTA cuối.
+- Không thay đổi KB, narrative, synthesizer, workers, API, pricing.
+
+Yêu cầu:
+
+- Thêm `LifeCyclesSummary` hiển thị 3 chu kỳ Đường Đời, mỗi chu kỳ tối đa 300 ký tự.
+- Thêm `LockedSectionCard` compact với số mục, title, số chỉ số, KB title, hint, word count và nút mở khóa.
+- Thêm `LOCKED_SECTIONS` 22 mục và `LOCKED_PHASES` nhóm B/C/D.
+- Refactor `SummaryDashboard` thành 5 free sections: profile/dashboard, line chart, career bars, life cycles summary, personal month full.
+- Thêm CTA sớm, locked grouped, CTA cuối, FAQ và sticky mobile CTA vào flow summary.
+
+Điều kiện Done:
+
+- `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build` pass.
+- Mobile 375px không tràn ngang.
+- Locked cards grouped theo phase B/C/D, mỗi card có hint rõ và CTA mở khóa.
+- Không động KB, narrative, synthesizer, workers, API, pricing.
+
+Update khi xong (2026-06-05):
+
+- Added `LifeCyclesSummary`, `LockedSectionCard`, `PhaseDivider`, `LockedSectionsGrouped`.
+- Added `lockedSectionConfig.ts` with 22 locked sections grouped by phase B/C/D.
+- Refactored `SummaryDashboard` to render profile, overview, 8 chips, line chart, career bars, cycles summary, month full, dual CTA, locked grouped, FAQ and sticky CTA.
+- Added CSS in `numerology-result.css` for cycles, locked cards, phase divider and final CTA.
+- Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
 ### T-PAY-NUM-1-DEPLOY - Deploy and smoke numerology payment
 
 Status: Todo

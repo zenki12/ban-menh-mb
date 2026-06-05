@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-05 15:31 +07 | T-PAY-NUM-4 | Free preview Mystical Hub redesign | `Task` |
 | 2026-06-05 15:16 +07 | T-UX-ERR-1 | Auth-aware error states | `Task` |
 | 2026-06-05 15:00 +07 | T-PAY-NUM-3-FIX-2 | Multi-faceted preview with locked aspect teasers | `Task` |
 | 2026-06-05 14:39 +07 | T-PAY-NUM-3-FIX | Generous free preview from narrative + month fields | `Task` |
@@ -134,6 +135,33 @@
 
 ---
 
+## [2026-06-05 15:31 +07] - T-PAY-NUM-4: Free preview Mystical Hub redesign
+
+**Loại:** `Task`
+**Ref:** T-PAY-NUM-4
+
+Changed:
+
+- Added `LifeCyclesSummary` for 3 life cycle previews with 300-character truncation.
+- Added compact `LockedSectionCard`, `PhaseDivider`, `LockedSectionsGrouped`, and `lockedSectionConfig.ts` with 22 locked sections grouped by phase B/C/D.
+- Refactored `SummaryDashboard` to show profile, overview, 8 chips, line chart, career bars, life cycles summary, personal month full, early CTA, grouped locked cards, final CTA, FAQ and sticky mobile CTA.
+- Added CSS in `numerology-result.css` for cycles, locked cards, phase dividers and final CTA.
+
+Not changed:
+
+- No KB, narrative, synthesizer, worker, API, pricing, voucher, payment backend, or entitlement logic changed.
+
+Verification:
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+
+Notes:
+
+- Manual browser visual smoke was not run in this turn; build verification passed.
+
+---
 ## [2026-06-05 15:16 +07] - T-UX-ERR-1: Auth-aware error states
 
 **Loại:** `Task`
