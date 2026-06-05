@@ -13,7 +13,7 @@ import { PageShell } from "../../../components/layout";
 import { FAQSection } from "../../../components/numerology/result/FAQSection";
 import { StickyBottomCTA } from "../../../components/numerology/result/StickyBottomCTA";
 import { SummaryDashboard } from "../../../components/numerology/result/SummaryDashboard";
-import { ErrorState, LoadingState } from "../../../components/ui";
+import { ErrorState, LoadingState, UnauthorizedState } from "../../../components/ui";
 import { fetchWithAuth } from "../../../lib/api/client";
 import { useAuth } from "../../../lib/auth";
 
@@ -23,6 +23,22 @@ type ReportResponse = {
   unlocked: boolean;
   entitlement: unknown;
 };
+
+function isAuthError(code: AppError["code"]) {
+  return code === "AUTH_REQUIRED" || code === "AUTH_INVALID_TOKEN" || code === "AUTH_SESSION_EXPIRED";
+}
+
+function authErrorDescription(code: AppError["code"]) {
+  return code === "AUTH_REQUIRED"
+    ? "Bạn cần đăng nhập trước khi xem báo cáo Thần Số Học."
+    : "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.";
+}
+
+function loginReturnHref() {
+  if (typeof window === "undefined") return "/";
+  const returnUrl = `${window.location.pathname}${window.location.search}`;
+  return `/?returnUrl=${encodeURIComponent(returnUrl)}`;
+}
 
 function ResultContent() {
   const router = useRouter();
@@ -84,6 +100,14 @@ function ResultContent() {
     return <LoadingState message="Đang phân tích dashboard Thần số học..." />;
   }
   if (error) {
+    if (isAuthError(error.code)) {
+      return (
+        <UnauthorizedState
+          description={authErrorDescription(error.code)}
+          onLogin={() => router.push(loginReturnHref())}
+        />
+      );
+    }
     return <ErrorState code={error.code} requestId={error.requestId} onRetry={fetchReport} />;
   }
   if (!report) {

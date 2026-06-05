@@ -6,7 +6,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 import { PageShell } from "../../../../components/layout";
 import { FullReport, type NumerologyReportWithSections } from "../../../../components/numerology/result/FullReport";
-import { ErrorState, LoadingState } from "../../../../components/ui";
+import { ErrorState, LoadingState, UnauthorizedState } from "../../../../components/ui";
 import { fetchWithAuth } from "../../../../lib/api/client";
 import { useAuth } from "../../../../lib/auth";
 
@@ -20,6 +20,22 @@ type ReportResponse = {
 function buildSummaryHref(search: { toString: () => string }) {
   const query = search.toString();
   return query ? `/than-so-hoc/result?${query}` : "/than-so-hoc/result";
+}
+
+function isAuthError(code: AppError["code"]) {
+  return code === "AUTH_REQUIRED" || code === "AUTH_INVALID_TOKEN" || code === "AUTH_SESSION_EXPIRED";
+}
+
+function authErrorDescription(code: AppError["code"]) {
+  return code === "AUTH_REQUIRED"
+    ? "Bạn cần đăng nhập trước khi xem báo cáo Thần Số Học."
+    : "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.";
+}
+
+function loginReturnHref() {
+  if (typeof window === "undefined") return "/";
+  const returnUrl = `${window.location.pathname}${window.location.search}`;
+  return `/?returnUrl=${encodeURIComponent(returnUrl)}`;
 }
 
 function ResultDetailsContent() {
@@ -81,7 +97,17 @@ function ResultDetailsContent() {
   }, [authLoading, loading, report, router, searchParams, unlocked]);
 
   if (loading || authLoading) return <LoadingState message="Đang tải luận giải..." />;
-  if (error) return <ErrorState code={error.code} requestId={error.requestId} onRetry={fetchReport} />;
+  if (error) {
+    if (isAuthError(error.code)) {
+      return (
+        <UnauthorizedState
+          description={authErrorDescription(error.code)}
+          onLogin={() => router.push(loginReturnHref())}
+        />
+      );
+    }
+    return <ErrorState code={error.code} requestId={error.requestId} onRetry={fetchReport} />;
+  }
   if (!report) return <ErrorState code="KB_NOT_AVAILABLE" onRetry={fetchReport} />;
   if (!unlocked) return <LoadingState message="Báo cáo chi tiết cần mở khóa trước khi xem..." />;
 

@@ -10,7 +10,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
 import { PageShell } from "../layout";
-import { Button, Card, ErrorState } from "../ui";
+import { Button, Card, ErrorState, UnauthorizedState } from "../ui";
 import { fetchWithAuth } from "../../lib/api/client";
 import { useAuth } from "../../lib/auth";
 import { buildModulePath, moduleToSlug } from "./utils";
@@ -99,6 +99,22 @@ function buildSuccessUrl(moduleSlug: string, searchParams: URLSearchParams, data
   if (data.productCode) params.set("productCode", data.productCode);
   if (data.voucherCode) params.set("voucherCode", data.voucherCode);
   return `/${moduleSlug}/payment/success?${params.toString()}`;
+}
+
+function isAuthError(code: AppError["code"]) {
+  return code === "AUTH_REQUIRED" || code === "AUTH_INVALID_TOKEN" || code === "AUTH_SESSION_EXPIRED";
+}
+
+function authErrorDescription(code: AppError["code"]) {
+  return code === "AUTH_REQUIRED"
+    ? "Bạn cần đăng nhập trước khi thanh toán."
+    : "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.";
+}
+
+function loginReturnHref() {
+  if (typeof window === "undefined") return "/";
+  const returnUrl = `${window.location.pathname}${window.location.search}`;
+  return `/?returnUrl=${encodeURIComponent(returnUrl)}`;
 }
 
 export function PaymentSetup({ productCode }: PaymentSetupProps) {
@@ -353,11 +369,18 @@ export function PaymentSetup({ productCode }: PaymentSetupProps) {
 
           {createErrorState ? (
             <Card padding="md" variant="default">
-              <ErrorState
-                code={createErrorState.code}
-                requestId={createErrorState.requestId}
-                title="Không thể tạo đơn thanh toán"
-              />
+              {isAuthError(createErrorState.code) ? (
+                <UnauthorizedState
+                  description={authErrorDescription(createErrorState.code)}
+                  onLogin={() => router.push(loginReturnHref())}
+                />
+              ) : (
+                <ErrorState
+                  code={createErrorState.code}
+                  requestId={createErrorState.requestId}
+                  title="Không thể tạo đơn thanh toán"
+                />
+              )}
             </Card>
           ) : null}
 
