@@ -1,6 +1,7 @@
 import { getProductsByModule } from "@banmenh/shared";
 import { PageShell } from "../../components/layout";
 import { InputForm } from "../../components/numerology/InputForm";
+import { NumerologyAuthNotice } from "../../components/numerology/NumerologyAuthNotice";
 import { Card, ProductCard } from "../../components/ui";
 
 const numerologyMetrics = [
@@ -55,6 +56,7 @@ export default function NumerologyPage() {
             Nhập thông tin cơ bản để tạo bản phân tích Thần số học cá nhân hóa.
           </p>
         </div>
+        <NumerologyAuthNotice />
         <InputForm />
       </section>
 
