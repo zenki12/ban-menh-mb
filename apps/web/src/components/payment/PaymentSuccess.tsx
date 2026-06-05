@@ -1,0 +1,183 @@
+"use client";
+
+import { formatPriceVnd, type ProductModule } from "@banmenh/shared";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { PageShell } from "../layout";
+import { Button, Card, ErrorState, LoadingState } from "../ui";
+import { fetchWithAuth } from "../../lib/api/client";
+import { useAuth } from "../../lib/auth";
+import { appendSearchParams, buildModulePath, moduleToSlug } from "./utils";
+
+type PaymentSuccessProps = {
+  module: ProductModule;
+};
+
+type CheckResponse = {
+  orderId: string;
+  status: "pending" | "confirming" | "confirmed" | "expired" | "failed";
+  amount: number;
+  productCode: string;
+  expiresAt: string | null;
+  confirmedAt: string | null;
+};
+
+const MAX_POLLS = 20;
+const POLL_INTERVAL_MS = 3000;
+
+function buildReportHref(module: ProductModule, searchParams: URLSearchParams): string {
+  const params = new URLSearchParams(searchParams);
+  params.delete("orderId");
+  params.delete("freeUnlock");
+  params.delete("voucherCode");
+  params.delete("productCode");
+  return appendSearchParams(buildModulePath(module, "/result/details"), params);
+}
+
+function SuccessPanel({
+  module,
+  orderId,
+  amount,
+  voucherCode,
+}: {
+  module: ProductModule;
+  orderId: string | null;
+  amount?: number;
+  voucherCode?: string | null;
+}) {
+  const searchParams = useSearchParams();
+  const { user } = useAuth();
+  const reportHref = useMemo(() => buildReportHref(module, searchParams), [module, searchParams]);
+  const displayName =
+    searchParams.get("name") ||
+    searchParams.get("fullName") ||
+    user?.displayName ||
+    "Hồ sơ của bạn";
+
+  return (
+    <Card padding="lg" variant="report">
+      <div className="mx-auto flex max-w-xl flex-col items-center gap-5 text-center motion-safe:animate-[fadeIn_0.35s_ease-out]">
+        <span
+          aria-hidden
+          className="flex size-16 items-center justify-center rounded-full border border-[rgba(52,211,153,0.35)] bg-[rgba(52,211,153,0.12)] text-4xl text-[var(--bm-success-soft)]"
+        >
+          ✓
+        </span>
+        <div>
+          <h2>Thanh toán thành công</h2>
+          <p className="mt-3 text-[var(--bm-text-soft)]">
+            Quyền truy cập báo cáo của <strong className="text-[var(--bm-text-main)]">{displayName}</strong>{" "}
+            đã được kích hoạt.
+          </p>
+        </div>
+        <div className="w-full rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-4 text-left">
+          {orderId ? (
+            <p className="text-sm text-[var(--bm-text-soft)]">
+              Mã đơn hàng: <code className="font-mono text-[var(--bm-text-main)]">{orderId}</code>
+            </p>
+          ) : null}
+          {voucherCode ? (
+            <p className="mt-2 text-sm text-[var(--bm-success-soft)]">Voucher đã dùng: {voucherCode}</p>
+          ) : null}
+          {typeof amount === "number" ? (
+            <p className="mt-2 text-lg font-bold text-[var(--bm-text-main)]">
+              {formatPriceVnd(amount)}
+            </p>
+          ) : null}
+        </div>
+        <div className="grid w-full gap-3 sm:grid-cols-2">
+          <Button href={reportHref} fullWidth variant="primary">
+            Xem báo cáo đầy đủ
+          </Button>
+          <Button href="/account" fullWidth variant="secondary">
+            Vào tài khoản
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+export function PaymentSuccess({ module }: PaymentSuccessProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("orderId");
+  const freeUnlock = searchParams.get("freeUnlock") === "true";
+  const voucherCode = searchParams.get("voucherCode");
+  const [result, setResult] = useState<CheckResponse | null>(null);
+  const [timedOut, setTimedOut] = useState(false);
+  const [error, setError] = useState(false);
+  const pollCount = useRef(0);
+
+  useEffect(() => {
+    if (freeUnlock) return;
+    if (!orderId) {
+      setError(true);
+      return;
+    }
+
+    const poll = async () => {
+      try {
+        const data = await fetchWithAuth<CheckResponse>(
+          `/api/payment/check?orderId=${encodeURIComponent(orderId)}`,
+        );
+        if (["confirmed", "failed", "expired"].includes(data.status)) {
+          setResult(data);
+          return;
+        }
+        pollCount.current += 1;
+        if (pollCount.current >= MAX_POLLS) {
+          setTimedOut(true);
+          return;
+        }
+        setTimeout(() => void poll(), POLL_INTERVAL_MS);
+      } catch {
+        setError(true);
+      }
+    };
+
+    setTimeout(() => void poll(), POLL_INTERVAL_MS);
+  }, [freeUnlock, orderId]);
+
+  const retryUrl = buildModulePath(module, "/payment");
+  const moduleName = moduleToSlug(module);
+
+  return (
+    <PageShell title="Thanh toán" showBack={false} containerWidth="narrow">
+      {freeUnlock ? (
+        <SuccessPanel module={module} orderId={orderId} amount={0} voucherCode={voucherCode} />
+      ) : null}
+      {!freeUnlock && !result && !timedOut && !error ? (
+        <LoadingState message="Đang xác nhận thanh toán..." />
+      ) : null}
+      {timedOut ? (
+        <ErrorState
+          description="Hệ thống đang xác nhận thanh toán. Vui lòng kiểm tra lại trong tài khoản sau ít phút."
+          onRetry={() => router.push("/account")}
+          retryLabel="Vào tài khoản"
+          title="Đang chờ xác nhận"
+        />
+      ) : null}
+      {error ? (
+        <ErrorState
+          code="PAYMENT_FAILED"
+          onRetry={() => router.push(retryUrl)}
+          retryLabel="Thử thanh toán lại"
+          title="Không thể kiểm tra thanh toán"
+        />
+      ) : null}
+      {result?.status === "confirmed" ? (
+        <SuccessPanel module={module} orderId={result.orderId} amount={result.amount} />
+      ) : null}
+      {result?.status === "failed" || result?.status === "expired" ? (
+        <ErrorState
+          code="PAYMENT_FAILED"
+          description={`Giao dịch cho ${moduleName} chưa hoàn tất hoặc đã hết hạn.`}
+          onRetry={() => router.push(retryUrl)}
+          retryLabel="Tạo đơn mới"
+          title="Thanh toán chưa hoàn tất"
+        />
+      ) : null}
+    </PageShell>
+  );
+}
