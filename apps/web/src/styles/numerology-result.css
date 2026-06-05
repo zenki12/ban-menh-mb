@@ -1,0 +1,144 @@
+/* === RESULT FREE PREVIEW === */
+
+.bm-result-overview {
+  @apply mb-8 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+}
+
+.bm-result-overview h2 {
+  @apply mb-3 text-base font-bold tracking-wide text-[var(--bm-gold-bright)];
+}
+
+.bm-result-overview p {
+  @apply text-[0.95rem] leading-relaxed text-[var(--bm-text-soft)];
+}
+
+/* === CTA CARD === */
+
+.bm-cta-card {
+  @apply my-10;
+}
+
+.bm-cta-card h2 {
+  @apply mb-2 text-center text-xl font-bold text-[var(--bm-text-main)];
+}
+
+.bm-cta-card h3 {
+  @apply mb-3 mt-5 text-base font-semibold text-[var(--bm-gold-bright)];
+}
+
+.bm-cta-card ul {
+  @apply space-y-2 text-[var(--bm-text-soft)];
+}
+
+.bm-cta-divider {
+  @apply my-5 border-t border-[var(--bm-border-subtle)];
+}
+
+.bm-cta-price-block {
+  @apply mb-4 text-center;
+}
+
+.bm-cta-price {
+  @apply text-3xl font-bold text-[var(--bm-gold-bright)];
+}
+
+.bm-cta-anchor {
+  @apply mt-1 text-sm italic text-[var(--bm-text-muted)];
+}
+
+.bm-cta-disclaimer {
+  @apply mt-3 text-center text-xs text-[var(--bm-text-muted)];
+}
+
+/* === FAQ === */
+
+.bm-faq {
+  @apply my-10;
+}
+
+.bm-faq h2 {
+  @apply mb-5 text-xl font-bold text-[var(--bm-text-main)];
+}
+
+.bm-faq-item {
+  @apply border-b border-[var(--bm-border-subtle)];
+}
+
+.bm-faq-q {
+  @apply flex w-full items-center justify-between gap-3 px-2 py-4 text-left font-medium text-[var(--bm-text-main)] transition-colors hover:text-[var(--bm-gold-bright)];
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.bm-faq-chevron {
+  @apply text-sm transition-transform duration-200;
+}
+
+.bm-faq-chevron.open {
+  @apply rotate-180;
+}
+
+.bm-faq-a {
+  @apply px-2 pb-4 leading-relaxed text-[var(--bm-text-soft)];
+}
+
+/* === LOCKED COUNT === */
+
+.bm-locked-section {
+  @apply mt-10;
+}
+
+.bm-locked-heading {
+  @apply mb-3 text-lg font-bold text-[var(--bm-text-main)];
+}
+
+.bm-locked-disclaimer {
+  @apply mb-5 rounded-lg border-l-4 border-[var(--bm-primary-soft)] bg-[var(--bm-bg-glass)] px-4 py-3 text-sm leading-relaxed text-[var(--bm-text-soft)];
+}
+
+.bm-locked-disclaimer ul {
+  @apply mt-2 space-y-1 pl-4;
+}
+
+/* === STICKY CTA === */
+
+.bm-sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(12, 8, 22, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--bm-border-subtle);
+  padding: 0.75rem 1rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.bm-sticky-cta.visible {
+  transform: translateY(0);
+}
+
+.bm-sticky-cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 600px;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+.bm-sticky-cta-price {
+  font-weight: 700;
+  color: var(--bm-gold-bright);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .bm-sticky-cta {
+    display: none;
+  }
+}

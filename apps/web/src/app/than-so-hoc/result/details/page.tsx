@@ -189,7 +189,7 @@ function ResultDetailsContent() {
           </p>
         </div>
       </PageShell>
-      {unlocked ? null : <StickyBottomCTA ctaLabel="Mở khóa →" onClick={openPayment} price={PRICE} />}
+      {unlocked ? null : <StickyBottomCTA onUnlock={openPayment} />}
     </>
   );
 }

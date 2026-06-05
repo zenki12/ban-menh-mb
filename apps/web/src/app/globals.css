@@ -2,6 +2,7 @@
 @import "../styles/tokens.css";
 @import "../styles/numerology-narrative.css";
 @import "../styles/numerology-grid-analysis.css";
+@import "../styles/numerology-result.css";
 
 * {
   box-sizing: border-box;

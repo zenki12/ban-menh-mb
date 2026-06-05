@@ -1,20 +1,32 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Button } from "../../ui";
 
-type StickyBottomCTAProps = {
-  price: string;
-  ctaLabel: string;
-  onClick: () => void;
+type Props = {
+  onUnlock: () => void;
 };
 
-export function StickyBottomCTA({ price, ctaLabel, onClick }: StickyBottomCTAProps) {
+export function StickyBottomCTA({ onUnlock }: Props) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)]/95 p-4 backdrop-blur md:hidden">
-      <div className="mx-auto flex max-w-md items-center justify-between gap-4">
-        <p className="bg-[image:var(--bm-gradient-gold-text)] bg-clip-text text-xl font-bold text-transparent">
-          {price}
-        </p>
-        <Button size="md" onClick={onClick}>
-          {ctaLabel}
+    <div
+      className={`bm-sticky-cta ${visible ? "visible" : ""}`}
+      role="region"
+      aria-label="Mở khóa báo cáo"
+    >
+      <div className="bm-sticky-cta-inner">
+        <div className="bm-sticky-cta-price">99.000đ</div>
+        <Button variant="primary" onClick={onUnlock}>
+          Mở khóa toàn bộ →
         </Button>
       </div>
     </div>
