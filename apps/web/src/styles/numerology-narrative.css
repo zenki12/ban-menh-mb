@@ -1,586 +1,487 @@
-.nar {
+﻿.nar {
   @apply mb-4 text-base leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .lp-section-title {
   @apply mb-3 mt-6 text-lg font-bold text-[var(--bm-gold-bright)];
 }
-
 .lp-traits,
 .lp-strengths,
 .lp-weaknesses {
   @apply list-disc space-y-2 pl-5;
 }
-
 .lp-traits strong,
 .lp-strengths strong,
 .lp-weaknesses strong {
   @apply text-[var(--bm-text-main)];
 }
-
 .nar-container {
   @apply text-base leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .nar-container .nar {
   @apply mb-4;
 }
-
 .nar-container .lp-section-title {
   @apply mb-4 mt-8 text-lg font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .nar-container .lp-strengths li,
 .nar-container .lp-weaknesses li {
   @apply mb-3 leading-relaxed;
 }
-
 .nar-container strong {
-  @apply text-[var(--bm-text-main)];
+  @apply font-extrabold text-[var(--bm-gold-bright)];
 }
-
 .nar-container em {
   @apply font-medium not-italic text-[var(--bm-primary-soft)];
 }
-
 .section-header {
   @apply rounded-lg border border-[var(--bm-border-gold)] bg-[var(--bm-bg-glass)] px-5 py-4 text-lg font-bold uppercase tracking-[0.18em] text-[var(--bm-gold-bright)];
 }
-
 .index-title {
   @apply flex flex-wrap items-center justify-between gap-3 text-xl font-bold text-[var(--bm-text-main)];
 }
-
 .index-title .number {
   background-image: var(--bm-gradient-purple-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-
 .num-badge {
   @apply rounded-full border border-[var(--bm-border-gold)] px-3 py-1 text-sm font-bold text-[var(--bm-gold-bright)];
 }
-
 .synthetic-text {
   @apply mb-4 text-base leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .insight-box {
-  @apply rounded-lg border border-[var(--bm-border-purple)] bg-[var(--bm-bg-glass)] p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
+  @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
+  background: transparent;
+  border-radius: 0;
 }
-
 .insight-box strong {
   @apply text-[var(--bm-text-main)];
 }
-
 .profile-card {
   @apply mb-6 grid gap-5 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5 md:grid-cols-[auto_1fr];
 }
-
 .profile-avatar {
   @apply flex size-28 flex-col items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[image:var(--bm-gradient-gold-text)] text-[var(--bm-bg-void)] shadow-[var(--bm-shadow-gold)];
 }
-
 .avatar-number {
   @apply text-4xl font-bold leading-none;
 }
-
 .avatar-label {
   @apply mt-1 text-xs font-bold uppercase;
 }
-
 .profile-name {
   @apply text-2xl font-bold text-[var(--bm-text-main)];
 }
-
 .profile-dob {
   @apply mt-1 text-sm text-[var(--bm-text-soft)];
 }
-
 .profile-nums {
   @apply mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3;
 }
-
 .pn-item {
   @apply flex items-center justify-between gap-3 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] px-3 py-2;
 }
-
 .pn-label {
   @apply text-xs text-[var(--bm-text-soft)];
 }
-
 .pn-val {
   @apply font-bold text-[var(--bm-gold-bright)];
 }
-
 .phase-divider {
   @apply rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] px-5 py-4 text-center uppercase tracking-[0.18em] shadow-[var(--bm-shadow-gold)];
 }
-
 .phase-divider span {
   @apply mr-2 text-sm font-bold text-[var(--bm-gold-bright)];
 }
-
 .phase-divider strong {
   @apply text-sm font-bold text-[var(--bm-text-main)] md:text-base;
 }
-
 .v1-section-header {
   @apply flex flex-wrap items-center gap-3 border-b border-[var(--bm-border-subtle)] pb-4;
 }
-
-.v1-section-header span {
+.v1-section-number {
   @apply flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--bm-primary)] text-base font-bold text-white;
 }
-
 .v1-section-header h3 {
   @apply text-lg font-bold uppercase tracking-[0.08em] text-[var(--bm-text-main)] md:text-xl;
 }
-
+.v1-section-title-badge {
+  @apply inline-flex min-w-10 items-center justify-center rounded-md bg-[rgba(139,92,246,0.16)] px-3 py-2 text-base font-bold text-[var(--bm-primary-soft)];
+}
 .v1-report-section {
   @apply border-[var(--bm-border-subtle)];
   opacity: 1;
   visibility: visible;
 }
-
 .profile-card-v1 {
   @apply grid gap-6 md:grid-cols-[auto_1fr];
 }
-
 .profile-avatar-v1 {
   @apply flex size-32 flex-col items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[image:var(--bm-gradient-gold-text)] text-[var(--bm-bg-void)] shadow-[var(--bm-shadow-gold)];
 }
-
 .profile-avatar-v1 span {
   @apply text-5xl font-bold leading-none;
 }
-
 .profile-avatar-v1 small {
   @apply mt-1 text-xs font-bold uppercase tracking-wider;
 }
-
 .career-grid,
 .lc-advice-grid {
   @apply my-5 grid gap-4 md:grid-cols-2;
 }
-
 .career-cards-grid {
   @apply my-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3;
 }
-
 .career-card {
-  @apply rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+  @apply pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .career-card-label {
   @apply mb-2 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .career-card-text {
   @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .career-item,
 .lc-advice-item {
-  @apply rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
+  @apply pt-2 text-sm leading-relaxed text-[var(--bm-text-soft)];
+  background: transparent;
+  border-radius: 0;
 }
-
 .career-lbl,
 .lc-advice-label {
   @apply mb-2 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .lc-advice-text {
   @apply text-[var(--bm-text-soft)];
 }
-
 .year-card-deep,
 .cycle-block,
 .pyramid-period {
-  @apply my-6 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-5;
+  @apply my-8 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .lp-extra-section {
-  @apply mt-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+  @apply mt-8 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .lp-extra-heading {
-  @apply -mx-5 -mt-5 mb-4 rounded-t-xl border-b border-[var(--bm-border-subtle)] bg-[rgba(37,99,235,0.18)] px-5 py-3 text-base font-bold uppercase tracking-wider text-[var(--bm-text-main)];
+  @apply mb-4 text-base font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
+  background: transparent;
+  border: 0;
 }
-
 .lp-extra-body {
   @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .lp-extra-body ul {
   @apply list-disc space-y-3 pl-5;
 }
-
 .lp-extra-body strong {
   @apply text-[var(--bm-text-main)];
 }
-
 .lp-famous-grid {
   @apply grid gap-3 sm:grid-cols-2 lg:grid-cols-3;
 }
-
 .lp-famous-card {
-  @apply rounded-lg border border-[var(--bm-border-subtle)] border-l-[3px] border-l-[var(--bm-gold-bright)] bg-[var(--bm-bg-panel)] p-4;
+  @apply pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .lp-famous-name {
   @apply mb-1 text-sm font-bold text-[var(--bm-gold-bright)];
 }
-
 .lp-famous-field {
   @apply mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--bm-primary-soft)];
 }
-
 .lp-famous-note {
   @apply text-sm italic leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .lp-compat-wrapper {
   @apply mb-5 grid gap-4 md:grid-cols-2;
 }
-
 .lp-compat-good,
 .lp-compat-bad {
-  @apply rounded-xl p-4;
+  @apply pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
-.lp-compat-good {
-  @apply border border-green-400/30 bg-green-500/10;
-}
-
-.lp-compat-bad {
-  @apply border border-red-400/30 bg-red-500/10;
-}
-
 .lp-compat-label {
   @apply mb-3 text-sm font-bold uppercase tracking-wider;
 }
-
 .lp-compat-good .lp-compat-label {
   @apply text-green-300;
 }
-
 .lp-compat-bad .lp-compat-label {
   @apply text-red-300;
 }
-
 .lp-compat-numbers {
   @apply mb-3 flex flex-wrap gap-2;
 }
-
 .lp-compat-num {
   @apply grid size-8 place-items-center rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] text-sm font-bold;
 }
-
 .lp-compat-good .lp-compat-num {
   @apply border-green-400/40 text-green-300;
 }
-
 .lp-compat-bad .lp-compat-num {
   @apply border-red-400/40 text-red-300;
 }
-
 .lp-compat-desc {
   @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .year-card-deep-head,
 .cycle-header {
-  @apply mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] px-4 py-3 text-sm;
+  @apply mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--bm-border-subtle)] pb-3 text-sm;
+  background: transparent;
+  border-radius: 0;
 }
-
 .year-card-deep-head strong,
 .cycle-header strong {
   @apply text-[var(--bm-gold-bright)];
 }
-
 .year-card-deep-head em,
 .cycle-header em {
   @apply text-[var(--bm-text-soft)];
 }
-
 .year-detail-block {
-  @apply my-6 rounded-xl border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.06)] p-5 shadow-[var(--bm-shadow-gold)];
+  @apply my-8 pt-2;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
-
 .year-detail-headline {
-  @apply mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.1)] px-4 py-3;
+  @apply mb-3 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--bm-border-subtle)] pb-3;
+  background: transparent;
+  border-radius: 0;
 }
-
 .year-detail-label {
   @apply text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .year-detail-subtitle {
   @apply mb-4 text-base font-medium italic text-[var(--bm-primary-soft)];
 }
-
 .year-domain-block,
 .py-domain,
 .aspect-block {
-  @apply my-4 rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-4;
+  @apply my-5 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .domain-title,
 .py-domain-title,
 .aspect-label {
   @apply mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .py-domain-summary,
 .aspect-subtitle {
   @apply mb-3 text-sm font-medium italic text-[var(--bm-primary-soft)];
 }
-
 .py-domain-body,
 .aspect-paragraph {
   @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .py-year-block {
-  @apply my-6 rounded-xl border border-[var(--bm-border-gold)] bg-[var(--bm-bg-panel)] p-5 shadow-[var(--bm-shadow-gold)];
+  @apply my-8 pt-2;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
-
 .py-year-header {
-  @apply mb-5 grid gap-3 rounded-lg border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.1)] px-4 py-3 text-center sm:grid-cols-3;
+  @apply mb-5 grid gap-3 border-b border-[var(--bm-border-subtle)] pb-3 text-left sm:grid-cols-3;
+  background: transparent;
+  border-radius: 0;
 }
-
 .py-year-label,
 .py-year-badge {
   @apply text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .py-year-age {
   @apply text-sm font-medium text-[var(--bm-text-soft)];
 }
-
 .cycle-circles-row {
   @apply my-6 grid gap-4 md:grid-cols-3;
 }
-
 .cycle-circle {
   @apply flex aspect-square flex-col items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] p-5 text-center shadow-[var(--bm-shadow-gold)];
 }
-
 .cycle-circle span {
   @apply text-5xl font-bold text-gradient-purple;
 }
-
 .cycle-circle strong {
   @apply mt-2 text-xs uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .cycle-circle em {
   @apply mt-1 text-xs text-[var(--bm-text-soft)];
 }
-
 .lc-circle-row {
   @apply my-6 grid gap-4 sm:grid-cols-3;
 }
-
 .lc-circle-item {
   @apply min-w-0;
 }
-
 .lc-circle {
-  @apply rounded-2xl border-2 border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5 text-center shadow-[var(--bm-shadow-purple)];
+  @apply rounded-2xl border-2 border-[var(--bm-border-subtle)] p-5 text-center;
+  background: transparent;
+  box-shadow: none;
   border-color: var(--lc-phase-color, var(--bm-border-purple));
 }
-
 .lc-stage-icon {
   @apply mb-2 text-3xl;
 }
-
 .lc-number,
 .lc-circle-num {
   @apply mb-2 text-5xl font-extrabold leading-none text-[var(--bm-gold-bright)];
 }
-
 .lc-stage-name {
   @apply mb-2 text-xs font-bold uppercase tracking-wider text-[var(--bm-text-main)];
 }
-
 .lc-age-range {
   @apply text-sm font-semibold text-[var(--bm-text-soft)];
 }
-
 .lc-year-range {
   @apply mt-1 text-xs italic text-[var(--bm-text-muted)];
 }
-
 .lc-intro-box {
-  @apply mb-6 rounded-lg border-l-[3px] border-l-[var(--bm-primary-soft)] bg-[var(--bm-bg-panel)] p-5;
+  @apply mb-8 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .lc-intro-text {
   @apply mb-3 text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .lc-intro-text:last-child {
   @apply mb-0;
 }
-
 .lc-intro-text strong {
   @apply text-[var(--bm-text-main)];
 }
-
 .lc-phase-block {
-  @apply mb-6 rounded-xl border border-[var(--bm-border-subtle)] border-l-4 bg-[var(--bm-bg-glass)] p-5;
-  border-left-color: var(--lc-phase-color, var(--bm-primary-soft));
+  @apply mb-8 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .lc-phase-header {
   @apply mb-4;
 }
-
 .lc-phase-title {
   @apply text-lg font-bold;
   color: var(--lc-phase-color, var(--bm-text-main));
 }
-
 .lc-phase-sub {
   @apply mt-1 text-sm italic text-[var(--bm-text-soft)];
 }
-
 .lc-phase-body {
   @apply text-[var(--bm-text-soft)];
 }
-
 .lc-phase-intro {
-  @apply mb-4 rounded-lg border-l-2 border-l-[var(--bm-primary-soft)] bg-[rgba(124,58,237,0.08)] p-4 text-sm italic leading-relaxed text-[var(--bm-text-soft)];
+  @apply mb-5 pt-2 text-sm italic leading-relaxed text-[var(--bm-text-soft)];
+  background: transparent;
+  border-radius: 0;
 }
-
 .lc-advice-box {
-  @apply mt-5 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] p-5;
+  @apply mt-8 border-t border-[var(--bm-border-subtle)] pt-5;
+  background: transparent;
+  border-radius: 0;
 }
-
 .lc-advice-title {
   @apply mb-4 text-sm font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .lc-advice-icon {
   @apply mb-2 text-2xl;
 }
-
 .lc-advice-content {
   @apply min-w-0;
 }
-
 .lc-advice-avoid {
-  @apply mt-4 rounded-lg border border-red-400/30 bg-red-500/10 p-4 text-sm leading-relaxed text-[var(--bm-text-soft)];
+  @apply mt-5 pt-2 text-sm leading-relaxed text-[var(--bm-text-soft)];
+  background: transparent;
+  border-radius: 0;
 }
-
 .lc-avoid-label {
   @apply font-bold text-red-300;
 }
-
 .pyramid-period-heading {
   @apply mb-4 border-b border-[var(--bm-border-subtle)] pb-3 text-lg font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .pyramid-period {
-  @apply mb-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+  @apply mb-8 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .pyramid-periods-wrap { @apply mt-6; }
-
 .pyramid-sub-heading {
   @apply my-4 text-base font-bold text-[var(--bm-text-main)];
 }
-
 .pyramid-sub-heading.challenge { @apply text-red-300; }
-
 .pyramid-note { @apply font-semibold text-[var(--bm-gold-bright)]; }
-
 .pyramid-advice { @apply font-semibold text-[var(--bm-primary-soft)]; }
-
 .pyramid-keywords { @apply text-sm italic text-[var(--bm-text-soft)]; }
-
 .pyramid-analysis-heading {
   @apply my-8 text-lg font-bold uppercase tracking-wider text-[var(--bm-gold-bright)];
 }
-
 .peak-analysis-block {
-  @apply mb-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-5;
+  @apply mb-8 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .peak-analysis-header {
   @apply mb-4 flex items-center gap-4;
 }
-
 .peak-analysis-num {
   @apply grid size-10 shrink-0 place-items-center rounded-full bg-[var(--bm-gold-bright)] text-lg font-extrabold text-[var(--bm-bg-void)];
 }
-
 .peak-analysis-kicker { @apply mb-1 text-xs font-bold uppercase tracking-wider text-[var(--bm-text-muted)]; }
-
 .peak-analysis-title { @apply text-base font-bold text-[var(--bm-text-main)]; }
-
 .peak-analysis-age { @apply mt-1 text-sm italic text-[var(--bm-text-soft)]; }
-
 .peak-aspect-grid {
   @apply my-5 grid gap-4 sm:grid-cols-2;
 }
-
 .peak-aspect-box {
-  @apply rounded-lg border-l-[3px] p-4;
+  @apply pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
-.peak-aspect-box.career { @apply border-l-yellow-400 bg-yellow-500/10; }
-
-.peak-aspect-box.opportunity { @apply border-l-green-400 bg-green-500/10; }
-
-.peak-aspect-box.love { @apply border-l-pink-400 bg-pink-500/10; }
-
-.peak-aspect-box.health { @apply border-l-orange-400 bg-orange-500/10; }
-
 .peak-aspect-label {
   @apply mb-2 text-xs font-bold uppercase tracking-wider text-[var(--bm-text-main)];
 }
-
 .peak-aspect-text {
   @apply m-0 text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .peak-negatives {
-  @apply my-4 rounded-lg border border-red-400/30 bg-red-500/10 p-4;
+  @apply my-5 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-
 .peak-negatives-label {
   @apply mb-2 text-xs font-bold uppercase tracking-wider text-red-300;
 }
-
 .peak-negatives ul {
   @apply list-disc space-y-2 pl-5;
 }
-
 .peak-negatives li {
   @apply text-sm leading-relaxed text-[var(--bm-text-soft)];
 }
-
 .peak-negatives strong { @apply text-[var(--bm-text-main)]; }
-
 .peak-reflection {
-  @apply mt-4 rounded-lg border-l-[3px] border-l-[var(--bm-primary-soft)] bg-[rgba(124,58,237,0.08)] p-4 italic text-[var(--bm-text-soft)];
+  @apply mt-5 pt-2 italic text-[var(--bm-text-soft)];
+  background: transparent;
+  border-radius: 0;
 }
-
 .peak-reflection-label {
   @apply mb-2 text-xs font-bold uppercase tracking-wider text-[var(--bm-primary-soft)];
 }
-
 .peak-reflection p {
   @apply m-0 text-sm leading-relaxed;
 }
-
 .karmic-debt-box,
 .cross-context-box {
-  @apply mt-4 rounded-lg border border-[var(--bm-border-purple)] bg-[rgba(124,58,237,0.1)] p-4;
+  @apply mt-5 pt-2;
+  background: transparent;
+  border-radius: 0;
 }
-/* Section 8 summary card */ .personal-year-card { display: flex; align-items: center; gap: 1rem; background: var(--bm-bg-glass); border: 1px solid var(--bm-border-gold); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1rem; } .py-icon { font-size: 2rem; } .py-content { flex: 1; } .py-title { font-weight: 700; color: var(--bm-text-main); font-size: 1.05rem; } .py-num-badge { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--bm-gold-bright); color: var(--bm-bg-void); font-weight: 800; font-size: 1.125rem; margin: 0.25rem 0; } .py-theme { color: var(--bm-text-soft); font-style: italic; font-size: 0.95rem; } /* Nên làm / Tránh grid */ .dos-donts-grid { display: grid; gap: 0.875rem; grid-template-columns: 1fr; margin: 1rem 0; } @media (min-width: 640px) { .dos-donts-grid { grid-template-columns: 1fr 1fr; } } .dos-block { background: rgba(34, 197, 94, 0.08); border-left: 3px solid #22c55e; padding: 0.875rem 1rem; border-radius: 0.5rem; color: var(--bm-text-soft); line-height: 1.6; } .dos-block strong { color: #4ade80; } .donts-block { background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; padding: 0.875rem 1rem; border-radius: 0.5rem; color: var(--bm-text-soft); line-height: 1.6; } .donts-block strong { color: #f87171; } /* Section 8.1 year cards grid */ .year-cards-grid { display: grid; gap: 0.875rem; grid-template-columns: 1fr; margin: 1.25rem 0; } @media (min-width: 640px) { .year-cards-grid { grid-template-columns: repeat(3, 1fr); } } .year-card-tab { background: var(--bm-bg-glass); border: 1px solid var(--bm-border-subtle); border-radius: 0.75rem; padding: 1rem 0.75rem; text-align: center; } .year-card-label { color: var(--bm-text-soft); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; } .year-card-num { font-size: 2rem; font-weight: 800; color: var(--bm-gold-bright); line-height: 1; margin-bottom: 0.5rem; } .year-card-age { color: var(--bm-text-muted); font-size: 0.85rem; font-style: italic; } /* Year block detail */ .py-year-block { background: var(--bm-bg-glass); border: 1px solid var(--bm-border-subtle); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; } .py-year-heading { font-weight: 700; font-size: 1.05rem; color: var(--bm-gold-bright); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--bm-border-subtle); } .py-year-intro { display: flex; gap: 1rem; margin-bottom: 1rem; } .year-detail-block { flex: 1; } .year-detail-headline { background: rgba(247, 201, 72, 0.08); border-left: 3px solid var(--bm-gold-bright); padding: 0.5rem 0.875rem; border-radius: 0.375rem; margin-bottom: 0.5rem; } .year-detail-label { font-weight: 700; color: var(--bm-gold-bright); font-size: 0.9rem; } .year-detail-subtitle { font-style: italic; color: var(--bm-text-soft); font-size: 0.9rem; margin-bottom: 0.5rem; } /* Year domain blocks (5 aspects) */ .year-domain-block { background: var(--bm-bg-panel); border-left: 3px solid var(--bm-primary-soft); border-radius: 0.5rem; padding: 0.875rem 1.125rem; margin-bottom: 0.875rem; } .year-domain-block .domain-title { font-weight: 700; color: var(--bm-text-main); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; } .year-domain-block p.nar { color: var(--bm-text-soft); line-height: 1.7; }
-/* Section 9.1 month detail */ .month-detail-block { background: var(--bm-bg-glass); border: 1px solid var(--bm-border-subtle); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; } .month-detail-headline { font-weight: 700; font-size: 1rem; color: var(--bm-gold-bright); text-transform: uppercase; letter-spacing: 0.08em; padding: 0.5rem 0.875rem; background: rgba(247, 201, 72, 0.08); border-left: 3px solid var(--bm-gold-bright); border-radius: 0.375rem; margin-bottom: 1rem; }
+/* Section 8/9 compact narrative primitives */ .personal-year-card{display:flex;align-items:center;gap:1rem;background:transparent;border-radius:0;padding:.25rem 0;margin-bottom:1rem}.py-icon{font-size:2rem}.py-content{flex:1}.py-title{font-weight:700;color:var(--bm-text-main);font-size:1.05rem}.py-num-badge{display:inline-grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:50%;background:var(--bm-gold-bright);color:var(--bm-bg-void);font-weight:800;font-size:1.125rem;margin:.25rem 0}.py-theme{color:var(--bm-text-soft);font-style:italic;font-size:.95rem}.dos-donts-grid{display:grid;gap:1.25rem;grid-template-columns:1fr;margin:1rem 0}@media (min-width:640px){.dos-donts-grid{grid-template-columns:1fr 1fr}}.dos-block,.donts-block{background:transparent;border-radius:0;padding:.25rem 0;color:var(--bm-text-soft);line-height:1.6}.dos-block strong{color:#4ade80}.donts-block strong{color:#f87171}.year-cards-grid{display:grid;gap:1.25rem;grid-template-columns:1fr;margin:1.25rem 0}@media (min-width:640px){.year-cards-grid{grid-template-columns:repeat(3,1fr)}}.year-card-tab{background:transparent;border-radius:0;padding:.25rem 0;text-align:left}.year-card-label{color:var(--bm-text-soft);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}.year-card-num{font-size:2rem;font-weight:800;color:var(--bm-gold-bright);line-height:1;margin-bottom:.5rem}.year-card-age{color:var(--bm-text-muted);font-size:.85rem;font-style:italic}.py-year-block,.month-detail-block{background:transparent;border-radius:0;padding:.25rem 0;margin-bottom:1.5rem}.py-year-heading{font-weight:700;font-size:1.05rem;color:var(--bm-gold-bright);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--bm-border-subtle)}.py-year-intro{display:flex;gap:1rem;margin-bottom:1rem}.year-detail-block{flex:1}.year-detail-headline,.month-detail-headline{background:transparent;padding:.25rem 0;border-radius:0;margin-bottom:.5rem}.year-detail-label,.month-detail-headline{font-weight:700;color:var(--bm-gold-bright);font-size:.9rem;text-transform:uppercase;letter-spacing:.08em}.year-detail-subtitle{font-style:italic;color:var(--bm-text-soft);font-size:.9rem;margin-bottom:.5rem}.year-domain-block{background:transparent;border-radius:0;padding:.25rem 0;margin-bottom:.875rem}.year-domain-block .domain-title{font-weight:700;color:var(--bm-text-main);font-size:.95rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}.year-domain-block p.nar{color:var(--bm-text-soft);line-height:1.7}

@@ -43,6 +43,7 @@ export function SummaryDashboard({
   unlocked,
   onUnlock,
 }: SummaryDashboardProps) {
+  const lifePathNumber = report.lifePath.displayNumber ?? report.lifePath.number;
   const searchParams = useSearchParams();
   const detailUrl = detailsHref(searchParams);
   const currentYear = report.personalYear.year;
@@ -79,7 +80,7 @@ export function SummaryDashboard({
             <div className="text-center">
               <div className="text-xs font-semibold text-white/58 sm:text-sm">SỐ CHỦ ĐẠO</div>
               <div className="mt-2 text-7xl font-black leading-none text-[#f7c948] sm:text-8xl">
-                {report.lifePath.number}
+                {lifePathNumber}
               </div>
             </div>
           </div>

@@ -305,18 +305,18 @@ export function buildPyramidSection(report: NumerologyReport, name: string, narr
     const { start, end, isOpen } = parsePyramidPeriodAge(periodStr);
     const labels = ["Một", "Hai", "Ba", "Bốn"];
     const lb = labels[idx] || String(idx + 1);
-    if (start === null) return `7.${idx + 1}. Giai đoạn ${lb}`;
+    if (start === null) return `6.${idx + 1}. Giai đoạn ${lb}`;
     const sy = birthYear + start;
-    if (isOpen) return `7.${idx + 1}. GIAI ĐOẠN ${lb.toUpperCase()} — KỂ TỪ TUỔI ${start} (${sy}) TRỞ ĐI`;
+    if (isOpen) return `6.${idx + 1}. GIAI ĐOẠN ${lb.toUpperCase()} — KỂ TỪ TUỔI ${start} (${sy}) TRỞ ĐI`;
     const ey = birthYear + (end ?? start);
-    return `7.${idx + 1}. GIAI ĐOẠN ${lb.toUpperCase()} TỪ ĐẦU TUỔI ${start} (${sy}) TỚI HẾT TUỔI ${end} (${ey})`;
+    return `6.${idx + 1}. GIAI ĐOẠN ${lb.toUpperCase()} TỪ ĐẦU TUỔI ${start} (${sy}) TỚI HẾT TUỔI ${end} (${ey})`;
   };
 
   const renderPeak = (peak: PeriodIndicatorResult, idx: number): string => {
     const data = asRecord(peak.data);
     const period = peak.period || "";
     const n = peak.number % 9 || 9;
-    let html = `<h4 class="pyramid-sub-heading">7.${idx + 1}.1. Đỉnh cao của bạn trong giai đoạn này là số ${peak.number}</h4>`;
+    let html = `<h4 class="pyramid-sub-heading">6.${idx + 1}.1. Đỉnh cao của bạn trong giai đoạn này là số ${peak.number}</h4>`;
     const narrativeHtml = renderPyramidNarrative(narrative, "pyramidPeak", n, {
       name,
       period,
@@ -343,7 +343,7 @@ export function buildPyramidSection(report: NumerologyReport, name: string, narr
     const data = asRecord(challenge?.data);
     const num = challenge?.number ?? "?";
     const period = challenge?.period || peaks[idx]?.period || "";
-    let html = `<h4 class="pyramid-sub-heading challenge">7.${idx + 1}.2. Thử thách của bạn trong giai đoạn này là số ${num}</h4>`;
+    let html = `<h4 class="pyramid-sub-heading challenge">6.${idx + 1}.2. Thử thách của bạn trong giai đoạn này là số ${num}</h4>`;
     const narrativeHtml = renderPyramidNarrative(narrative, "pyramidChallenge", num, { name, period });
     if (narrativeHtml) {
       html += narrativeHtml;

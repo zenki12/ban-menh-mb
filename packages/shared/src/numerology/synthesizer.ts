@@ -39,10 +39,20 @@ export type SectionBlock = {
   id: string;
   number: string;
   title: string;
+  titleBadge?: string;
+  quickIntro?: {
+    badge?: string;
+    headline: string;
+    summary: string;
+    tone?: "gold" | "purple" | "blue" | "red";
+  } | null;
   intro?: string;
   html: string;
   chartSlot?: "pyramid" | "birth-grid" | "combined-grid" | "career-bars";
 };
+
+type QuickIntro = NonNullable<SectionBlock["quickIntro"]>;
+type QuickIntroTone = NonNullable<QuickIntro["tone"]>;
 
 export type Phase = {
   letter: "A" | "B" | "C" | "D";
@@ -149,7 +159,7 @@ function section(
   number: string,
   title: string,
   html: string,
-  options: Pick<SectionBlock, "intro" | "chartSlot"> = {},
+  options: Pick<SectionBlock, "intro" | "chartSlot" | "quickIntro" | "titleBadge"> = {},
 ): SectionBlock {
   return {
     id: `section-${number.replace(/[^\dA-Za-z]+/g, "-").replace(/^-|-$/g, "")}`,
@@ -160,12 +170,268 @@ function section(
   };
 }
 
+function intro(
+  badge: string | undefined,
+  headline: string,
+  summary: string,
+  tone: QuickIntroTone = "gold",
+): QuickIntro {
+  return { badge, headline, summary, tone };
+}
+
+function dataTitle(indicator: IndicatorResult): string {
+  return readString(indicator.data, ["title", "theme", "name", "keywords"]);
+}
+
+function dataSummary(indicator: IndicatorResult, fallback: string): string {
+  return readString(indicator.data, ["description", "meaning", "summary", "lesson", "advice", "theme"]) || fallback;
+}
+
 function displayNumber(indicator: IndicatorResult): number {
   return indicator.displayNumber ?? indicator.number;
 }
 
+function lifePathDisplayNumber(report: NumerologyReport): number {
+  return displayNumber(report.lifePath);
+}
+
+function indicatorIntro(label: string, indicator: IndicatorResult, fallback: string): NonNullable<SectionBlock["quickIntro"]> {
+  const title = dataTitle(indicator);
+  const number = displayNumber(indicator);
+  return intro(
+    String(number),
+    `${label} của bạn là số ${number}${title ? ` — ${title}` : ""}.`,
+    dataSummary(indicator, fallback),
+  );
+}
+
+function withQuickIntros(phases: Phase[], report: NumerologyReport): Phase[] {
+  const missing = report.karmicLessons.missingNumbers.join(", ") || "không có số thiếu rõ rệt";
+  const firstPeak = report.pyramidPeaks[0]?.number;
+  const firstCycle = report.lifeCycles[0]?.number;
+
+  function build(item: SectionBlock): NonNullable<SectionBlock["quickIntro"]> | undefined {
+    switch (item.number) {
+      case "1":
+        return intro(
+          undefined,
+          "Tổng quan này gom các chỉ số cốt lõi trong bản đồ Thần số học của bạn.",
+          "Hãy xem đây như trang định vị nhanh trước khi đi vào từng lớp luận giải chi tiết.",
+          "purple",
+        );
+      case "2":
+        return intro(
+          "3 năm",
+          "Ba năm gần nhất cho thấy luồng vận số đang mở ra trước mắt bạn.",
+          "Phần này giúp bạn nhìn nhanh chủ đề chính của từng năm để chọn nhịp hành động phù hợp.",
+          "blue",
+        );
+      case "3":
+        return intro(
+          undefined,
+          "Nhóm ngành nghề phù hợp được tổng hợp từ Đường đời, Sứ mệnh và Ngày sinh.",
+          "Đây là góc nhìn tham chiếu về môi trường làm việc, năng lực nổi bật và kiểu đóng góp dễ phát huy.",
+          "blue",
+        );
+      case "4":
+        return indicatorIntro(
+          "Chỉ số Đường Đời",
+          report.lifePath,
+          "Con số này gợi mở bài học lớn của cuộc đời, cách bạn trưởng thành và hướng phát triển tự nhiên nhất.",
+        );
+      case "5":
+        return intro(
+          firstCycle ? String(firstCycle) : undefined,
+          "Chu kỳ Đường Đời cho thấy ba giai đoạn phát triển chính của bạn.",
+          "Mỗi chu kỳ là một nhịp trưởng thành khác nhau: gieo hạt, chín muồi và thu hoạch kinh nghiệm sống.",
+          "purple",
+        );
+      case "6":
+        return intro(
+          firstPeak ? String(firstPeak) : undefined,
+          "Biểu đồ Kim Tự Tháp cho thấy các đỉnh cao và thử thách theo từng chặng tuổi.",
+          "Phần này giúp bạn quan sát chủ đề nổi bật của từng giai đoạn, không phải để đoán chắc tương lai.",
+          "blue",
+        );
+      case "7":
+        return indicatorIntro(
+          "Chỉ số Năm Cá Nhân",
+          report.personalYear,
+          "Con số này gợi mở chủ đề năng lượng chính của năm hiện tại và cách bạn nên ưu tiên nguồn lực.",
+        );
+      case "8":
+        return intro(
+          "3 năm",
+          "Chu kỳ vận số mở rộng giúp bạn đọc sâu hơn ba năm liên tiếp.",
+          "Thay vì nhìn từng năm rời rạc, phần này cho thấy nhịp chuyển động nối tiếp giữa hiện tại và tương lai gần.",
+          "blue",
+        );
+      case "9":
+        return indicatorIntro(
+          "Chỉ số Tháng Cá Nhân",
+          report.personalMonth,
+          "Con số này gợi mở sắc thái năng lượng của tháng hiện tại trong bối cảnh năm cá nhân.",
+        );
+      case "10":
+        return intro(
+          "3 tháng",
+          "Ba tháng cá nhân cho thấy nhịp vận hành ngắn hạn của bạn.",
+          "Phần này phù hợp để quan sát ưu tiên gần, điều chỉnh hành động và tránh đi ngược dòng năng lượng tháng.",
+          "blue",
+        );
+      case "11":
+        return indicatorIntro(
+          "Chỉ số Sứ Mệnh",
+          report.destiny,
+          "Con số này gợi mở cách bạn đóng góp, tạo giá trị và biểu hiện năng lực ra thế giới bên ngoài.",
+        );
+      case "12":
+        return intro(
+          `${lifePathDisplayNumber(report)} ↔ ${report.destiny.number}`,
+          "Tương quan Đường đời và Sứ mệnh cho thấy hướng sống và cách đóng góp gặp nhau ở đâu.",
+          "Khi hai năng lượng này hòa nhịp, bạn dễ hành động đúng với bản chất và mục tiêu dài hạn hơn.",
+          "purple",
+        );
+      case "13":
+        return indicatorIntro(
+          "Thử thách Sứ Mệnh",
+          report.destinyChallenge,
+          "Con số này gợi mở điểm cần rèn luyện để bạn thể hiện sứ mệnh một cách chín chắn hơn.",
+        );
+      case "14":
+        return indicatorIntro(
+          "Chỉ số Trưởng Thành",
+          report.maturity,
+          "Con số này gợi mở năng lượng sẽ rõ dần khi bạn bước vào giai đoạn chín muồi của cuộc đời.",
+        );
+      case "15":
+        return indicatorIntro(
+          "Năng lực giai đoạn Trưởng Thành",
+          report.maturityAbility,
+          "Con số này gợi mở năng lực có thể được khai mở mạnh hơn khi trải nghiệm sống đủ sâu.",
+        );
+      case "16":
+        return indicatorIntro(
+          "Chỉ số Linh Hồn",
+          report.soul,
+          "Con số này gợi mở điều bạn thật sự khao khát bên trong, kể cả khi chưa luôn thể hiện ra ngoài.",
+        );
+      case "17":
+        return intro(
+          `${lifePathDisplayNumber(report)} ↔ ${report.soul.number}`,
+          "Tương quan Đường đời và Linh hồn cho thấy hành trình bên ngoài có đồng điệu với khao khát bên trong hay không.",
+          "Đây là điểm soi chiếu quan trọng để bạn sống bớt xé ngang giữa trách nhiệm và nhu cầu nội tâm.",
+          "purple",
+        );
+      case "18":
+        return indicatorIntro(
+          "Thử thách Linh Hồn",
+          report.soulChallenge,
+          "Con số này gợi mở bài học nội tâm cần được chữa lành, chấp nhận hoặc rèn luyện.",
+        );
+      case "19":
+        return indicatorIntro(
+          "Chỉ số Nhân Cách",
+          report.personality,
+          "Con số này gợi mở cách người khác dễ cảm nhận về bạn trong tiếp xúc ban đầu.",
+        );
+      case "20":
+        return indicatorIntro(
+          "Thử thách Nhân Cách",
+          report.personalityChallenge,
+          "Con số này gợi mở điểm dễ gây hiểu lầm hoặc giới hạn trong cách bạn biểu hiện ra ngoài.",
+        );
+      case "21":
+        return intro(
+          missing,
+          `Các bài học nghiệp của bạn tập trung ở số ${missing}.`,
+          "Đây là những năng lượng còn thiếu hoặc cần được chủ động rèn luyện thông qua trải nghiệm sống.",
+          "red",
+        );
+      case "22":
+        return intro(
+          undefined,
+          "Nợ nghiệp cho thấy những bài học sâu cần được nhìn nhận bằng trách nhiệm và sự tỉnh thức.",
+          "Nếu xuất hiện, các số này không phải lời kết án, mà là lời nhắc về cách chuyển hóa thói quen và lựa chọn.",
+          "red",
+        );
+      case "23":
+        return intro(
+          undefined,
+          "Biểu đồ Ngày sinh cho thấy cách các con số bẩm sinh phân bố trong lưới Pythagoras.",
+          "Phần này giúp bạn quan sát điểm mạnh tự nhiên, khoảng trống và các trục năng lượng nổi bật.",
+          "blue",
+        );
+      case "24":
+        return intro(
+          undefined,
+          "Biểu đồ Tên và Biểu đồ Tổng hợp cho thấy năng lượng tên gọi bù đắp cho ngày sinh như thế nào.",
+          "Đây là góc nhìn về năng lượng được bổ sung, mũi tên sức mạnh và những điểm cần cân bằng.",
+          "blue",
+        );
+      case "25":
+        return indicatorIntro(
+          "Chỉ số Thái Độ",
+          report.attitude,
+          "Con số này gợi mở phản ứng tự nhiên của bạn trước môi trường, cơ hội và thử thách ban đầu.",
+        );
+      case "26":
+        return indicatorIntro(
+          "Chỉ số Ngày Sinh",
+          report.birthday,
+          "Con số này gợi mở món quà tự nhiên, tài năng bẩm sinh và cách bạn dễ tỏa sáng nhất.",
+        );
+      case "27":
+        return indicatorIntro(
+          "Chỉ số Vượt Khó",
+          report.tensionNumber,
+          "Con số này gợi mở kiểu áp lực nội tâm và cách bạn học vượt qua mâu thuẫn bên trong.",
+        );
+      case "28":
+        return indicatorIntro(
+          "Chỉ số Năng Lực Tư Duy",
+          report.cognitiveAbility,
+          "Con số này gợi mở cách bạn tiếp nhận, xử lý và kết nối thông tin khi ra quyết định.",
+        );
+      case "29":
+        return indicatorIntro(
+          "Chỉ số Động Lực Tiếp Cận",
+          report.approachMotivation,
+          "Con số này gợi mở động cơ khiến bạn chủ động bước vào một tình huống, con người hoặc cơ hội mới.",
+        );
+      case "30":
+        return indicatorIntro(
+          "Chỉ số Năng Lực Tiếp Cận",
+          report.approachAbility,
+          "Con số này gợi mở năng lực giúp bạn biến sự tiếp cận ban đầu thành kết nối hoặc hành động cụ thể.",
+        );
+      case "31":
+        return indicatorIntro(
+          "Chỉ số Thái Độ Tiếp Cận",
+          report.approachAttitude,
+          "Con số này gợi mở sắc thái thái độ bạn mang theo khi bắt đầu tương tác với người, việc hoặc mục tiêu mới.",
+        );
+      default:
+        return intro(
+          undefined,
+          `${item.title} là một lát cắt trong bản đồ Thần số học của bạn.`,
+          "Hãy dùng phần này như một gợi ý tham chiếu để quan sát bản thân rõ hơn.",
+          "purple",
+        );
+    }
+  }
+
+  return phases.map((phase) => ({
+    ...phase,
+    sections: phase.sections.map((item) => ({
+      ...item,
+      quickIntro: item.quickIntro === null ? undefined : (item.quickIntro ?? build(item)),
+    })),
+  }));
+}
+
 function buildProfileHeader(report: NumerologyReport): SynthesizedReport["profileHeader"] {
-  const lpNum = displayNumber(report.lifePath);
+  const lpNum = lifePathDisplayNumber(report);
   return {
     name: report.input.fullName,
     dob: report.input.dob,
@@ -184,7 +450,7 @@ function buildProfileHeader(report: NumerologyReport): SynthesizedReport["profil
 }
 
 function overviewHtml(report: NumerologyReport, name: string): string {
-  const lpNum = displayNumber(report.lifePath);
+  const lpNum = lifePathDisplayNumber(report);
   const chips = buildProfileHeader(report).chips8
     .map(
       (chip) =>
@@ -202,7 +468,7 @@ function careerCard(label: string, text: string): string {
 }
 
 function careerHtml(report: NumerologyReport, name: string): string {
-  const lpNum = displayNumber(report.lifePath);
+  const lpNum = lifePathDisplayNumber(report);
   const lpCareer = readString(report.lifePath.data, ["career", "career_fit", "mission"]);
   const destCareer = readString(report.destiny.data, ["career", "career_fit", "mission"]);
   const bdayCareer = readString(report.birthday.data, ["career_fit", "career", "mission"]);
@@ -230,10 +496,10 @@ function relationshipHtml(titleText: string, first: number, second: number, name
 }
 
 export function buildLifePathDestinyCorrelation(report: NumerologyReport, name: string): string {
-  const lpNum = report.lifePath.number;
+  const lpNum = lifePathDisplayNumber(report);
   const destNum = report.destiny.number;
-  const lp_dest_same = lpNum === destNum;
-  const reducedLp = lpNum % 9 || 9;
+  const lp_dest_same = report.lifePath.number === destNum;
+  const reducedLp = report.lifePath.number % 9 || 9;
   const reducedDest = destNum % 9 || 9;
   const lp_dest_harmony = ([1, 3, 5, 9].includes(reducedLp) && [1, 3, 5, 9].includes(reducedDest))
     || ([2, 4, 6, 8].includes(reducedLp) && [2, 4, 6, 8].includes(reducedDest));
@@ -251,9 +517,9 @@ export function buildLifePathDestinyCorrelation(report: NumerologyReport, name: 
 }
 
 function buildLifePathSoulCorrelation(report: NumerologyReport, name: string): string {
-  const lpNum = report.lifePath.number;
+  const lpNum = lifePathDisplayNumber(report);
   const soulNum = report.soul.number;
-  const lpSoulSame = lpNum === soulNum;
+  const lpSoulSame = report.lifePath.number === soulNum;
   const compat = lpSoulSame
     ? `hoàn toàn đồng nhất: mục tiêu, tham vọng và những mong muốn sâu bên trong bạn hòa hợp, đồng điệu với nhau, giúp bạn phát triển mạnh mẽ hơn`
     : `có những điểm giao thoa. Bề ngoài bạn thể hiện năng lượng đường đời ${lpNum}, nhưng sâu bên trong bạn đang khao khát những điều mà linh hồn số ${soulNum} hướng tới`;
@@ -295,7 +561,7 @@ function karmicDebtHtml(report: NumerologyReport, narrative: NarrativeKb, kb: Nu
 }
 
 function lifePathHtml(report: NumerologyReport, narrative: NarrativeKb, ctx: NarrativeContext, name: string): string {
-  const lpNum = displayNumber(report.lifePath);
+  const lpNum = lifePathDisplayNumber(report);
   const narrativeHtml =
     fromNarrative(narrative, "lifePath", lpNum, { name, number: lpNum }) ??
     (lpNum === 10 ? renderLifePathTenLiteral(name) : "");
@@ -317,7 +583,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
   const { report, narrative, kb } = input;
   const name = report.input.fullName;
   const ctx: NarrativeContext = {
-    lifePath: displayNumber(report.lifePath),
+    lifePath: lifePathDisplayNumber(report),
     soul: report.soul.number,
     destiny: report.destiny.number,
     personality: report.personality.number,
@@ -346,24 +612,31 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
       letter: "B",
       title: "PHÂN TÍCH ĐƯỜNG ĐỜI",
       sections: [
-        section("5", "Chỉ số Đường Đời (Số Chủ Đạo)", lifePathHtml(report, narrative, ctx, name), {
-          intro: `<strong>Số Đường Đời ${displayNumber(report.lifePath)}</strong> — Đây là chỉ số cốt lõi định hình toàn bộ hành trình cuộc đời của bạn.`,
-        }),
-        section("6", "Chu Kỳ Đường Đời", buildLifeCyclesSection(report, name)),
         section(
-          "7",
+          "4",
+          "Chỉ số Đường Đời (Số Chủ Đạo)",
+          `<p class="nar"><strong>Số Đường Đời ${lifePathDisplayNumber(report)}</strong> — Đây là chỉ số cốt lõi định hình toàn bộ hành trình cuộc đời của bạn.</p>` +
+            lifePathHtml(report, narrative, ctx, name),
+          {
+          titleBadge: String(lifePathDisplayNumber(report)),
+          quickIntro: null,
+          },
+        ),
+        section("5", "Chu Kỳ Đường Đời", buildLifeCyclesSection(report, name)),
+        section(
+          "6",
           "Biểu đồ Kim Tự Tháp — Đỉnh cao & Thử thách",
           buildPyramidSection(report, name, narrative),
           { chartSlot: "pyramid" },
         ),
         section(
-          "8",
+          "7",
           "Chỉ số Năm Cá Nhân",
           `<p class="nar"><strong>Năm Cá Nhân ${report.personalYear.number}</strong> — ${escapeHtml(readString(report.personalYear.data, ["title"]))} (${report.personalYear.year})</p>` +
             personalPeriod("Năm", report.personalYear.number, report.personalYear.year, name, report.personalYear.data),
         ),
         section(
-          "8.1",
+          "8",
           "Chu Kỳ Vận Số — Phân Tích Chi Tiết 3 Năm",
           `<p class="nar" style="font-style:italic;">Mỗi năm trong cuộc đời bạn mang một con số cá nhân riêng biệt, lặp lại theo vòng 9 năm. Những con số này cho biết luồng năng lượng chủ đạo của năm đó — ảnh hưởng toàn diện đến sự nghiệp, tài chính, tình yêu, sức khỏe và các mối quan hệ xã hội. Hiểu và đi theo luồng năng lượng này giúp bạn hành động đúng thời điểm và tránh đi ngược lại dòng chảy tự nhiên.</p>` +
             `<div class="year-cards-grid">` +
@@ -380,7 +653,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
         ),
         section("9", "Chỉ số Tháng Cá Nhân", personalPeriod(`Tháng ${report.personalMonth.month}`, report.personalMonth.number, `${report.personalMonth.month}/${report.personalYear.year}`, name, report.personalMonth.data)),
         section(
-          "9.1",
+          "10",
           "Chỉ Số Các Tháng — Phân Tích 3 Tháng",
           `<p class="nar" style="font-style:italic;">Những con số này cho biết ở mỗi tháng sẽ có những điều gì có khả năng xảy ra và bạn nên tập trung làm việc theo con số nào, theo con số này nào sẽ ở mức độ sâu hơn so với chỉ số năm.</p>` +
             `<div class="year-cards-grid">` +
@@ -391,7 +664,7 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
               )
               .join("") +
             `</div>` +
-            report.personalMonthsRange.map((item) => personalMonthDeep(item, name)).join(""),
+            report.personalMonthsRange.map((item, idx) => personalMonthDeep(item, name, `10.${idx + 1}`)).join(""),
         ),
       ],
     },
@@ -400,46 +673,46 @@ export function buildSynthesizedReport(input: SynthesizerInput): SynthesizedRepo
       title: "PHÂN TÍCH SỨ MỆNH & NỘI TÂM",
       sections: [
         section(
-          "10",
+          "11",
           "Chỉ số Sứ Mệnh (Vận Mệnh)",
           `<p class="nar"><strong>Sứ Mệnh số ${report.destiny.number}</strong> — ${escapeHtml(readString(report.destiny.data, ["title"]))}. Đây là chỉ số thể hiện cách bạn đạt được mục tiêu và đóng góp cho thế giới.</p>` +
             renderIndicator(narrative, "destiny", "Sứ mệnh", report.destiny, name) +
             destinyCtxBlock(report.destiny.number, ctx, name),
         ),
-        section("11", "Tương quan Đường đời & Sứ mệnh", buildLifePathDestinyCorrelation(report, name)),
+        section("12", "Tương quan Đường đời & Sứ mệnh", buildLifePathDestinyCorrelation(report, name)),
         section(
-          "12",
+          "13",
           "Thử thách Sứ Mệnh",
           `<p class="nar">Không có sứ mệnh nào không đi kèm với thử thách. Với <strong>${escapeHtml(name)}</strong>, thử thách số <strong>${report.destinyChallenge.number}</strong> xuất hiện không phải để ngăn cản bạn — mà để rèn luyện bạn trở thành phiên bản đủ mạnh để thực sự sống đúng sứ mệnh đó.</p>` +
             challengeHtml(narrative, "destinyChallenge", "Thử thách Sứ mệnh", report.destinyChallenge, name),
         ),
-        section("13", "Chỉ số Trưởng Thành", renderIndicator(narrative, "maturity", "Trưởng thành", report.maturity, name) + maturityCtxBlock(report.maturity.number, ctx, name)),
-        section("14", "Năng lực trong giai đoạn Trưởng Thành", renderMaturityAbility(report, name)),
-        section("15", "Chỉ số Linh Hồn (Mong ước sâu thẳm)", renderIndicator(narrative, "soul", "Linh hồn", report.soul, name) + soulCtxBlock(report.soul.number, ctx, name)),
-        section("16", "Tương quan Đường đời & Linh hồn", buildLifePathSoulCorrelation(report, name)),
-        section("17", "Thử thách Linh Hồn", challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name)),
-        section("18", "Chỉ số Nhân Cách", renderIndicator(narrative, "personality", "Nhân cách", report.personality, name) + personalityCtxBlock(report.personality.number, ctx, name)),
-        section("19", "Thử thách Nhân Cách", challengeHtml(narrative, "personalityChallenge", "Thử thách Nhân cách", report.personalityChallenge, name)),
-        section("20", "Các bài học nghiệp (Karmic Lessons)", karmicLessonsHtml(report, narrative, name)),
-        section("21", "Các chỉ số Nợ Nghiệp (Karmic Debt)", karmicDebtHtml(report, narrative, kb, name)),
+        section("14", "Chỉ số Trưởng Thành", renderIndicator(narrative, "maturity", "Trưởng thành", report.maturity, name) + maturityCtxBlock(report.maturity.number, ctx, name)),
+        section("15", "Năng lực trong giai đoạn Trưởng Thành", renderMaturityAbility(report, name)),
+        section("16", "Chỉ số Linh Hồn (Mong ước sâu thẳm)", renderIndicator(narrative, "soul", "Linh hồn", report.soul, name) + soulCtxBlock(report.soul.number, ctx, name)),
+        section("17", "Tương quan Đường đời & Linh hồn", buildLifePathSoulCorrelation(report, name)),
+        section("18", "Thử thách Linh Hồn", challengeHtml(narrative, "soulChallenge", "Thử thách Linh hồn", report.soulChallenge, name)),
+        section("19", "Chỉ số Nhân Cách", renderIndicator(narrative, "personality", "Nhân cách", report.personality, name) + personalityCtxBlock(report.personality.number, ctx, name)),
+        section("20", "Thử thách Nhân Cách", challengeHtml(narrative, "personalityChallenge", "Thử thách Nhân cách", report.personalityChallenge, name)),
+        section("21", "Các bài học nghiệp (Karmic Lessons)", karmicLessonsHtml(report, narrative, name)),
+        section("22", "Các chỉ số Nợ Nghiệp (Karmic Debt)", karmicDebtHtml(report, narrative, kb, name)),
       ],
     },
     {
       letter: "D",
       title: "PHÂN TÍCH NĂNG LỰC & BIỂU ĐỒ SỨC MẠNH",
       sections: [
-        section("22", "Biểu đồ Sức Mạnh — Lưới Ngày Sinh (Pythagoras)", buildBirthGridNarrative(report, name), { chartSlot: "birth-grid" }),
-        section("23", "Biểu đồ Tên & Biểu đồ Tổng Hợp", buildNameCombinedGridNarrative(report, name), { chartSlot: "combined-grid" }),
-        section("24", "Chỉ số Thái Độ", renderIndicator(narrative, "attitude", "Thái độ", report.attitude, name)),
-        section("25", "Chỉ số Ngày Sinh (Tài năng Tự nhiên)", renderIndicator(narrative, "birthday", "Ngày sinh", report.birthday, name)),
-        section("26", "Chỉ số Vượt Khó (Tension Number)", renderIndicator(narrative, "tensionNumber", "Vượt khó", report.tensionNumber, name)),
-        section("27", "Chỉ số Năng Lực Tư Duy", renderIndicator(narrative, "cognitiveAbility", "Năng lực tư duy", report.cognitiveAbility, name)),
-        section("28", "Chỉ số Động Lực Tiếp Cận", renderIndicator(narrative, "approachMotivation", "Động lực tiếp cận", report.approachMotivation, name)),
-        section("29", "Chỉ số Năng Lực Tiếp Cận", renderIndicator(narrative, "approachAbility", "Năng lực tiếp cận", report.approachAbility, name)),
-        section("30", "Chỉ số Thái Độ Tiếp Cận", renderIndicator(narrative, "approachAttitude", "Thái độ tiếp cận", report.approachAttitude, name)),
+        section("23", "Biểu đồ Sức Mạnh — Lưới Ngày Sinh (Pythagoras)", buildBirthGridNarrative(report, name), { chartSlot: "birth-grid" }),
+        section("24", "Biểu đồ Tên & Biểu đồ Tổng Hợp", buildNameCombinedGridNarrative(report, name), { chartSlot: "combined-grid" }),
+        section("25", "Chỉ số Thái Độ", renderIndicator(narrative, "attitude", "Thái độ", report.attitude, name)),
+        section("26", "Chỉ số Ngày Sinh (Tài năng Tự nhiên)", renderIndicator(narrative, "birthday", "Ngày sinh", report.birthday, name)),
+        section("27", "Chỉ số Vượt Khó (Tension Number)", renderIndicator(narrative, "tensionNumber", "Vượt khó", report.tensionNumber, name)),
+        section("28", "Chỉ số Năng Lực Tư Duy", renderIndicator(narrative, "cognitiveAbility", "Năng lực tư duy", report.cognitiveAbility, name)),
+        section("29", "Chỉ số Động Lực Tiếp Cận", renderIndicator(narrative, "approachMotivation", "Động lực tiếp cận", report.approachMotivation, name)),
+        section("30", "Chỉ số Năng Lực Tiếp Cận", renderIndicator(narrative, "approachAbility", "Năng lực tiếp cận", report.approachAbility, name)),
+        section("31", "Chỉ số Thái Độ Tiếp Cận", renderIndicator(narrative, "approachAttitude", "Thái độ tiếp cận", report.approachAttitude, name)),
       ],
     },
   ];
 
-  return { profileHeader: buildProfileHeader(report), phases };
+  return { profileHeader: buildProfileHeader(report), phases: withQuickIntros(phases, report) };
 }

@@ -37,7 +37,7 @@ export function combineGridCells(dobGrid: GridCells, nameGrid: GridCells): GridC
 }
 
 export function buildCellAnalysis(grid: GridCells, source: GridAnalysisSource): string {
-  let html = `<h4 style="font-family:var(--font-ui);font-size:1rem;color:#1e3a8a;margin:1.5rem 0 0.5rem">Phân Tích Từng Số Trong ${source === "dob" ? "Biểu Đồ Ngày Sinh" : "Biểu Đồ Tên"}</h4>`;
+  let html = `<h4 style="font-family:var(--font-ui);font-size:1rem;color:var(--bm-cyan);margin:1.5rem 0 0.5rem">Phân Tích Từng Số Trong ${source === "dob" ? "Biểu Đồ Ngày Sinh" : "Biểu Đồ Tên"}</h4>`;
 
   for (let n = 1; n <= 9; n++) {
     const count = grid[n] || 0;
@@ -65,7 +65,7 @@ export function buildArrowsAnalysis(grid: GridCells, sourceName: string): string
     else missingArrows.push(arrow);
   });
 
-  let html = `<h4 style="font-family:var(--font-ui);font-size:1rem;color:#1e3a8a;margin:2rem 0 0.5rem">Phân Tích Mũi Tên Sức Mạnh — ${sourceName}</h4>`;
+  let html = `<h4 style="font-family:var(--font-ui);font-size:1rem;color:var(--bm-cyan);margin:2rem 0 0.5rem">Phân Tích Mũi Tên Sức Mạnh — ${sourceName}</h4>`;
 
   if (activeArrows.length > 0) {
     html += `<p class="nar"><strong>Bạn sở hữu ${activeArrows.length} mũi tên sức mạnh</strong> — đây là những trục năng lượng hoạt động đầy đủ trong biểu đồ:</p>`;
@@ -147,7 +147,7 @@ export function buildCompensationAnalysis(
   }
 
   if (stillMissing.length > 0) {
-    html += `<p class="nar" style="color:#7f1d1d;"><strong>⚠️ Các số vẫn còn thiếu sau khi kết hợp:</strong> ${stillMissing.join(", ")} — Đây là những bài học nghiệp (Karmic Lessons) sâu sắc nhất của bạn trong kiếp này, cần được chủ động phát triển thông qua trải nghiệm sống.</p>`;
+    html += `<p class="nar" style="color:var(--bm-text-soft);"><strong>⚠️ Các số vẫn còn thiếu sau khi kết hợp:</strong> ${stillMissing.join(", ")} — Đây là những bài học nghiệp (Karmic Lessons) sâu sắc nhất của bạn trong kiếp này, cần được chủ động phát triển thông qua trải nghiệm sống.</p>`;
   }
 
   return html;

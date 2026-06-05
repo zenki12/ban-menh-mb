@@ -17,6 +17,7 @@ import { BirthChartGrid } from "./charts/BirthChartGrid";
 import { CareerBars } from "./charts/CareerBars";
 import { CombinedChartGrid } from "./charts/CombinedChartGrid";
 import { PyramidSvgChart } from "./charts/PyramidSvgChart";
+import { FloatingReportNav } from "./FloatingReportNav";
 import { PhaseDivider, ProfileHeaderCard, SectionHeader } from "./v1";
 
 export type NumerologyReportWithSections = NumerologyReport & {
@@ -90,6 +91,33 @@ function ChartSlot({ slot, report }: { slot?: Phase["sections"][number]["chartSl
   return null;
 }
 
+type QuickIntroTone = NonNullable<NonNullable<Phase["sections"][number]["quickIntro"]>["tone"]>;
+
+const quickIntroToneClass: Record<QuickIntroTone, string> = {
+  blue: "border-[var(--bm-cyan)]",
+  gold: "border-[var(--bm-gold-bright)]",
+  purple: "border-[var(--bm-primary-soft)]",
+  red: "border-[var(--bm-danger-soft)]",
+};
+
+function QuickIntro({ item }: { item: Phase["sections"][number] }) {
+  if (!item.quickIntro) return null;
+  const tone = item.quickIntro.tone ?? "gold";
+  return (
+    <div className={`mt-5 border-l-2 ${quickIntroToneClass[tone]} py-1 pl-4`}>
+      <div className="flex flex-wrap items-baseline gap-2">
+        {item.quickIntro.badge ? (
+          <span className="rounded-full border border-[var(--bm-border-gold)] px-2.5 py-0.5 text-xs font-black text-[var(--bm-gold-bright)]">
+            {item.quickIntro.badge}
+          </span>
+        ) : null}
+        <p className="text-base font-bold leading-7 text-[var(--bm-text-main)]">{item.quickIntro.headline}</p>
+      </div>
+      <p className="mt-2 max-w-[72ch] text-sm leading-7 text-[var(--bm-text-soft)]">{item.quickIntro.summary}</p>
+    </div>
+  );
+}
+
 function SectionBody({ item, report }: { item: Phase["sections"][number]; report: NumerologyReport }) {
   if (item.chartSlot === "pyramid" && item.html.includes("<!-- CHART:pyramid -->")) {
     const [beforeChart, afterChart = ""] = item.html.split("<!-- CHART:pyramid -->");
@@ -131,27 +159,31 @@ export function FullReport({ report, userName }: FullReportProps) {
     report.profileHeader ?? {
       name: userName,
       dob: report.input.dob,
-      lifePathNumber: report.lifePath.number,
+      lifePathNumber: report.lifePath.displayNumber ?? report.lifePath.number,
       chips8: [],
     };
 
   if (!phases.length) return <EmptySections userName={userName} />;
 
   return (
-    <div className="grid gap-12">
-      <ProfileHeaderCard {...profileHeader} />
-      {phases.map((phase) => (
-        <section className="grid gap-6" key={phase.letter}>
-          <PhaseDivider letter={phase.letter} title={phase.title} />
-          {phase.sections.map((item) => (
-            <Card as="article" className="v1-report-section" id={item.id} key={item.id} variant="glass" padding="lg">
-              <SectionHeader number={item.number} title={item.title} />
-              {item.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{item.intro}</p> : null}
-              <SectionBody item={item} report={report} />
-            </Card>
-          ))}
-        </section>
-      ))}
-    </div>
+    <>
+      <div className="grid gap-12">
+        <ProfileHeaderCard {...profileHeader} />
+        {phases.map((phase) => (
+          <section className="grid gap-6" key={phase.letter}>
+            <PhaseDivider letter={phase.letter} title={phase.title} />
+            {phase.sections.map((item) => (
+              <Card as="article" className="v1-report-section scroll-mt-24" id={item.id} key={item.id} variant="glass" padding="lg">
+                <SectionHeader number={item.number} title={item.title} titleBadge={item.titleBadge} />
+                <QuickIntro item={item} />
+                {item.intro ? <p className="mt-4 text-[var(--bm-text-soft)]">{item.intro}</p> : null}
+                <SectionBody item={item} report={report} />
+              </Card>
+            ))}
+          </section>
+        ))}
+      </div>
+      <FloatingReportNav phases={phases} />
+    </>
   );
 }

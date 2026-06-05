@@ -53,6 +53,7 @@ function readKeywords(data: Record<string, unknown>) {
 
 export function FreeIndicatorSection({ indicator, title, hint }: FreeIndicatorSectionProps) {
   const data = asRecord(indicator.data);
+  const displayNumber = indicator.displayNumber ?? indicator.number;
   const description = readDescription(data);
   const aspects = ASPECT_CONFIG
     .map((aspect) => ({ ...aspect, text: readAspectText(data, aspect.fields) }))
@@ -74,7 +75,7 @@ export function FreeIndicatorSection({ indicator, title, hint }: FreeIndicatorSe
         <div className="flex flex-col items-center">
           <div className="flex size-32 items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[image:var(--bm-gradient-gold-text)] shadow-[var(--bm-shadow-gold)] sm:size-40">
             <span className="text-6xl font-bold text-[var(--bm-bg-void)] sm:text-7xl">
-              {indicator.number}
+              {displayNumber}
             </span>
           </div>
           {chips.length > 0 ? (

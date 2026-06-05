@@ -176,10 +176,17 @@ function ResultDetailsContent() {
             <MagneticCTA price={PRICE} onClick={openPayment} />
           </>
         )}
-        <p className="mt-10 pb-24 text-sm text-[var(--bm-text-muted)] md:pb-0">
-          Nội dung Thần số học chỉ dùng để tham khảo và tự quan sát, không khẳng định tương
-          lai chắc chắn, không thay thế tư vấn chuyên môn hoặc quyết định quan trọng.
-        </p>
+        <div className="mt-10 pb-24 text-sm leading-relaxed text-[var(--bm-text-muted)] md:pb-0">
+          <p>
+            Các con số gợi mở xu hướng, nhưng không quyết định toàn bộ cuộc đời bạn. Bản luận giải này chỉ dùng để
+            tham khảo và tự quan sát bản thân, điều quan trọng nhất vẫn là cách bạn sống, lựa chọn, rèn luyện, gieo
+            thiện lành mỗi ngày.
+          </p>
+          <p className="mt-2">
+            Và cuối cùng, xin hãy ghi nhớ:{" "}
+            <strong className="text-[var(--bm-gold-bright)]">Đức năng thắng số.</strong>
+          </p>
+        </div>
       </PageShell>
       {unlocked ? null : <StickyBottomCTA ctaLabel="Mở khóa →" onClick={openPayment} price={PRICE} />}
     </>

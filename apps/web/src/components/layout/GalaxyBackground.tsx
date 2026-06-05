@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 type Star = { x: number; y: number; r: number; a: number; speed: number; offset: number };
 type Particle = { x: number; y: number; vx: number; vy: number; r: number; a: number };
 type Orbiter = { angle: number; trailLen: number; trail: Array<{ x: number; y: number; a: number }>; size: number };
 type Ring = { rx: number; ry: number; tiltX: number; tiltZ: number; speed: number; color: string; base: number; dots: number; phase: number; orbiters: Orbiter[] };
+type Ripple = { id: number; x: number; y: number };
 const STAR_COUNT = 180;
 const PARTICLE_COUNT = 48;
 const RING_CONFIG = [
@@ -53,6 +54,9 @@ function createRings(): Ring[] {
 }
 export function GalaxyBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  const [pointerVisible, setPointerVisible] = useState(false);
+  const [ripples, setRipples] = useState<Ripple[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -237,12 +241,344 @@ export function GalaxyBackground() {
     };
   }, []);
 
+  useEffect(() => {
+    let rippleId = 0;
+
+    function handleMove(event: PointerEvent) {
+      setPointerVisible(true);
+      setPointer({ x: event.clientX, y: event.clientY });
+    }
+
+    function handleLeave() {
+      setPointerVisible(false);
+    }
+
+    function handleDown(event: PointerEvent) {
+      const id = rippleId++;
+      setRipples((items) => [...items, { id, x: event.clientX, y: event.clientY }].slice(-5));
+      window.setTimeout(() => {
+        setRipples((items) => items.filter((item) => item.id !== id));
+      }, 900);
+    }
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerleave", handleLeave);
+    window.addEventListener("pointerdown", handleDown);
+
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerleave", handleLeave);
+      window.removeEventListener("pointerdown", handleDown);
+    };
+  }, []);
+
   return (
-    <canvas
-      aria-hidden="true"
-      className="fixed inset-0 size-full pointer-events-none"
-      ref={canvasRef}
-      style={{ zIndex: -1 }}
-    />
+    <>
+      <canvas
+        aria-hidden="true"
+        className="fixed inset-0 size-full pointer-events-none"
+        ref={canvasRef}
+        style={{ zIndex: -1 }}
+      />
+      <div aria-hidden="true" className="bm-cosmic-layer" style={{ zIndex: -1 }}>
+        <div className="bm-aurora bm-aurora-a" />
+        <div className="bm-aurora bm-aurora-b" />
+        <div className="bm-orbit bm-orbit-a" />
+        <div className="bm-orbit bm-orbit-b" />
+        <div className="bm-stars bm-stars-a" />
+        <div className="bm-stars bm-stars-b" />
+        <div className="bm-constellation bm-constellation-a" />
+        <div className="bm-constellation bm-constellation-b" />
+        <div className="bm-meteor bm-meteor-a" />
+        <div className="bm-meteor bm-meteor-b" />
+        <div className="bm-meteor bm-meteor-c" />
+        <div className="bm-cosmic-veil" />
+      </div>
+      <div
+        aria-hidden="true"
+        className="bm-cursor-glow"
+        style={{
+          opacity: pointerVisible ? 1 : 0,
+          transform: `translate3d(${pointer.x}px, ${pointer.y}px, 0)`,
+          zIndex: -1,
+        }}
+      />
+      {ripples.map((ripple) => (
+        <span
+          aria-hidden="true"
+          className="bm-click-ripple"
+          key={ripple.id}
+          style={{ left: ripple.x, top: ripple.y, zIndex: -1 }}
+        />
+      ))}
+      <style>{`
+        .bm-cosmic-layer {
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          overflow: hidden;
+          background:
+            radial-gradient(circle at 20% 10%, rgba(167, 139, 250, 0.06), transparent 28rem),
+            radial-gradient(circle at 80% 20%, rgba(125, 211, 252, 0.035), transparent 30rem),
+            radial-gradient(circle at 50% 85%, rgba(251, 191, 36, 0.03), transparent 32rem);
+        }
+        .bm-cosmic-veil {
+          position: absolute;
+          inset: 0;
+          z-index: 5;
+          background:
+            radial-gradient(circle at 50% 35%, transparent 0 16rem, rgba(2, 6, 23, 0.30) 36rem),
+            rgba(2, 6, 23, 0.26);
+          backdrop-filter: saturate(0.72);
+        }
+        .bm-aurora {
+          position: absolute;
+          width: 80rem;
+          height: 26rem;
+          border-radius: 999px;
+          filter: blur(44px);
+          opacity: 0.10;
+          mix-blend-mode: screen;
+          transform-origin: center;
+        }
+        .bm-aurora-a {
+          left: -18rem;
+          top: 8rem;
+          background: linear-gradient(90deg, rgba(124, 58, 237, 0), rgba(124, 58, 237, 0.26), rgba(244, 114, 182, 0.10), rgba(124, 58, 237, 0));
+          animation: bmAuroraA 18s ease-in-out infinite alternate;
+        }
+        .bm-aurora-b {
+          right: -22rem;
+          bottom: 5rem;
+          background: linear-gradient(90deg, rgba(125, 211, 252, 0), rgba(125, 211, 252, 0.12), rgba(251, 191, 36, 0.07), rgba(125, 211, 252, 0));
+          animation: bmAuroraB 22s ease-in-out infinite alternate;
+        }
+        .bm-orbit {
+          position: absolute;
+          left: 50%;
+          top: 45%;
+          width: 62rem;
+          height: 19rem;
+          border: 1px solid rgba(167, 139, 250, 0.08);
+          border-radius: 50%;
+          box-shadow: 0 0 18px rgba(124, 58, 237, 0.07);
+          transform-origin: center;
+        }
+        .bm-orbit-a { animation: bmOrbitA 34s linear infinite; }
+        .bm-orbit-b {
+          width: 44rem;
+          height: 13rem;
+          border-color: rgba(251, 191, 36, 0.08);
+          animation: bmOrbitB 42s linear infinite reverse;
+        }
+        .bm-stars {
+          position: absolute;
+          inset: 0;
+          background-image:
+            radial-gradient(circle, rgba(255,255,255,0.90) 0 1px, transparent 1.5px),
+            radial-gradient(circle, rgba(253,224,71,0.75) 0 1px, transparent 1.5px),
+            radial-gradient(circle, rgba(125,211,252,0.70) 0 1px, transparent 1.5px);
+          background-size: 120px 120px, 190px 190px, 260px 260px;
+          background-position: 0 0, 40px 80px, 120px 20px;
+          opacity: 0.12;
+        }
+        .bm-stars-a { animation: bmStarDrift 32s linear infinite; }
+        .bm-stars-b {
+          opacity: 0.06;
+          filter: blur(1px);
+          transform: scale(1.25);
+          animation: bmStarDriftB 48s linear infinite;
+        }
+        .bm-constellation {
+          position: absolute;
+          width: 26rem;
+          height: 18rem;
+          opacity: 0.11;
+          background:
+            linear-gradient(28deg, transparent 18%, rgba(125, 211, 252, 0.22) 18.2%, transparent 18.6%),
+            linear-gradient(138deg, transparent 43%, rgba(167, 139, 250, 0.20) 43.2%, transparent 43.8%),
+            linear-gradient(8deg, transparent 64%, rgba(251, 191, 36, 0.15) 64.2%, transparent 64.6%);
+        }
+        .bm-constellation::before,
+        .bm-constellation::after {
+          content: "";
+          position: absolute;
+          width: 0.5rem;
+          height: 0.5rem;
+          border-radius: 999px;
+          background: #dbeafe;
+          box-shadow:
+            6rem 3rem 0 rgba(253, 224, 71, 0.58),
+            14rem 5rem 0 rgba(167, 139, 250, 0.58),
+            22rem 12rem 0 rgba(125, 211, 252, 0.58),
+            9rem 15rem 0 rgba(255, 255, 255, 0.50);
+        }
+        .bm-constellation-a {
+          left: 7vw;
+          top: 17vh;
+          animation: bmFloat 14s ease-in-out infinite alternate;
+        }
+        .bm-constellation-b {
+          right: 8vw;
+          bottom: 16vh;
+          transform: rotate(18deg) scale(0.85);
+          animation: bmFloat 18s ease-in-out infinite alternate-reverse;
+        }
+        .bm-meteor {
+          position: absolute;
+          width: 8rem;
+          height: 1px;
+          border-radius: 999px;
+          background: linear-gradient(90deg, rgba(255,255,255,0), rgba(253,224,71,0.58), rgba(125,211,252,0.20));
+          box-shadow: 0 0 10px rgba(253, 224, 71, 0.20);
+          opacity: 0;
+          transform: rotate(var(--meteor-rotate));
+          transform-origin: right center;
+        }
+        .bm-meteor::after {
+          content: "";
+          position: absolute;
+          right: 0;
+          top: 50%;
+          width: 0.28rem;
+          height: 0.28rem;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.86);
+          box-shadow: 0 0 12px rgba(253, 224, 71, 0.55);
+          transform: translateY(-50%);
+        }
+        .bm-meteor-a {
+          left: -12rem;
+          top: 12vh;
+          --meteor-rotate: 18deg;
+          --meteor-x: 132vw;
+          --meteor-y: 42vh;
+          animation: bmMeteor 17s linear infinite 1.2s;
+        }
+        .bm-meteor-b {
+          left: calc(100vw + 14rem);
+          top: 26vh;
+          width: 6.5rem;
+          --meteor-rotate: 154deg;
+          --meteor-x: -138vw;
+          --meteor-y: 34vh;
+          animation: bmMeteor 21s linear infinite 7s;
+        }
+        .bm-meteor-c {
+          left: -14rem;
+          top: 82vh;
+          width: 7.5rem;
+          --meteor-rotate: -16deg;
+          --meteor-x: 128vw;
+          --meteor-y: -30vh;
+          animation: bmMeteor 25s linear infinite 12s;
+        }
+        .bm-cursor-glow {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: 18rem;
+          height: 18rem;
+          margin-left: -9rem;
+          margin-top: -9rem;
+          pointer-events: none;
+          border-radius: 999px;
+          background:
+            radial-gradient(circle, rgba(253, 224, 71, 0.04), transparent 22%),
+            radial-gradient(circle, rgba(167, 139, 250, 0.06), transparent 46%),
+            radial-gradient(circle, rgba(125, 211, 252, 0.035), transparent 66%);
+          filter: blur(34px);
+          mix-blend-mode: screen;
+          transition: opacity 180ms ease-out;
+          will-change: transform, opacity;
+        }
+        .bm-click-ripple {
+          position: fixed;
+          width: 0.75rem;
+          height: 0.75rem;
+          margin-left: -0.375rem;
+          margin-top: -0.375rem;
+          pointer-events: none;
+          border-radius: 999px;
+          border: 1px solid rgba(253, 224, 71, 0.55);
+          box-shadow:
+            0 0 14px rgba(253, 224, 71, 0.48),
+            0 0 32px rgba(167, 139, 250, 0.26);
+          animation: bmClickRipple 900ms ease-out forwards;
+        }
+        .bm-click-ripple::before,
+        .bm-click-ripple::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 4px;
+          height: 4px;
+          border-radius: 999px;
+          background: var(--bm-cyan);
+          box-shadow:
+            22px 0 0 rgba(253, 224, 71, 0.58),
+            -20px 2px 0 rgba(167, 139, 250, 0.58),
+            4px 20px 0 rgba(255, 255, 255, 0.50),
+            -3px -22px 0 rgba(125, 211, 252, 0.58);
+          transform: translate(-50%, -50%);
+          animation: bmClickSpark 900ms ease-out forwards;
+        }
+        .bm-click-ripple::after {
+          transform: translate(-50%, -50%) rotate(45deg);
+        }
+        @keyframes bmAuroraA {
+          from { transform: translate3d(0, 0, 0) rotate(-12deg) scale(1); }
+          to { transform: translate3d(12rem, 8rem, 0) rotate(8deg) scale(1.12); }
+        }
+        @keyframes bmAuroraB {
+          from { transform: translate3d(0, 0, 0) rotate(16deg) scale(1); }
+          to { transform: translate3d(-10rem, -7rem, 0) rotate(-10deg) scale(1.08); }
+        }
+        @keyframes bmOrbitA {
+          from { transform: translate(-50%, -50%) rotate(18deg); }
+          to { transform: translate(-50%, -50%) rotate(378deg); }
+        }
+        @keyframes bmOrbitB {
+          from { transform: translate(-50%, -50%) rotate(-26deg); }
+          to { transform: translate(-50%, -50%) rotate(334deg); }
+        }
+        @keyframes bmStarDrift {
+          from { background-position: 0 0, 40px 80px, 120px 20px; }
+          to { background-position: 120px 120px, 230px 270px, 380px 280px; }
+        }
+        @keyframes bmStarDriftB {
+          from { background-position: 0 0, 40px 80px, 120px 20px; }
+          to { background-position: -160px 180px, -80px 320px, 30px 420px; }
+        }
+        @keyframes bmFloat {
+          from { translate: 0 0; opacity: 0.12; }
+          to { translate: 2rem -1.5rem; opacity: 0.22; }
+        }
+        @keyframes bmMeteor {
+          0%, 58% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-rotate)); }
+          64% { opacity: 0.62; }
+          86% { opacity: 0.30; }
+          100% { opacity: 0; transform: translate3d(var(--meteor-x), var(--meteor-y), 0) rotate(var(--meteor-rotate)); }
+        }
+        @keyframes bmClickRipple {
+          0% { transform: scale(0.4); opacity: 0.95; }
+          70% { opacity: 0.45; }
+          100% { transform: scale(10); opacity: 0; }
+        }
+        @keyframes bmClickSpark {
+          0% { opacity: 1; scale: 0.4; }
+          100% { opacity: 0; scale: 2.2; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .bm-cosmic-layer *,
+          .bm-cursor-glow,
+          .bm-click-ripple {
+            animation: none !important;
+            display: none;
+          }
+        }
+      `}</style>
+    </>
   );
 }

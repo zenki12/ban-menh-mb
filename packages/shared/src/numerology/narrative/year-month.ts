@@ -829,7 +829,7 @@ type MonthDeepContent = {
   tongket: string;
 };
 
-export function personalMonthDeep(item: { number: number; year: number; month: number }, name: string): string {
+export function personalMonthDeep(item: { number: number; year: number; month: number }, name: string, headingNumber?: string): string {
     const num = item.number;
     const month = item.month;
     const year = item.year;
@@ -941,7 +941,7 @@ export function personalMonthDeep(item: { number: number; year: number; month: n
 
     return `
     <div class="month-detail-block">
-      <div class="month-detail-headline">CHỈ SỐ THÁNG ${label} CỦA BẠN LÀ: ${n}</div>
+      <div class="month-detail-headline">${headingNumber ? `${headingNumber}. ` : ""}CHỈ SỐ THÁNG ${label} CỦA BẠN LÀ: ${n}</div>
       <p class="nar">${c.energy}</p>
       ${domainsHtml}
     </div>`;
