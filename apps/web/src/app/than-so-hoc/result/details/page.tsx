@@ -58,7 +58,95 @@ function themeBullets(data: unknown, fallback: string[]) {
     .map((field) => record[field])
     .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
     .flatMap((value) => value.split(/[.\n]/).map((part) => part.trim()).filter(Boolean));
-  return (chunks.length ? chunks : fallback).slice(0, 3);
+  return [...chunks, ...fallback].filter((item, index, all) => all.indexOf(item) === index).slice(0, 3);
+}
+
+const personalMonthSummaries: Record<number, { bullets: string[]; summary: string }> = {
+  1: {
+    bullets: [
+      "Tháng khởi đầu, chủ động và mở hướng mới",
+      "Phù hợp để ra quyết định, bắt tay vào việc và tạo nhịp đi riêng",
+      "Tránh nóng vội hoặc ôm quá nhiều mục tiêu cùng lúc",
+    ],
+    summary:
+      "Trong tháng này, năng lượng số 1 khuyến khích bạn bắt đầu rõ ràng hơn: chọn một việc quan trọng, tự đứng ra dẫn nhịp và biến ý tưởng thành bước hành động đầu tiên. Đây không phải tháng để chờ mọi thứ hoàn hảo, mà là tháng để tạo đà.",
+  },
+  2: {
+    bullets: [
+      "Tháng hợp tác, lắng nghe và điều chỉnh nhịp quan hệ",
+      "Phù hợp để xây cầu nối, thương lượng và làm việc cùng người khác",
+      "Tránh nhạy cảm quá mức hoặc phụ thuộc vào phản ứng bên ngoài",
+    ],
+    summary:
+      "Năng lượng số 2 đưa trọng tâm về sự tinh tế trong tương tác. Tháng này phù hợp để bạn lắng nghe nhiều hơn, làm mềm các va chạm và chọn cách đi cùng người khác thay vì tự gánh mọi thứ một mình.",
+  },
+  3: {
+    bullets: [
+      "Tháng biểu đạt, kết nối và làm mới cảm hứng",
+      "Phù hợp để giao tiếp, sáng tạo, truyền thông và chia sẻ ý tưởng",
+      "Tránh phân tán, nói nhiều hơn làm hoặc để cảm xúc kéo lệch kế hoạch",
+    ],
+    summary:
+      "Năng lượng số 3 mở ra một tháng nhẹ hơn, giàu tương tác và cảm hứng. Nếu biết chọn đúng kênh biểu đạt, bạn có thể khiến công việc, quan hệ và tinh thần trở nên thông thoáng hơn.",
+  },
+  4: {
+    bullets: [
+      "Tháng xây nền, kỷ luật và xử lý việc còn dang dở",
+      "Phù hợp để lập kế hoạch, chỉnh quy trình và hoàn thiện chi tiết",
+      "Tránh trì trệ, cứng nhắc hoặc quá sa vào kiểm soát",
+    ],
+    summary:
+      "Năng lượng số 4 yêu cầu bạn quay về với cấu trúc. Tháng này hợp để dọn lại nền tảng, làm chắc các việc cơ bản và biến những ý định rời rạc thành hệ thống có thể theo được.",
+  },
+  5: {
+    bullets: [
+      "Tháng biến chuyển, linh hoạt và mở trải nghiệm mới",
+      "Phù hợp để thử cách làm khác, di chuyển, kết nối và thích nghi",
+      "Tránh bốc đồng, thay đổi vì chán hoặc bỏ dở việc quan trọng",
+    ],
+    summary:
+      "Năng lượng số 5 khiến nhịp tháng nhanh hơn. Bạn có thể gặp nhiều thay đổi nhỏ nhưng liên tiếp; điểm quan trọng là giữ sự linh hoạt mà vẫn nhớ mục tiêu chính mình đang theo.",
+  },
+  6: {
+    bullets: [
+      "Tháng trách nhiệm, chăm sóc và cân bằng đời sống cá nhân",
+      "Phù hợp để vun đắp quan hệ, gia đình, cam kết và chất lượng sống",
+      "Tránh ôm hết trách nhiệm hoặc can thiệp quá sâu vào chuyện của người khác",
+    ],
+    summary:
+      "Năng lượng số 6 kéo bạn về những điều cần được chăm nom kỹ hơn: gia đình, tình cảm, cam kết và sự hài hòa trong môi trường sống. Tháng này đẹp khi bạn biết cho đi mà không đánh mất ranh giới.",
+  },
+  7: {
+    bullets: [
+      "Tháng chiêm nghiệm, học sâu và rà soát lại hướng đi",
+      "Phù hợp để nghiên cứu, nghỉ nhịp, quan sát và lắng nghe trực giác",
+      "Tránh cô lập quá lâu hoặc suy diễn mọi thứ theo hướng nặng nề",
+    ],
+    summary:
+      "Năng lượng số 7 làm tháng này chậm và sâu hơn. Đây là lúc bạn nên bớt chạy theo bề mặt, dành thời gian hiểu bản chất vấn đề và chọn lại điều thật sự đáng đầu tư tinh thần.",
+  },
+  8: {
+    bullets: [
+      "Tháng hành động thực tế, tài chính và kết quả hữu hình",
+      "Phù hợp để chốt việc, thương lượng, quản trị nguồn lực và đo hiệu quả",
+      "Tránh áp lực thành tích hoặc dùng quyền lực một cách căng thẳng",
+    ],
+    summary:
+      "Năng lượng số 8 đưa bạn vào tháng cần rõ ràng về nguồn lực, trách nhiệm và kết quả. Nếu biết hành động có chiến lược, đây là tháng tốt để tạo bước tiến cụ thể trong công việc và tài chính.",
+  },
+  9: {
+    bullets: [
+      "Tháng hoàn tất, buông điều cũ và nhìn lại toàn cảnh",
+      "Phù hợp để kết thúc việc dang dở, dọn cảm xúc và chuẩn bị chu kỳ mới",
+      "Tránh níu kéo những điều đã hết vai trò hoặc quyết định trong bi quan",
+    ],
+    summary:
+      "Năng lượng số 9 khép lại một nhịp cũ để bạn nhẹ hơn trước khi bước tiếp. Tháng này phù hợp để hoàn tất, tha thứ, sắp xếp lại ưu tiên và trả không gian cho điều mới đang đến.",
+  },
+};
+
+function personalMonthFallback(number: number) {
+  return personalMonthSummaries[number] ?? personalMonthSummaries[1];
 }
 
 function findFreeLifePathSection(report: NumerologyReportWithSections): Phase["sections"][number] | null {
@@ -113,6 +201,8 @@ function LockedDetailsPreview({
   report: NumerologyReportWithSections;
   onUnlock: () => void;
 }) {
+  const monthFallback = personalMonthFallback(report.personalMonth.number);
+
   return (
     <>
       <section className="grid gap-10">
@@ -133,13 +223,15 @@ function LockedDetailsPreview({
 
         <PartialIndicatorSection
           hint="Chủ đề vận hành trong tháng hiện tại, giúp bạn chọn trọng tâm hành động ngắn hạn."
-          indicator={report.personalMonth}
-          themeBullets={themeBullets(report.personalMonth.data, [
-            "Nhận diện năng lượng chính của tháng",
-            "Chọn trọng tâm hành động phù hợp",
-            "Phần luận giải chi tiết từng tháng đang được khóa",
-          ])}
-          title={`Tháng cá nhân ${report.personalMonth.month}`}
+          indicator={{
+            ...report.personalMonth,
+            data: {
+              ...asRecord(report.personalMonth.data),
+              description: monthFallback.summary,
+            },
+          }}
+          themeBullets={themeBullets(report.personalMonth.data, monthFallback.bullets)}
+          title={`Tháng ${report.personalMonth.month}/${report.personalYear.year}`}
         />
       </section>
 
