@@ -12,6 +12,24 @@
   @apply text-[0.95rem] leading-relaxed text-[var(--bm-text-soft)];
 }
 
+/* === RICH INDICATOR PREVIEW === */
+
+.bm-trait-chip {
+  @apply inline-flex items-center rounded-full border border-[var(--bm-border-gold)] bg-[rgba(247,201,72,0.08)] px-3 py-1 text-xs font-medium text-[var(--bm-gold-bright)];
+}
+
+.bm-preview-field {
+  @apply rounded-lg border-l-2 border-[var(--bm-primary-soft)] bg-[var(--bm-bg-glass)] px-3 py-2;
+}
+
+.bm-locked-aspects {
+  @apply mt-4 rounded-lg bg-[rgba(124,58,237,0.06)] p-3;
+}
+
+.bm-locked-aspect-item {
+  @apply pl-1 text-sm text-[var(--bm-text-muted)];
+}
+
 /* === PERSONAL MONTH FULL PREVIEW === */
 
 .bm-preview-month-full {
