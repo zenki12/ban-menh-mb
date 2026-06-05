@@ -13,6 +13,16 @@ const bodySchema = z.object({
   gender: z.enum(["male", "female"]).optional(),
 });
 
+type ReportSectionRecord = {
+  number?: unknown;
+  title?: unknown;
+  html?: unknown;
+};
+
+type ReportPhaseRecord = {
+  sections?: unknown;
+};
+
 function getBearerToken(request: Request): string | null {
   const auth = request.headers.get("Authorization");
   if (!auth?.startsWith("Bearer ")) return null;
@@ -26,6 +36,52 @@ async function readJson(request: Request): Promise<unknown | null> {
   } catch {
     return null;
   }
+}
+
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+function htmlToTextChunks(html: string): string[] {
+  return decodeHtmlEntities(
+    html
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(p|div|li|h[1-6])>/gi, "\n")
+      .replace(/<[^>]+>/g, " "),
+  )
+    .split(/\n|(?<=\.)\s+/)
+    .map((chunk) => chunk.replace(/\s+/g, " ").trim())
+    .filter((chunk) => chunk.length >= 32);
+}
+
+function getSections(report: Record<string, unknown>): ReportSectionRecord[] {
+  const phases = Array.isArray(report.phases) ? (report.phases as ReportPhaseRecord[]) : [];
+  return phases.flatMap((phase) =>
+    Array.isArray(phase.sections) ? (phase.sections as ReportSectionRecord[]) : [],
+  );
+}
+
+function findSection(report: Record<string, unknown>, number: string): ReportSectionRecord | undefined {
+  return getSections(report).find((section) => section.number === number);
+}
+
+function buildFreePeriodPreview(section: ReportSectionRecord | undefined) {
+  if (!section || typeof section.html !== "string") return null;
+  const chunks = htmlToTextChunks(section.html);
+  const description = chunks.find((chunk) => chunk.length >= 120) ?? chunks[0] ?? "";
+  const bullets = chunks.filter((chunk) => chunk !== description).slice(0, 3);
+  if (!description && bullets.length === 0) return null;
+  return {
+    title: typeof section.title === "string" ? section.title : "",
+    description,
+    bullets,
+  };
 }
 
 export async function POST(request: Request) {
@@ -99,6 +155,10 @@ export async function POST(request: Request) {
           ? { ...(responsePayload.report as Record<string, unknown>) }
           : responsePayload.report;
       if (!unlocked && report && typeof report === "object") {
+        (report as Record<string, unknown>).freePeriodPreviews = {
+          personalYear: buildFreePeriodPreview(findSection(report as Record<string, unknown>, "7")),
+          personalMonth: buildFreePeriodPreview(findSection(report as Record<string, unknown>, "9")),
+        };
         const freePhases = Array.isArray((report as Record<string, unknown>).phases)
           ? ((report as Record<string, unknown>).phases as Array<Record<string, unknown>>)
               .map((phase) => ({

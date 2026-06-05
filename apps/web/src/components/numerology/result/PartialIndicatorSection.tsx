@@ -42,6 +42,7 @@ export function PartialIndicatorSection({
 }: PartialIndicatorSectionProps) {
   const data = asRecord(indicator.data);
   const preview = readPreview(data, indicator.narrative);
+  const visibleThemeBullets = themeBullets.filter((item) => item.trim()).slice(0, 3);
 
   return (
     <Card as="article" className="border-[var(--bm-border-purple)]" variant="glass" padding="lg">
@@ -62,14 +63,16 @@ export function PartialIndicatorSection({
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--bm-primary-soft)]">{title}</p>
           <h2 className="mt-3 text-gradient-purple">{readTitle(data, title)}</h2>
           <p className="mt-3 italic text-[var(--bm-text-soft)]">{hint}</p>
-          <div className="mt-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-4">
-            <h4 className="text-base">Chủ đề chính:</h4>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-[var(--bm-text-soft)]">
-              {themeBullets.slice(0, 3).map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          {visibleThemeBullets.length > 0 ? (
+            <div className="mt-6 rounded-xl border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] p-4">
+              <h4 className="text-base">Chủ đề chính:</h4>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-[var(--bm-text-soft)]">
+                {visibleThemeBullets.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {Array.isArray(preview) ? (
             <div className="mt-6 space-y-3">{preview.map((item) => <p key={item}>{item}</p>)}</div>
           ) : (
