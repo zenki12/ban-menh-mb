@@ -3,30 +3,24 @@
 import {
   calcCareerGroups,
   calcLineChartData,
+  calcPersonalityGroups,
   type IndicatorResult,
   type NumerologyReport,
 } from "@banmenh/shared";
 import { useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 
 import { Button, Card } from "../../ui";
 import { CareerBars } from "./charts/CareerBars";
 import { LineChartVanSo } from "./charts/LineChartVanSo";
-import { FAQSection } from "./FAQSection";
-import { LifeCyclesSummary } from "./LifeCyclesSummary";
-import { LockedSectionsGrouped } from "./LockedSectionsGrouped";
+import { PersonalityBars } from "./charts/PersonalityBars";
 import { generateOverview } from "./overview";
-import { PersonalMonthFull } from "./PersonalMonthFull";
-import { RichIndicatorPreview } from "./RichIndicatorPreview";
-import { StickyBottomCTA } from "./StickyBottomCTA";
-import { UNLOCK_CTA_ID } from "./scrollToUnlock";
-import { LOCKED_COUNT } from "./utils";
 
 type SummaryDashboardProps = {
   report: NumerologyReport;
   userName: string;
   dob: string;
   unlocked: boolean;
-  onUnlock: () => void;
 };
 
 const indicatorChips = [
@@ -40,8 +34,6 @@ const indicatorChips = [
   ["Tháng cá nhân", "personalMonth"],
 ] as const satisfies ReadonlyArray<readonly [string, keyof NumerologyReport]>;
 
-const PRICE = "99.000đ";
-
 function detailsHref(search: { toString: () => string }) {
   const query = search.toString();
   return query ? `/than-so-hoc/result/details?${query}` : "/than-so-hoc/result/details";
@@ -51,220 +43,115 @@ function displayNumber(indicator: IndicatorResult) {
   return indicator.displayNumber ?? indicator.number;
 }
 
-function PersonalYearPreview({ report }: { report: NumerologyReport }) {
-  return (
-    <RichIndicatorPreview
-      indicator={report.personalYear}
-      introField={["theme", "description"]}
-      introMaxChars={250}
-      label="Chỉ số thời gian"
-      lockedAspects={["Tình cảm trong năm", "Sức khỏe & lifestyle", "Mối quan hệ gia đình"]}
-      shownFields={[
-        { key: "career", icon: "💼", label: "Sự nghiệp", maxChars: 120 },
-        { key: "finance", icon: "💰", label: "Tài chính", maxChars: 120 },
-      ]}
-      title={`Năm Cá Nhân ${report.personalYear.year}: Số`}
-    />
-  );
-}
-
-function ProfileHero({
-  dob,
-  report,
-  userName,
-}: {
-  dob: string;
-  report: NumerologyReport;
-  userName: string;
-}) {
-  return (
-    <section className="rounded-lg border border-white/10 bg-[#0c0816]/86 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34)] sm:p-7">
-      <div className="grid gap-4 border-b border-white/10 pb-5 text-sm sm:grid-cols-2">
-        <div>
-          <div className="text-white/48">Họ và tên</div>
-          <div className="mt-1 text-lg font-semibold text-[#f5e8c7]">{userName}</div>
-        </div>
-        <div>
-          <div className="text-white/48">Ngày sinh</div>
-          <div className="mt-1 text-lg font-semibold text-[#f5e8c7]">{dob}</div>
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center gap-6 py-8">
-        <div className="relative grid size-48 place-items-center rounded-full bg-[radial-gradient(circle_at_center,rgba(247,201,72,0.22),rgba(168,85,247,0.12)_48%,rgba(12,8,22,0.18)_70%)] shadow-[0_0_72px_rgba(247,201,72,0.28)] ring-4 ring-[#f7c948]/70 sm:size-64">
-          <div className="absolute inset-4 rounded-full border border-white/12" />
-          <div className="text-center">
-            <div className="text-xs font-semibold text-white/58 sm:text-sm">SỐ CHỦ ĐẠO</div>
-            <div className="mt-2 text-7xl font-black leading-none text-[#f7c948] sm:text-8xl">
-              {displayNumber(report.lifePath)}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function DashboardChips({ report }: { report: NumerologyReport }) {
-  return (
-    <section>
-      <div className="mb-4">
-        <h2 className="text-xl font-bold text-[var(--bm-text-main)]">Các chỉ số chính</h2>
-        <p className="mt-2 text-sm text-[var(--bm-text-soft)]">
-          Đây là bảng số khái quát để bạn nhìn nhanh cấu trúc năng lượng của hồ sơ.
-        </p>
-      </div>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {indicatorChips.map(([label, key]) => {
-          const indicator = report[key] as IndicatorResult;
-          return (
-            <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 text-center" key={key}>
-              <div className="text-3xl font-black text-[#f5e8c7]">{displayNumber(indicator)}</div>
-              <div className="mt-1 text-xs text-white/58">{label}</div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function UnlockCTA({
-  detailUrl,
-  final,
-  onUnlock,
-  unlocked,
-  userName,
-}: {
-  detailUrl: string;
-  final?: boolean;
-  onUnlock: () => void;
-  unlocked: boolean;
-  userName: string;
-}) {
-  return (
-    <section className="scroll-mt-8" id={final ? UNLOCK_CTA_ID : undefined}>
-      <Card className={`bm-cta-card ${final ? "bm-cta-card-final" : ""}`} variant="glass" padding="lg">
-        <h2>{final ? "Đường đời bản đồ này nằm trong báo cáo đầy đủ" : `Luận giải đầy đủ về ${userName}`}</h2>
-
-        <div className="bm-cta-divider" />
-
-        <h3>🎯 Báo cáo đầy đủ gồm:</h3>
-        <ul>
-          <li>✓ 33 chỉ số phân tích chuyên sâu</li>
-          <li>✓ {LOCKED_COUNT} mục đang khóa theo 3 phần B/C/D</li>
-          <li>✓ Vận số 11 năm tới và chi tiết 3 năm</li>
-          <li>✓ Lưới Pythagoras 3x3 và mũi tên sức mạnh</li>
-          <li>✓ Bài học Karmic và Nợ Nghiệp nếu có</li>
-          <li>✓ Hơn 50.000 chữ luận giải cá nhân hóa</li>
-        </ul>
-
-        <div className="bm-cta-divider" />
-
-        <h3>💵 Bạn nhận được với {PRICE}:</h3>
-        <ul>
-          <li>⏱ Truy cập vĩnh viễn, đọc lại không giới hạn</li>
-          <li>📱 Đọc trên mọi thiết bị</li>
-          <li>🔧 Hỗ trợ sửa thông tin trong 24h</li>
-          <li>🔒 Bảo mật PayOS qua ngân hàng Việt Nam</li>
-        </ul>
-
-        <div className="bm-cta-divider" />
-
-        <div className="bm-cta-price-block">
-          <div className="bm-cta-price">{PRICE}</div>
-          <div className="bm-cta-anchor">(~ giá 2 bát phở)</div>
-        </div>
-
-        {unlocked ? (
-          <Button href={detailUrl} fullWidth size="lg" variant="primary">
-            Xem báo cáo đầy đủ
-          </Button>
-        ) : (
-          <Button fullWidth onClick={onUnlock} size="lg" variant="primary">
-            Khám phá toàn bộ chỉ số →
-          </Button>
-        )}
-
-        <p className="bm-cta-disclaimer">ⓘ Không hoàn tiền sau khi mở khóa</p>
-      </Card>
-    </section>
-  );
-}
-
 export function SummaryDashboard({
   report,
   userName,
   dob,
   unlocked,
-  onUnlock,
 }: SummaryDashboardProps) {
   const searchParams = useSearchParams();
   const detailUrl = detailsHref(searchParams);
   const currentYear = report.personalYear.year;
-  const lineData = calcLineChartData(report, currentYear, -5, 5);
-  const careerGroups = calcCareerGroups(report.lifePath.number, report.destiny.number);
+  const lineData = useMemo(
+    () => calcLineChartData(report, currentYear, -5, 5),
+    [currentYear, report],
+  );
+  const personalityGroups = useMemo(
+    () => calcPersonalityGroups(report.input.dobParts),
+    [report.input.dobParts],
+  );
+  const careerGroups = useMemo(
+    () => calcCareerGroups(report.lifePath.number, report.destiny.number),
+    [report.destiny.number, report.lifePath.number],
+  );
 
   return (
     <div className="space-y-8">
-      <ProfileHero dob={dob} report={report} userName={userName} />
+      <section className="rounded-lg border border-white/10 bg-[#0c0816]/86 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34)] sm:p-7">
+        <div className="grid gap-4 border-b border-white/10 pb-5 text-sm sm:grid-cols-2">
+          <div>
+            <div className="text-white/48">Họ và tên</div>
+            <div className="mt-1 text-lg font-semibold text-[#f5e8c7]">{userName}</div>
+          </div>
+          <div>
+            <div className="text-white/48">Ngày sinh</div>
+            <div className="mt-1 text-lg font-semibold text-[#f5e8c7]">{dob}</div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-6 py-8">
+          <div className="relative grid size-48 place-items-center rounded-full bg-[radial-gradient(circle_at_center,rgba(247,201,72,0.22),rgba(168,85,247,0.12)_48%,rgba(12,8,22,0.18)_70%)] shadow-[0_0_72px_rgba(247,201,72,0.28)] ring-4 ring-[#f7c948]/70 sm:size-64">
+            <div className="absolute inset-4 rounded-full border border-white/12" />
+            <div className="text-center">
+              <div className="text-xs font-semibold text-white/58 sm:text-sm">SỐ CHỦ ĐẠO</div>
+              <div className="mt-2 text-7xl font-black leading-none text-[#f7c948] sm:text-8xl">
+                {displayNumber(report.lifePath)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="bm-result-overview">
         <h2>Tổng quan</h2>
         <p>{generateOverview(report, userName)}</p>
       </section>
 
-      <DashboardChips report={report} />
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <RichIndicatorPreview
-          indicator={report.lifePath}
-          introField={["description", "meaning"]}
-          introMaxChars={300}
-          label="Chỉ số chính"
-          lockedAspects={[
-            "Điểm yếu cần lưu ý",
-            "Tình cảm & cách yêu",
-            "Sức khỏe & cân bằng",
-            "Tài chính & quản lý tiền",
-            "Phong cách phụ huynh",
-            "Đối tác phù hợp & khắc khẩu",
-            "Người nổi tiếng cùng chỉ số",
-          ]}
-          numberOverride={report.lifePath.displayNumber ?? report.lifePath.number}
-          positiveTraitsKey="positive_traits"
-          shownFields={[{ key: "career", icon: "💼", label: "Sự nghiệp phù hợp", maxChars: 100 }]}
-          title="Số Đường Đời"
-        />
-        <PersonalYearPreview report={report} />
+      <section>
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-[var(--bm-text-main)]">Các chỉ số chính</h2>
+          <p className="mt-2 text-sm text-[var(--bm-text-soft)]">
+            Bảng số khái quát để bạn nhìn nhanh cấu trúc năng lượng của hồ sơ.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {indicatorChips.map(([label, key]) => {
+            const indicator = report[key] as IndicatorResult;
+            return (
+              <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 text-center" key={key}>
+                <div className="text-3xl font-black text-[#f5e8c7]">{displayNumber(indicator)}</div>
+                <div className="mt-1 text-xs text-white/58">{label}</div>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
-      <section className="bm-visual-section">
-        <h2>Biểu đồ vận số 11 năm</h2>
+      <section className="space-y-4">
+        <h2 className="text-lg font-bold text-[#f5e8c7]">Chu kỳ vận số của bạn</h2>
         <LineChartVanSo data={lineData} />
       </section>
 
-      <section className="bm-visual-section">
-        <h2>Nhóm ngành nghề phù hợp</h2>
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-lg font-bold text-[#f5e8c7]">Nhóm tính cách theo biểu đồ ngày sinh</h2>
+          <p className="text-sm leading-6 text-white/62">
+            Các nhóm tính cách bẩm sinh được phân tích từ biểu đồ Pythagoras ngày sinh.
+          </p>
+        </div>
+        <PersonalityBars groups={personalityGroups} />
+      </section>
+
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-lg font-bold text-[#f5e8c7]">Nhóm ngành phù hợp</h2>
+          <p className="text-sm leading-6 text-white/62">
+            Gợi ý định hướng dựa trên Số Đường Đời và Số Sứ Mệnh.
+          </p>
+        </div>
         <CareerBars groups={careerGroups} />
       </section>
 
-      <LifeCyclesSummary report={report} />
-
-      <PersonalMonthFull report={report} />
-
-      {unlocked ? null : <UnlockCTA detailUrl={detailUrl} onUnlock={onUnlock} unlocked={unlocked} userName={userName} />}
-
-      {unlocked ? (
-        <UnlockCTA detailUrl={detailUrl} final onUnlock={onUnlock} unlocked={unlocked} userName={userName} />
-      ) : (
-        <>
-          <LockedSectionsGrouped onUnlock={onUnlock} report={report} />
-          <UnlockCTA detailUrl={detailUrl} final onUnlock={onUnlock} unlocked={unlocked} userName={userName} />
-          <FAQSection />
-          <StickyBottomCTA onUnlock={onUnlock} />
-        </>
-      )}
+      <Card as="section" className="text-center" padding="lg" variant="glass">
+        <h2>Luận giải chi tiết</h2>
+        <p className="mx-auto mt-3 max-w-2xl text-[var(--bm-text-soft)]">
+          Màn chi tiết sẽ mở một số chỉ số miễn phí trước, các phần chuyên sâu còn lại được khóa
+          ngay trong dòng đọc.
+        </p>
+        <Button className="mt-6" href={detailUrl} size="lg" variant="primary">
+          {unlocked ? "Xem báo cáo đầy đủ" : "Xem chi tiết miễn phí"}
+        </Button>
+      </Card>
     </div>
   );
 }
