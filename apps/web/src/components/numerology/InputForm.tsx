@@ -212,8 +212,8 @@ export function InputForm() {
         <Button className="mt-7" fullWidth loading={submitting} type="submit">
           Phân tích báo cáo của tôi
         </Button>
-        <p className="mt-4 text-sm text-[var(--bm-text-muted)]">
-          Báo cáo dùng để tham khảo và tự quan sát, không thay thế tư vấn chuyên môn.
+        <p className="mt-4 text-sm leading-6 text-[var(--bm-text-muted)]">
+          Mỗi bản luận giải là một tấm gương để bạn nhìn lại nhịp sống, lựa chọn và những khuynh hướng nổi bật của mình.
         </p>
       </form>
     </Card>
