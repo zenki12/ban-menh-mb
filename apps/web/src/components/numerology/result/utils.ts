@@ -21,3 +21,17 @@ export function truncateText(value: string, maxLength: number): string {
   const trimmed = normalized.slice(0, maxLength).trimEnd();
   return `${trimmed}...`;
 }
+
+/**
+ * Extract plain text from HTML, strip all tags and collapse whitespace.
+ */
+export function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}

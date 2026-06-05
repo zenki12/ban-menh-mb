@@ -8,7 +8,7 @@ import { LockedGrid, type LockedGroup } from "./LockedGrid";
 import { generateOverview } from "./overview";
 import { PersonalMonthFull } from "./PersonalMonthFull";
 import { UNLOCK_CTA_ID } from "./scrollToUnlock";
-import { LOCKED_COUNT, readString, truncateText } from "./utils";
+import { LOCKED_COUNT, readString, stripHtml, truncateText } from "./utils";
 
 type SummaryDashboardProps = {
   report: NumerologyReport;
@@ -86,14 +86,32 @@ function displayNumber(indicator: IndicatorResult) {
 }
 
 function indicatorTitle(indicator: IndicatorResult, fallbackLabel: string) {
-  return readString(indicator.data, ["title", "name", "theme"]) || `${fallbackLabel} ${displayNumber(indicator)}`;
+  return (
+    readString(indicator.data, ["title", "name", "theme", "label", "subtitle"]) ||
+    `${fallbackLabel} ${displayNumber(indicator)}`
+  );
 }
 
 function previewBody(indicator: IndicatorResult, maxLength: number) {
-  const text =
-    readString(indicator.data, ["description", "meaning", "title"]) ||
-    `Chỉ số ${displayNumber(indicator)} mở ra một góc nhìn khái quát về năng lượng nổi bật của bạn.`;
-  return truncateText(text, maxLength);
+  const narrative = (indicator as { narrative?: string | null }).narrative;
+  if (typeof narrative === "string" && narrative.trim()) {
+    const cleaned = stripHtml(narrative).replace(/\{\{[^}]+\}\}/g, "bạn");
+    if (cleaned.length > 50) return truncateText(cleaned, maxLength);
+  }
+
+  const fallbackText = readString(indicator.data, [
+    "description",
+    "meaning",
+    "summary",
+    "theme",
+    "strengths",
+    "intro",
+    "title",
+  ]);
+
+  if (fallbackText) return truncateText(fallbackText, maxLength);
+
+  return `Chỉ số ${displayNumber(indicator)} mở ra góc nhìn về năng lượng nổi bật của bạn.`;
 }
 
 function IndicatorPreview({
@@ -121,9 +139,9 @@ function IndicatorPreview({
 }
 
 function PersonalYearPreview({ report }: { report: NumerologyReport }) {
-  const personalYearTitle = readString(report.personalYear.data, ["title", "theme"]);
+  const personalYearTitle = readString(report.personalYear.data, ["title", "theme", "name"]);
   const personalYearIntro =
-    readString(report.personalYear.data, ["description", "meaning", "summary"]) ||
+    readString(report.personalYear.data, ["description", "meaning", "summary", "theme", "intro"]) ||
     `Năm cá nhân ${report.personalYear.number} mở ra một nhịp vận số riêng cho hiện tại.`;
 
   return (
@@ -135,7 +153,7 @@ function PersonalYearPreview({ report }: { report: NumerologyReport }) {
         Năm Cá Nhân {report.personalYear.year}: Số {report.personalYear.number}
         {personalYearTitle ? ` - "${personalYearTitle}"` : ""}
       </h3>
-      <p className="mt-4 text-[var(--bm-text-soft)]">{truncateText(personalYearIntro, 200)}</p>
+      <p className="mt-4 text-[var(--bm-text-soft)]">{truncateText(personalYearIntro, 300)}</p>
     </Card>
   );
 }
@@ -207,7 +225,7 @@ export function SummaryDashboard({
         <IndicatorPreview
           indicator={report.lifePath}
           label="Chỉ số chính"
-          maxLength={200}
+          maxLength={350}
           title="Số Đường Đời"
         />
         <PersonalYearPreview report={report} />
