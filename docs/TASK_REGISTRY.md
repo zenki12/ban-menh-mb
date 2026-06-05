@@ -3449,6 +3449,37 @@ Update khi xong (2026-06-05):
 - Thêm CSS cho month preview trong `numerology-result.css`.
 - Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
 
+### T-PAY-NUM-3-FIX - Make free preview generous, use all available data
+
+Status: Done
+
+Bối cảnh:
+
+- Free preview hiện ưu tiên field ngắn trong `kb.json`, nên nhiều trường hợp rơi vào nội dung generic hoặc quá mỏng.
+- Life Path đã có narrative HTML rich content và `personal_month` có các field như `focus`, `action`, `moon_link`, `warning`.
+
+Yêu cầu:
+
+- Preview Đường Đời ưu tiên narrative HTML, strip tag, thay placeholder bằng `bạn`, rồi truncate.
+- Mở rộng field fallback cho indicator title/body và tăng Life Path preview lên 350 ký tự.
+- Personal Year preview dùng thêm `theme`, `intro`, `name` và truncate 300 ký tự.
+- PersonalMonthFull render tự động tất cả field có data trong mapping.
+- Không đụng KB, narrative, synthesizer, workers, API routes, pricing.
+
+Điều kiện Done:
+
+- `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build` pass.
+- Preview không crash khi data/null field thiếu.
+- Tháng Cá Nhân render được mọi field có data trong `FIELD_META`.
+
+Update khi xong (2026-06-05):
+
+- Added `stripHtml` helper and made indicator preview prefer narrative HTML before KB fallback fields.
+- Expanded title/body fallback field lists and increased Life Path preview length to 350 characters.
+- Expanded Personal Year preview fields and length to 300 characters.
+- Reworked `PersonalMonthFull` to render every string field covered by `FIELD_META`, skipping missing/non-string values.
+- Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
 ### T-PAY-NUM-1-DEPLOY - Deploy and smoke numerology payment
 
 Status: Todo

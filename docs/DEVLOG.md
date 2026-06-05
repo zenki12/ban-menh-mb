@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-05 14:39 +07 | T-PAY-NUM-3-FIX | Generous free preview from narrative + month fields | `Task` |
 | 2026-06-05 13:53 +07 | T-PAY-NUM-2 | Numerology free preview flow + CTA FAQ | `Task` |
 | 2026-06-05 11:33 +07 | T-PAY-NUM-1 | Numerology payment module-scoped routes | `Task` |
 | 2026-06-05 14:15 +07 | T-PAY-NUM-3 | Free preview indicators + anchor wording | `Task` |
@@ -128,6 +129,32 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-05 14:39 +07] - T-PAY-NUM-3-FIX: Generous free preview from narrative + month fields
+
+**Loai:** `Task`
+**Ref:** T-PAY-NUM-3-FIX
+
+> Make the free preview use richer data already present in the report response, without touching KB, narrative files, synthesizer, workers, API routes, or pricing.
+
+Changed:
+
+- Added `stripHtml()` and made indicator preview prefer narrative HTML before KB data fallbacks.
+- Expanded indicator title/body fallback fields and increased Life Path preview from 200 to 350 characters.
+- Expanded Personal Year fallback fields and increased preview length to 300 characters.
+- Reworked `PersonalMonthFull` to render every available string field covered by `FIELD_META`, including `focus`, `action`, `moon_link`, `warning`, `avoid`, `best_for`, and related fields.
+
+Verification:
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+
+Notes:
+
+- Manual browser visual check was not run in this turn; build verification passed.
 
 ---
 
