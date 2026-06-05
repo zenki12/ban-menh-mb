@@ -7,8 +7,9 @@ import { Button, Card } from "../../ui";
 import { LockedGrid, type LockedGroup } from "./LockedGrid";
 import { generateOverview } from "./overview";
 import { PersonalMonthFull } from "./PersonalMonthFull";
+import { RichIndicatorPreview } from "./RichIndicatorPreview";
 import { UNLOCK_CTA_ID } from "./scrollToUnlock";
-import { LOCKED_COUNT, readString, stripHtml, truncateText } from "./utils";
+import { LOCKED_COUNT } from "./utils";
 
 type SummaryDashboardProps = {
   report: NumerologyReport;
@@ -85,76 +86,20 @@ function displayNumber(indicator: IndicatorResult) {
   return indicator.displayNumber ?? indicator.number;
 }
 
-function indicatorTitle(indicator: IndicatorResult, fallbackLabel: string) {
-  return (
-    readString(indicator.data, ["title", "name", "theme", "label", "subtitle"]) ||
-    `${fallbackLabel} ${displayNumber(indicator)}`
-  );
-}
-
-function previewBody(indicator: IndicatorResult, maxLength: number) {
-  const narrative = (indicator as { narrative?: string | null }).narrative;
-  if (typeof narrative === "string" && narrative.trim()) {
-    const cleaned = stripHtml(narrative).replace(/\{\{[^}]+\}\}/g, "bạn");
-    if (cleaned.length > 50) return truncateText(cleaned, maxLength);
-  }
-
-  const fallbackText = readString(indicator.data, [
-    "description",
-    "meaning",
-    "summary",
-    "theme",
-    "strengths",
-    "intro",
-    "title",
-  ]);
-
-  if (fallbackText) return truncateText(fallbackText, maxLength);
-
-  return `Chỉ số ${displayNumber(indicator)} mở ra góc nhìn về năng lượng nổi bật của bạn.`;
-}
-
-function IndicatorPreview({
-  title,
-  label,
-  indicator,
-  maxLength,
-}: {
-  title: string;
-  label: string;
-  indicator: IndicatorResult;
-  maxLength: number;
-}) {
-  return (
-    <Card as="article" variant="glass" padding="lg">
-      <p className="text-sm font-bold uppercase tracking-[0.14em] text-[var(--bm-primary-soft)]">
-        {label}
-      </p>
-      <h3 className="mt-3">
-        {title} {displayNumber(indicator)} - "{indicatorTitle(indicator, title)}"
-      </h3>
-      <p className="mt-4 text-[var(--bm-text-soft)]">{previewBody(indicator, maxLength)}</p>
-    </Card>
-  );
-}
-
 function PersonalYearPreview({ report }: { report: NumerologyReport }) {
-  const personalYearTitle = readString(report.personalYear.data, ["title", "theme", "name"]);
-  const personalYearIntro =
-    readString(report.personalYear.data, ["description", "meaning", "summary", "theme", "intro"]) ||
-    `Năm cá nhân ${report.personalYear.number} mở ra một nhịp vận số riêng cho hiện tại.`;
-
   return (
-    <Card as="article" variant="glass" padding="lg">
-      <p className="text-sm font-bold uppercase tracking-[0.14em] text-[var(--bm-primary-soft)]">
-        Chỉ số thời gian
-      </p>
-      <h3 className="mt-3">
-        Năm Cá Nhân {report.personalYear.year}: Số {report.personalYear.number}
-        {personalYearTitle ? ` - "${personalYearTitle}"` : ""}
-      </h3>
-      <p className="mt-4 text-[var(--bm-text-soft)]">{truncateText(personalYearIntro, 300)}</p>
-    </Card>
+    <RichIndicatorPreview
+      indicator={report.personalYear}
+      introField={["theme", "description"]}
+      introMaxChars={250}
+      label="Chỉ số thời gian"
+      lockedAspects={["Tình cảm trong năm", "Sức khỏe & lifestyle", "Mối quan hệ gia đình"]}
+      shownFields={[
+        { key: "career", icon: "💼", label: "Sự nghiệp", maxChars: 120 },
+        { key: "finance", icon: "💰", label: "Tài chính", maxChars: 120 },
+      ]}
+      title={`Năm Cá Nhân ${report.personalYear.year}: Số`}
+    />
   );
 }
 
@@ -222,10 +167,23 @@ export function SummaryDashboard({
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <IndicatorPreview
+        <RichIndicatorPreview
           indicator={report.lifePath}
+          introField={["description", "meaning"]}
+          introMaxChars={300}
           label="Chỉ số chính"
-          maxLength={350}
+          lockedAspects={[
+            "Điểm yếu cần lưu ý",
+            "Tình cảm & cách yêu",
+            "Sức khỏe & cân bằng",
+            "Tài chính & quản lý tiền",
+            "Phong cách phụ huynh",
+            "Đối tác phù hợp & khắc khẩu",
+            "Người nổi tiếng cùng chỉ số",
+          ]}
+          numberOverride={report.lifePath.displayNumber ?? report.lifePath.number}
+          positiveTraitsKey="positive_traits"
+          shownFields={[{ key: "career", icon: "💼", label: "Sự nghiệp phù hợp", maxChars: 100 }]}
           title="Số Đường Đời"
         />
         <PersonalYearPreview report={report} />
