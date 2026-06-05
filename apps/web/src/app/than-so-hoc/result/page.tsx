@@ -10,8 +10,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 import { PageShell } from "../../../components/layout";
-import { FAQSection } from "../../../components/numerology/result/FAQSection";
-import { StickyBottomCTA } from "../../../components/numerology/result/StickyBottomCTA";
 import { SummaryDashboard } from "../../../components/numerology/result/SummaryDashboard";
 import { ErrorState, LoadingState, UnauthorizedState } from "../../../components/ui";
 import { fetchWithAuth } from "../../../lib/api/client";
@@ -128,12 +126,10 @@ function ResultContent() {
         unlocked={unlocked}
         userName={input.fullName}
       />
-      <FAQSection />
       <p className="mt-10 text-sm text-[var(--bm-text-muted)]">
         Nội dung Thần số học chỉ dùng để tham khảo và tự quan sát, không khẳng định tương lai
         chắc chắn, không thay thế tư vấn chuyên môn hoặc quyết định quan trọng.
       </p>
-      {unlocked ? null : <StickyBottomCTA onUnlock={openPayment} />}
     </PageShell>
   );
 }
