@@ -1,6 +1,7 @@
 import type { IndicatorResult } from "@banmenh/shared";
 import { Card } from "../../ui";
 import { ASPECT_CONFIG, readAspectText } from "./aspects";
+import { stripHtml } from "./utils";
 
 export type NarrativeIndicator = IndicatorResult & { narrative?: string | null };
 
@@ -27,11 +28,19 @@ function readTitle(data: Record<string, unknown>, fallback: string) {
 }
 
 function readDescription(data: Record<string, unknown>) {
-  for (const key of ["description", "meaning", "dynamic"]) {
+  for (const key of ["summary", "overview", "description", "meaning", "dynamic", "lesson", "mission", "growth_path"]) {
     const value = data[key];
-    if (typeof value === "string" && value.trim()) return value;
+    if (typeof value === "string" && value.trim().length > 20) return value;
   }
   return "";
+}
+
+function readNarrativeOverview(narrative?: string | null) {
+  if (!narrative) return "";
+  return narrative
+    .split(/<\/p>/i)
+    .map((item) => stripHtml(`${item}</p>`))
+    .find((item) => item.length > 80) ?? "";
 }
 
 function readStringArray(data: Record<string, unknown>, key: string): string[] {
@@ -54,7 +63,7 @@ function readKeywords(data: Record<string, unknown>) {
 export function FreeIndicatorSection({ indicator, title, hint }: FreeIndicatorSectionProps) {
   const data = asRecord(indicator.data);
   const displayNumber = indicator.displayNumber ?? indicator.number;
-  const description = readDescription(data);
+  const description = readDescription(data) || readNarrativeOverview(indicator.narrative);
   const aspects = ASPECT_CONFIG
     .map((aspect) => ({ ...aspect, text: readAspectText(data, aspect.fields) }))
     .filter((aspect) => aspect.text);
@@ -110,8 +119,15 @@ export function FreeIndicatorSection({ indicator, title, hint }: FreeIndicatorSe
           </p>
           <h2 className="mt-3 text-gradient-purple">{readTitle(data, title)}</h2>
           <p className="mt-3 italic text-[var(--bm-text-soft)]">{hint}</p>
+          {description ? (
+            <div className="mt-5 rounded-xl border border-[var(--bm-border-subtle)] bg-[rgba(2,6,23,0.35)] p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--bm-gold-bright)]">
+                Tổng quát
+              </p>
+              <p className="mt-2 text-[var(--bm-text-main)]">{description}</p>
+            </div>
+          ) : null}
           <div className="my-6 h-px bg-[var(--bm-border-subtle)]" />
-          {description ? <p className="mb-6 text-[var(--bm-text-main)]">{description}</p> : null}
           {indicator.narrative ? (
             <div className="nar-container" dangerouslySetInnerHTML={{ __html: indicator.narrative }} />
           ) : null}
