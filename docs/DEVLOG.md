@@ -37,6 +37,7 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-05 13:53 +07 | T-PAY-NUM-2 | Numerology free preview flow + CTA FAQ | `Task` |
 | 2026-06-05 11:33 +07 | T-PAY-NUM-1 | Numerology payment module-scoped routes | `Task` |
 | 2026-06-04 23:54 +07 | T-0610c-lifePath10 | Life Path 10 display + narrative KB | `Task` |
 | 2026-06-04 13:49 +07 | T-0606o/T-0606n | Free voucher commit + security hardening | `Task` |
@@ -126,6 +127,39 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-05 13:53 +07] - T-PAY-NUM-2: Numerology free preview flow + CTA FAQ
+
+**Loai:** `Task`
+**Ref:** T-PAY-NUM-2
+
+> Make `/than-so-hoc/result` the single free preview surface and reserve `/result/details` for unlocked users.
+
+Changed:
+
+- Added `generateOverview(report, name)` helper and free preview constants.
+- Refactored `SummaryDashboard` to render profile, overview, 8 core chips, 2 concise indicator previews, locked grid and enhanced CTA.
+- Added dynamic locked count `33 - 2 = 31`.
+- Added `FAQSection` with 5 accordion items and accessible `aria-expanded`.
+- Refactored `StickyBottomCTA` to appear on mobile after scroll > 600px with listener cleanup.
+- Added `numerology-result.css` for preview, CTA, FAQ, locked and sticky blocks.
+- Updated `/than-so-hoc/result/details` to redirect locked users back to `/than-so-hoc/result?notice=locked`.
+
+Not changed:
+
+- Did not touch KB content, `narrative.json`, synthesizer, pricing, entitlement logic, workers or API routes.
+
+Verification:
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+
+Residual risk:
+
+- Manual browser smoke should still be run with a logged-in locked/unlocked account to confirm redirect and sticky behavior against real entitlement state.
 
 ---
 

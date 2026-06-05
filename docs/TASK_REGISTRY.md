@@ -3380,6 +3380,41 @@ Update khi xong (2026-06-05):
 - Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
 - Not done by design: worker/webhook deploy and PayOS sandbox smoke test, deferred to `T-PAY-NUM-1-DEPLOY`.
 
+### T-PAY-NUM-2 - Refactor free preview flow and CTA FAQ
+
+Status: Done
+
+Bối cảnh:
+
+- `/than-so-hoc/result` cần là free preview duy nhất cho báo cáo Thần số học.
+- `/than-so-hoc/result/details` chỉ dành cho user đã unlock.
+- Preview cũ còn nằm một phần trong details page, khiến flow mua báo cáo chưa rõ.
+
+Yêu cầu:
+
+- Refactor `/than-so-hoc/result` thành preview đầy đủ: profile, overview, 8 chỉ số chính, 2 indicator previews, locked grid, CTA, FAQ, sticky CTA mobile.
+- Thêm `generateOverview()` dùng data từ report.
+- LockedGrid dùng count động `33 - 2 = 31`.
+- `/than-so-hoc/result/details` redirect về `/than-so-hoc/result?notice=locked` khi user chưa unlock.
+- Không đụng KB content, narrative, synthesizer, pricing, entitlement logic, workers hoặc API routes.
+
+Điều kiện Done:
+
+- `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build` pass.
+- `/result` có preview structure mới.
+- `/result/details` chỉ render `FullReport` khi unlocked.
+- Sticky CTA chỉ hiện trên mobile sau scroll.
+
+Update khi xong (2026-06-05):
+
+- Added `overview.ts`, result preview utilities and dynamic locked count constants.
+- Refactored `SummaryDashboard` into free preview flow with overview, 8 chips and 2 concise indicator previews.
+- Added enhanced CTA card with benefits and price anchor.
+- Added FAQ accordion and scroll-aware sticky mobile CTA.
+- Gated details page for unlocked users only; locked users redirect to summary with notice.
+- Added `numerology-result.css` and imported it through `globals.css`.
+- Verified: `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run build`.
+
 ### T-PAY-NUM-1-DEPLOY - Deploy and smoke numerology payment
 
 Status: Todo
