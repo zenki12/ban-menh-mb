@@ -81,6 +81,46 @@ Cập nhật khi xong:
 - Đã move `logo/` vào `apps/web/public/logo/`.
 - Đã giữ icon module tại `apps/web/public/icons/modules/`.
 
+### T-HOME-DEMO - Tạo 3 homepage demo variants để so sánh
+
+Status: Done
+
+Bối cảnh:
+
+- Homepage chính thức đang dùng shared components sau T-HOME-1.
+- Cần có 3 hướng demo riêng để so sánh trước khi promote bản cuối.
+- Demo routes nằm trong `.gitignore`, chỉ dùng local review.
+
+Yêu cầu:
+
+- Không đụng homepage chính thức `/`.
+- Không đụng `components/homepage/`.
+- Không đổi `pricing.ts`, KB, workers, synthesizer.
+- Tạo 3 route demo riêng: Clean, Focused, Premium.
+- Tạo `/demo` index để so sánh.
+- Mỗi variant tự maintain components riêng, không share với homepage chính.
+
+Output:
+
+- Local ignored route `/demo/homepage-v2-clean`.
+- Local ignored route `/demo/homepage-v2-focused`.
+- Local ignored route `/demo/homepage-v2-premium`.
+- Local ignored route `/demo` index.
+
+Điều kiện Done:
+
+- Các route demo trả `200`.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Mỗi page/component demo dưới giới hạn dòng.
+
+Cập nhật khi xong:
+
+- Đã tạo Variant A Clean: benefit-first, tối giản, giá 99.000đ.
+- Đã tạo Variant B Focused: outcome-first, 3 câu hỏi lớn, FAQ, pricing CTA.
+- Đã tạo Variant C Premium: spiritual vibe, methodology, testimonials placeholder có TODO.
+- Đã giữ Tarot status là sắp ra mắt/Q1 2027 trong variants.
+- Đã không đụng homepage chính thức.
+
 ## Phase 0 - Khóa Nền Tảng Dự Án
 
 ### T-0001 - Chốt tài liệu nền V2
@@ -2727,6 +2767,47 @@ Yêu cầu:
 - Free voucher feature committed: `745bf75`.
 - T-0606n CORS, middleware, audit fix, and rate limiting complete: `49c1999`, `8acfc16`, `a61ce8b`, `4d63861`.
 - Final typecheck/lint, worker TS, KB tests, and webpack build pass.
+
+### T-AUDIT-S1 - Fix 5 blocker findings from project audit
+
+Status: Done
+
+Bối cảnh:
+
+- Audit toan dự án phát hiện 5 blocker findings cần xử lý theo từng item atomic commit.
+- Phạm vi chia rõ: C1 homepage promotion, C2 PayOS signature hardening, C3 voucher per-user limit, I13 typecheck OOM, I15 cleanup local-only demo variants.
+
+Yêu cầu:
+
+- Mỗi item = 1 atomic commit.
+- Không đụng KB content, narrative, synthesizer logic.
+- Không dùng `--no-verify`, `--force`, `--amend`.
+- Không commit `kb-private/*` hoặc `.env.local`.
+- Sau mỗi fix: `typecheck` + `lint` pass.
+
+Output cần có:
+
+- `apps/web/src/components/homepage-v2/` với Mystic Hub production.
+- `workers/payment/src/lib/payos-signature.ts` và `apps/web/src/lib/payos/signature.ts` constant-time compare.
+- `tools/test-payos-signature.mjs` và `npm run payos:test-sig`.
+- `perUserLimit` enforcement qua `countByUserAndVoucher`.
+- `apps/web/tsconfig.json` narrow include + `apps/web/package.json` typecheck heap bump.
+
+Goal:
+
+- Chốt 5 blocker audit findings mà không phá flow hiện tại.
+
+Điều kiện Done:
+
+- 4 commits atomic: C1, C2, C3, I13.
+- I15 cleanup local-only, không commit.
+- `npm run typecheck`, `npm run lint`, `npm run payos:test-sig` pass.
+- Homepage chính ở `/` render Mystic Hub production.
+
+Update khi xong:
+
+- Hoàn tất 2026-06-10: Mystic Hub promoted to production homepage, PayOS signature hardened, voucher perUserLimit enforced, typecheck OOM fix applied, stale demo variants removed local-only.
+- Manual smoke vẫn còn cần user credential nếu muốn test voucher free-unlock 2 lần qua API.
 
 ### T-0607 - Restructure result flow và port V1 charts
 

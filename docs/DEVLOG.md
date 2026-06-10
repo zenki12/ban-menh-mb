@@ -37,6 +37,8 @@
 
 | Ngày & Giờ | Ref | Tiêu đề | Loại |
 |-----------|-----|---------|------|
+| 2026-06-10 00:00 +07 | T-AUDIT-S1 | Fix 5 blocker findings from project audit | `Task` |
+| 2026-06-06 00:37 +07 | T-HOME-DEMO | Local homepage A/B/C variants | `Task` |
 | 2026-06-06 00:37 +07 | T-HOME-1 | Homepage shared component refactor | `Task` |
 | 2026-06-05 15:31 +07 | T-PAY-NUM-4 | Free preview Mystical Hub redesign | `Task` |
 | 2026-06-05 15:16 +07 | T-UX-ERR-1 | Auth-aware error states | `Task` |
@@ -133,6 +135,70 @@
 <!-- ============================================================
      ENTRY MỚI NHẤT Ở TRÊN CÙNG
      ============================================================ -->
+
+---
+
+## [2026-06-10 00:00 +07] - T-AUDIT-S1: Fix 5 blocker findings from project audit
+
+**Loại:** `Task`  
+**Ref:** T-AUDIT-S1
+
+**Đã làm**
+
+- C1: Promote Mystic Hub homepage từ ignored demo route sang `apps/web/src/components/homepage-v2/`; root `page.tsx` không còn import từ `demo/`.
+- C2: PayOS signature verify dùng constant-time compare, reject non-primitive values khi build signature string, thêm `npm run payos:test-sig`.
+- C3: Enforce `voucher.perUserLimit` bằng Firestore aggregate count theo `userId + voucherCode + status=confirmed`; thêm error code `VOUCHER_PER_USER_LIMIT_EXCEEDED` và composite index purchases.
+- I13: Narrow `apps/web/tsconfig.json` include/exclude và tăng heap cho typecheck lên 4096MB.
+- I15: Xóa local-only stale demo variants `homepage-v2-clean`, `homepage-v2-focused`, `homepage-v2-premium`, `homepage-v2-saas`; không commit vì `demo/` gitignored.
+
+**Không làm**
+
+- Không sửa KB content, narrative JSON, synthesizer logic, route auth/payment ngoài phạm vi audit fix.
+- Không deploy production.
+- Không chạy `--no-verify`, `--force`, hoặc amend.
+
+**Verify đã chạy**
+
+- Sau từng commit C1/C2/C3/I13: `npm.cmd run typecheck`, `npm.cmd run lint`.
+- C2: `npm.cmd run payos:test-sig`.
+
+**Rủi ro còn lại**
+
+- Manual voucher free-unlock lần 2 cần Firebase credential + user thật để smoke qua `/api/payment/create`.
+- Final full KB/build verification chạy ở cuối task để xác nhận toàn bộ batch.
+
+## [2026-06-06 00:37 +07] - T-HOME-DEMO: Local homepage A/B/C variants
+
+**Loại:** Task  
+**Ref:** T-HOME-DEMO
+
+**Đã làm**
+
+- Tạo local route `/demo` để so sánh các homepage variants.
+- Tạo Variant A `/demo/homepage-v2-clean`: tối giản, benefit-first, một CTA chính.
+- Tạo Variant B `/demo/homepage-v2-focused`: outcome-first, 3 câu hỏi lớn, FAQ và pricing CTA.
+- Tạo Variant C `/demo/homepage-v2-premium`: spiritual vibe, methodology cards và testimonials placeholder.
+- Mỗi variant có component/style riêng trong route demo, không dùng chung với homepage chính.
+- Giữ pricing hiển thị `99.000đ`; không đụng `pricing.ts`.
+- Giữ Tarot ở trạng thái sắp ra mắt/Q1 2027.
+
+**Không làm**
+
+- Không đổi homepage chính thức `/`.
+- Không đổi `apps/web/src/components/homepage/*`.
+- Không đụng KB, narrative, synthesizer, workers hoặc payment.
+- Không commit demo files vì `apps/web/src/app/demo/*` đang nằm trong `.gitignore` theo scope task.
+
+**Verify**
+
+- `npm.cmd run typecheck` pass.
+- `npm.cmd run lint` pass.
+- `npm.cmd run build` pass.
+- `/demo`, `/demo/homepage-hub`, `/demo/homepage-v2-clean`, `/demo/homepage-v2-focused`, `/demo/homepage-v2-premium` trả `200`.
+
+**Rủi ro còn lại**
+
+- Demo routes là local ignored files. Nếu muốn version control các demo này, cần task riêng để thay đổi `.gitignore` và commit demo routes.
 
 ---
 
