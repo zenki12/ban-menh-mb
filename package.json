@@ -21,6 +21,7 @@
     "kb:test-challenges": "node tools/kb-import/test-challenges.mjs",
     "kb:test-synthesizer": "node tools/kb-import/test-synthesizer.mjs",
     "kb:test-diacritics": "node tools/kb-import/test-diacritics.mjs",
+    "payos:test-sig": "node tools/test-payos-signature.mjs",
     "kb:extract-narrative": "node tools/kb-import/extract-narrative.mjs",
     "kb:validate-narrative": "node tools/kb-import/validate-narrative.mjs",
     "kb:upload-kv": "node tools/kb-import/upload-to-kv.mjs",

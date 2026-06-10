@@ -1,7 +1,7 @@
 // PayOS signature helper. Document: https://payos.vn/docs/api/
 // Dùng node:crypto — không thêm dependency.
 
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
  * Tạo signature cho PayOS payment request.
@@ -43,10 +43,19 @@ export function verifyPayosSignature(
 ): boolean {
   const sortedKeys = Object.keys(data).sort();
   const queryString = sortedKeys
-    .map((key) => `${key}=${String(data[key])}`)
+    .map((key) => {
+      const value = data[key];
+      if (value !== null && typeof value === "object") {
+        throw new Error(`PayOS signature: non-primitive value at key "${key}"`);
+      }
+      return `${key}=${value ?? ""}`;
+    })
     .join("&");
   const expected = createHmac("sha256", checksumKey)
     .update(queryString)
     .digest("hex");
-  return expected === signature;
+  const expectedBuf = Buffer.from(expected, "hex");
+  const receivedBuf = Buffer.from(signature.toLowerCase(), "hex");
+  if (expectedBuf.length !== receivedBuf.length) return false;
+  return timingSafeEqual(expectedBuf, receivedBuf);
 }

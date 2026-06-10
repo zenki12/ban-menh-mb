@@ -13,7 +13,13 @@ export async function verifyPayosWebhook(
 ): Promise<boolean> {
   const sortedKeys = Object.keys(data).sort();
   const queryString = sortedKeys
-    .map((key) => `${key}=${String(data[key])}`)
+    .map((key) => {
+      const value = data[key];
+      if (value !== null && typeof value === "object") {
+        throw new Error(`PayOS signature: non-primitive value at key "${key}"`);
+      }
+      return `${key}=${value ?? ""}`;
+    })
     .join("&");
 
   const encoder = new TextEncoder();
@@ -33,5 +39,17 @@ export async function verifyPayosWebhook(
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 
-  return signatureHex.toLowerCase() === signature.toLowerCase();
+  return timingSafeEqualHex(signatureHex, signature);
+}
+
+function timingSafeEqualHex(a: string, b: string): boolean {
+  const aLower = a.toLowerCase();
+  const bLower = b.toLowerCase();
+  if (aLower.length !== bLower.length) return false;
+
+  let diff = 0;
+  for (let i = 0; i < aLower.length; i++) {
+    diff |= aLower.charCodeAt(i) ^ bLower.charCodeAt(i);
+  }
+  return diff === 0;
 }
