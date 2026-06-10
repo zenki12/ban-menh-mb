@@ -1,28 +1,31 @@
-import { PageShell } from "../components/layout";
+import { MysticStyles } from "../components/homepage-v2/MysticStyles";
 import {
-  HomepageCallout,
-  HomepageHero,
-  HomepageModulesConstellation,
-  HomepageModulesGrid,
-  HomepagePricingPlans,
-  HomepageStyles,
-  HomepageTrustSignals,
-} from "../components/homepage";
+  MysticFAQ,
+  MysticFinalCTA,
+  MysticFooter,
+  MysticHero,
+  MysticHowItWorks,
+  MysticModuleTabs,
+  MysticPillars,
+  MysticPricing,
+  MysticStats,
+} from "../components/homepage-v2";
 
 export default function HomePage() {
   return (
     <>
-      <HomepageStyles />
-      <div className="relative z-10">
-        <PageShell containerWidth="wide" showBack={false}>
-          <HomepageHero />
-          <HomepageModulesGrid />
-          <HomepagePricingPlans />
-          <HomepageModulesConstellation />
-          <HomepageCallout />
-          <HomepageTrustSignals />
-        </PageShell>
-      </div>
+      <MysticStyles />
+      <main className="mystic-page">
+        <MysticHero />
+        <MysticStats />
+        <MysticPillars />
+        <MysticModuleTabs />
+        <MysticPricing />
+        <MysticHowItWorks />
+        <MysticFAQ />
+        <MysticFinalCTA />
+        <MysticFooter />
+      </main>
     </>
   );
 }
