@@ -4,7 +4,7 @@ import {
   type AppError,
   type Voucher,
 } from "@banmenh/shared";
-import { firestoreVoucherRepository } from "../firestore";
+import { firestorePurchaseRepository, firestoreVoucherRepository } from "../firestore";
 
 type ValidVoucherResult = {
   valid: true;
@@ -64,7 +64,20 @@ export async function validateVoucher(
     return { valid: false, error: createError("VOUCHER_OUT_OF_USES") };
   }
 
-  // TODO T-0506/T-0801: enforce perUserLimit by querying confirmed purchases.
+  if (voucher.perUserLimit !== undefined && voucher.perUserLimit > 0) {
+    const usedCount = await firestorePurchaseRepository.countByUserAndVoucher(
+      userId,
+      voucher.code,
+      { userId },
+    );
+    if (usedCount >= voucher.perUserLimit) {
+      return {
+        valid: false,
+        error: createError("VOUCHER_PER_USER_LIMIT_EXCEEDED"),
+      };
+    }
+  }
+
   const product = findProduct(productCode);
   if (!product) {
     return { valid: false, error: createError("NOT_FOUND") };

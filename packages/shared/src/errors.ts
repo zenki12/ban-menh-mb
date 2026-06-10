@@ -28,6 +28,7 @@ export type ErrorCode =
   | "VOUCHER_OUT_OF_USES"
   | "VOUCHER_NOT_APPLICABLE"
   | "VOUCHER_ALREADY_USED"
+  | "VOUCHER_PER_USER_LIMIT_EXCEEDED"
   // KB
   | "KB_ACCESS_DENIED"
   | "KB_NOT_AVAILABLE"
@@ -77,6 +78,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   VOUCHER_OUT_OF_USES: "Mã voucher đã hết lượt sử dụng.",
   VOUCHER_NOT_APPLICABLE: "Mã voucher không áp dụng cho gói này.",
   VOUCHER_ALREADY_USED: "Bạn đã dùng mã này trước đó.",
+  VOUCHER_PER_USER_LIMIT_EXCEEDED: "Bạn đã sử dụng hết lượt cho voucher này.",
   KB_ACCESS_DENIED: "Không thể truy cập kho dữ liệu, vui lòng thử lại.",
   KB_NOT_AVAILABLE: "Nội dung tạm thời chưa sẵn sàng.",
   RATE_LIMITED: "Bạn đang thao tác quá nhanh, vui lòng đợi một chút.",

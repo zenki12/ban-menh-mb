@@ -14,7 +14,7 @@ function col() {
 
 export const firestorePurchaseRepository: Pick<
   PurchaseRepository,
-  "getById" | "getByOrderId" | "create"
+  "getById" | "getByOrderId" | "countByUserAndVoucher" | "create"
 > = {
   async getById(id, _ctx) {
     const doc = await col().doc(id).get();
@@ -28,6 +28,16 @@ export const firestorePurchaseRepository: Pick<
       .get();
     if (snap.empty) return null;
     return fromFirestoreDoc<Purchase>(snap.docs[0]);
+  },
+
+  async countByUserAndVoucher(userId, voucherCode, _ctx) {
+    const snap = await col()
+      .where("userId", "==", userId)
+      .where("voucherCode", "==", voucherCode)
+      .where("status", "==", "confirmed")
+      .count()
+      .get();
+    return snap.data().count;
   },
 
   async create(input, _ctx) {

@@ -16,6 +16,11 @@ export interface PurchaseRepository {
     options: PaginationOptions,
     ctx: StorageContext,
   ): Promise<QueryResult<Purchase>>;
+  countByUserAndVoucher(
+    userId: string,
+    voucherCode: string,
+    ctx: StorageContext,
+  ): Promise<number>;
   create(
     input: Omit<Purchase, "id" | "createdAt">,
     ctx: StorageContext,
