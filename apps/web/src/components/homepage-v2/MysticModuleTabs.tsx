@@ -5,7 +5,7 @@ import { useState } from "react";
 const modules = [
   {
     label: "Thần số học",
-    mark: "LIVE",
+    mark: "Đang mở",
     title: "Báo cáo Thần Số Học",
     text: "Khởi đầu hành trình khám phá bản thân với 33 chỉ số cốt lõi và các chu kỳ vận số.",
   },
@@ -18,19 +18,19 @@ const modules = [
   },
   {
     label: "Tử vi",
-    mark: "Q2 2027",
+    mark: "Quý 2/2027",
     title: "Lá số tử vi",
     text: "Khám phá 12 cung, chính tinh, phụ tinh và các chu kỳ vận hạn qua giao diện trực quan, giúp việc luận giải trở nên dễ hiểu và thực tiễn hơn.",
   },
   {
     label: "Ma trận",
-    mark: "Q3 2027",
+    mark: "Quý 3/2027",
     title: "Ma trận định mệnh",
     text: "Khám phá 22 năng lượng cốt lõi, sứ mệnh linh hồn và những bài học quan trọng được thiết kế riêng cho hành trình cuộc đời của bạn.",
   },
   {
     label: "Bản đồ sao",
-    mark: "Q3 2027",
+    mark: "Quý 3/2027",
     title: "Bản đồ sao",
     text: "Khám phá vị trí các hành tinh, 12 cung hoàng đạo và 12 nhà chiêm tinh để hiểu rõ tính cách, tiềm năng và định hướng phát triển của bản thân.",
   },
@@ -94,7 +94,7 @@ function TarotMock() {
             <div>
               <div className="text-3xl">✦</div>
               <strong>{label}</strong>
-              <p className="m-0 mt-2 text-xs text-[var(--bm-text-muted)]">{["The Star", "Strength", "The Sun"][index]}</p>
+              <p className="m-0 mt-2 text-xs text-[var(--bm-text-muted)]">{["Ngôi Sao", "Sức Mạnh", "Mặt Trời"][index]}</p>
             </div>
           </div>
         ))}
@@ -282,15 +282,15 @@ export function MysticModuleTabs() {
     <section className="mystic-section" id="roadmap">
       <div className="mystic-container">
         <div className="section-head">
-          <p className="section-kicker">6 modules</p>
+          <p className="section-kicker">6 hệ thống</p>
           <h2>
-            Một cấu trúc hub, sáu <span className="mystic-gradient">cánh cửa luận giải</span>
+            Một trung tâm huyền học, sáu <span className="mystic-gradient">cánh cửa luận giải</span>
           </h2>
-          <p>(Chọn một module bên dưới để xem thông tin chi tiết và lộ trình ra mắt.)</p>
+          <p>(Chọn một hệ thống bên dưới để xem thông tin chi tiết và lộ trình ra mắt.)</p>
         </div>
         <div className="tabs-grid">
           <div>
-            <div className="module-tabs" role="tablist" aria-label="Modules Bản Mệnh">
+            <div className="module-tabs" role="tablist" aria-label="Các hệ thống Bản Mệnh">
               {modules.map((item, index) => (
                 <button
                   aria-selected={active === index}

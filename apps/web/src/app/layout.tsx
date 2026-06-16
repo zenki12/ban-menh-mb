@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { Footer, GalaxyBackground, Header } from "../components/layout";
+import { BackHomeBar, Footer, GalaxyBackground, Header } from "../components/layout";
 import { AuthProvider } from "../lib/auth";
 import "./globals.css";
+import "../styles/tarot-workflow.css";
+import "../styles/tarot-workflow-landing.css";
+import "../styles/tarot-workflow-stage.css";
 
 export const metadata: Metadata = {
-  title: "Bản Mệnh V2",
+  title: "Bản Mệnh",
   description: "Nền tảng tra cứu huyền học module hóa.",
 };
 
@@ -23,6 +26,7 @@ export default function RootLayout({
         {/* AuthProvider là client component — Next.js cho phép wrap server layout */}
         <AuthProvider>
           <Header />
+          <BackHomeBar />
           <main className="flex-1">{children}</main>
           <Footer />
         </AuthProvider>

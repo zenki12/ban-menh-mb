@@ -36,7 +36,7 @@ export function PageShell({
   return (
     <section
       className={[
-        "mx-auto w-full px-5 py-10 text-[var(--bm-text-main)] sm:px-8 sm:py-16",
+        "mx-auto w-full px-5 pt-8 pb-10 text-[var(--bm-text-main)] sm:px-8 sm:pt-10 sm:pb-16",
         widthClasses[containerWidth],
       ].join(" ")}
     >

@@ -9,11 +9,9 @@ export function MysticStyles() {
   overflow-x: hidden;
   color: var(--bm-text-main);
   background:
-    radial-gradient(circle at 22% 8%, rgba(124,58,237,0.26), transparent 34rem),
-    radial-gradient(circle at 76% 18%, rgba(37,99,235,0.18), transparent 36rem),
-    radial-gradient(circle at 36% 76%, rgba(160,48,98,0.20), transparent 38rem),
-    radial-gradient(circle at 8% 52%, rgba(190,24,93,0.12), transparent 34rem),
-    linear-gradient(160deg, #070014 0%, #0a0620 42%, #06122c 100%);
+    radial-gradient(circle at 18% 8%, rgba(124,58,237,0.12), transparent 30rem),
+    radial-gradient(circle at 82% 18%, rgba(37,99,235,0.10), transparent 32rem),
+    radial-gradient(circle at 50% 86%, rgba(251,191,36,0.045), transparent 34rem);
 }
 .mystic-page * { box-sizing: border-box; }
 .mystic-page::before {
@@ -22,14 +20,17 @@ export function MysticStyles() {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.62;
+  opacity: 0.36;
   background-image:
-    radial-gradient(circle, rgba(255,255,255,0.85) 0 1px, transparent 1.4px),
-    radial-gradient(circle, rgba(96,165,250,0.85) 0 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(167,139,250,0.75) 0 1px, transparent 1.5px);
-  background-position: 0 0, 38px 62px, 84px 20px;
-  background-size: 120px 120px, 170px 170px, 220px 220px;
-  animation: mystic-star-drift 46s linear infinite;
+    radial-gradient(circle at 7% 18%, rgba(255,255,255,0.88) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 13% 62%, rgba(253,224,71,0.78) 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 91% 22%, rgba(125,211,252,0.82) 0 1.1px, transparent 1.7px),
+    radial-gradient(circle at 86% 72%, rgba(167,139,250,0.76) 0 1.2px, transparent 1.8px);
+  background-position: 0 0, 24px 84px, 0 0, -42px 38px;
+  background-size: 118px 118px, 154px 154px, 126px 126px, 168px 168px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0 24%, transparent 42% 58%, #000 76% 100%);
+  mask-image: linear-gradient(90deg, #000 0 24%, transparent 42% 58%, #000 76% 100%);
+  animation: mystic-star-drift 38s linear infinite;
 }
 .mystic-page::after {
   content: "";
@@ -37,7 +38,7 @@ export function MysticStyles() {
   inset: -10%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.22;
+  opacity: 0.10;
   background:
     conic-gradient(from 40deg at 48% 24%, transparent, rgba(124,58,237,0.28), transparent, rgba(251,191,36,0.12), transparent),
     radial-gradient(circle at 70% 40%, rgba(34,211,238,0.12), transparent 20rem);
@@ -52,8 +53,9 @@ export function MysticStyles() {
 }
 .mystic-container { width: min(1120px, 100%); margin: 0 auto; }
 .mystic-section { position: relative; padding: 5rem 1.25rem; }
-.mystic-hero { min-height: auto; display: flex; align-items: center; padding: 4.5rem 1.25rem 3.5rem; position: relative; }
+.mystic-hero { min-height: auto; display: flex; align-items: center; padding: 2.25rem 1.25rem 3rem; position: relative; }
 .mystic-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: stretch; }
+.numerology-entry-grid { grid-template-columns: minmax(0, 0.88fr) minmax(460px, 1.12fr); gap: 2.4rem; }
 .mystic-hero-left { display: flex; flex-direction: column; justify-content: center; }
 .mystic-pill {
   display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: min(100%, 39rem); border: 1px solid var(--bm-border-gold); border-radius: 999px;
@@ -121,9 +123,27 @@ export function MysticStyles() {
 .section-kicker { color: var(--bm-gold-bright); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; }
 .section-head h2 { margin: 0.75rem 0 1rem; font-size: clamp(1.7rem, 3.2vw, 2.6rem); line-height: 1.15; color: white; font-weight: 900; }
 .section-head p { margin: 0; color: var(--bm-text-muted); line-height: 1.75; }
-.stats-grid, .pillars-grid, .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.stats-grid, .pillars-grid, .steps-grid, .benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .mystic-card, .pricing-card, .faq-item, .cta-banner { border: 1px solid var(--bm-border-subtle); border-radius: var(--bm-radius-xl); background: var(--bm-bg-panel); backdrop-filter: blur(16px); }
 .mystic-card { padding: 1.5rem; }
+.benefit-card { position: relative; overflow: hidden; min-height: 15.5rem; }
+.benefit-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(251, 191, 36, 0.14), transparent 8rem),
+    radial-gradient(circle at 84% 18%, rgba(167, 139, 250, 0.12), transparent 9rem);
+  opacity: 0.72;
+}
+.benefit-card > * { position: relative; z-index: 1; }
+.benefit-icon {
+  border: 1px solid var(--bm-border-gold);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(124, 58, 237, 0.16));
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.12);
+  font-weight: 900;
+}
 .hover-lift { transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease; }
 .hover-lift:hover { transform: translateY(-4px); border-color: var(--bm-border-gold); box-shadow: var(--bm-shadow-gold); }
 .metric { display: block; margin-bottom: 0.4rem; font-size: clamp(1.8rem, 3vw, 2.4rem); line-height: 1; font-weight: 900; color: var(--bm-gold-bright); font-variant-numeric: tabular-nums; }
@@ -136,7 +156,8 @@ export function MysticStyles() {
 .tabs-grid .cosmic-window { min-height: 520px; }
 .tabs-grid .cosmic-body { min-height: 460px; }
 .module-tabs { display: grid; gap: 0.75rem; }
-.module-tab { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid var(--bm-border-subtle); border-radius: var(--bm-radius-lg); background: rgba(255, 255, 255, 0.04); color: var(--bm-text-soft); padding: 0.85rem 1rem; cursor: pointer; text-align: left; }
+.module-tab { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid var(--bm-border-subtle); border-radius: var(--bm-radius-lg); background: rgba(255, 255, 255, 0.04); color: var(--bm-text-soft); padding: 0.85rem 1rem; cursor: pointer; text-align: left; transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease; }
+.module-tab:hover, .module-tab:focus-visible { transform: translateY(-2px); border-color: var(--bm-border-gold); background: rgba(251, 191, 36, 0.08); box-shadow: 0 0 20px rgba(251, 191, 36, 0.1); }
 .module-tab.active { border-color: var(--bm-border-gold); background: rgba(251, 191, 36, 0.1); color: white; }
 .module-tab span:first-child { display: inline-flex; align-items: center; gap: 0.55rem; font-weight: 800; }
 .status-badge { display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid var(--bm-border-purple); border-radius: 999px; padding: 0.25rem 0.55rem; color: var(--bm-primary-soft); font-size: 0.7rem; font-weight: 900; white-space: nowrap; }
@@ -227,12 +248,94 @@ export function MysticStyles() {
 .batu-feature-grid strong { display: block; color: var(--bm-gold-bright); font-size: 0.82rem; margin-bottom: 0.38rem; }
 .batu-feature-grid span { display: block; color: var(--bm-text-muted); font-size: 0.76rem; line-height: 1.55; }
 .batu-note { margin-top: 0.82rem; border-left: 3px solid var(--bm-gold-bright); border-radius: var(--bm-radius-lg); background: rgba(251, 191, 36, 0.08); padding: 0.78rem 0.95rem; color: var(--bm-text-soft); font-size: 0.9rem; line-height: 1.65; }
-.pricing-card { max-width: 780px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; }
+.unlock-packages-toggle {
+  position: relative;
+  overflow: hidden;
+  width: min(860px, 100%);
+  min-height: 4rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid var(--bm-border-gold);
+  border-radius: var(--bm-radius-xl);
+  background:
+    radial-gradient(circle at 8% 50%, rgba(253, 224, 71, 0.2), transparent 13rem),
+    linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(124, 58, 237, 0.2), rgba(20, 15, 35, 0.78));
+  color: var(--bm-gold-bright);
+  padding: 0.95rem 1.25rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.12), inset 0 0 24px rgba(251, 191, 36, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.unlock-packages-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(253, 224, 71, 0.16), transparent);
+  transform: translateX(-120%);
+  animation: unlock-sheen 7s ease-in-out infinite;
+}
+.unlock-packages-toggle:hover,
+.unlock-packages-toggle:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--bm-gold-bright);
+  box-shadow: var(--bm-shadow-gold);
+}
+.unlock-packages-title, .unlock-packages-meta { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 0.65rem; }
+.unlock-packages-title { text-transform: uppercase; }
+.unlock-packages-spark {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid var(--bm-border-gold);
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.12);
+  color: white;
+  font-size: 1rem;
+  box-shadow: 0 0 18px rgba(253, 224, 71, 0.2);
+}
+.unlock-packages-meta {
+  color: var(--bm-text-soft);
+  font-size: 0.76rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.unlock-packages-chevron {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border: 1px solid var(--bm-border-gold);
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.1);
+  color: white;
+  line-height: 1;
+  transition: transform 0.22s ease;
+}
+.unlock-packages-chevron.open { transform: rotate(180deg); }
+.unlock-packages-panel { margin-top: 1rem; }
+.pricing-card { max-width: 860px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; }
+.pricing-card h2 { margin: 0.6rem 0 0.55rem; color: white; font-size: clamp(1.8rem, 3vw, 2.5rem); line-height: 1.15; font-weight: 900; }
+.pricing-copy { margin: 0; color: var(--bm-text-soft); line-height: 1.75; }
 .price { color: var(--bm-gold-bright); font-size: 3rem; font-weight: 900; }
 .feature-list { display: grid; gap: 0.7rem; margin: 1.1rem 0 0; padding: 0; list-style: none; color: var(--bm-text-soft); }
+.early-note { margin: 1rem 0 0; color: var(--bm-text-soft); line-height: 1.65; }
+.pricing-action { display: grid; justify-items: start; gap: 0.8rem; min-width: 15rem; }
+.pricing-action p { margin: 0; color: var(--bm-text-soft); }
 .step-number { width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 0.8rem; color: #1f1300; background: var(--bm-gold-bright); font-weight: 900; margin-bottom: 1rem; }
 .faq-list { max-width: 860px; margin: 0 auto; display: grid; gap: 0.8rem; }
-.faq-button { width: 100%; border: 0; background: transparent; color: white; display: flex; justify-content: space-between; gap: 1rem; padding: 1.15rem 1.25rem; text-align: left; cursor: pointer; font-weight: 800; }
+.faq-button { width: 100%; border: 0; border-radius: inherit; background: transparent; color: white; display: flex; justify-content: space-between; gap: 1rem; padding: 1.15rem 1.25rem; text-align: left; cursor: pointer; font-weight: 800; transition: background-color 0.2s ease, color 0.2s ease; }
+.faq-button:hover, .faq-button:focus-visible { background: rgba(251, 191, 36, 0.07); color: var(--bm-gold-bright); }
 .faq-icon { color: var(--bm-gold-bright); transition: transform 0.2s ease; }
 .faq-icon.open { transform: rotate(180deg); }
 .faq-answer { padding: 0 1.25rem 1.2rem; color: var(--bm-text-muted); line-height: 1.75; }
@@ -253,18 +356,21 @@ export function MysticStyles() {
 @keyframes astro-spin { to { transform: rotate(360deg); } }
 @keyframes astro-spin-reverse { to { transform: rotate(-360deg); } }
 @keyframes astro-float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -6px, 0); } }
-@media (prefers-reduced-motion: reduce) { .orbit-map, .orbit-node-inner, .sigil, .sigil::before, .sigil::after, .sigil-mark, .mystic-gradient, .mystic-gradient::after, .astro-map::before, .astro-chart::before, .astro-orbit, .astro-point { animation: none; } }
+@keyframes unlock-sheen { 0%, 72%, 100% { transform: translateX(-120%); } 86% { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) { .orbit-map, .orbit-node-inner, .sigil, .sigil::before, .sigil::after, .sigil-mark, .mystic-gradient, .mystic-gradient::after, .astro-map::before, .astro-chart::before, .astro-orbit, .astro-point, .unlock-packages-toggle::before { animation: none; } }
 @media (max-width: 900px) {
   .mystic-hero-grid, .tabs-grid, .pricing-card, .footer-grid { grid-template-columns: 1fr; }
-  .stats-grid, .pillars-grid, .steps-grid { grid-template-columns: 1fr; }
+  .stats-grid, .pillars-grid, .steps-grid, .benefits-grid { grid-template-columns: 1fr; }
   .tradition-row { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 560px) {
   .mystic-section { padding: 3.5rem 1rem; }
-  .mystic-hero { min-height: auto; padding: 4rem 1rem 3rem; }
+  .mystic-hero { min-height: auto; padding: 2.25rem 1rem 2.5rem; }
   .mystic-hero h1 { font-size: clamp(1.9rem, 8vw, 2.6rem); }
   .mystic-actions { flex-direction: column; }
   .mystic-btn { width: 100%; }
+  .unlock-packages-toggle { align-items: flex-start; flex-direction: column; }
+  .unlock-packages-meta { width: 100%; justify-content: space-between; }
   .module-tabs { display: flex; overflow-x: auto; padding-bottom: 0.35rem; scroll-snap-type: x mandatory; }
   .module-tab { min-width: 13rem; scroll-snap-align: start; }
   .tradition-row, .tarot-row, .palace-grid { grid-template-columns: 1fr 1fr; }

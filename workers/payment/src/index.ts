@@ -1,4 +1,4 @@
-// Bản Mệnh V2 — Payment Worker (Cloudflare Workers + Hono)
+// Bản Mệnh — Payment Worker (Cloudflare Workers + Hono)
 // T-0503a: scaffold + /health. T-0503b: webhook logic.
 
 import { Hono } from "hono";
@@ -84,7 +84,7 @@ app.use("*", async (c, next) => {
   if (allowedOrigin) c.header("Access-Control-Allow-Origin", allowedOrigin);
 });
 
-app.get("/", (c) => c.text("Bản Mệnh V2 — Payment Worker"));
+app.get("/", (c) => c.text("Bản Mệnh — Payment Worker"));
 
 app.get("/health", (c) =>
   c.json({ ok: true, service: "payment-worker", timestamp: new Date().toISOString() }),

@@ -1,4 +1,4 @@
-# Payment Worker — Bản Mệnh V2
+# Payment Worker — Bản Mệnh
 
 Cloudflare Worker xử lý webhook PayOS và payment boundary.
 
@@ -12,7 +12,7 @@ Cloudflare Worker xử lý webhook PayOS và payment boundary.
 
 | Method | Path | Status |
 |--------|------|--------|
-| GET | `/` | ✅ "Bản Mệnh V2 — Payment Worker" |
+| GET | `/` | ✅ "Bản Mệnh — Payment Worker" |
 | GET | `/health` | ✅ `{ ok: true, service, timestamp }` |
 | POST | `/webhook/payos` | ✅ Verify signature + update Firestore |
 

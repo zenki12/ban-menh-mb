@@ -1,4 +1,4 @@
-# KB Worker - Ban Menh V2
+# KB Worker - Ban Menh
 
 Cloudflare Worker generate Numerology report from private KV data. It does not expose raw KB.
 

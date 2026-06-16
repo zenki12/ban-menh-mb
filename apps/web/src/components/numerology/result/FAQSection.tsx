@@ -17,7 +17,7 @@ const FAQS = [
   },
   {
     q: "Khác gì với các trang thần số học khác?",
-    a: "Bản Mệnh V2 tập trung vào 33 chỉ số, chu kỳ thời gian, lưới Pythagoras và phần luận giải sâu hơn cho từng nhóm chỉ số.",
+    a: "Bản Mệnh tập trung vào 33 chỉ số, chu kỳ thời gian, lưới Pythagoras và phần luận giải sâu hơn cho từng nhóm chỉ số.",
   },
   {
     q: "PayOS có an toàn không?",

@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
 type Star = { x: number; y: number; r: number; a: number; speed: number; offset: number };
+type Sparkle = { x: number; y: number; r: number; a: number; speed: number; offset: number; hue: number };
+type SideSparkle = { x: number; y: number; r: number; a: number; speed: number; offset: number; hue: number };
 type Particle = { x: number; y: number; vx: number; vy: number; r: number; a: number };
 type Orbiter = { angle: number; trailLen: number; trail: Array<{ x: number; y: number; a: number }>; size: number };
 type Ring = { rx: number; ry: number; tiltX: number; tiltZ: number; speed: number; color: string; base: number; dots: number; phase: number; orbiters: Orbiter[] };
 type Ripple = { id: number; x: number; y: number };
-const STAR_COUNT = 180;
+
+const STAR_COUNT = 360;
+const SPARKLE_COUNT = 130;
+const SIDE_SPARKLE_COUNT = 190;
 const PARTICLE_COUNT = 48;
 const RING_CONFIG = [
   { rx: 160, ry: 46, tiltX: 70, tiltZ: 0, speed: 0.0022, color: "rgba(167,139,250,", base: 0.4, dots: 2 },
@@ -19,6 +25,7 @@ const RING_CONFIG = [
 function randomRange(min: number, max: number) {
   return min + Math.random() * (max - min);
 }
+
 function hexToRgba(hex: string, alpha: number) {
   const normalized = hex.trim().replace("#", "");
   if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
@@ -32,26 +39,63 @@ function hexToRgba(hex: string, alpha: number) {
 
 function createStars(): Star[] {
   return Array.from({ length: STAR_COUNT }, () => ({
-    x: randomRange(-900, 900), y: randomRange(-600, 600), r: randomRange(0.2, 1.5),
-    a: randomRange(0.1, 0.9), speed: randomRange(0.004, 0.018), offset: randomRange(0, Math.PI * 2),
+    x: randomRange(-900, 900),
+    y: randomRange(-600, 600),
+    r: randomRange(0.2, 1.5),
+    a: randomRange(0.1, 0.9),
+    speed: randomRange(0.004, 0.018),
+    offset: randomRange(0, Math.PI * 2),
   }));
 }
+
+function createSparkles(): Sparkle[] {
+  return Array.from({ length: SPARKLE_COUNT }, () => ({
+    x: randomRange(-980, 980),
+    y: randomRange(-680, 680),
+    r: randomRange(0.8, 2.8),
+    a: randomRange(0.08, 0.34),
+    speed: randomRange(0.006, 0.024),
+    offset: randomRange(0, Math.PI * 2),
+    hue: randomRange(0, 1),
+  }));
+}
+
+function createSideSparkles(): SideSparkle[] {
+  return Array.from({ length: SIDE_SPARKLE_COUNT }, () => ({
+    x: Math.random() < 0.5 ? randomRange(0.015, 0.22) : randomRange(0.78, 0.985),
+    y: randomRange(0.02, 0.98),
+    r: randomRange(0.75, 2.7),
+    a: randomRange(0.12, 0.48),
+    speed: randomRange(0.008, 0.032),
+    offset: randomRange(0, Math.PI * 2),
+    hue: randomRange(0, 1),
+  }));
+}
+
 function createParticles(): Particle[] {
   return Array.from({ length: PARTICLE_COUNT }, () => ({
-    x: randomRange(-700, 700), y: randomRange(-450, 450), vx: randomRange(-0.11, 0.11),
-    vy: randomRange(-0.11, 0.11), r: randomRange(0.3, 1.7), a: randomRange(0.15, 0.65),
+    x: randomRange(-700, 700),
+    y: randomRange(-450, 450),
+    vx: randomRange(-0.11, 0.11),
+    vy: randomRange(-0.11, 0.11),
+    r: randomRange(0.3, 1.7),
+    a: randomRange(0.15, 0.65),
   }));
 }
+
 function createRings(): Ring[] {
   return RING_CONFIG.map((ring) => ({
     ...ring,
     phase: randomRange(0, Math.PI * 2),
     orbiters: Array.from({ length: ring.dots }, (_, index) => ({
-      angle: (index / ring.dots) * Math.PI * 2, trailLen: Math.floor(randomRange(30, 50)),
-      trail: [], size: randomRange(2.4, 4),
+      angle: (index / ring.dots) * Math.PI * 2,
+      trailLen: Math.floor(randomRange(30, 50)),
+      trail: [],
+      size: randomRange(2.4, 4),
     })),
   }));
 }
+
 export function GalaxyBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
@@ -72,6 +116,8 @@ export function GalaxyBackground() {
     let frameId = 0;
     let resizeTimer: number | undefined;
     const stars = createStars();
+    const sparkles = createSparkles();
+    const sideSparkles = createSideSparkles();
     const particles = createParticles();
     const rings = createRings();
     const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -81,6 +127,7 @@ export function GalaxyBackground() {
     const blue = styles.getPropertyValue("--bm-blue") || "#3b82f6";
     const nebulaPrimary = hexToRgba(primary, 0.22);
     const nebulaBlue = hexToRgba(blue, 0.12);
+
     function resize() {
       const dpr = window.devicePixelRatio || 1;
       width = window.innerWidth;
@@ -93,6 +140,7 @@ export function GalaxyBackground() {
       centerX = width / 2;
       centerY = height / 2;
     }
+
     function project(ring: Ring, theta: number) {
       const ex = ring.rx * Math.cos(theta);
       const ey = ring.ry * Math.sin(theta);
@@ -121,10 +169,65 @@ export function GalaxyBackground() {
 
     function drawStars(timestamp: number) {
       stars.forEach((star) => {
-        const twinkle = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(timestamp * star.speed + star.offset));
+        const twinkle = 0.22 + 0.78 * (0.5 + 0.5 * Math.sin(timestamp * star.speed + star.offset));
         context.beginPath();
         context.arc(centerX + star.x, centerY + star.y, star.r, 0, Math.PI * 2);
         context.fillStyle = `rgba(210,220,255,${star.a * twinkle})`;
+        context.fill();
+      });
+
+      sparkles.forEach((sparkle) => {
+        const twinkle = 0.18 + 0.82 * (0.5 + 0.5 * Math.sin(timestamp * sparkle.speed + sparkle.offset));
+        const alpha = sparkle.a * twinkle;
+        const glow = context.createRadialGradient(
+          centerX + sparkle.x,
+          centerY + sparkle.y,
+          0,
+          centerX + sparkle.x,
+          centerY + sparkle.y,
+          sparkle.r * 4.5,
+        );
+        const hueColor =
+          sparkle.hue < 0.34
+            ? "rgba(253,224,71,"
+            : sparkle.hue < 0.68
+              ? "rgba(167,139,250,"
+              : "rgba(125,211,252,";
+        glow.addColorStop(0, `${hueColor}${alpha})`);
+        glow.addColorStop(0.35, `${hueColor}${alpha * 0.35})`);
+        glow.addColorStop(1, `${hueColor}0)`);
+        context.fillStyle = glow;
+        context.beginPath();
+        context.arc(centerX + sparkle.x, centerY + sparkle.y, sparkle.r * 4.5, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = `rgba(255,255,255,${alpha * 0.92})`;
+        context.beginPath();
+        context.arc(centerX + sparkle.x, centerY + sparkle.y, sparkle.r * 0.55, 0, Math.PI * 2);
+        context.fill();
+      });
+
+      sideSparkles.forEach((sparkle) => {
+        const x = width * sparkle.x;
+        const y = height * sparkle.y;
+        const pulse = 0.14 + 0.86 * (0.5 + 0.5 * Math.sin(timestamp * sparkle.speed + sparkle.offset));
+        const alpha = sparkle.a * pulse;
+        const hueColor =
+          sparkle.hue < 0.38
+            ? "rgba(253,224,71,"
+            : sparkle.hue < 0.72
+              ? "rgba(167,139,250,"
+              : "rgba(125,211,252,";
+        const glow = context.createRadialGradient(x, y, 0, x, y, sparkle.r * 5.6);
+        glow.addColorStop(0, `${hueColor}${alpha})`);
+        glow.addColorStop(0.32, `${hueColor}${alpha * 0.32})`);
+        glow.addColorStop(1, `${hueColor}0)`);
+        context.fillStyle = glow;
+        context.beginPath();
+        context.arc(x, y, sparkle.r * 5.6, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = `rgba(255,255,255,${alpha})`;
+        context.beginPath();
+        context.arc(x, y, Math.max(0.65, sparkle.r * 0.42), 0, Math.PI * 2);
         context.fill();
       });
     }
@@ -311,274 +414,6 @@ export function GalaxyBackground() {
           style={{ left: ripple.x, top: ripple.y, zIndex: -1 }}
         />
       ))}
-      <style>{`
-        .bm-cosmic-layer {
-          position: fixed;
-          inset: 0;
-          pointer-events: none;
-          overflow: hidden;
-          background:
-            radial-gradient(circle at 20% 10%, rgba(167, 139, 250, 0.06), transparent 28rem),
-            radial-gradient(circle at 80% 20%, rgba(125, 211, 252, 0.035), transparent 30rem),
-            radial-gradient(circle at 50% 85%, rgba(251, 191, 36, 0.03), transparent 32rem);
-        }
-        .bm-cosmic-veil {
-          position: absolute;
-          inset: 0;
-          z-index: 5;
-          background:
-            radial-gradient(circle at 50% 35%, transparent 0 16rem, rgba(2, 6, 23, 0.30) 36rem),
-            rgba(2, 6, 23, 0.26);
-          backdrop-filter: saturate(0.72);
-        }
-        .bm-aurora {
-          position: absolute;
-          width: 80rem;
-          height: 26rem;
-          border-radius: 999px;
-          filter: blur(44px);
-          opacity: 0.10;
-          mix-blend-mode: screen;
-          transform-origin: center;
-        }
-        .bm-aurora-a {
-          left: -18rem;
-          top: 8rem;
-          background: linear-gradient(90deg, rgba(124, 58, 237, 0), rgba(124, 58, 237, 0.26), rgba(244, 114, 182, 0.10), rgba(124, 58, 237, 0));
-          animation: bmAuroraA 18s ease-in-out infinite alternate;
-        }
-        .bm-aurora-b {
-          right: -22rem;
-          bottom: 5rem;
-          background: linear-gradient(90deg, rgba(125, 211, 252, 0), rgba(125, 211, 252, 0.12), rgba(251, 191, 36, 0.07), rgba(125, 211, 252, 0));
-          animation: bmAuroraB 22s ease-in-out infinite alternate;
-        }
-        .bm-orbit {
-          position: absolute;
-          left: 50%;
-          top: 45%;
-          width: 62rem;
-          height: 19rem;
-          border: 1px solid rgba(167, 139, 250, 0.08);
-          border-radius: 50%;
-          box-shadow: 0 0 18px rgba(124, 58, 237, 0.07);
-          transform-origin: center;
-        }
-        .bm-orbit-a { animation: bmOrbitA 34s linear infinite; }
-        .bm-orbit-b {
-          width: 44rem;
-          height: 13rem;
-          border-color: rgba(251, 191, 36, 0.08);
-          animation: bmOrbitB 42s linear infinite reverse;
-        }
-        .bm-stars {
-          position: absolute;
-          inset: 0;
-          background-image:
-            radial-gradient(circle, rgba(255,255,255,0.90) 0 1px, transparent 1.5px),
-            radial-gradient(circle, rgba(253,224,71,0.75) 0 1px, transparent 1.5px),
-            radial-gradient(circle, rgba(125,211,252,0.70) 0 1px, transparent 1.5px);
-          background-size: 120px 120px, 190px 190px, 260px 260px;
-          background-position: 0 0, 40px 80px, 120px 20px;
-          opacity: 0.12;
-        }
-        .bm-stars-a { animation: bmStarDrift 32s linear infinite; }
-        .bm-stars-b {
-          opacity: 0.06;
-          filter: blur(1px);
-          transform: scale(1.25);
-          animation: bmStarDriftB 48s linear infinite;
-        }
-        .bm-constellation {
-          position: absolute;
-          width: 26rem;
-          height: 18rem;
-          opacity: 0.11;
-          background:
-            linear-gradient(28deg, transparent 18%, rgba(125, 211, 252, 0.22) 18.2%, transparent 18.6%),
-            linear-gradient(138deg, transparent 43%, rgba(167, 139, 250, 0.20) 43.2%, transparent 43.8%),
-            linear-gradient(8deg, transparent 64%, rgba(251, 191, 36, 0.15) 64.2%, transparent 64.6%);
-        }
-        .bm-constellation::before,
-        .bm-constellation::after {
-          content: "";
-          position: absolute;
-          width: 0.5rem;
-          height: 0.5rem;
-          border-radius: 999px;
-          background: #dbeafe;
-          box-shadow:
-            6rem 3rem 0 rgba(253, 224, 71, 0.58),
-            14rem 5rem 0 rgba(167, 139, 250, 0.58),
-            22rem 12rem 0 rgba(125, 211, 252, 0.58),
-            9rem 15rem 0 rgba(255, 255, 255, 0.50);
-        }
-        .bm-constellation-a {
-          left: 7vw;
-          top: 17vh;
-          animation: bmFloat 14s ease-in-out infinite alternate;
-        }
-        .bm-constellation-b {
-          right: 8vw;
-          bottom: 16vh;
-          transform: rotate(18deg) scale(0.85);
-          animation: bmFloat 18s ease-in-out infinite alternate-reverse;
-        }
-        .bm-meteor {
-          position: absolute;
-          width: 8rem;
-          height: 1px;
-          border-radius: 999px;
-          background: linear-gradient(90deg, rgba(255,255,255,0), rgba(253,224,71,0.58), rgba(125,211,252,0.20));
-          box-shadow: 0 0 10px rgba(253, 224, 71, 0.20);
-          opacity: 0;
-          transform: rotate(var(--meteor-rotate));
-          transform-origin: right center;
-        }
-        .bm-meteor::after {
-          content: "";
-          position: absolute;
-          right: 0;
-          top: 50%;
-          width: 0.28rem;
-          height: 0.28rem;
-          border-radius: 999px;
-          background: rgba(255, 255, 255, 0.86);
-          box-shadow: 0 0 12px rgba(253, 224, 71, 0.55);
-          transform: translateY(-50%);
-        }
-        .bm-meteor-a {
-          left: -12rem;
-          top: 12vh;
-          --meteor-rotate: 18deg;
-          --meteor-x: 132vw;
-          --meteor-y: 42vh;
-          animation: bmMeteor 17s linear infinite 1.2s;
-        }
-        .bm-meteor-b {
-          left: calc(100vw + 14rem);
-          top: 26vh;
-          width: 6.5rem;
-          --meteor-rotate: 154deg;
-          --meteor-x: -138vw;
-          --meteor-y: 34vh;
-          animation: bmMeteor 21s linear infinite 7s;
-        }
-        .bm-meteor-c {
-          left: -14rem;
-          top: 82vh;
-          width: 7.5rem;
-          --meteor-rotate: -16deg;
-          --meteor-x: 128vw;
-          --meteor-y: -30vh;
-          animation: bmMeteor 25s linear infinite 12s;
-        }
-        .bm-cursor-glow {
-          position: fixed;
-          left: 0;
-          top: 0;
-          width: 18rem;
-          height: 18rem;
-          margin-left: -9rem;
-          margin-top: -9rem;
-          pointer-events: none;
-          border-radius: 999px;
-          background:
-            radial-gradient(circle, rgba(253, 224, 71, 0.04), transparent 22%),
-            radial-gradient(circle, rgba(167, 139, 250, 0.06), transparent 46%),
-            radial-gradient(circle, rgba(125, 211, 252, 0.035), transparent 66%);
-          filter: blur(34px);
-          mix-blend-mode: screen;
-          transition: opacity 180ms ease-out;
-          will-change: transform, opacity;
-        }
-        .bm-click-ripple {
-          position: fixed;
-          width: 0.75rem;
-          height: 0.75rem;
-          margin-left: -0.375rem;
-          margin-top: -0.375rem;
-          pointer-events: none;
-          border-radius: 999px;
-          border: 1px solid rgba(253, 224, 71, 0.55);
-          box-shadow:
-            0 0 14px rgba(253, 224, 71, 0.48),
-            0 0 32px rgba(167, 139, 250, 0.26);
-          animation: bmClickRipple 900ms ease-out forwards;
-        }
-        .bm-click-ripple::before,
-        .bm-click-ripple::after {
-          content: "";
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 4px;
-          height: 4px;
-          border-radius: 999px;
-          background: var(--bm-cyan);
-          box-shadow:
-            22px 0 0 rgba(253, 224, 71, 0.58),
-            -20px 2px 0 rgba(167, 139, 250, 0.58),
-            4px 20px 0 rgba(255, 255, 255, 0.50),
-            -3px -22px 0 rgba(125, 211, 252, 0.58);
-          transform: translate(-50%, -50%);
-          animation: bmClickSpark 900ms ease-out forwards;
-        }
-        .bm-click-ripple::after {
-          transform: translate(-50%, -50%) rotate(45deg);
-        }
-        @keyframes bmAuroraA {
-          from { transform: translate3d(0, 0, 0) rotate(-12deg) scale(1); }
-          to { transform: translate3d(12rem, 8rem, 0) rotate(8deg) scale(1.12); }
-        }
-        @keyframes bmAuroraB {
-          from { transform: translate3d(0, 0, 0) rotate(16deg) scale(1); }
-          to { transform: translate3d(-10rem, -7rem, 0) rotate(-10deg) scale(1.08); }
-        }
-        @keyframes bmOrbitA {
-          from { transform: translate(-50%, -50%) rotate(18deg); }
-          to { transform: translate(-50%, -50%) rotate(378deg); }
-        }
-        @keyframes bmOrbitB {
-          from { transform: translate(-50%, -50%) rotate(-26deg); }
-          to { transform: translate(-50%, -50%) rotate(334deg); }
-        }
-        @keyframes bmStarDrift {
-          from { background-position: 0 0, 40px 80px, 120px 20px; }
-          to { background-position: 120px 120px, 230px 270px, 380px 280px; }
-        }
-        @keyframes bmStarDriftB {
-          from { background-position: 0 0, 40px 80px, 120px 20px; }
-          to { background-position: -160px 180px, -80px 320px, 30px 420px; }
-        }
-        @keyframes bmFloat {
-          from { translate: 0 0; opacity: 0.12; }
-          to { translate: 2rem -1.5rem; opacity: 0.22; }
-        }
-        @keyframes bmMeteor {
-          0%, 58% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-rotate)); }
-          64% { opacity: 0.62; }
-          86% { opacity: 0.30; }
-          100% { opacity: 0; transform: translate3d(var(--meteor-x), var(--meteor-y), 0) rotate(var(--meteor-rotate)); }
-        }
-        @keyframes bmClickRipple {
-          0% { transform: scale(0.4); opacity: 0.95; }
-          70% { opacity: 0.45; }
-          100% { transform: scale(10); opacity: 0; }
-        }
-        @keyframes bmClickSpark {
-          0% { opacity: 1; scale: 0.4; }
-          100% { opacity: 0; scale: 2.2; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .bm-cosmic-layer *,
-          .bm-cursor-glow,
-          .bm-click-ripple {
-            animation: none !important;
-            display: none;
-          }
-        }
-      `}</style>
     </>
   );
 }

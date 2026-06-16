@@ -1,4 +1,4 @@
-// Ban Menh V2 - KB Worker. Generates reports from private KV data.
+// Ban Menh - KB Worker. Generates reports from private KV data.
 
 import { buildSynthesizedReport, generateReport, type NarrativeKb } from "@banmenh/shared";
 import { Hono } from "hono";
@@ -123,7 +123,7 @@ function attachNarrative<T extends { number: number }>(
   return { ...item, narrative: getNarrative(narrative, group, lookupNumber, vars) };
 }
 
-app.get("/", (c) => c.text("Bản Mệnh V2 - KB Worker"));
+app.get("/", (c) => c.text("Bản Mệnh - KB Worker"));
 
 app.get("/health", (c) =>
   c.json({ ok: true, service: "kb-worker", timestamp: new Date().toISOString() }),

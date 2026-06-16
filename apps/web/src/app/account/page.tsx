@@ -71,7 +71,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <PageShell title="Tài khoản" showBack backHref="/" backLabel="Dashboard">
+      <PageShell title="Tài khoản" showBack={false}>
         <LoadingState message="Đang tải tài khoản..." />
       </PageShell>
     );
@@ -79,7 +79,7 @@ export default function AccountPage() {
 
   if (!user) {
     return (
-      <PageShell title="Tài khoản" showBack backHref="/" backLabel="Dashboard">
+      <PageShell title="Tài khoản" showBack={false}>
         <Card as="section" padding="lg" variant="glass">
           <UnauthorizedState
             description="Đăng nhập để xem báo cáo và quyền truy cập của bạn."
@@ -95,9 +95,7 @@ export default function AccountPage() {
       <PageShell
         title="Tài khoản"
         subtitle="Tài khoản khách"
-        showBack
-        backHref="/"
-        backLabel="Dashboard"
+        showBack={false}
       >
         <Card as="section" padding="lg" variant="glass">
           <h3>Tài khoản tạm thời</h3>
@@ -116,9 +114,7 @@ export default function AccountPage() {
     <PageShell
       title="Tài khoản"
       subtitle="Quản lý báo cáo và quyền truy cập của bạn"
-      showBack
-      backHref="/"
-      backLabel="Dashboard"
+      showBack={false}
       containerWidth="default"
     >
       <section>
@@ -175,7 +171,7 @@ export default function AccountPage() {
       </section>
 
       <p className="mt-10 max-w-3xl text-sm text-[var(--bm-text-muted)]">
-        Bản Mệnh V2 chỉ lưu dữ liệu cần thiết để phục vụ tra cứu và thanh toán.
+        Bản Mệnh chỉ lưu dữ liệu cần thiết để phục vụ tra cứu và thanh toán.
         Chi tiết xem trang{" "}
         <a
           className="underline hover:text-[var(--bm-text-soft)]"

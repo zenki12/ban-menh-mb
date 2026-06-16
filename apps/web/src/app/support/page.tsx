@@ -34,9 +34,7 @@ export default function SupportPage() {
     <PageShell
       title="Trợ giúp"
       subtitle="Hướng dẫn nhanh và kênh liên hệ"
-      showBack
-      backHref="/"
-      backLabel="Dashboard"
+      showBack={false}
       containerWidth="narrow"
     >
       <section>

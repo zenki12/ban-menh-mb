@@ -1,13 +1,10 @@
 import { MysticStyles } from "../components/homepage-v2/MysticStyles";
 import {
+  MysticBenefits,
   MysticFAQ,
-  MysticFinalCTA,
-  MysticFooter,
   MysticHero,
   MysticHowItWorks,
   MysticModuleTabs,
-  MysticPillars,
-  MysticPricing,
   MysticStats,
 } from "../components/homepage-v2";
 
@@ -18,13 +15,10 @@ export default function HomePage() {
       <main className="mystic-page">
         <MysticHero />
         <MysticStats />
-        <MysticPillars />
+        <MysticBenefits />
         <MysticModuleTabs />
-        <MysticPricing />
         <MysticHowItWorks />
         <MysticFAQ />
-        <MysticFinalCTA />
-        <MysticFooter />
       </main>
     </>
   );

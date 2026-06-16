@@ -8,29 +8,32 @@ import { Button } from "../ui";
 const navLinks = [
   { href: "/than-so-hoc", label: "Thần số học" },
   { href: "/tarot", label: "Tarot" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/#loi-ich", label: "Lợi ích" },
   { href: "/pricing", label: "Bảng giá" },
+  { href: "/legal/privacy", label: "Bảo mật" },
+  { href: "/legal/terms", label: "Điều khoản" },
 ];
 
 function NavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname();
-  const isActive = pathname === href || pathname.startsWith(`${href}/`);
+  const isActive =
+    pathname === href ||
+    pathname.startsWith(`${href}/`) ||
+    (href.startsWith("/#") && pathname === "/");
+
   return (
     <a
       className={[
-        "relative rounded-md px-2 py-2 font-bold transition-colors duration-200",
-        isActive
-          ? "text-[var(--bm-primary-soft)]"
-          : "text-[var(--bm-text-soft)]",
-        "hover:text-[var(--bm-primary-soft)] focus-visible:outline-none",
-        "focus-visible:ring-2 focus-visible:ring-[var(--bm-primary-soft)]",
-        "focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bm-bg-void)]",
+        "px-3 py-2 text-sm font-bold transition-colors duration-200",
+        isActive ? "text-white" : "text-[var(--bm-text-soft)]/90",
+        "hover:text-white focus-visible:outline-none focus-visible:ring-2",
+        "focus-visible:ring-[var(--bm-primary-soft)] focus-visible:ring-offset-2",
+        "focus-visible:ring-offset-[var(--bm-bg-void)]",
       ].join(" ")}
       href={href}
     >
       {label}
-      {isActive ? (
-        <span className="absolute inset-x-2 bottom-0 h-px bg-[var(--bm-primary-soft)]" />
-      ) : null}
     </a>
   );
 }
@@ -65,7 +68,7 @@ function AccountArea() {
 
   if (!user) {
     return (
-      <Button onClick={signInWithGoogle} size="sm" variant="ghost">
+      <Button onClick={signInWithGoogle} size="sm" variant="primary">
         Đăng nhập
       </Button>
     );
@@ -90,10 +93,10 @@ function AccountArea() {
         aria-expanded={isOpen}
         aria-haspopup="menu"
         className={[
-          "inline-flex min-h-9 items-center gap-2 rounded-lg border px-3",
-          "border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)]",
-          "text-sm font-bold text-[var(--bm-text-soft)]",
-          "hover:border-[var(--bm-primary-soft)] hover:text-[var(--bm-text-main)]",
+          "inline-flex min-h-9 items-center gap-2 rounded-full border px-4",
+          "border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)]",
+          "text-sm font-bold text-white",
+          "hover:border-[var(--bm-gold-bright)] hover:bg-[rgba(251,191,36,0.12)]",
           "focus-visible:outline-none focus-visible:ring-2",
           "focus-visible:ring-[var(--bm-primary-soft)] focus-visible:ring-offset-2",
           "focus-visible:ring-offset-[var(--bm-bg-void)] transition-colors",
@@ -104,7 +107,9 @@ function AccountArea() {
         <span className="max-w-[120px] truncate">
           {user.displayName ?? user.email ?? "Tài khoản"}
         </span>
-        <span aria-hidden="true" className={isOpen ? "rotate-180 transition-transform" : "transition-transform"}>⌄</span>
+        <span aria-hidden="true" className={isOpen ? "rotate-180 transition-transform" : "transition-transform"}>
+          ⌄
+        </span>
       </button>
 
       {isOpen ? (
@@ -126,7 +131,10 @@ function AccountArea() {
           </a>
           <button
             className="block w-full px-4 py-2 text-left text-sm text-[var(--bm-text-soft)] hover:bg-[var(--bm-bg-glass)] hover:text-[var(--bm-danger-soft)]"
-            onClick={() => { setIsOpen(false); void signOutFn(); }}
+            onClick={() => {
+              setIsOpen(false);
+              void signOutFn();
+            }}
             role="menuitem"
             type="button"
           >
@@ -142,16 +150,21 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-[var(--bm-border-subtle)] bg-[rgba(10,5,20,0.82)] backdrop-blur-xl">
+      <div className="h-px bg-gradient-to-r from-transparent via-[var(--bm-gold-bright)] to-transparent opacity-50" />
       <div className="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
         <a
-          className="text-gradient-purple rounded-md text-xl font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bm-primary-soft)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bm-bg-void)]"
+          className="inline-flex items-center gap-2 rounded-full px-2 py-2 text-xl font-black text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bm-primary-soft)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bm-bg-void)]"
           href="/"
         >
+          <span className="size-2.5 rounded-full bg-[var(--bm-gold-bright)] shadow-[0_0_10px_rgba(253,224,71,0.45)]" />
           Bản Mệnh
         </a>
 
-        <nav aria-label="Điều hướng chính" className="hidden items-center gap-5 md:flex">
+        <nav
+          aria-label="Điều hướng chính"
+          className="hidden items-center gap-1 rounded-full border border-[var(--bm-border-subtle)] bg-[rgba(255,255,255,0.03)] px-2 py-1 md:flex"
+        >
           {navLinks.map((link) => (
             <NavLink key={link.href} {...link} />
           ))}
@@ -164,7 +177,7 @@ export function Header() {
         <button
           aria-expanded={mobileOpen}
           aria-label="Mở menu"
-          className="inline-flex size-11 items-center justify-center rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] text-[var(--bm-text-main)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bm-primary-soft)] md:hidden"
+          className="inline-flex size-11 items-center justify-center rounded-full border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] text-[var(--bm-text-main)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bm-primary-soft)] md:hidden"
           onClick={() => setMobileOpen((v) => !v)}
           type="button"
         >
@@ -175,7 +188,7 @@ export function Header() {
       </div>
 
       {mobileOpen ? (
-        <div className="border-t border-[var(--bm-border-subtle)] bg-[var(--bm-bg-panel)] px-5 py-4 md:hidden">
+        <div className="border-t border-[var(--bm-border-subtle)] bg-[rgba(10,5,20,0.94)] px-5 py-4 md:hidden">
           <nav aria-label="Điều hướng mobile" className="flex flex-col gap-2">
             {navLinks.map((link) => (
               <NavLink key={link.href} {...link} />

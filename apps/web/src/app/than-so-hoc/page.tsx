@@ -1,112 +1,150 @@
 import { getProductsByModule } from "@banmenh/shared";
-import { PageShell } from "../../components/layout";
+import { MysticStyles } from "../../components/homepage-v2/MysticStyles";
 import { InputForm } from "../../components/numerology/InputForm";
 import { NumerologyAuthNotice } from "../../components/numerology/NumerologyAuthNotice";
 import { Card, ProductCard } from "../../components/ui";
 
 const numerologyMetrics = [
   {
-    icon: "1",
-    title: "Số đường đời",
-    description: "Gợi ý nhịp phát triển chính từ ngày sinh.",
-  },
-  {
-    icon: "2",
-    title: "Số sứ mệnh",
-    description: "Tóm tắt hướng thể hiện qua tên khai sinh.",
-  },
-  {
     icon: "3",
-    title: "Số linh hồn",
-    description: "Gợi mở động lực bên trong và điều bạn coi trọng.",
+    title: "Số Đường đời",
+    description: "Gợi ý nhịp phát triển chính, xu hướng trải nghiệm và bài học nổi bật từ ngày sinh.",
   },
   {
     icon: "4",
-    title: "Số cá tính",
-    description: "Cách năng lượng cá nhân thường được người khác nhận thấy.",
+    title: "Sứ mệnh",
+    description: "Tóm tắt hướng thể hiện qua tên khai sinh và cách bạn đóng góp giá trị cho xung quanh.",
   },
   {
-    icon: "5",
+    icon: "2",
+    title: "Linh hồn",
+    description: "Làm rõ động lực bên trong, điều bạn coi trọng và nhu cầu cảm xúc cốt lõi.",
+  },
+  {
+    icon: "4",
+    title: "Cá tính",
+    description: "Mô tả cách năng lượng cá nhân thường được người khác cảm nhận từ bên ngoài.",
+  },
+  {
+    icon: "9",
     title: "Năm cá nhân",
-    description: "Bối cảnh chủ đạo trong chu kỳ một năm hiện tại.",
+    description: "Cho biết bối cảnh chủ đạo của năm hiện tại để bạn quan sát cơ hội và thử thách.",
   },
   {
     icon: "6",
     title: "Tháng cá nhân",
-    description: "Gợi ý ngắn hạn để quan sát và điều chỉnh.",
+    description: "Gợi ý nhịp ngắn hạn trong từng tháng, giúp bạn điều chỉnh hành động thực tế hơn.",
   },
+];
+
+const processSteps = [
+  "Nhập họ tên, tên thường gọi, giới tính và ngày sinh.",
+  "Nhận dashboard tổng quan miễn phí với các chỉ số chính.",
+  "Mở khóa bản luận giải đầy đủ khi bạn muốn đọc sâu hơn.",
 ];
 
 export default function NumerologyPage() {
   const products = getProductsByModule("numerology");
 
   return (
-    <PageShell
-      title="Thần số học"
-      subtitle="Khám phá ý nghĩa con số trong ngày sinh và tên gọi của bạn"
-      showBack
-      backHref="/"
-      backLabel="Dashboard"
-      containerWidth="default"
-    >
-      <section>
-        <div className="max-w-2xl">
-          <h2>Bắt đầu tra cứu</h2>
-          <p className="mt-4 text-[var(--bm-text-soft)]">
-            Nhập thông tin cơ bản để tạo bản phân tích Thần số học cá nhân hóa.
-          </p>
-        </div>
-        <NumerologyAuthNotice />
-        <InputForm />
-      </section>
-
-      <section className="mt-14">
-        <div className="max-w-2xl">
-          <h2>Các chỉ số sẽ được luận giải</h2>
-          <p className="mt-4 text-[var(--bm-text-soft)]">
-            Báo cáo chia thông tin thành các nhóm chỉ số rõ ràng để bạn dễ đọc và đối chiếu.
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {numerologyMetrics.map((metric) => (
-            <Card key={metric.title} as="article" variant="default" padding="sm">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl" aria-hidden="true">
-                  {metric.icon}
-                </span>
-                <h3 className="text-lg">{metric.title}</h3>
+    <>
+      <MysticStyles />
+      <div className="mystic-page">
+        <section className="mystic-hero">
+          <div className="mystic-container">
+            <div className="mystic-hero-grid numerology-entry-grid">
+              <div className="mystic-hero-left">
+                <div className="mystic-pill">✦ Module đang mở · Báo cáo cá nhân hóa · Không cần kiến thức nền</div>
+                <h1>
+                  Khám phá hồ sơ <span className="mystic-gradient">Thần số học</span> của bạn
+                </h1>
+                <p className="mystic-subtitle">
+                  Nhập thông tin cơ bản để tạo bản phân tích Thần số học theo ngày sinh và tên gọi.
+                  Bản tổng quan giúp bạn nắm nhanh các chỉ số chính trước khi mở phần luận giải đầy đủ.
+                </p>
+                <div className="mt-7 grid gap-3 text-[var(--bm-text-soft)]">
+                  {processSteps.map((step, index) => (
+                    <div className="flex items-start gap-3" key={step}>
+                      <span className="mt-1 inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.08)] text-xs font-black text-[var(--bm-gold-bright)]">
+                        {index + 1}
+                      </span>
+                      <span>{step}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mystic-trust">
+                  <span>✓ Tổng quan miễn phí</span>
+                  <span>✓ Luận giải theo từng mục</span>
+                  <span>✓ Lưu cùng tài khoản</span>
+                </div>
               </div>
-              <p className="mt-3 text-sm text-[var(--bm-text-soft)]">{metric.description}</p>
+
+              <div>
+                <NumerologyAuthNotice />
+                <InputForm />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mystic-section pt-0">
+          <div className="mystic-container">
+            <div className="section-head">
+              <p className="section-kicker">Chỉ số cốt lõi</p>
+              <h2>Bản đồ số học được chia thành từng lớp dễ đọc</h2>
+              <p>
+                Báo cáo không chỉ đưa ra con số, mà còn diễn giải theo nhóm ý nghĩa để bạn dễ quan
+                sát tính cách, động lực, chu kỳ hiện tại và hướng phát triển.
+              </p>
+            </div>
+
+            <div className="benefits-grid">
+              {numerologyMetrics.map((metric) => (
+                <Card key={metric.title} as="article" className="benefit-card mystic-card hover-lift" padding="lg" variant="panel">
+                  <div className="benefit-icon mb-5 inline-flex size-12 items-center justify-center rounded-xl text-xl text-[var(--bm-gold-bright)]">
+                    {metric.icon}
+                  </div>
+                  <h3>{metric.title}</h3>
+                  <p>{metric.description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mystic-section pt-0">
+          <div className="mystic-container">
+            <div className="section-head">
+              <p className="section-kicker">Mở khóa</p>
+              <h2>Sở hữu bản luận giải đầy đủ</h2>
+              <p>
+                Bản tổng quan giúp bạn xem nhanh các chỉ số chính. Khi cần đọc sâu hơn, bạn có thể
+                mở khóa báo cáo Thần số học đầy đủ và xem lại trong tài khoản.
+              </p>
+            </div>
+
+            <div className="grid gap-5">
+              {products.map((product) => (
+                <ProductCard key={product.code} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mystic-section pt-0 pb-16">
+          <div className="mystic-container">
+            <Card as="section" className="cta-banner text-left sm:text-center" padding="lg" variant="panel">
+              <div className="section-kicker">Lưu ý</div>
+              <h2 className="mt-3">Luận giải để tham khảo, chiêm nghiệm và định hướng</h2>
+              <p className="mx-auto mt-4 max-w-3xl text-[var(--bm-text-soft)]">
+                Thần số học trong Bản Mệnh là công cụ tự quan sát. Nội dung không khẳng định tương
+                lai chắc chắn, không thay thế tư vấn y tế, pháp lý, tài chính, đầu tư hoặc tâm lý,
+                và không nên là căn cứ duy nhất cho các quyết định quan trọng.
+              </p>
             </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-14">
-        <div className="max-w-2xl">
-          <h2>Sở hữu báo cáo của bạn</h2>
-          <p className="mt-4 text-[var(--bm-text-soft)]">
-            Mua một lần, mở khóa vĩnh viễn báo cáo Thần số học đầy đủ trong tài khoản.
-          </p>
-        </div>
-        <div className="mt-8 grid gap-5">
-          {products.map((product) => (
-            <ProductCard key={product.code} product={product} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-14">
-        <Card as="section" variant="panel" padding="lg">
-          <h2>Lưu ý khi đọc luận giải</h2>
-          <p className="mt-4 text-[var(--bm-text-soft)]">
-            Thần số học trong Bản Mệnh V2 được dùng như công cụ tham khảo và tự quan sát.
-            Nội dung không khẳng định tương lai chắc chắn, không thay thế tư vấn chuyên môn
-            và không nên là căn cứ duy nhất cho quyết định quan trọng.
-          </p>
-        </Card>
-      </section>
-    </PageShell>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

@@ -1,0 +1,469 @@
+import { Button, Card } from "../../components/ui";
+import { AnalysisCard, DeckBack, RitualPulse, SelectedSlot, SpreadOption, ThemeOption } from "./tarot-ui";
+import {
+  DECK,
+  MINI_MODALS,
+  SAMPLE_QUESTIONS,
+  SPREAD_OPTIONS,
+  type ReadingSection,
+  type ReadingSession,
+  type Spread,
+  type ThemeKey,
+} from "./tarot-data";
+
+export type TarotModalKey = keyof typeof MINI_MODALS | null;
+
+export type TarotTopic = {
+  key: ThemeKey;
+  icon: string;
+  label: string;
+  subtitle: string;
+  lead: string;
+  niches: Array<{ label: string; hint: string }>;
+};
+
+type QuestionMode = "suggested" | "custom";
+
+export function FieldSelectView({
+  activeTheme,
+  onAdvance,
+  onSkip,
+  topics,
+}: {
+  activeTheme: ThemeKey;
+  onAdvance: (theme: ThemeKey) => void;
+  onSkip: () => void;
+  topics: TarotTopic[];
+}) {
+  return (
+    <div className="tarot-stage-block">
+      <Card className="tarot-stage-highlight" padding="lg" variant="glass">
+        <div className="tarot-stage-highlight-title">
+          <span>✦</span>
+          <strong>Chọn một chủ đề để mở cánh cửa đầu tiên</strong>
+        </div>
+        <p>
+          Từ đây, Tarot sẽ đi vào đúng mạch câu hỏi của bạn. Mỗi chủ đề là một lớp đọc riêng, và mỗi lớp sẽ mở tiếp
+          các niche nhỏ ở bước sau.
+        </p>
+      </Card>
+
+      <div className="tarot-topic-grid">
+        {topics.map((item) => (
+          <TopicCard active={item.key === activeTheme} key={item.key} item={item} onClick={() => onAdvance(item.key)} />
+        ))}
+      </div>
+
+      <div className="tarot-stage-actions">
+        <Button onClick={onSkip} variant="secondary">
+          Bỏ qua bước chọn chủ đề
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function TopicCard({
+  active,
+  item,
+  onClick,
+}: {
+  active: boolean;
+  item: TarotTopic;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className={active ? "tarot-option active tarot-topic-card" : "tarot-option tarot-topic-card"}
+      onClick={onClick}
+      type="button"
+    >
+      <span>{item.icon}</span>
+      <strong>{item.label}</strong>
+      <em>{item.subtitle}</em>
+      <p>{item.lead}</p>
+    </button>
+  );
+}
+
+export function NicheSelectView({
+  niches,
+  onChoose,
+  query,
+  setQuery,
+  topic,
+}: {
+  niches: TarotTopic["niches"];
+  onChoose: (value: string) => void;
+  query: string;
+  setQuery: (value: string) => void;
+  topic: TarotTopic;
+}) {
+  return (
+    <div className="tarot-stage-block">
+      <Card className="tarot-stage-highlight" padding="lg" variant="glass">
+        <div className="tarot-stage-highlight-title">
+          <span>Ⅱ</span>
+          <strong>Lĩnh vực {topic.label}</strong>
+        </div>
+        <p>{topic.lead}</p>
+      </Card>
+
+      <label className="tarot-search-wrap">
+        <span>Tìm nhanh chủ đề</span>
+        <input
+          className="tarot-search"
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Ví dụ: gia đình, đồng nghiệp, đầu tư..."
+          type="search"
+          value={query}
+        />
+      </label>
+
+      <div className="tarot-niche-list">
+        {niches.length > 0 ? (
+          niches.map((item) => (
+            <button className="tarot-niche" key={item.label} onClick={() => onChoose(item.label)} type="button">
+              <strong>{item.label}</strong>
+              <span>{item.hint}</span>
+              <i aria-hidden="true">→</i>
+            </button>
+          ))
+        ) : (
+          <Card padding="md" variant="glass">
+            <p className="text-[var(--bm-text-soft)]">Không thấy kết quả phù hợp. Hãy đổi từ khóa hoặc quay lại danh sách đầy đủ.</p>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function QuestionView({
+  onBack,
+  onContinue,
+  onSelectQuestion,
+  onSkip,
+  question,
+  questionMode,
+  setQuestion,
+  setQuestionMode,
+}: {
+  onBack: () => void;
+  onContinue: () => void;
+  onSelectQuestion: (value: string) => void;
+  onSkip: () => void;
+  question: string;
+  questionMode: QuestionMode;
+  setQuestion: (value: string) => void;
+  setQuestionMode: (value: QuestionMode) => void;
+}) {
+  return (
+    <div className="tarot-stage-block">
+      <Card className="tarot-stage-highlight tarot-stage-highlight--question" padding="lg" variant="glass">
+        <div className="tarot-stage-highlight-title">
+          <span>Ⅲ</span>
+          <strong>Câu hỏi của bạn</strong>
+        </div>
+        <p>Đặt câu hỏi ngắn gọn, cụ thể, và đủ thành tâm. Hệ thống sẽ bám vào câu này ở các bước sau.</p>
+      </Card>
+
+      <div className="tarot-segmented">
+        <button className={questionMode === "suggested" ? "active" : ""} onClick={() => setQuestionMode("suggested")} type="button">
+          Câu hỏi gợi ý
+        </button>
+        <button className={questionMode === "custom" ? "active" : ""} onClick={() => setQuestionMode("custom")} type="button">
+          Tự nhập
+        </button>
+      </div>
+
+      {questionMode === "suggested" ? (
+        <div className="tarot-question-cloud">
+          {SAMPLE_QUESTIONS.map((item) => (
+            <button className={question === item ? "active" : ""} key={item} onClick={() => onSelectQuestion(item)} type="button">
+              {item}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <label className="block">
+          <textarea
+            className="tarot-textarea"
+            maxLength={200}
+            onChange={(event) => setQuestion(event.target.value)}
+            placeholder="Điều bạn muốn vũ trụ giải đáp... (tùy chọn)"
+            value={question}
+          />
+          <span className="tarot-counter">{question.length} / 200</span>
+        </label>
+      )}
+
+      <div className="tarot-stage-actions">
+        <Button onClick={onBack} variant="secondary">
+          Quay lại
+        </Button>
+        <Button onClick={onSkip} variant="ghost">
+          Bỏ qua câu hỏi gợi ý
+        </Button>
+        <Button onClick={onContinue}>Tiếp tục</Button>
+      </div>
+    </div>
+  );
+}
+
+export function SpreadSelectView({
+  onBack,
+  onContinue,
+  setSpread,
+  spread,
+}: {
+  onBack: () => void;
+  onContinue: () => void;
+  setSpread: (value: Spread) => void;
+  spread: Spread;
+}) {
+  return (
+    <div className="tarot-stage-block">
+      <Card className="tarot-stage-highlight tarot-stage-highlight--spread" padding="lg" variant="glass">
+        <div className="tarot-stage-highlight-title">
+          <span>Ⅳ</span>
+          <strong>Chọn kiểu trải bài</strong>
+        </div>
+        <p>
+          Mỗi kiểu trải bài là một khung đọc khác nhau. Chọn ít lá khi muốn gọn ý, chọn nhiều lá khi cần đi sâu hơn
+          vào diễn biến, lực kéo và kết quả.
+        </p>
+      </Card>
+
+      <div className="tarot-spread-grid">
+        {SPREAD_OPTIONS.map((item) => (
+          <SpreadOption
+            active={item.value === spread}
+            hint={item.hint}
+            label={item.label}
+            key={item.value}
+            value={item.value}
+            onClick={() => setSpread(item.value)}
+          />
+        ))}
+      </div>
+
+      <div className="tarot-stage-actions">
+        <Button onClick={onBack} variant="secondary">
+          Quay lại
+        </Button>
+        <Button onClick={onContinue}>Mở bài</Button>
+      </div>
+    </div>
+  );
+}
+
+export function RitualLoadingView({ session }: { session: ReadingSession }) {
+  return (
+    <section className="tarot-stage tarot-stage--ritual tarot-fade-up">
+      <div className="tarot-stage-shell tarot-stage-shell--centered">
+        <div className="tarot-stage-topbar">
+          <div className="tarot-stage-tabs" aria-hidden="true">
+            {[1, 2, 3, 4].map((item) => (
+              <span className={item === 5 ? "active" : item < 5 ? "done" : ""} key={item} />
+            ))}
+          </div>
+        </div>
+        <div className="tarot-ritual-layout">
+          <RitualPulse />
+          <h2>Hãy nghiêm túc suy nghĩ và tự trả lời...</h2>
+          <p className="tarot-ritual-question">“{session.question}”</p>
+          <p className="tarot-ritual-caption">Chậm lại một nhịp. Vũ trụ đang lắng nghe.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function DeckDrawView({
+  onChoose,
+  selectedIndexes,
+  session,
+}: {
+  onChoose: (deckIndex: number) => void;
+  selectedIndexes: number[];
+  session: ReadingSession;
+}) {
+  return (
+    <section className="tarot-stage tarot-stage--deck tarot-fade-up">
+      <div className="tarot-stage-shell tarot-stage-shell--wide">
+        <div className="tarot-stage-reading-header">
+          <p>{session.themeLabel} · {session.spread} lá</p>
+          <h2>Rút bài từ bộ 78 lá</h2>
+          <span>Chạm vào các lá bài để chọn đúng số lượng theo kiểu trải đã chọn.</span>
+        </div>
+
+        <div className="tarot-deck-grid">
+          {DECK.map((card, index) => (
+            <DeckBack
+              disabled={selectedIndexes.length >= session.cards.length && !selectedIndexes.includes(index)}
+              index={index}
+              key={card.id}
+              onClick={() => onChoose(index)}
+              selected={selectedIndexes.includes(index)}
+            />
+          ))}
+        </div>
+
+        <div className="tarot-drawn-tray">
+          {session.cards.map((card, index) => (
+            <div className={selectedIndexes[index] !== undefined ? "filled" : ""} key={`${card.id}-${index}`}>
+              {card.position}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function SpreadRevealView({
+  flippedIndexes,
+  onAnalysis,
+  onFlip,
+  readyForAnalysis,
+  session,
+}: {
+  flippedIndexes: number[];
+  onAnalysis: () => void;
+  onFlip: (index: number) => void;
+  readyForAnalysis: boolean;
+  session: ReadingSession;
+}) {
+  return (
+    <section className="tarot-stage tarot-stage--reveal tarot-fade-up">
+      <div className="tarot-stage-shell tarot-stage-shell--wide">
+        <div className="tarot-stage-reading-header">
+          <p>{session.themeLabel} · {session.question}</p>
+          <h2>Lật từng lá để mở thông điệp</h2>
+          <span>Đọc xong mới sang bước kết nối tâm thức và tổng hợp luận giải.</span>
+        </div>
+
+        <div className="tarot-reveal-grid">
+          {session.cards.map((card, index) => {
+            const flipped = flippedIndexes.includes(index);
+            return <SelectedSlot card={card} flipped={flipped} index={index} key={`${card.id}-${index}`} onFlip={() => onFlip(index)} />;
+          })}
+        </div>
+
+        {readyForAnalysis ? (
+          <div className="tarot-center-action">
+            <Button onClick={onAnalysis} size="lg">
+              Xem luận giải
+            </Button>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+export function ConsciousnessCheckView({
+  onAnswer,
+  session,
+  step,
+}: {
+  onAnswer: () => void;
+  session: ReadingSession;
+  step: number;
+}) {
+  const prompts = [
+    "Trong tình huống này, bạn có đang giữ một niềm tin cũ mà chưa dám đổi không?",
+    "Có chi tiết nào bạn đã lờ đi nhưng thực ra lại là tín hiệu quan trọng?",
+    "Bạn có sẵn sàng biến điều vừa nhận ra thành một hành động cụ thể trong vài ngày tới không?",
+  ];
+
+  return (
+    <section className="tarot-stage tarot-stage--consciousness tarot-fade-up">
+      <div className="tarot-stage-shell tarot-stage-shell--centered">
+        <div className="tarot-stage-reading-header tarot-stage-reading-header--compact">
+          <p>{session.themeLabel} · Kết nối tâm thức</p>
+          <h2>Hãy dành vài nhịp để tự đối thoại</h2>
+          <span>Câu hỏi này giúp gỡ lớp diễn giải cuối cùng trước khi sang phần luận giải.</span>
+        </div>
+
+        <Card className="tarot-consciousness-card" padding="lg" variant="glass">
+          <div className="tarot-star">✦</div>
+          <h1>Kết nối tâm thức</h1>
+          <p>Vũ trụ cần bạn xác nhận 3 điều để thông điệp được giải mã chính xác hơn cho hoàn cảnh hiện tại.</p>
+          <div className="tarot-consciousness-question">{prompts[step]}</div>
+          <div className="tarot-consciousness-actions">
+            <Button onClick={onAnswer} variant="secondary">
+              Có
+            </Button>
+            <Button onClick={onAnswer} variant="secondary">
+              Không
+            </Button>
+          </div>
+          <button className="tarot-link-button" onClick={onAnswer} type="button">
+            Chia sẻ thêm thông tin
+          </button>
+        </Card>
+      </div>
+    </section>
+  );
+}
+
+export function FinalReadingView({
+  onReset,
+  readingSections,
+  session,
+}: {
+  onReset: () => void;
+  readingSections: ReadingSection[];
+  session: ReadingSession;
+}) {
+  return (
+    <section className="tarot-stage tarot-stage--final tarot-fade-up">
+      <div className="tarot-stage-shell tarot-stage-shell--wide">
+        <div className="tarot-stage-reading-header">
+          <p>{session.themeLabel} · Thông điệp sau cùng</p>
+          <h2>Thông điệp từ vũ trụ</h2>
+          <span>Đây là bản đọc đã ghép đầy đủ các lớp. Sau này KB sẽ đi vào đúng các slot này mà không cần đổi khung.</span>
+        </div>
+
+        <div className="tarot-final-grid">
+          <div className="tarot-final-story">
+            {readingSections.map((section) => (
+              <Card as="article" className="tarot-final-section" key={section.title} padding="lg" variant="glass">
+                <h3>{section.title}</h3>
+                <p>{section.body}</p>
+              </Card>
+            ))}
+          </div>
+
+          <div className="tarot-final-aside">
+            <Card className="tarot-final-card" padding="lg" variant="glass">
+              <h3>Điểm nhấn của lượt đọc</h3>
+              <p>Lá mở đầu và lá trung tâm thường cho biết mạch đọc chính của toàn bộ phiên trải.</p>
+            </Card>
+            <AnalysisCard card={session.cards[0]} />
+            {session.cards[1] ? <AnalysisCard card={session.cards[1]} /> : null}
+          </div>
+        </div>
+
+        <Card className="tarot-final-card" padding="lg" variant="glass">
+          <h3>Bộ lá đã mở</h3>
+          <div className="tarot-final-cards">
+            {session.cards.map((card) => (
+              <span key={`${card.id}-${card.position}`}>
+                {card.position}: {card.nameVi} · {card.orientation === "upright" ? "Xuôi" : "Ngược"}
+              </span>
+            ))}
+          </div>
+        </Card>
+
+        <div className="tarot-center-action">
+          <Button onClick={onReset} size="lg">
+            Trở về đầu hành trình
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}

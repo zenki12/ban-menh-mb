@@ -126,9 +126,9 @@ export function InputForm() {
     "mt-2 w-full rounded-lg border border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] px-4 py-3 text-[var(--bm-text-main)] outline-none transition focus:border-[var(--bm-border-purple)]";
 
   return (
-    <Card as="section" className="mt-6" variant="glass" padding="lg">
+    <Card as="section" className="mt-5 sm:mt-6" variant="glass" padding="lg">
       <form onSubmit={handleSubmit} noValidate>
-        <div className="grid gap-5">
+        <div className="grid gap-4 sm:gap-5">
           <div>
             <label className="text-sm font-bold" htmlFor="fullName">
               Họ và tên (đầy đủ và có dấu) <span className="text-[var(--bm-danger)]">*</span>
@@ -161,7 +161,7 @@ export function InputForm() {
             <legend className="text-sm font-bold">
               Giới tính <span className="text-[var(--bm-danger)]">*</span>
             </legend>
-            <div role="radiogroup" className="mt-3 grid grid-cols-2 gap-3 sm:gap-4">
+            <div role="radiogroup" className="mt-3 grid grid-cols-2 gap-3">
               {genderOptions.map((option) => {
                 const selected = formData.gender === option.value;
                 return (
@@ -172,14 +172,14 @@ export function InputForm() {
                     aria-checked={selected}
                     onClick={() => setField("gender", option.value)}
                     className={[
-                      "group flex flex-col items-center gap-2 rounded-2xl border-2 px-4 py-6 transition-all duration-200",
+                      "group flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all duration-200 sm:min-h-32 sm:py-4",
                       selected
                         ? option.selectedClass
                         : "border-[var(--bm-border-subtle)] bg-[var(--bm-bg-glass)] opacity-70 hover:-translate-y-0.5 hover:opacity-100",
                     ].join(" ")}
                     style={selected ? { backgroundImage: option.selectedBg } : undefined}
                   >
-                    <img src={option.iconSrc} alt="" aria-hidden="true" className="size-32 object-contain sm:size-40" />
+                    <img src={option.iconSrc} alt="" aria-hidden="true" className="size-14 object-contain sm:size-16" />
                     <span className="text-base font-bold text-[var(--bm-text-main)]">{option.label}</span>
                   </button>
                 );
@@ -209,10 +209,10 @@ export function InputForm() {
           </div>
         </div>
 
-        <Button className="mt-7" fullWidth loading={submitting} type="submit">
+        <Button className="mt-6" fullWidth loading={submitting} type="submit">
           Phân tích báo cáo của tôi
         </Button>
-        <p className="mt-4 text-sm leading-6 text-[var(--bm-text-muted)]">
+        <p className="mt-3 text-sm leading-6 text-[var(--bm-text-muted)]">
           Mỗi bản luận giải là một tấm gương để bạn nhìn lại nhịp sống, lựa chọn và những khuynh hướng nổi bật của mình.
         </p>
       </form>

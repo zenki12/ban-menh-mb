@@ -40,6 +40,45 @@ Done        Đã hoàn tất và đối chiếu đủ điều kiện done
 - Nếu task đụng payment, auth, entitlement, KB hoặc legal, bắt buộc audit bảo mật trước khi `Done`.
 - Nếu tạo code mới, phải kiểm tra nguy cơ file phình to, logic trùng, dependency thừa và secret/KB leakage.
 
+## Ad-hoc - Audit Fixes
+
+### T-AUDIT-S2 - Post-Sprint-1 + Tarot audit fixes
+
+Status: In Progress
+
+Bối cảnh:
+
+- T-AUDIT-S1 đã hoàn tất vòng audit trước.
+- Worktree còn nhiều thay đổi Tarot/layout chưa có checkpoint commit.
+- Cần xử lý các finding audit sau Sprint 1 và Tarot shell mà không chạm KB content, narrative JSON hoặc synthesizer logic.
+
+Yêu cầu:
+
+- Mỗi item trong task phải là một atomic commit riêng.
+- Commit checkpoint các file Tarot/layout hiện có trước khi sửa tiếp.
+- Thay hardcode tên người thật trong Tarot UI bằng displayName từ auth hoặc fallback an toàn.
+- Scope CSS Tarot vào route `/tarot`, không import ở root layout.
+- Thêm lock `processingAt` cho payment webhook để giảm rủi ro double-grant khi webhook đến song song.
+- Xử lý dead/no-op layout components theo intent hiện có.
+- Lazy-load GalaxyBackground bằng dynamic import `ssr: false`.
+- Parallelize entitlement check và KB fetch trong numerology report API.
+- Sửa duplicate ADR ID.
+- Thêm placeholder routes cho các module chưa live.
+- Đổi hardcode hex trong Tarot CSS sang `--bm-*` tokens.
+- Làm các minor cleanup trong phạm vi task.
+
+Điều kiện Done:
+
+- Có commit atomic cho từng item từ Item 0 đến M-MISC.
+- `npm run lint` pass sau mỗi commit.
+- Cuối task `npm run typecheck`, `npm run build`, `npm run payos:test-sig`, `npm run kb:test-engine`, `npm run kb:test-synthesizer` pass.
+- Không còn hardcode tên người thật trong `src/`.
+- Không còn Tarot CSS import ở root layout.
+- 4 placeholder routes `/tu-vi`, `/ma-tran`, `/chiem-sao`, `/bat-tu` tồn tại.
+- ADR không còn duplicate ID.
+- Không commit `.env.local`, `kb-private/*`, `*.log`.
+- DEVLOG ghi rõ việc đã làm, không làm, command đã chạy và rủi ro còn lại.
+
 ## Ad-hoc - Homepage
 
 ### T-HOME-1 - Tách homepage monolith thành components
@@ -3790,6 +3829,76 @@ Update khi xong:
 
 - Ghi layout/copy đã dùng.
 - Ghi rủi ro UX/content.
+
+### T-0702A - Prototype Tarot ritual UX theo Mystery Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- User muốn bám UX/workflow và nhịp animation của Mystery Tarot.
+- Không cần clone giao diện, không cần nối KB trong bước này.
+
+Yêu cầu:
+
+- `/tarot` không còn cảm giác form cứng.
+- Có journey: landing, tụ tâm, chọn chủ đề/câu hỏi, chọn trải bài, rút/lật bài, kết quả.
+- Animation chậm: heartbeat, ripple, fade-up, reveal từng lá.
+- Không public KB private, không gọi AI.
+
+Output:
+
+- `apps/web/src/app/tarot/page.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-data.ts`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+
+Điều kiện Done:
+
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Flow 1 lá / 3 lá render được bằng data mô phỏng local.
+- KB/backend/history vẫn để các task T-0701..T-0708 xử lý tiếp.
+
+### T-0702B - Port Mystery Tarot UX shell local-only
+
+Status: In Progress
+
+Bối cảnh:
+
+- User muốn `/tarot` bám sát nhịp UX và workflow của Mystery Tarot hơn nữa.
+- Không cần nối KB ở bước này, chỉ cần shell, animation và journey gần như bản tham chiếu.
+
+Yêu cầu:
+
+- Màn landing phải có cảm giác nghi thức, không còn form cứng.
+- Journey phải đi qua: landing, popup tạo phiên, tĩnh tâm, chọn bài, lật bài, phân tích.
+- Có modal phụ cho thông điệp mỗi ngày, lịch sử, từ điển, chủ đề.
+- Text user-facing bằng tiếng Việt có dấu.
+- Không gọi AI, không public KB private.
+
+Output:
+
+- `apps/web/src/app/tarot/page.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-data.ts`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+
+Goal:
+
+- Tarot UX nhìn và đi gần hơn với website tham chiếu, nhưng vẫn chạy local-only trong app hiện tại.
+
+Điều kiện Done:
+
+- `npm run typecheck` pass.
+- `npm run lint` pass.
+- `npm run build` pass.
+- Manual smoke trên `/tarot` không vỡ layout desktop/mobile.
+
+Update khi xong:
+
+- Đã dựng prototype ritual UX local-only, không gọi KB/AI.
+- Đã tách data, UI helpers và experience để file không vượt giới hạn lint.
+- Rủi ro còn lại: chưa manual browser QA do automation/dev-server local bị lỗi sandbox trong phiên này.
 
 ### T-0703 - Build Daily Message
 

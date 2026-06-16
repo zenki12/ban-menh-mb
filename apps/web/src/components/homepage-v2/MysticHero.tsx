@@ -46,7 +46,7 @@ export function MysticHero() {
             </a>
           </div>
           <div className="mystic-trust">
-            <span>✓ Không AI trả lời runtime</span>
+            <span>✓ Không tạo luận giải tự động theo từng lượt</span>
             <span>✓ Tri thức cổ điển</span>
             <span>✓ Vĩnh viễn</span>
           </div>
@@ -60,7 +60,7 @@ export function MysticHero() {
             <span className="ml-3 text-xs text-[var(--bm-text-muted)]">Báo cáo Bản Mệnh</span>
           </div>
           <div className="cosmic-body">
-            <div className="orbit-stage" aria-label="Sáu module Bản Mệnh">
+            <div className="orbit-stage" aria-label="Sáu hệ thống Bản Mệnh">
               <div className="orbit-map">
                 <div className="orbit-ring" />
                 {orbitModules.map((mod, index) => (
@@ -76,7 +76,7 @@ export function MysticHero() {
                   >
                     <div className="orbit-node-inner">
                       {mod.href ? (
-                        <a className="orbit-action" href={mod.href} aria-label={`Mở module ${mod.label}`}>
+                        <a className="orbit-action" href={mod.href} aria-label={`Mở hệ thống ${mod.label}`}>
                           <img className="orbit-logo" src={mod.src} alt={mod.alt} />
                           <span className="orbit-label">{mod.label}</span>
                         </a>
@@ -84,7 +84,7 @@ export function MysticHero() {
                         <button
                           className="orbit-action"
                           type="button"
-                          aria-label={`Xem trạng thái module ${mod.label}`}
+                          aria-label={`Xem trạng thái hệ thống ${mod.label}`}
                           onClick={() => setNoticeModule(mod.label)}
                         >
                           <img className="orbit-logo" src={mod.src} alt={mod.alt} />
@@ -109,7 +109,7 @@ export function MysticHero() {
               </div>
             </div>
             <p className="orbit-note">
-              Chọn một module trong vòng tròn phía trên để bắt đầu tra cứu.
+              Chọn một hệ thống trong vòng tròn phía trên để bắt đầu tra cứu.
             </p>
           </div>
         </div>
@@ -134,9 +134,9 @@ export function MysticHero() {
             </div>
             <div className="module-picker-body">
               <p className="section-kicker">Chọn hệ thống</p>
-              <h2 id="module-picker-title">Bạn muốn bắt đầu từ module nào?</h2>
+              <h2 id="module-picker-title">Bạn muốn bắt đầu từ hệ thống nào?</h2>
               <p className="module-picker-copy">
-                Thần số học đang mở để bạn nhập thông tin và nhận báo cáo. Các hệ thống còn lại sẽ ra mắt theo roadmap.
+                Thần số học đang mở để bạn nhập thông tin và nhận báo cáo. Các hệ thống còn lại sẽ ra mắt theo lộ trình.
               </p>
               <div className="module-picker-grid">
                 {orbitModules.map((mod) =>
@@ -164,7 +164,7 @@ export function MysticHero() {
                 )}
               </div>
               <a className="module-picker-roadmap roadmap-link" href="#roadmap" onClick={() => setIsPickerOpen(false)}>
-                Xem roadmap bên dưới
+                Xem lộ trình bên dưới
               </a>
             </div>
           </div>
@@ -188,7 +188,7 @@ export function MysticHero() {
               Tính năng đang được phát triển và dự kiến sẽ được phát hành trong các phiên bản sắp tới. Vui lòng tham
               khảo{" "}
               <a className="roadmap-link" href="#roadmap" onClick={() => setNoticeModule(null)}>
-                roadmap
+                lộ trình
               </a>{" "}
               bên dưới để biết thêm chi tiết.
             </p>

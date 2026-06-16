@@ -11,6 +11,66 @@
 
 ---
 
+## 2026-06-13 12:30 +07 — T-0702B — Port Mystery Tarot UX shell local-only
+
+Loại: Task
+
+Đã làm:
+
+- Thay shell Tarot bằng flow local-only gần hơn với website tham chiếu: landing, popup tạo phiên, tĩnh tâm, chọn bài, lật bài, phân tích.
+- Làm lại data/UI Tarot thành bản sạch tiếng Việt, có spread 1/3/5/7/10/12, modal phụ và hiệu ứng heartbeat/ripple/fade-up.
+- Giữ KB ngoài luồng, không gọi AI, không public KB private.
+
+File đã sửa:
+
+- `apps/web/src/app/tarot/page.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-data.ts`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Command đã chạy:
+
+- `npm.cmd run typecheck`
+- `npm.cmd run lint`
+- `npm.cmd run build`
+
+Rủi ro còn lại:
+
+- Chưa smoke qua browser nội bộ trong phiên này.
+- Phần KB Tarot/Mystery workflow thật vẫn để task tiếp theo, hiện tại chỉ là UX shell local-only.
+
+## 2026-06-13 11:50 +07 — T-0702A — Prototype Tarot ritual UX theo Mystery Tarot
+
+Loại: Task
+
+Đã làm:
+
+- Thay `/tarot` skeleton/form-like bằng flow ritual local-only: landing, tụ tâm, chọn chủ đề/câu hỏi, chọn trải bài, rút/lật bài và kết quả.
+- Thêm nhịp animation chậm cho heartbeat, ripple, fade-up và reveal từng lá.
+- Tách dữ liệu mô phỏng, UI helpers và experience thành file riêng để giữ file dưới giới hạn lint.
+- Không gọi AI, không nối KB private trong bước này.
+
+File đã sửa:
+
+- `apps/web/src/app/tarot/page.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-data.ts`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `docs/TASK_REGISTRY.md`
+
+Verify:
+
+- `npm run typecheck` pass.
+- `npm run lint` pass.
+- `npm run build` pass.
+
+Rủi ro / chưa làm:
+
+- Chưa manual browser QA do automation/dev-server local lỗi sandbox trong phiên này.
+- KB thật, combo, history, entitlement và backend Tarot vẫn thuộc các task Tarot MVP sau.
+
 ## Môi trường dự án
 
 | Môi trường | Mục đích | Trạng thái |

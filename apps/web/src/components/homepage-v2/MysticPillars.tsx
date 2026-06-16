@@ -7,7 +7,7 @@ const pillars = [
   {
     iconType: "codex",
     title: "Tri thức được biên tập và hệ thống hóa",
-    text: "Các luận giải được xây dựng từ kho tư liệu huyền học được chọn lọc và tổ chức có cấu trúc. Nội dung được biên soạn từ hệ thống tri thức đã được xây dựng sẵn, thay vì tạo sinh tự động bằng AI theo từng yêu cầu, giúp mỗi báo cáo duy trì tính liên kết, chiều sâu và nhất quán.",
+    text: "Các luận giải được xây dựng từ kho tư liệu huyền học được chọn lọc và tổ chức có cấu trúc. Nội dung được biên soạn từ hệ thống tri thức đã được xây dựng sẵn, thay vì tạo sinh tự động bằng trí tuệ nhân tạo theo từng yêu cầu, giúp mỗi báo cáo duy trì tính liên kết, chiều sâu và nhất quán.",
   },
   {
     iconType: "infinity",

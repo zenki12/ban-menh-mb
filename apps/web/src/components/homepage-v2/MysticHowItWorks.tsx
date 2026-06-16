@@ -1,18 +1,18 @@
 const steps = [
   {
     iconType: "input",
-    title: "Nhập tên và ngày sinh",
-    text: "Báo cáo cá nhân hóa được tính từ thông tin cơ bản, không cần quy trình phức tạp.",
+    title: "Nhập thông tin cơ bản",
+    text: "Họ tên và ngày sinh là đủ để bắt đầu tạo hồ sơ cá nhân hóa.",
   },
   {
     iconType: "preview",
-    title: "Xem tổng quan miễn phí",
-    text: "Dashboard chỉ số, hai lớp khái quát và tháng hiện tại giúp người dùng hiểu giá trị trước.",
+    title: "Xem 6 module tổng quan",
+    text: "Hệ thống hiển thị 6 lớp phân tích chính để bạn nắm bức tranh chung trước.",
   },
   {
     iconType: "unlock",
-    title: "Mở khóa luận giải đầy đủ",
-    text: "33 chỉ số chi tiết, nội dung dài và chu kỳ vận số để đọc theo từng giai đoạn.",
+    title: "Mở phần luận giải đầy đủ",
+    text: "Đi sâu vào từng module để xem diễn giải chi tiết và các mốc quan trọng.",
   },
 ] as const;
 
@@ -46,16 +46,15 @@ function StepIcon({ type }: { type: (typeof steps)[number]["iconType"] }) {
 
 export function MysticHowItWorks() {
   return (
-    <section className="mystic-section">
+    <section className="mystic-section" id="hanh-trinh">
       <div className="mystic-container">
         <div className="section-head">
-          <p className="section-kicker">Hành trình</p>
+          <p className="section-kicker">HÀNH TRÌNH</p>
           <h2>Ba bước để mở bản đồ cá nhân</h2>
         </div>
         <div className="steps-grid">
-          {steps.map((step, index) => (
+          {steps.map((step) => (
             <article className="mystic-card hover-lift" key={step.title}>
-              <div className="step-number">{index + 1}</div>
               <div className="pillar-icon">
                 <StepIcon type={step.iconType} />
               </div>

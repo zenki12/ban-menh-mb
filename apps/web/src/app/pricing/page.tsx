@@ -63,9 +63,7 @@ export default function PricingPage() {
     <PageShell
       title="Bảng giá"
       subtitle="Chọn gói phù hợp với hành trình của bạn"
-      showBack
-      backHref="/"
-      backLabel="Dashboard"
+      showBack={false}
       containerWidth="default"
     >
       {MODULE_GROUPS.map((group) => {

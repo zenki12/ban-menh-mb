@@ -1,0 +1,48 @@
+@keyframes tarot-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tarot-gradient-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes tarot-ripple-out {
+  0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.48); }
+  70% { opacity: 0.22; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.18); }
+}
+
+@keyframes tarot-heartbeat {
+  0%, 100% { color: #fde68a; transform: scale(1); box-shadow: 0 0 42px rgba(251, 191, 36, 0.26); }
+  12% { color: #f472b6; transform: scale(1.12); box-shadow: 0 0 72px rgba(244, 114, 182, 0.34); }
+  22% { transform: scale(0.98); }
+  34% { color: #c4b5fd; transform: scale(1.08); box-shadow: 0 0 70px rgba(167, 139, 250, 0.42); }
+  48% { transform: scale(1); }
+}
+
+@keyframes tarot-card-breathe {
+  0%, 100% { transform: translateY(0) rotate(var(--tarot-rotate, 0deg)); }
+  50% { transform: translateY(-7px) rotate(var(--tarot-rotate, 0deg)); }
+}
+
+.tarot-fade-up { animation: tarot-fade-up 520ms ease-out both; }
+
+.tarot-gradient {
+  display: inline-block;
+  background: linear-gradient(110deg, #fff7cc, #facc15, #c4b5fd, #f9a8d4, #fff7cc);
+  background-size: 280% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: tarot-gradient-flow 11s ease-in-out infinite;
+  -webkit-background-clip: text;
+}
+
+.tarot-ripple { animation: tarot-ripple-out 3.6s ease-out infinite; }
+.tarot-heartbeat { animation: tarot-heartbeat 3.8s ease-in-out infinite; }
+
+.tarot-card-back:hover:not(:disabled) {
+  cursor: pointer;
+  animation: tarot-card-breathe 2.6s ease-in-out infinite;
+}

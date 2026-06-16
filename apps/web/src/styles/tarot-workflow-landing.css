@@ -1,0 +1,242 @@
+.tarot-landing {
+  position: relative;
+  display: grid;
+  width: min(92rem, calc(100% - 2rem));
+  min-height: calc(100vh - 8rem);
+  align-items: center;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 5.5rem) 0;
+}
+
+.tarot-landing-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(28rem, 1.12fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.tarot-landing-copy { max-width: 46rem; }
+
+.tarot-hero-pill {
+  display: inline-flex;
+  max-width: 100%;
+  border: 1px solid rgba(251, 191, 36, 0.46);
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.1);
+  box-shadow: 0 0 34px rgba(251, 191, 36, 0.12);
+  color: var(--bm-gold-bright);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  padding: 0.78rem 1.25rem;
+}
+
+.tarot-landing-copy h1 {
+  margin-top: 1.45rem;
+  color: var(--bm-text-main);
+  font-size: clamp(3.8rem, 8vw, 7.7rem);
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.98;
+}
+
+.tarot-landing-copy > p {
+  margin-top: 1.45rem;
+  color: var(--bm-text-soft);
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.95;
+}
+
+.tarot-landing-steps {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.tarot-landing-step {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--bm-text-soft);
+  font-size: 1.05rem;
+}
+
+.tarot-landing-step span {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: 0 0 2.4rem;
+  place-items: center;
+  border: 1px solid var(--bm-border-gold);
+  border-radius: 999px;
+  color: var(--bm-gold-bright);
+  font-weight: 900;
+}
+
+.tarot-landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.tarot-landing-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.35rem;
+  margin-top: 1.65rem;
+  color: var(--bm-text-muted);
+}
+
+.tarot-landing-panel {
+  position: relative;
+  min-height: 46rem;
+  overflow: hidden;
+}
+
+.tarot-landing-panel-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 25% 18%, rgba(251, 191, 36, 0.12), transparent 15rem),
+    radial-gradient(circle at 78% 26%, rgba(167, 139, 250, 0.16), transparent 18rem),
+    radial-gradient(circle at 42% 80%, rgba(244, 114, 182, 0.08), transparent 18rem);
+}
+
+.tarot-landing-panel-inner {
+  position: relative;
+  display: grid;
+  gap: 1.35rem;
+}
+
+.tarot-window-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.46rem;
+  color: var(--bm-text-muted);
+  font-size: 0.86rem;
+}
+
+.tarot-window-bar span {
+  width: 0.78rem;
+  height: 0.78rem;
+  border-radius: 999px;
+}
+
+.tarot-window-bar span:nth-child(1) { background: #fb7185; }
+.tarot-window-bar span:nth-child(2) { background: #fbbf24; }
+.tarot-window-bar span:nth-child(3) { background: #a78bfa; }
+
+.tarot-landing-ritual {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: center;
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 1rem;
+}
+
+.tarot-landing-small-title,
+.tarot-landing-label {
+  color: var(--bm-gold-bright);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.tarot-landing-ritual h2 {
+  margin-top: 0.35rem;
+  color: var(--bm-text-main);
+  font-size: clamp(1.65rem, 3vw, 2.45rem);
+  font-weight: 950;
+}
+
+.tarot-landing-ritual p:last-child {
+  margin-top: 0.65rem;
+  color: var(--bm-text-soft);
+  line-height: 1.75;
+}
+
+.tarot-landing-panel-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.tarot-landing-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tarot-landing-spread-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tarot-landing-question { min-height: 7rem; }
+
+.tarot-landing-tools {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tarot-landing-tools button,
+.tarot-home-button {
+  cursor: pointer;
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--bm-text-soft);
+  font-weight: 800;
+  padding: 0.8rem 1rem;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.tarot-landing-tools button:hover,
+.tarot-home-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--bm-border-gold);
+  color: var(--bm-gold-bright);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+@media (max-width: 1180px) {
+  .tarot-landing-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .tarot-landing {
+    width: min(100% - 1rem, 100%);
+    padding-top: 1rem;
+  }
+
+  .tarot-landing-copy h1 { font-size: clamp(3rem, 16vw, 4.4rem); }
+  .tarot-landing-panel { border-radius: 1.25rem; }
+
+  .tarot-landing-ritual,
+  .tarot-landing-theme-grid,
+  .tarot-landing-spread-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tarot-landing-ritual {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .tarot-landing-ritual .relative {
+    transform: scale(0.78);
+    margin: -1.8rem 0;
+  }
+
+  .tarot-landing-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

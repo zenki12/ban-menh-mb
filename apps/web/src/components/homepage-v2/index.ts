@@ -1,3 +1,4 @@
+export { MysticBenefits } from "./MysticBenefits";
 export { MysticFAQ } from "./MysticFAQ";
 export { MysticFinalCTA } from "./MysticFinalCTA";
 export { MysticFooter } from "./MysticFooter";
