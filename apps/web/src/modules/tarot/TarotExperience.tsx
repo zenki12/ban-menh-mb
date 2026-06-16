@@ -161,7 +161,7 @@ export function TarotExperience() {
     return () => window.clearTimeout(timer);
   }, [phase]);
 
-  function startReading() {
+  function finalizeSession() {
     const cleanQuestion = question.trim() || DEFAULT_QUESTION;
     setSession({ theme, themeLabel: getThemeLabel(theme), spread, question: cleanQuestion, cards: drawCards(spread) });
     setSelectedIndexes([]);
@@ -193,7 +193,7 @@ export function TarotExperience() {
         <LandingView
           onBegin={() => setPhase("fieldSelect")}
           onOpenModal={setModal}
-          onStart={() => setPhase("fieldSelect")}
+          onStart={finalizeSession}
           question={question}
           setQuestion={setQuestion}
           setSpread={setSpread}
@@ -252,7 +252,7 @@ export function TarotExperience() {
             />
           ) : null}
           {phase === "spreadSelect" ? (
-            <SpreadSelectView onBack={() => setPhase("question")} onContinue={startReading} spread={spread} setSpread={setSpread} />
+            <SpreadSelectView onBack={() => setPhase("question")} onContinue={finalizeSession} spread={spread} setSpread={setSpread} />
           ) : null}
         </StageShell>
       ) : null}
