@@ -10,7 +10,7 @@
 
 .tarot-landing-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(28rem, 1.12fr);
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 1fr);
   gap: clamp(2rem, 5vw, 4.5rem);
   align-items: center;
 }
@@ -33,7 +33,7 @@
 .tarot-landing-copy h1 {
   margin-top: 1.45rem;
   color: var(--bm-text-main);
-  font-size: clamp(3.8rem, 8vw, 7.7rem);
+  font-size: clamp(2.6rem, 4.5vw, 4.4rem);
   font-weight: 950;
   letter-spacing: 0;
   line-height: 0.98;
@@ -216,7 +216,7 @@
     padding-top: 1rem;
   }
 
-  .tarot-landing-copy h1 { font-size: clamp(3rem, 16vw, 4.4rem); }
+  .tarot-landing-copy h1 { font-size: clamp(2rem, 10vw, 3rem); }
   .tarot-landing-panel { border-radius: 1.25rem; }
 
   .tarot-landing-ritual,
