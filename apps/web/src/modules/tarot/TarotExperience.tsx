@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Card } from "../../components/ui";
+import { useAuth } from "../../lib/auth";
 import {
   buildReadingSections,
   MINI_MODALS,
@@ -126,6 +127,7 @@ const STAGE_SEQUENCE: Exclude<Phase, "landing">[] = [
 ];
 
 export function TarotExperience() {
+  const { user } = useAuth();
   const [phase, setPhase] = useState<Phase>("landing");
   const [modal, setModal] = useState<TarotModalKey>(null);
   const [theme, setTheme] = useState<ThemeKey>("love");
@@ -149,6 +151,7 @@ export function TarotExperience() {
   const readyForAnalysis = Boolean(session && flippedIndexes.length >= session.cards.length);
   const stageIndex = phase === "landing" ? -1 : STAGE_SEQUENCE.indexOf(phase);
   const stage = phase === "landing" ? null : STAGE_COPY[phase];
+  const displayName = user?.displayName?.trim() || "Bạn";
   const usesStageShell =
     phase === "fieldSelect" || phase === "nicheSelect" || phase === "question" || phase === "spreadSelect";
 
@@ -211,6 +214,7 @@ export function TarotExperience() {
           question={session?.question ?? question}
           spread={session?.spread ?? spread}
           topHint={topic.lead}
+          userName={displayName}
         >
           {phase === "fieldSelect" ? (
             <FieldSelectView activeTheme={theme} onAdvance={(nextTheme) => {
@@ -299,6 +303,7 @@ function StageShell({
   question,
   spread,
   topHint,
+  userName,
 }: {
   children: ReactNode;
   onHome: () => void;
@@ -310,6 +315,7 @@ function StageShell({
   question: string;
   spread: Spread;
   topHint: string;
+  userName: string;
 }) {
   return (
     <section className="tarot-stage">
@@ -332,7 +338,7 @@ function StageShell({
             <Card className="tarot-stage-profile" padding="md" variant="glass">
               <div className="tarot-stage-profile-mark">✦</div>
               <div className="tarot-stage-profile-body">
-                <strong>Nông Xuân Thái</strong>
+                <strong>{userName}</strong>
                 <span>Vũ trụ đang đọc: {themeLabel}</span>
                 <span>Lĩnh vực hiện tại: {niche}</span>
                 <span>Kiểu trải bài: {spread} lá</span>
