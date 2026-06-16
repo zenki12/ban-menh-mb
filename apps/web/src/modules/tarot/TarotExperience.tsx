@@ -5,9 +5,9 @@ import type { ReactNode } from "react";
 import { Card } from "../../components/ui";
 import { useAuth } from "../../lib/auth";
 import {
-  DAILY_CARD,
   MAJOR_NAMES,
   buildReadingSections,
+  getDailyCard,
   MINI_MODALS,
   SAMPLE_QUESTIONS,
   STAGE_COPY,
@@ -115,6 +115,18 @@ const TOPICS: TarotTopic[] = [
   },
 ];
 
+const ALL_TOPICS: TarotTopic[] = [
+  ...TOPICS,
+  {
+    key: "general",
+    icon: "···",
+    label: "Xem Thêm",
+    subtitle: "Tất cả chủ đề",
+    lead: "Tổng hợp tất cả niche từ 5 lĩnh vực. Chọn nếu bạn đã có chủ đề cụ thể trong đầu.",
+    niches: TOPICS.flatMap((t) => t.niches),
+  },
+];
+
 const DEFAULT_QUESTION = "Tôi nên nhìn tình huống hiện tại như thế nào?";
 const STAGE_SEQUENCE: Exclude<Phase, "landing">[] = [
   "fieldSelect",
@@ -143,7 +155,9 @@ export function TarotExperience() {
   const [flippedIndexes, setFlippedIndexes] = useState<number[]>([]);
   const [consciousnessStep, setConsciousnessStep] = useState(0);
 
-  const topic = useMemo(() => TOPICS.find((item) => item.key === theme) ?? TOPICS[0], [theme]);
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const dailyCard = useMemo(() => getDailyCard(todayStr), [todayStr]);
+  const topic = useMemo(() => ALL_TOPICS.find((item) => item.key === theme) ?? ALL_TOPICS[0], [theme]);
   const readingSections = useMemo<ReadingSection[]>(() => (session ? buildReadingSections(session) : []), [session]);
   const filteredNiches = useMemo(() => {
     const haystack = nicheQuery.trim().toLowerCase();
@@ -162,6 +176,13 @@ export function TarotExperience() {
     const timer = window.setTimeout(() => setPhase("deckDraw"), 1800);
     return () => window.clearTimeout(timer);
   }, [phase]);
+
+  useEffect(() => {
+    const seen = window.localStorage.getItem("tarot_daily_seen");
+    if (seen !== todayStr) {
+      setModal("daily");
+    }
+  }, [todayStr]);
 
   function finalizeSession() {
     const cleanQuestion = question.trim() || DEFAULT_QUESTION;
@@ -187,6 +208,13 @@ export function TarotExperience() {
     setConsciousnessStep(0);
     setNiche("Tổng quan");
     setNicheQuery("");
+  }
+
+  function handleCloseModal() {
+    if (modal === "daily") {
+      window.localStorage.setItem("tarot_daily_seen", todayStr);
+    }
+    setModal(null);
   }
 
   return (
@@ -223,7 +251,7 @@ export function TarotExperience() {
               setTheme(nextTheme);
               setNiche("Tổng quan");
               setPhase("nicheSelect");
-            }} onSkip={() => setPhase("question")} topics={TOPICS} />
+            }} onSkip={() => setPhase("question")} topics={ALL_TOPICS} />
           ) : null}
           {phase === "nicheSelect" ? (
             <NicheSelectView
@@ -285,14 +313,14 @@ export function TarotExperience() {
       {phase === "finalReading" && session ? <FinalReadingView onReset={reset} readingSections={readingSections} session={session} /> : null}
 
       {modal ? (
-        <ModalShell onClose={() => setModal(null)}>
+        <ModalShell onClose={handleCloseModal}>
           <h2 className="mb-4 text-2xl font-black text-[var(--bm-text-main)]">
             {MINI_MODALS[modal].title}
           </h2>
           {modal === "daily" && (
             <div className="tarot-modal-daily">
-              <p className="tarot-modal-card-name">{DAILY_CARD.card}</p>
-              <p className="mt-3 leading-relaxed text-[var(--bm-text-soft)]">{DAILY_CARD.body}</p>
+              <p className="tarot-modal-card-name">{dailyCard.card}</p>
+              <p className="mt-3 leading-relaxed text-[var(--bm-text-soft)]">{dailyCard.body}</p>
             </div>
           )}
           {modal === "history" && (

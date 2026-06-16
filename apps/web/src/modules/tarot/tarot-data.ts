@@ -112,7 +112,11 @@ export const DAILY_MESSAGE = {
     "Hôm nay, hãy giữ một khoảng lặng ngắn trước khi quyết định. Lá bài nhắc bạn nhìn lại điều đang nuôi dưỡng niềm tin thay vì phản ứng quá nhanh.",
 };
 
-export const DAILY_CARD = DAILY_MESSAGE;
+// Kept for backward compat. Client code should call getDailyCard(todayStr) directly.
+export const DAILY_CARD = {
+  card: DAILY_MESSAGE.card,
+  body: DAILY_MESSAGE.body,
+};
 
 export const MINI_MODALS = {
   daily: {
@@ -219,6 +223,31 @@ export const DECK: DeckCard[] = [
   ...MAJOR_NAMES.map((card, index) => majorCard(card, index)),
   ...SUITS.flatMap((suit, suitIndex) => RANKS.map((rank, rankIndex) => minorCard(suit, rank, 22 + suitIndex * 14 + rankIndex))),
 ];
+
+const DAILY_CARD_MESSAGES: Record<string, string> = {
+  "Kẻ Khờ": "Hôm nay hợp để thử một bước mới, nhưng hãy giữ sự tỉnh táo trước khi nhảy vào điều chưa rõ.",
+  "Pháp Sư": "Bạn đang có đủ công cụ cần thiết. Hãy chọn một việc cụ thể và biến ý tưởng thành hành động nhỏ.",
+  "Nữ Tư Tế": "Trực giác đang nói nhỏ hơn lý trí. Hãy dành vài phút lắng lại trước khi phản hồi.",
+  "Hoàng Hậu": "Điều cần nuôi dưỡng hôm nay là sự mềm mại. Một hành động chăm sóc nhỏ có thể đổi nhịp cả ngày.",
+  "Hoàng Đế": "Hãy đặt lại ranh giới và cấu trúc. Sự rõ ràng sẽ giúp bạn bớt bị kéo theo cảm xúc nhất thời.",
+  "Giáo Hoàng": "Một lời khuyên có nền tảng sẽ hữu ích hơn tự đoán một mình. Hãy quay về nguyên tắc bạn tin là đúng.",
+  "Những Người Yêu": "Ngày hôm nay nhấn mạnh lựa chọn từ trái tim nhưng cần sự thành thật. Đừng né điều cần được gọi tên.",
+  "Chiến Xa": "Năng lượng tiến lên đang mạnh. Chọn hướng rõ ràng, rồi đi từng bước thay vì kéo mình theo nhiều phía.",
+  "Sức Mạnh": "Sự kiên nhẫn là sức mạnh chính hôm nay. Bạn không cần thắng bằng áp lực, chỉ cần không bỏ rơi mình.",
+  "Ẩn Sĩ": "Một khoảng lặng sẽ giúp bạn thấy điều đang bị nhiễu. Hãy tạm lùi lại trước khi đưa ra kết luận.",
+};
+
+const DAILY_FALLBACK_BODY =
+  "Lá bài hôm nay mời bạn quan sát kỹ nhịp cảm xúc và chọn một hành động nhỏ, rõ ràng, thay vì phản ứng quá nhanh.";
+
+export function getDailyCard(dateStr: string): { card: string; body: string } {
+  const hash = Array.from(dateStr).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const card = DECK[hash % DECK.length] ?? DECK[0];
+  return {
+    card: card.nameVi,
+    body: DAILY_CARD_MESSAGES[card.nameVi] ?? DAILY_FALLBACK_BODY,
+  };
+}
 
 export const POSITION_LABELS: Record<Spread, string[]> = {
   1: ["Thông điệp trọng tâm"],
