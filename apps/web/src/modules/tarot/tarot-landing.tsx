@@ -63,7 +63,7 @@ export function LandingView({
           <div className="tarot-landing-facts">
             <span>✓ 1 / 3 / 5 / 7 / 10 / 12 lá</span>
             <span>✓ Trải bài theo từng chủ đề</span>
-            <span>✓ Sẵn khung để gắn KB Tarot</span>
+            <span>✓ Lưu lịch sử trải bài</span>
           </div>
         </div>
 
