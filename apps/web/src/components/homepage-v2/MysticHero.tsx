@@ -16,7 +16,7 @@ const orbitModules: OrbitModule[] = [
   { label: "Tử vi", src: "/logo/tuvi.png", alt: "Tử vi" },
   { label: "Ma trận", src: "/logo/matrix.png", alt: "Ma trận định mệnh" },
   { label: "Bản đồ sao", src: "/logo/astro.png", alt: "Bản đồ sao" },
-  { label: "Bát tự", src: "/logo/batu.png", alt: "Bát tự" },
+  { label: "Bát tự", src: "/logo/batu.jpg", alt: "Bát tự" },
 ];
 
 export function MysticHero() {

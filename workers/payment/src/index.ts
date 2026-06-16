@@ -230,31 +230,33 @@ app.post("/webhook/payos", async (c) => {
   const specs = PRODUCT_ENTITLEMENT_MAP[String(purchase.productCode ?? "")];
   if (specs && specs.length > 0) {
     const userId = String(purchase.userId ?? "");
-    for (const spec of specs) {
-      const entitlementId = `${userId}_${orderId}${spec.idSuffix ?? ""}`;
-      const expiresAt = spec.expiresInDays
-        ? new Date(Date.now() + spec.expiresInDays * 86400000).toISOString()
-        : undefined;
-      try {
-        await firestoreCreate(sa.projectId, accessToken, "entitlements", entitlementId, {
-          userId,
-          module: spec.module,
-          type: spec.type,
-          purchaseId: orderId,
-          status: "active",
-          startsAt: now,
-          expiresAt,
-          lifetime: !spec.expiresInDays,
-        });
-      } catch (err) {
-        console.error(`[webhook] firestoreCreate entitlement ${entitlementId} failed:`, err);
-        notifyTelegram(
-          formatPaymentError("server_error", orderId, {
-            message: serverErrorMessage(err),
-          }),
-        );
-      }
-    }
+    await Promise.allSettled(
+      specs.map(async (spec) => {
+        const entitlementId = `${userId}_${orderId}${spec.idSuffix ?? ""}`;
+        const expiresAt = spec.expiresInDays
+          ? new Date(Date.now() + spec.expiresInDays * 86400000).toISOString()
+          : undefined;
+        try {
+          await firestoreCreate(sa.projectId, accessToken, "entitlements", entitlementId, {
+            userId,
+            module: spec.module,
+            type: spec.type,
+            purchaseId: orderId,
+            status: "active",
+            startsAt: now,
+            expiresAt,
+            lifetime: !spec.expiresInDays,
+          });
+        } catch (err) {
+          console.error(`[webhook] firestoreCreate entitlement ${entitlementId} failed:`, err);
+          notifyTelegram(
+            formatPaymentError("server_error", orderId, {
+              message: serverErrorMessage(err),
+            }),
+          );
+        }
+      }),
+    );
   }
 
   const voucherCode = String(purchase.voucherCode ?? "").trim().toUpperCase();

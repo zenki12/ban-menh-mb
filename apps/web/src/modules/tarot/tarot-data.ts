@@ -104,6 +104,7 @@ export const SAMPLE_QUESTIONS = [
   "Bài học chính của tình huống hiện tại là gì?",
 ];
 
+// TODO(T-TAROT-KB): Replace with runtime fetch from KB worker when Tarot KB is ready.
 export const DAILY_MESSAGE = {
   title: "Thông điệp mỗi ngày",
   card: "Ngôi Sao",
