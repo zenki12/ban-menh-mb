@@ -54,7 +54,7 @@
 }
 
 .tarot-stage-tabs span.done { background: rgba(251, 191, 36, 0.62); }
-.tarot-stage-tabs span.active { background: #c084fc; box-shadow: 0 0 26px rgba(192, 132, 252, 0.84); }
+.tarot-stage-tabs span.active { background: var(--bm-violet); box-shadow: 0 0 26px rgba(192, 132, 252, 0.84); }
 
 .tarot-stage-grid {
   position: relative;
@@ -343,7 +343,7 @@
 
 .tarot-ritual-layout h2,
 .tarot-stage-reading-header h2 {
-  color: #fff6c9;
+  color: var(--bm-gold-faint);
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(1.8rem, 4vw, 3.2rem);
   line-height: 1.1;

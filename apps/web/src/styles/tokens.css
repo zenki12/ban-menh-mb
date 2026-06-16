@@ -47,6 +47,9 @@
   --bm-warning: #f59e0b;
   --bm-danger: #ef4444;
   --bm-danger-soft: #fca5a5;
+  --bm-rose: #fb7185;
+  --bm-violet: #c084fc;
+  --bm-gold-faint: #fff6c9;
 
   /* ========== Border ========== */
   --bm-border-subtle: rgba(255, 255, 255, 0.10);

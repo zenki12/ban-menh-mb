@@ -124,9 +124,9 @@
   border-radius: 999px;
 }
 
-.tarot-window-bar span:nth-child(1) { background: #fb7185; }
-.tarot-window-bar span:nth-child(2) { background: #fbbf24; }
-.tarot-window-bar span:nth-child(3) { background: #a78bfa; }
+.tarot-window-bar span:nth-child(1) { background: var(--bm-rose); }
+.tarot-window-bar span:nth-child(2) { background: var(--bm-gold); }
+.tarot-window-bar span:nth-child(3) { background: var(--bm-primary-soft); }
 
 .tarot-landing-ritual {
   display: grid;
