@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { BackHomeBar, Footer, GalaxyBackground, Header } from "../components/layout";
 import { AuthProvider } from "../lib/auth";
 import "./globals.css";
-import "../styles/tarot-workflow.css";
-import "../styles/tarot-workflow-landing.css";
-import "../styles/tarot-workflow-stage.css";
 
 export const metadata: Metadata = {
   title: "Bản Mệnh",
