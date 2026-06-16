@@ -12,7 +12,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(22rem, 1fr);
   gap: clamp(2rem, 5vw, 4.5rem);
-  align-items: center;
+  align-items: start;
 }
 
 .tarot-landing-copy { max-width: 46rem; }
@@ -33,7 +33,7 @@
 .tarot-landing-copy h1 {
   margin-top: 1.45rem;
   color: var(--bm-text-main);
-  font-size: clamp(2.6rem, 4.5vw, 4.4rem);
+  font-size: clamp(2.4rem, 3.5vw, 3.8rem);
   font-weight: 950;
   letter-spacing: 0;
   line-height: 0.98;
@@ -90,7 +90,7 @@
 
 .tarot-landing-panel {
   position: relative;
-  min-height: 46rem;
+  min-height: 36rem;
   overflow: hidden;
 }
 
