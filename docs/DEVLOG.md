@@ -11,6 +11,47 @@
 
 ---
 
+## 2026-06-16 17:00 +07 — T-AUDIT-S2 — Post-Sprint-1 + Tarot audit fixes
+
+Loại: Audit Fix
+
+Đã làm:
+
+- Item 0: Checkpoint commit toàn bộ 11 untracked Tarot/layout files + modified files (safe checkpoint trước khi fix).
+- C1: `TarotExperience.tsx` — xóa hardcode tên người thật, thay bằng `user?.displayName || "Bạn"` qua `useAuth()`.
+- C2: Xóa 3 Tarot CSS import khỏi root `apps/web/src/app/layout.tsx`, tạo `apps/web/src/app/tarot/layout.tsx` scope CSS đúng route `/tarot`.
+- I2: `docs/ADR.md` — đổi ADR-007 duplicate (narrative extension) → ADR-008, cập nhật index table.
+- I7: Tạo 4 placeholder "Sắp ra mắt" pages: `/tu-vi`, `/ma-tran`, `/chiem-sao`, `/bat-tu`.
+- M: `MysticHero.tsx` đổi `batu.png` → `batu.jpg` (tiết kiệm ~2.3MB); `tarot-data.ts` thêm TODO marker DAILY_MESSAGE; `workers/payment/src/index.ts` đổi entitlement for-loop → `Promise.allSettled`.
+- I3/I4 xác nhận đã có: BackHomeBar mounted tại `layout.tsx:26`, CSS classes tồn tại tại `globals.css:455+`.
+
+Không làm (defer sang T-AUDIT-S2B):
+
+- I1: Webhook processingAt lock (TOCTOU) — cần review flow đầy đủ.
+- I8: GalaxyBackground dynamic import ssr:false — perf improvement.
+- I9: Promise.all cho checkEntitlement + KB fetch trong numerology route.
+- I14: Tarot CSS hardcode hex → `--bm-*` tokens.
+
+Commits (6):
+
+- `26e21df` feat(tarot): checkpoint
+- `137fe65` fix(tarot): C1 hardcoded name
+- `0420f4a` perf(tarot): C2 CSS scope
+- `97b18b6` docs(adr): I2 ADR-008
+- `c27aa57` feat(routes): I7 placeholder routes
+- `7b1aebe` chore: M misc fixes
+
+Command đã chạy:
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+
+Rủi ro còn lại:
+
+- 4 items defer cần T-AUDIT-S2B trước khi có thể đánh full audit Done.
+
+---
+
 ## 2026-06-13 12:30 +07 — T-0702B — Port Mystery Tarot UX shell local-only
 
 Loại: Task

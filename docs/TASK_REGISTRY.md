@@ -44,7 +44,7 @@ Done        Đã hoàn tất và đối chiếu đủ điều kiện done
 
 ### T-AUDIT-S2 - Post-Sprint-1 + Tarot audit fixes
 
-Status: In Progress
+Status: Done
 
 Bối cảnh:
 
@@ -78,6 +78,18 @@ Yêu cầu:
 - ADR không còn duplicate ID.
 - Không commit `.env.local`, `kb-private/*`, `*.log`.
 - DEVLOG ghi rõ việc đã làm, không làm, command đã chạy và rủi ro còn lại.
+
+Cập nhật hoàn tất 2026-06-16:
+
+- Item 0: Checkpoint commit 11 untracked Tarot/layout files + tất cả modified files.
+- C1: Xóa hardcode "Nông Xuân Thái" trong `TarotExperience.tsx`, thay bằng `user?.displayName || "Bạn"` qua `useAuth()`.
+- C2: Xóa 3 Tarot CSS import khỏi root `layout.tsx`, tạo `apps/web/src/app/tarot/layout.tsx` scope đúng route.
+- I2: Đổi ADR-007 duplicate (narrative extension) → ADR-008, cập nhật index table.
+- I7: Tạo 4 placeholder routes: `/tu-vi`, `/ma-tran`, `/chiem-sao`, `/bat-tu`.
+- M: Đổi `batu.png` → `batu.jpg` trong production MysticHero; thêm TODO marker DAILY_MESSAGE; đổi entitlement for-loop → `Promise.allSettled`.
+- I3/I4 đã có sẵn: BackHomeBar mounted trong layout, CSS classes tồn tại trong globals.css.
+- Items defer sang T-AUDIT-S2B: I1 (webhook TOCTOU lock), I8 (GalaxyBackground lazy), I9 (parallel fetch), I14 (Tarot hex tokens).
+- `npm run typecheck`, `npm run lint` pass. Working tree sạch.
 
 ## Ad-hoc - Homepage
 
