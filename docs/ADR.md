@@ -19,6 +19,7 @@
 | ADR-005 | 2026-05-16 | Stack/Validation | Zod cho runtime validation và schema | ACCEPTED | - |
 | ADR-006 | 2026-05-16 | Stack/API | Hono framework cho Cloudflare Workers | ACCEPTED | - |
 | ADR-007 | 2026-06-05 | Payment/Architecture | Module-scoped payment URL với shared component (Option C hybrid) | ACCEPTED | - |
+| ADR-008 | 2026-06-05 | KB/Narrative | Numerology narrative extension khi V1 partial-rich | ACCEPTED | - |
 
 ---
 
@@ -339,7 +340,7 @@ Dùng **Hono** làm framework cho cả 3 Worker (`workers/payment`, `workers/kb`
 
 ---
 
-## ADR-007 - Numerology narrative extension khi V1 partial-rich
+## ADR-008 - Numerology narrative extension khi V1 partial-rich
 
 | Field | Value |
 |---|---|
