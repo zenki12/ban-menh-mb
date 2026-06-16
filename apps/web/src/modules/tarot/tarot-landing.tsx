@@ -89,7 +89,7 @@ export function LandingView({
             <div className="tarot-landing-panel-section">
               <label className="tarot-landing-label">Chủ đề quan tâm</label>
               <div className="tarot-landing-theme-grid">
-                {THEME_OPTIONS.map((item) => (
+                {THEME_OPTIONS.filter((item) => item.key !== "general").map((item) => (
                   <ThemeOption
                     active={item.key === theme}
                     hint={item.hint}

@@ -11,12 +11,12 @@ type OrbitModule = {
 };
 
 const orbitModules: OrbitModule[] = [
-  { label: "Thần số", src: "/logo/numerology.png", alt: "Thần số học", href: "/than-so-hoc" },
-  { label: "Tarot", src: "/logo/tarot.png", alt: "Tarot" },
-  { label: "Tử vi", src: "/logo/tuvi.png", alt: "Tử vi" },
-  { label: "Ma trận", src: "/logo/matrix.png", alt: "Ma trận định mệnh" },
-  { label: "Bản đồ sao", src: "/logo/astro.png", alt: "Bản đồ sao" },
-  { label: "Bát tự", src: "/logo/batu.jpg", alt: "Bát tự" },
+  { label: "Thần số", src: "/icons/modules/module-numerology.png", alt: "Thần số học", href: "/than-so-hoc" },
+  { label: "Tarot", src: "/icons/modules/module-tarot.png", alt: "Tarot" },
+  { label: "Tử vi", src: "/icons/modules/module-tuvi.png", alt: "Tử vi" },
+  { label: "Ma trận", src: "/icons/modules/module-matrix.png", alt: "Ma trận định mệnh" },
+  { label: "Bản đồ sao", src: "/icons/modules/module-astro.png", alt: "Bản đồ sao" },
+  { label: "Bát tự", src: "/icons/modules/module-batu.png", alt: "Bát tự" },
 ];
 
 export function MysticHero() {
