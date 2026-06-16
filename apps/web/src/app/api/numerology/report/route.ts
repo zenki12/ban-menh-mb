@@ -108,16 +108,11 @@ export async function POST(request: Request) {
   const timeout = setTimeout(() => controller.abort(), 30_000);
   let unlocked = false;
   let entitlement = null;
-  try {
-    const result = await checkEntitlement(uid, "numerology_single_report");
-    unlocked = result.has;
-    entitlement = result.has ? result.entitlement : null;
-  } catch (entitlementErr) {
-    console.error("[numerology/report] checkEntitlement failed:", entitlementErr);
-  }
 
-  try {
-    const response = await fetch(`${workerUrl.replace(/\/$/, "")}/numerology/report`, {
+  // Entitlement check and KB fetch are independent — run in parallel.
+  const [entitlementResult, kbFetchResult] = await Promise.allSettled([
+    checkEntitlement(uid, "numerology_single_report"),
+    fetch(`${workerUrl.replace(/\/$/, "")}/numerology/report`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${bearer}`,
@@ -125,7 +120,24 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({ ...parsed.data, includeSections: true }),
       signal: controller.signal,
-    });
+    }),
+  ]);
+
+  if (entitlementResult.status === "fulfilled") {
+    unlocked = entitlementResult.value.has;
+    entitlement = entitlementResult.value.has ? entitlementResult.value.entitlement : null;
+  } else {
+    console.error("[numerology/report] checkEntitlement failed:", entitlementResult.reason);
+  }
+
+  if (kbFetchResult.status === "rejected") {
+    clearTimeout(timeout);
+    console.error("[numerology/report] KB fetch failed:", kbFetchResult.reason);
+    return NextResponse.json({ error: createError("KB_NOT_AVAILABLE") }, { status: 502 });
+  }
+
+  try {
+    const response = kbFetchResult.value;
 
     const text = await response.text();
     let payload: unknown = text;
