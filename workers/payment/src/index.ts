@@ -186,6 +186,20 @@ app.post("/webhook/payos", async (c) => {
     return c.json({ ok: true, idempotent: true, orderId });
   }
 
+  // 5b. processingAt lock — prevents double-grant if PayOS delivers two webhooks
+  // for the same order before the Firestore update completes.
+  const LOCK_TTL_MS = 30_000;
+  const processingAt = Number(purchase.processingAt ?? 0);
+  if (processingAt && Date.now() - processingAt < LOCK_TTL_MS) {
+    return c.json({ ok: true, processing: true, orderId });
+  }
+  try {
+    await firestorePatch(sa.projectId, accessToken, "purchases", orderId, { processingAt: Date.now() }, ["processingAt"]);
+  } catch (err) {
+    console.error("[webhook] processingAt lock failed:", err);
+    // Non-fatal: continue processing; double-grant risk is low without the lock.
+  }
+
   // 6. Amount check — KHÔNG tin amount từ webhook nếu không khớp
   const webhookAmount = Number(data.amount);
   const purchaseAmount = Number(purchase.amount);
