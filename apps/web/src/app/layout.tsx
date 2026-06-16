@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
-import { BackHomeBar, Footer, GalaxyBackground, Header } from "../components/layout";
+import dynamic from "next/dynamic";
+import { BackHomeBar, Footer, Header } from "../components/layout";
 import { AuthProvider } from "../lib/auth";
 import "./globals.css";
+
+const GalaxyBackground = dynamic(
+  () =>
+    import("../components/layout/GalaxyBackground").then((m) => ({
+      default: m.GalaxyBackground,
+    })),
+  { ssr: false },
+);
 
 export const metadata: Metadata = {
   title: "Bản Mệnh",
