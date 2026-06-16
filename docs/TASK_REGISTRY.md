@@ -3925,7 +3925,7 @@ Update khi xong:
 
 ### T-0703 - Build Daily Message
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -3953,8 +3953,10 @@ Goal:
 
 Update khi xong:
 
-- Ghi logic daily đã implement.
-- Ghi data source.
+- `getDailyCard(dateStr)` trong tarot-data.ts: hash char-code của date string, modulo DECK.length → lá khác nhau mỗi ngày, deterministic.
+- Auto-popup useEffect: check `localStorage["tarot_daily_seen"]`, nếu khác ngày hôm nay thì `setModal("daily")`.
+- `handleCloseModal`: ghi `localStorage["tarot_daily_seen"] = todayStr` khi đóng modal daily.
+- Data source: static trong tarot-data.ts, 10 lá Major Arcana có thông điệp riêng, còn lại dùng fallback.
 
 ### T-0704 - Build Tarot wizard: chọn chủ đề và câu hỏi
 
