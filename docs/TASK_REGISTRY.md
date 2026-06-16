@@ -91,6 +91,17 @@ Cập nhật hoàn tất 2026-06-16:
 - Items defer sang T-AUDIT-S2B: I1 (webhook TOCTOU lock), I8 (GalaxyBackground lazy), I9 (parallel fetch), I14 (Tarot hex tokens).
 - `npm run typecheck`, `npm run lint` pass. Working tree sạch.
 
+### T-AUDIT-S2B — Security & Performance Audit Batch 2B
+
+- **Status:** Done
+- **Branch:** codex-t0610c-section10-extra
+- **Date:** 2026-06-16
+- Items hoàn tất:
+  - I1: processingAt lock (TOCTOU prevention) — workers/payment/src/index.ts
+  - I8: GalaxyBackground lazy-load — GalaxyBackgroundLazy Client Component wrapper
+  - I9: Parallel entitlement + KB fetch — api/numerology/report/route.ts
+  - I14: CSS design tokens — --bm-rose, --bm-violet, --bm-gold-faint thay hardcode hex
+
 ## Ad-hoc - Homepage
 
 ### T-HOME-1 - Tách homepage monolith thành components

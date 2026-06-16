@@ -11,6 +11,35 @@
 
 ---
 
+## 2026-06-16 18:00 +07 — T-AUDIT-S2B hoàn tất
+
+Loại: Audit Fix
+
+Hoàn tất 4 items deferred từ T-AUDIT-S2:
+
+- **I1 (webhook TOCTOU):** Thêm processingAt lock 30s trong payment worker. Nếu PayOS gửi 2 webhook trùng trước khi Firestore update xong, webhook thứ 2 trả về `{ ok: true, processing: true }` thay vì double-grant.
+- **I8 (GalaxyBackground SSR):** `next/dynamic({ ssr: false })` không dùng được trong Server Component. Tạo `GalaxyBackgroundLazy.tsx` là Client Component chứa dynamic import; root `layout.tsx` import wrapper này.
+- **I9 (parallel fetch):** `checkEntitlement` và KB fetch chạy song song qua `Promise.allSettled`. Entitlement fail không block response; KB fail → 502.
+- **I14 (CSS tokens):** Thêm `--bm-rose`, `--bm-violet`, `--bm-gold-faint` vào `tokens.css`. Tarot CSS files dùng token thay hardcode hex.
+
+Commits:
+
+- `bc873a1` perf(api): parallelize entitlement check and KB fetch (T-AUDIT-S2B I9)
+- `34b7278` fix(webhook): add processingAt lock to prevent TOCTOU double-grant (T-AUDIT-S2B I1)
+- `d1ba30c` style(tarot): replace hardcode hex with --bm-* tokens (T-AUDIT-S2B I14)
+- `5e7a15e` perf(layout): lazy-load GalaxyBackground with ssr:false (T-AUDIT-S2B I8)
+- `c3ae37f` fix(layout): wrap GalaxyBackground dynamic import in client component (T-AUDIT-S2B I8-fix)
+
+Verify:
+
+- `npm run lint` pass.
+
+Rủi ro còn lại:
+
+- Không chạy lại build trong docs-only commit này theo đúng phạm vi user yêu cầu; build đã pass ở hotfix I8-fix trước đó.
+
+---
+
 ## 2026-06-16 17:00 +07 — T-AUDIT-S2 — Post-Sprint-1 + Tarot audit fixes
 
 Loại: Audit Fix
