@@ -265,7 +265,7 @@ export function RitualLoadingView({ session }: { session: ReadingSession }) {
         <div className="tarot-stage-topbar">
           <div className="tarot-stage-tabs" aria-hidden="true">
             {[1, 2, 3, 4].map((item) => (
-              <span className={item === 5 ? "active" : item < 5 ? "done" : ""} key={item} />
+              <span className="done" key={item} />
             ))}
           </div>
         </div>
@@ -368,7 +368,7 @@ export function ConsciousnessCheckView({
   session,
   step,
 }: {
-  onAnswer: () => void;
+  onAnswer: (answer: boolean) => void;
   session: ReadingSession;
   step: number;
 }) {
@@ -393,14 +393,14 @@ export function ConsciousnessCheckView({
           <p>Vũ trụ cần bạn xác nhận 3 điều để thông điệp được giải mã chính xác hơn cho hoàn cảnh hiện tại.</p>
           <div className="tarot-consciousness-question">{prompts[step]}</div>
           <div className="tarot-consciousness-actions">
-            <Button onClick={onAnswer} variant="secondary">
+            <Button onClick={() => onAnswer(true)} variant="secondary">
               Có
             </Button>
-            <Button onClick={onAnswer} variant="secondary">
+            <Button onClick={() => onAnswer(false)} variant="secondary">
               Không
             </Button>
           </div>
-          <button className="tarot-link-button" onClick={onAnswer} type="button">
+          <button className="tarot-link-button" onClick={() => onAnswer(false)} type="button">
             Chia sẻ thêm thông tin
           </button>
         </Card>
@@ -430,7 +430,7 @@ export function FinalReadingView({
         <div className="tarot-final-grid">
           <div className="tarot-final-story">
             {readingSections.map((section) => (
-              <Card as="article" className="tarot-final-section" key={section.title} padding="lg" variant="glass">
+              <Card as="article" className="tarot-final-section tarot-final-section--placeholder" key={section.title} padding="lg" variant="glass">
                 <h3>{section.title}</h3>
                 <p>{section.body}</p>
               </Card>

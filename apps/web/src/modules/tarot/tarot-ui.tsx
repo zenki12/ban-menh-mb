@@ -106,6 +106,7 @@ export function DeckBack({
         selected
           ? "pointer-events-none -translate-y-3 border-[var(--bm-border-gold)] opacity-35"
           : "border-[var(--bm-border-purple)] bg-[rgba(35,20,70,0.88)] hover:-translate-y-4 hover:border-[var(--bm-border-gold)] hover:shadow-[0_0_42px_rgba(251,191,36,0.22)]",
+        disabled ? "pointer-events-none opacity-40 grayscale" : "",
       ].join(" ")}
       style={{ transform: selected ? undefined : `rotate(${rotate}deg)` }}
       aria-label={`Chọn lá bài ${index + 1}`}
@@ -219,7 +220,7 @@ export function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-[rgba(2,6,23,0.74)] px-4 py-6 backdrop-blur-md">
-      <div className="w-full max-w-3xl rounded-[2rem] border border-[var(--bm-border-purple)] bg-[rgba(13,8,28,0.96)] p-5 shadow-[0_0_80px_rgba(124,58,237,0.26)] sm:p-7">
+      <div className="max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-[var(--bm-border-purple)] bg-[rgba(13,8,28,0.96)] p-5 shadow-[0_0_80px_rgba(124,58,237,0.26)] sm:p-7">
         <div className="mb-5 flex justify-end">
           <Button onClick={onClose} size="sm" variant="secondary">
             Đóng

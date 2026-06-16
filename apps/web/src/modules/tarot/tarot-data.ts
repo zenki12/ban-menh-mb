@@ -112,6 +112,8 @@ export const DAILY_MESSAGE = {
     "Hôm nay, hãy giữ một khoảng lặng ngắn trước khi quyết định. Lá bài nhắc bạn nhìn lại điều đang nuôi dưỡng niềm tin thay vì phản ứng quá nhanh.",
 };
 
+export const DAILY_CARD = DAILY_MESSAGE;
+
 export const MINI_MODALS = {
   daily: {
     title: "Thông điệp mỗi ngày",
@@ -135,7 +137,7 @@ export const MINI_MODALS = {
   },
 } as const;
 
-const MAJOR_NAMES = [
+export const MAJOR_NAMES = [
   ["Kẻ Khờ", "The Fool", "Khởi đầu"],
   ["Pháp Sư", "The Magician", "Hành động"],
   ["Nữ Tư Tế", "The High Priestess", "Trực giác"],

@@ -216,7 +216,7 @@
   display: grid;
   gap: 0.55rem;
   align-content: start;
-  border: 1px solid rgba(167, 139, 250, 0.28);
+  border: 1px solid var(--bm-border-purple);
   border-radius: 1.25rem;
   background: rgba(124, 58, 237, 0.08);
   color: var(--bm-text-soft);
@@ -278,7 +278,7 @@
   grid-template-columns: 12rem minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
-  border: 1px solid rgba(167, 139, 250, 0.28);
+  border: 1px solid var(--bm-border-purple);
   border-radius: 1rem;
   background: rgba(124, 58, 237, 0.07);
   color: var(--bm-text-soft);
@@ -344,14 +344,14 @@
 .tarot-ritual-layout h2,
 .tarot-stage-reading-header h2 {
   color: var(--bm-gold-faint);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--bm-font-serif);
   font-size: clamp(1.8rem, 4vw, 3.2rem);
   line-height: 1.1;
 }
 
 .tarot-ritual-question {
   color: var(--bm-gold-bright);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--bm-font-serif);
   font-size: clamp(1.15rem, 2vw, 1.55rem);
   font-style: italic;
 }
@@ -396,7 +396,7 @@
 
 .tarot-drawn-tray div {
   min-width: 7rem;
-  border: 1px solid rgba(167, 139, 250, 0.28);
+  border: 1px solid var(--bm-border-purple);
   border-radius: 999px;
   color: var(--bm-text-muted);
   padding: 0.55rem 0.8rem;
@@ -420,7 +420,7 @@
 .tarot-center-action { position: relative; z-index: 1; display: flex; justify-content: center; margin-top: 2rem; }
 .tarot-consciousness-card { position: relative; z-index: 1; max-width: 44rem; margin: 0 auto; text-align: center; }
 .tarot-star { color: var(--bm-gold-bright); font-size: 2rem; }
-.tarot-consciousness-card h1 { color: var(--bm-gold-bright); font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.8rem, 4vw, 2.8rem); }
+.tarot-consciousness-card h1 { color: var(--bm-gold-bright); font-family: var(--bm-font-serif); font-size: clamp(1.8rem, 4vw, 2.8rem); }
 .tarot-consciousness-card p { margin-top: 0.6rem; color: var(--bm-text-soft); line-height: 1.75; }
 
 .tarot-consciousness-question {
@@ -446,6 +446,10 @@
   text-decoration: underline;
 }
 
+.tarot-link-button:hover {
+  color: var(--bm-primary-soft);
+}
+
 .tarot-final-grid {
   position: relative;
   z-index: 1;
@@ -464,7 +468,7 @@
 .tarot-final-section h3,
 .tarot-final-card h3 {
   color: var(--bm-gold-bright);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--bm-font-serif);
   font-size: 1.25rem;
 }
 
@@ -483,6 +487,44 @@
 
 .tarot-final-cards { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1rem; }
 
+.tarot-final-section--placeholder {
+  border: 1px dashed var(--bm-border-subtle);
+  opacity: 0.8;
+}
+
+.tarot-modal-daily { display: grid; gap: 0.5rem; }
+.tarot-modal-card-name { color: var(--bm-gold-bright); font-size: 1.25rem; font-weight: 900; }
+.tarot-modal-empty { padding: 2rem 0; text-align: center; }
+.tarot-modal-dictionary { display: grid; gap: 0.75rem; }
+
+.tarot-modal-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.tarot-modal-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem;
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: var(--bm-radius-sm);
+}
+
+.tarot-modal-topics { display: grid; gap: 0.75rem; }
+
+.tarot-modal-topic-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: var(--bm-radius-md);
+}
+
+.tarot-modal-topic-icon { font-size: 1.25rem; flex: 0 0 auto; }
+
 @media (max-width: 1180px) {
   .tarot-stage-grid,
   .tarot-final-grid { grid-template-columns: 1fr; }
@@ -495,6 +537,15 @@
 
   .tarot-stage-title,
   .tarot-stage-subtitle { grid-column: 1 / -1; }
+}
+
+@media (max-width: 1024px) {
+  .tarot-stage-shell {
+    grid-template-columns: 1fr;
+  }
+  .tarot-stage-aside {
+    order: -1;
+  }
 }
 
 @media (max-width: 760px) {
@@ -517,7 +568,7 @@
   .tarot-stage-tabs { justify-content: center; width: 100%; }
   .tarot-niche { grid-template-columns: 1fr auto; }
   .tarot-niche span { grid-column: 1 / -1; }
-  .tarot-deck-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.55rem; }
+  .tarot-deck-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
   .tarot-card-back { min-height: 8.5rem; }
   .tarot-reveal-grid { grid-template-columns: 1fr; }
 }

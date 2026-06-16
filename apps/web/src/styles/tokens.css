@@ -90,6 +90,9 @@
   --bm-text-card-title: clamp(1.125rem, 1vw + 0.75rem, 1.5rem);/* 18 → 24 */
   --bm-text-body: 1rem;                                         /* 16 */
   --bm-text-small: 0.875rem;                                    /* 14 */
+
+  /* ========== Typography family ========== */
+  --bm-font-serif: Georgia, "Times New Roman", serif;
 }
 
 /* Theme mapping cho Tailwind v4. Cho phép dùng class kiểu `bg-bg-void`, `text-primary`, v.v. */

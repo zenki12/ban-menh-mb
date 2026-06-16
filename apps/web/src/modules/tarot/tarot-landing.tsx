@@ -56,7 +56,7 @@ export function LandingView({
               Thông điệp mỗi ngày
             </Button>
             <Button leftIcon={<span>✦</span>} onClick={onBegin} size="lg">
-              Bắt đầu trải bài
+              Bắt đầu từng bước
             </Button>
           </div>
 

@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import { Card } from "../../components/ui";
 import { useAuth } from "../../lib/auth";
 import {
+  DAILY_CARD,
+  MAJOR_NAMES,
   buildReadingSections,
   MINI_MODALS,
   SAMPLE_QUESTIONS,
@@ -272,7 +274,7 @@ export function TarotExperience() {
       ) : null}
       {phase === "consciousnessCheck" && session ? (
         <ConsciousnessCheckView
-          onAnswer={() => {
+          onAnswer={(_answer) => {
             if (consciousnessStep >= 2) setPhase("finalReading");
             else setConsciousnessStep((current) => current + 1);
           }}
@@ -284,8 +286,49 @@ export function TarotExperience() {
 
       {modal ? (
         <ModalShell onClose={() => setModal(null)}>
-          <h2 className="mb-3 text-2xl font-black text-[var(--bm-text-main)]">{MINI_MODALS[modal].title}</h2>
-          <p className="text-[var(--bm-text-soft)]">{MINI_MODALS[modal].body}</p>
+          <h2 className="mb-4 text-2xl font-black text-[var(--bm-text-main)]">
+            {MINI_MODALS[modal].title}
+          </h2>
+          {modal === "daily" && (
+            <div className="tarot-modal-daily">
+              <p className="tarot-modal-card-name">{DAILY_CARD.card}</p>
+              <p className="mt-3 leading-relaxed text-[var(--bm-text-soft)]">{DAILY_CARD.body}</p>
+            </div>
+          )}
+          {modal === "history" && (
+            <div className="tarot-modal-empty">
+              <p className="text-[var(--bm-text-muted)]">Chưa có phiên trải bài nào được lưu.</p>
+              <p className="mt-2 text-sm text-[var(--bm-text-muted)]">
+                Hoàn thành một lượt trải bài để xem lại lịch sử.
+              </p>
+            </div>
+          )}
+          {modal === "dictionary" && (
+            <div className="tarot-modal-dictionary">
+              <p className="mb-3 text-sm text-[var(--bm-text-muted)]">22 lá Ẩn chính (Major Arcana)</p>
+              <div className="tarot-modal-card-grid">
+                {MAJOR_NAMES.map(([vi, , keyword]) => (
+                  <div className="tarot-modal-card-item" key={vi}>
+                    <strong className="text-[var(--bm-text-main)]">{vi}</strong>
+                    <span className="text-sm text-[var(--bm-text-muted)]">{keyword}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {modal === "topics" && (
+            <div className="tarot-modal-topics">
+              {TOPICS.map((topic) => (
+                <div className="tarot-modal-topic-item" key={topic.key}>
+                  <span className="tarot-modal-topic-icon">{topic.icon}</span>
+                  <div>
+                    <strong className="text-[var(--bm-text-main)]">{topic.label}</strong>
+                    <p className="text-sm text-[var(--bm-text-muted)]">{topic.subtitle}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </ModalShell>
       ) : null}
     </div>
