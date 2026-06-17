@@ -16,8 +16,7 @@ body {
 }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  font-family: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
   font-size: var(--bm-text-body);
   line-height: 1.7;
   color: var(--bm-text-main);

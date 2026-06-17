@@ -92,7 +92,8 @@
   --bm-text-small: 0.875rem;                                    /* 14 */
 
   /* ========== Typography family ========== */
-  --bm-font-serif: Georgia, "Times New Roman", serif;
+  --bm-font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
+  --bm-font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
 }
 
 /* Theme mapping cho Tailwind v4. Cho phép dùng class kiểu `bg-bg-void`, `text-primary`, v.v. */

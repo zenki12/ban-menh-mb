@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import { Be_Vietnam_Pro, Lora } from "next/font/google";
 import { BackHomeBar, Footer, GalaxyBackgroundLazy, Header } from "../components/layout";
 import { AuthProvider } from "../lib/auth";
 import "./globals.css";
+
+const beVietnam = Be_Vietnam_Pro({
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "700", "800", "900"],
+  variable: "--font-be-vietnam",
+  display: "swap",
+});
+
+const lora = Lora({
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-lora",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Bản Mệnh",
@@ -14,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="vi" className={`${beVietnam.variable} ${lora.variable}`}>
       <body
         className="relative isolate flex min-h-screen flex-col"
         suppressHydrationWarning

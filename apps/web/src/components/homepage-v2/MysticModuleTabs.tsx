@@ -11,9 +11,9 @@ const modules = [
   },
   {
     label: "Tarot",
-    mark: "Sắp ra mắt",
+    mark: "Đang mở",
+    href: "/tarot",
     title: "Rút bài Tarot",
-    statusLine: "Sắp ra mắt.",
     text: "Đặt câu hỏi, chọn lĩnh vực quan tâm và khám phá thông điệp từ các lá bài Tarot.",
   },
   {
@@ -113,9 +113,12 @@ function TarotMock() {
           <span>Tình yêu, công việc, tài chính, định hướng và phát triển bản thân.</span>
         </div>
       </div>
-      <div className="module-insight module-insight-soon">
+      <div className="module-insight module-insight-live">
         ✨ Hàng nghìn tổ hợp diễn giải từ số lá, lĩnh vực, vị trí và thông điệp từng lá bài.
       </div>
+      <a className="mystic-btn mystic-btn-primary mt-4" href="/tarot">
+        Bắt đầu trải bài →
+      </a>
     </>
   );
 }
@@ -303,7 +306,7 @@ export function MysticModuleTabs() {
                   <span>{active === index ? "✦" : "•"} {item.label}</span>
                   <span
                     className={`status-badge ${
-                      index === 0 ? "status-live" : index === 1 ? "status-soon" : "status-planned"
+                      index <= 1 ? "status-live" : "status-planned"
                     }`}
                   >
                     {item.mark}
@@ -313,7 +316,7 @@ export function MysticModuleTabs() {
             </div>
             <div className="module-copy">
               <h3>{current.title}</h3>
-              {"statusLine" in current ? <em className="module-status-line">{current.statusLine}</em> : null}
+              {"statusLine" in current ? <em className="module-status-line">{current.statusLine as string}</em> : null}
               <p>{current.text}</p>
               <p className="mt-4 text-sm text-[var(--bm-gold-bright)]">
                 ✨ Ưu đãi dành riêng cho những người tham gia sớm.

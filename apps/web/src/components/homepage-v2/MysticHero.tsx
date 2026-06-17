@@ -12,7 +12,7 @@ type OrbitModule = {
 
 const orbitModules: OrbitModule[] = [
   { label: "Thần số", src: "/icons/modules/module-numerology.png", alt: "Thần số học", href: "/than-so-hoc" },
-  { label: "Tarot", src: "/icons/modules/module-tarot.png", alt: "Tarot" },
+  { label: "Tarot", src: "/icons/modules/module-tarot.png", alt: "Tarot", href: "/tarot" },
   { label: "Tử vi", src: "/icons/modules/module-tuvi.png", alt: "Tử vi" },
   { label: "Ma trận", src: "/icons/modules/module-matrix.png", alt: "Ma trận định mệnh" },
   { label: "Bản đồ sao", src: "/icons/modules/module-astro.png", alt: "Bản đồ sao" },
