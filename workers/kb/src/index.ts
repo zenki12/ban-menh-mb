@@ -6,9 +6,11 @@ import { logger } from "hono/logger";
 import { verifyFirebaseToken } from "./lib/auth";
 import { loadKb, loadNarrative } from "./lib/kb-loader";
 import { checkRateLimit, getClientIp } from "./lib/rate-limit";
+import { findTarotCombo, loadTarotCards, loadTarotComboDetail, loadTarotComboIndex } from "./lib/tarot-kb-loader";
 
 type Env = {
   BANMENH_KB_DEV: KVNamespace;
+  TAROT_KB_R2: R2Bucket;
   FIREBASE_PROJECT_ID: string;
   FIREBASE_CLIENT_EMAIL: string;
   FIREBASE_PRIVATE_KEY: string;
@@ -234,6 +236,91 @@ app.post("/numerology/report", async (c) => {
     console.error("[kb-worker] report generation failed:", err);
     const res = error("SERVER_ERROR", "Không thể tạo báo cáo.", 500);
     return c.json(res.body, res.status);
+  }
+});
+
+app.get("/tarot/card/:cardId", async (c) => {
+  const token = getBearerToken(c.req.header("Authorization"));
+  if (!token) {
+    return c.json({ error: { code: "AUTH_REQUIRED", message: "Thiếu Bearer token." } }, 401);
+  }
+
+  try {
+    await verifyFirebaseToken(token, c.env.FIREBASE_PROJECT_ID);
+  } catch {
+    return c.json({ error: { code: "AUTH_INVALID_TOKEN", message: "Token không hợp lệ." } }, 401);
+  }
+
+  const cardId = Number(c.req.param("cardId"));
+  const niche = c.req.query("niche") ?? "general";
+  const reversed = c.req.query("reversed") === "true";
+
+  if (!Number.isInteger(cardId)) {
+    return c.json({ error: { code: "VALIDATION", message: "cardId không hợp lệ." } }, 400);
+  }
+
+  try {
+    const cards = await loadTarotCards(c.env.BANMENH_KB_DEV);
+    const card = cards.find((item) => item.id === cardId);
+    if (!card) {
+      return c.json({ error: { code: "NOT_FOUND", message: "Không tìm thấy lá bài." } }, 404);
+    }
+
+    const text = reversed
+      ? (card.aspects?.[`${niche}_rev`] ?? card.reversed ?? "")
+      : (card.aspects?.[niche] ?? card.upright ?? "");
+
+    return c.json({ ok: true, card: { id: card.id, name: card.name, nameVi: card.nameVi }, text });
+  } catch (err) {
+    console.error("[tarot] card lookup failed:", err);
+    return c.json({ error: { code: "SERVER_ERROR", message: "Lỗi server." } }, 500);
+  }
+});
+
+app.get("/tarot/combo", async (c) => {
+  const token = getBearerToken(c.req.header("Authorization"));
+  if (!token) {
+    return c.json({ error: { code: "AUTH_REQUIRED", message: "Thiếu Bearer token." } }, 401);
+  }
+
+  try {
+    await verifyFirebaseToken(token, c.env.FIREBASE_PROJECT_ID);
+  } catch {
+    return c.json({ error: { code: "AUTH_INVALID_TOKEN", message: "Token không hợp lệ." } }, 401);
+  }
+
+  const cards = c.req.query("cards");
+  const niche = c.req.query("niche") ?? "general";
+  const variant = c.req.query("variant") ?? "Up_Up";
+
+  if (!cards) {
+    return c.json({ error: { code: "VALIDATION", message: "Thiếu param cards." } }, 400);
+  }
+
+  try {
+    const cardNames = cards.split(",").map((value) => value.trim()).filter(Boolean);
+    if (cardNames.length < 2) {
+      return c.json({ error: { code: "VALIDATION", message: "Cần ít nhất 2 lá bài." } }, 400);
+    }
+
+    const comboIndex = await loadTarotComboIndex(c.env.BANMENH_KB_DEV);
+    const entry = findTarotCombo(comboIndex.combos, cardNames);
+
+    if (!entry) {
+      return c.json({ ok: true, found: false, text: "" });
+    }
+
+    const detail = await loadTarotComboDetail(c.env.TAROT_KB_R2, entry);
+    const text =
+      detail?.[niche]?.[variant] ??
+      detail?.general?.[variant] ??
+      detail?.love?.[variant] ??
+      "";
+
+    return c.json({ ok: true, found: true, combo: { id: entry.id, title: entry.title }, text });
+  } catch (err) {
+    console.error("[tarot] combo lookup failed:", err);
+    return c.json({ error: { code: "SERVER_ERROR", message: "Lỗi server." } }, 500);
   }
 });
 

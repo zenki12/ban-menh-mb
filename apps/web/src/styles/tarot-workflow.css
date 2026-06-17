@@ -30,13 +30,14 @@
 .tarot-fade-up { animation: tarot-fade-up 520ms ease-out both; }
 
 .tarot-gradient {
-  display: inline-block;
+  display: inline;
   background: linear-gradient(110deg, #fff7cc, #facc15, #c4b5fd, #f9a8d4, #fff7cc);
   background-size: 280% 100%;
+  -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
   animation: tarot-gradient-flow 11s ease-in-out infinite;
-  -webkit-background-clip: text;
 }
 
 .tarot-ripple { animation: tarot-ripple-out 3.6s ease-out infinite; }

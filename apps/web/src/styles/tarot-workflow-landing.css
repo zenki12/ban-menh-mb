@@ -2,16 +2,16 @@
   position: relative;
   display: grid;
   width: min(92rem, calc(100% - 2rem));
-  min-height: calc(100vh - 8rem);
+  min-height: unset;
   align-items: center;
   margin: 0 auto;
-  padding: clamp(2rem, 6vw, 5.5rem) 0;
+  padding: clamp(1.5rem, 4vw, 3rem) 0;
 }
 
 .tarot-landing-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(22rem, 1fr);
-  gap: clamp(2rem, 5vw, 4.5rem);
+  gap: clamp(1.5rem, 3vw, 3rem);
   align-items: start;
 }
 
@@ -34,10 +34,11 @@
 .tarot-landing-copy h1 {
   margin-top: 1.45rem;
   color: var(--bm-text-main);
-  font-size: clamp(2.4rem, 3.5vw, 3.8rem);
-  font-weight: 950;
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  font-weight: 900;
   letter-spacing: 0;
-  line-height: 0.98;
+  line-height: 1.1;
+  text-wrap: pretty;
 }
 
 .tarot-landing-copy > p {
@@ -91,7 +92,7 @@
 
 .tarot-landing-panel {
   position: relative;
-  min-height: 36rem;
+  min-height: unset;
   overflow: hidden;
 }
 

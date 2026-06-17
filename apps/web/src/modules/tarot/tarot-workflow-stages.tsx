@@ -19,7 +19,7 @@ export type TarotTopic = {
   label: string;
   subtitle: string;
   lead: string;
-  niches: Array<{ label: string; hint: string }>;
+  niches: Array<{ label: string; hint: string; kbKey: string }>;
 };
 
 type QuestionMode = "suggested" | "custom";
@@ -344,7 +344,7 @@ export function SpreadRevealView({
           <span>Đọc xong mới sang bước kết nối tâm thức và tổng hợp luận giải.</span>
         </div>
 
-        <div className="tarot-reveal-grid">
+        <div className={`tarot-reveal-grid tarot-reveal-grid--${session.cards.length}`}>
           {session.cards.map((card, index) => {
             const flipped = flippedIndexes.includes(index);
             return <SelectedSlot card={card} flipped={flipped} index={index} key={`${card.id}-${index}`} onFlip={() => onFlip(index)} />;

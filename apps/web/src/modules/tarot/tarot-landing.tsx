@@ -1,28 +1,20 @@
 import { Button, Card } from "../../components/ui";
-import type { Spread, ThemeKey } from "./tarot-data";
-import { SPREAD_OPTIONS, THEME_OPTIONS } from "./tarot-data";
-import { RitualPulse, SpreadOption, ThemeOption } from "./tarot-ui";
+import type { ThemeKey } from "./tarot-data";
+import { THEME_OPTIONS } from "./tarot-data";
+import { RitualPulse, ThemeOption } from "./tarot-ui";
 import type { TarotModalKey } from "./tarot-workflow-stages";
 
 export function LandingView({
   onBegin,
   onOpenModal,
-  onStart,
-  question,
-  setQuestion,
-  setSpread,
+  onQuickStart,
   setTheme,
-  spread,
   theme,
 }: {
   onBegin: () => void;
   onOpenModal: (modal: TarotModalKey) => void;
-  onStart: () => void;
-  question: string;
-  setQuestion: (value: string) => void;
-  setSpread: (value: Spread) => void;
+  onQuickStart: () => void;
   setTheme: (value: ThemeKey) => void;
-  spread: Spread;
   theme: ThemeKey;
 }) {
   return (
@@ -82,7 +74,7 @@ export function LandingView({
               <div>
                 <p className="tarot-landing-small-title">Chuẩn bị lượt trải</p>
                 <h2>Chọn một điểm khởi đầu</h2>
-                <p>Phần bên dưới chỉ định hướng ban đầu. Khi bấm bắt đầu, bạn vẫn sẽ đi qua đầy đủ các bước như workflow chính.</p>
+                <p>Chọn chủ đề để đi thẳng vào lớp góc nhìn chi tiết trước khi đặt câu hỏi và chọn kiểu trải bài.</p>
               </div>
             </div>
 
@@ -101,34 +93,8 @@ export function LandingView({
               </div>
             </div>
 
-            <label className="tarot-landing-panel-section">
-              <span className="tarot-landing-label">Câu hỏi của bạn</span>
-              <textarea
-                className="tarot-textarea tarot-landing-question"
-                onChange={(event) => setQuestion(event.target.value)}
-                placeholder="Ví dụ: Tôi nên nhìn tình huống hiện tại như thế nào?"
-                value={question}
-              />
-            </label>
-
-            <div className="tarot-landing-panel-section">
-              <label className="tarot-landing-label">Kiểu trải bài</label>
-              <div className="tarot-landing-spread-grid">
-                {SPREAD_OPTIONS.slice(0, 3).map((item) => (
-                  <SpreadOption
-                    active={item.value === spread}
-                    hint={item.hint}
-                    key={item.value}
-                    label={item.label}
-                    onClick={() => setSpread(item.value)}
-                    value={item.value}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <Button fullWidth onClick={onStart} size="lg">
-              Bắt đầu trải bài
+            <Button fullWidth onClick={onQuickStart} size="lg">
+              Chọn góc nhìn →
             </Button>
 
             <div className="tarot-landing-tools">

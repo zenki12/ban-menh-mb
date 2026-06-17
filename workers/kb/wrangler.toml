@@ -10,9 +10,17 @@ name = "banmenh-kb-dev"
 binding = "BANMENH_KB_DEV"
 id = "70886bee025145cf8ff352bcfa0148b6"
 
+[[env.dev.r2_buckets]]
+binding = "TAROT_KB_R2"
+bucket_name = "banmenh-tarot-kb-dev"
+
 [env.production]
 name = "banmenh-kb-prod"
 
 [[env.production.kv_namespaces]]
 binding = "BANMENH_KB_DEV"
 id = "placeholder-prod-kv-id"
+
+[[env.production.r2_buckets]]
+binding = "TAROT_KB_R2"
+bucket_name = "banmenh-tarot-kb-prod"

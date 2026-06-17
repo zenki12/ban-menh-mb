@@ -45,12 +45,29 @@ const TOPICS: TarotTopic[] = [
     subtitle: "Quan hệ & cảm xúc",
     lead: "Chủ đề này đi vào cách hai người chạm vào nhau, cách giữ nhịp cảm xúc và những nút thắt đang cần được gọi tên.",
     niches: [
-      { label: "Yêu bản thân", hint: "Nhìn lại giá trị của chính mình" },
-      { label: "Tình bạn / tri kỷ", hint: "Sự thấu hiểu và kết nối" },
-      { label: "Gia đình", hint: "Cách nói chuyện và nâng đỡ nhau" },
-      { label: "Con cái / thai kỳ", hint: "Dòng chảy gia đình" },
-      { label: "Quan hệ độc hại", hint: "Điểm bế tắc cần tháo gỡ" },
-      { label: "Tri kỷ / soulmate", hint: "Kết nối linh hồn" },
+      { label: "Tình Yêu Tổng Quát", hint: "Bức tranh toàn cảnh tình cảm", kbKey: "love" },
+      { label: "Người Yêu Cũ", hint: "Quá khứ và những gì còn đọng lại", kbKey: "ex" },
+      { label: "Người Yêu Hiện Tại", hint: "Mối quan hệ đang diễn ra", kbKey: "current_love" },
+      { label: "Mối Quan Hệ Mập Mờ", hint: "Chưa rõ ràng, cần định hướng", kbKey: "ambiguous" },
+      { label: "Crush / Thầm Thích", hint: "Cảm xúc chưa nói thành lời", kbKey: "crush" },
+      { label: "Người Yêu Tương Lai", hint: "Tình duyên phía trước", kbKey: "future_love" },
+      { label: "Người Ấy", hint: "Đọc năng lượng một người cụ thể", kbKey: "someone" },
+      { label: "Hôn Nhân", hint: "Chuyện kết hôn và hôn nhân", kbKey: "marriage" },
+      { label: "Giải Quyết Xung Đột", hint: "Mâu thuẫn cần tháo gỡ", kbKey: "conflict" },
+      { label: "Chia Tay & Hàn Gắn", hint: "Kết thúc hoặc làm lành", kbKey: "breakup" },
+      { label: "Yêu Xa", hint: "Khoảng cách và kết nối", kbKey: "long_distance" },
+      { label: "Người Thứ Ba / Ghen Tuông", hint: "Tình huống phức tạp ba người", kbKey: "jealousy" },
+      { label: "Yêu Bản Thân", hint: "Mối quan hệ với chính mình", kbKey: "self_love" },
+      { label: "Tìm Kiếm Tình Yêu", hint: "Cơ duyên chưa gặp", kbKey: "finding_love" },
+      { label: "Mức Độ Hợp Nhau", hint: "Compatibility và tương đồng", kbKey: "compatibility" },
+      { label: "Mối Quan Hệ Độc Hại", hint: "Nhận diện và thoát ra", kbKey: "toxic_relationship" },
+      { label: "Tri Kỷ / Soulmate", hint: "Kết nối linh hồn sâu sắc", kbKey: "soulmate" },
+      { label: "Gương Vỡ Lại Lành", hint: "Cơ hội hàn gắn sau đổ vỡ", kbKey: "reconciliation" },
+      { label: "Người Thầm Thương", hint: "Người yêu bí mật", kbKey: "secret_admirer" },
+      { label: "Tình Bạn / Tri Kỷ", hint: "Sự thấu hiểu và kết nối bạn bè", kbKey: "friendship" },
+      { label: "Con Cái / Thai Kỳ", hint: "Dòng chảy gia đình, sinh sản", kbKey: "pregnancy" },
+      { label: "Thị Phi / Đàm Tiếu", hint: "Chuyện thị phi xung quanh", kbKey: "gossip" },
+      { label: "Gia Đình", hint: "Cách nói chuyện và nâng đỡ nhau", kbKey: "family" },
     ],
   },
   {
@@ -60,12 +77,20 @@ const TOPICS: TarotTopic[] = [
     subtitle: "Công việc & định hướng",
     lead: "Dành cho câu chuyện nghề nghiệp, môi trường làm việc, những ngã rẽ cần cân nhắc và nhịp phát triển tiếp theo.",
     niches: [
-      { label: "Tìm việc", hint: "Cơ hội và lựa chọn mới" },
-      { label: "Định hướng", hint: "Lối đi nghề nghiệp" },
-      { label: "Môi trường làm việc", hint: "Điều đang diễn ra quanh bạn" },
-      { label: "Thăng tiến", hint: "Khả năng được ghi nhận" },
-      { label: "Kinh doanh", hint: "Quyết định và rủi ro" },
-      { label: "Đồng nghiệp", hint: "Quan hệ trong công việc" },
+      { label: "Sự Nghiệp / Công Việc", hint: "Bức tranh toàn cảnh công việc", kbKey: "career" },
+      { label: "Xin Việc Làm", hint: "Cơ hội và lựa chọn mới", kbKey: "job_search" },
+      { label: "Thăng Tiến", hint: "Khả năng được ghi nhận", kbKey: "promotion" },
+      { label: "Kinh Doanh", hint: "Quyết định và rủi ro", kbKey: "business" },
+      { label: "Đồng Nghiệp / Cấp Trên", hint: "Quan hệ trong công việc", kbKey: "colleague" },
+      { label: "Chuyển Nghề", hint: "Ngã rẽ sự nghiệp", kbKey: "career_change" },
+      { label: "Freelance / Tự Do", hint: "Làm việc độc lập", kbKey: "freelance" },
+      { label: "Phỏng Vấn", hint: "Chuẩn bị và kết quả phỏng vấn", kbKey: "interview" },
+      { label: "Pháp Lý / Giấy Tờ", hint: "Thủ tục, hợp đồng, giấy tờ", kbKey: "legal" },
+      { label: "Chuyển Chỗ / Xuất Ngoại", hint: "Di chuyển vì công việc", kbKey: "moving" },
+      { label: "Kiệt Sức / Áp Lực", hint: "Burnout và quản lý năng lượng", kbKey: "burnout" },
+      { label: "Khởi Nghiệp", hint: "Bắt đầu venture mới", kbKey: "startup" },
+      { label: "Thị Phi Công Sở", hint: "Chuyện nội bộ, chính trị công sở", kbKey: "workplace_politics" },
+      { label: "Nghề Tay Trái", hint: "Thu nhập và đam mê song song", kbKey: "side_hustle" },
     ],
   },
   {
@@ -75,12 +100,14 @@ const TOPICS: TarotTopic[] = [
     subtitle: "Tiền bạc & đầu tư",
     lead: "Một lớp nhìn rõ hơn vào dòng tiền, thói quen chi tiêu, cơ hội đầu tư và những áp lực tài chính đang hiện diện.",
     niches: [
-      { label: "Dòng tiền", hint: "Thu nhập và chi tiêu" },
-      { label: "Đầu tư", hint: "Cơ hội và cảnh báo" },
-      { label: "Nợ / cam kết", hint: "Áp lực tài chính" },
-      { label: "Mua bán", hint: "Quyết định giao dịch" },
-      { label: "Cơ hội tiền bạc", hint: "Nguồn lực mới" },
-      { label: "Ổn định dài hạn", hint: "Nền tảng vật chất" },
+      { label: "Tài Chính Tổng Quát", hint: "Bức tranh toàn cảnh tài chính", kbKey: "finance" },
+      { label: "Đầu Tư", hint: "Cơ hội và cảnh báo", kbKey: "investment" },
+      { label: "Nợ Nần / Vay Mượn", hint: "Áp lực tài chính", kbKey: "debt" },
+      { label: "Tiết Kiệm / Tích Lũy", hint: "Xây dựng nền tảng vật chất", kbKey: "savings" },
+      { label: "Lộc Tài / May Mắn", hint: "Vận may tài chính", kbKey: "luck_money" },
+      { label: "Bất Động Sản", hint: "Nhà đất, tài sản cố định", kbKey: "real_estate" },
+      { label: "Thua Lỗ / Khó Khăn", hint: "Vượt qua giai đoạn khó", kbKey: "financial_loss" },
+      { label: "Vận May Bất Ngờ", hint: "Cơ hội tiền bạc không ngờ tới", kbKey: "sudden_wealth" },
     ],
   },
   {
@@ -90,12 +117,14 @@ const TOPICS: TarotTopic[] = [
     subtitle: "Thể chất & tinh thần",
     lead: "Không thay thế chuyên môn y tế, nhưng giúp bạn quan sát nhịp sống, mức căng thẳng và dấu hiệu cần cân bằng lại.",
     niches: [
-      { label: "Năng lượng", hint: "Trạng thái hiện tại" },
-      { label: "Cân bằng", hint: "Nhịp sống và nghỉ ngơi" },
-      { label: "Căng thẳng", hint: "Áp lực tinh thần" },
-      { label: "Thói quen", hint: "Điều cần điều chỉnh" },
-      { label: "Hồi phục", hint: "Quay về trạng thái vững" },
-      { label: "Tự chăm sóc", hint: "Lắng nghe cơ thể" },
+      { label: "Sức Khỏe Thể Chất", hint: "Tình trạng cơ thể hiện tại", kbKey: "health" },
+      { label: "Sức Khỏe Tinh Thần", hint: "Tâm lý và cảm xúc", kbKey: "mental" },
+      { label: "Năng Lượng / Chakra", hint: "Trạng thái năng lượng", kbKey: "energy" },
+      { label: "Ăn Uống / Chăm Sóc", hint: "Thói quen sức khỏe", kbKey: "diet" },
+      { label: "Thú Cưng", hint: "Sức khỏe và năng lượng thú cưng", kbKey: "pet" },
+      { label: "Chữa Lành", hint: "Quá trình phục hồi", kbKey: "healing" },
+      { label: "Căng Thẳng / Âu Lo", hint: "Áp lực tinh thần", kbKey: "stress" },
+      { label: "Tổn Thương Quá Khứ", hint: "Vết thương cần được nhìn nhận", kbKey: "trauma" },
     ],
   },
   {
@@ -105,12 +134,23 @@ const TOPICS: TarotTopic[] = [
     subtitle: "Học tập & phát triển",
     lead: "Dành cho những câu hỏi về bản sắc, tiềm năng, bài học cá nhân và quãng đường đang mở ra phía trước.",
     niches: [
-      { label: "Tiến kiếp", hint: "Bản thân và nếp nghĩ trước đây" },
-      { label: "Nghiệp quả", hint: "Nhân quả tuần hoàn" },
-      { label: "Đồ vật thất lạc", hint: "Mạnh mẽ và phương hướng" },
-      { label: "Thi cử / kiểm tra", hint: "Kết quả bài thi" },
-      { label: "Học bổng", hint: "Cơ hội vươn xa" },
-      { label: "Năng khiếu / đam mê", hint: "Khám phá biệt tài" },
+      { label: "Học Tập", hint: "Kết quả và hướng học tập", kbKey: "study" },
+      { label: "Du Học", hint: "Cơ hội học ở nước ngoài", kbKey: "study_abroad" },
+      { label: "Định Hướng Bản Thân", hint: "Bản sắc và tiềm năng", kbKey: "self" },
+      { label: "Sứ Mệnh / Mục Đích", hint: "Lý do tồn tại sâu sắc", kbKey: "purpose" },
+      { label: "Bóng Tối Nội Tâm", hint: "Phần cần đối mặt trong mình", kbKey: "shadow_self" },
+      { label: "Ra Quyết Định", hint: "Lựa chọn trước ngã rẽ", kbKey: "decision" },
+      { label: "Du Lịch / Di Chuyển", hint: "Chuyến đi và dịch chuyển", kbKey: "travel" },
+      { label: "Tâm Linh", hint: "Kết nối tâm linh và trực giác", kbKey: "spiritual" },
+      { label: "Giải Mã Giấc Mơ", hint: "Ý nghĩa giấc mơ gần đây", kbKey: "dream" },
+      { label: "Tiền Kiếp", hint: "Ký ức và bài học từ kiếp trước", kbKey: "past_life" },
+      { label: "Nghiệp Quả / Karma", hint: "Nhân quả tuần hoàn", kbKey: "karma" },
+      { label: "Tìm Đồ Thất Lạc", hint: "Manh mối và phương hướng", kbKey: "lost_item" },
+      { label: "Thi Cử / Kiểm Tra", hint: "Kết quả bài thi", kbKey: "exams" },
+      { label: "Học Bổng", hint: "Cơ hội vươn xa", kbKey: "scholarship" },
+      { label: "Năng Khiếu / Đam Mê", hint: "Khám phá biệt tài", kbKey: "talent" },
+      { label: "Thần Hộ Mệnh", hint: "Năng lượng bảo hộ xung quanh", kbKey: "spirit_guide" },
+      { label: "Tổng Quát", hint: "Không giới hạn chủ đề cụ thể", kbKey: "general" },
     ],
   },
 ];
@@ -223,12 +263,8 @@ export function TarotExperience() {
         <LandingView
           onBegin={() => setPhase("fieldSelect")}
           onOpenModal={setModal}
-          onStart={finalizeSession}
-          question={question}
-          setQuestion={setQuestion}
-          setSpread={setSpread}
+          onQuickStart={() => setPhase("nicheSelect")}
           setTheme={setTheme}
-          spread={spread}
           theme={theme}
         />
       ) : null}
@@ -392,7 +428,7 @@ function StageShell({
     <section className="tarot-stage">
       <div className="tarot-stage-shell tarot-fade-up">
         <div className="tarot-stage-topbar">
-          <button className="tarot-home-button" onClick={onHome} type="button">← Trang chủ</button>
+          <button className="tarot-home-button" onClick={onHome} type="button">← Tarot</button>
           <div className="tarot-stage-tabs" aria-hidden="true">
             {STAGE_SEQUENCE.map((item, index) => (
               <span className={index === stageIndex ? "active" : index < stageIndex ? "done" : ""} key={item} />
@@ -400,28 +436,20 @@ function StageShell({
           </div>
         </div>
 
-        <div className="tarot-stage-grid">
-          <aside className="tarot-stage-aside">
+        <div className="tarot-stage-body">
+          <div className="tarot-stage-heading">
             <div className="tarot-stage-badge">{stage?.badge ?? "I"}</div>
-            <div className="tarot-stage-kicker">{stage?.title ?? "Hành trình Tarot"}</div>
-            <h1 className="tarot-stage-title">{phase === "finalReading" ? "Thông điệp cuối cùng" : stage?.title ?? "Tarot"}</h1>
+            <h1 className="tarot-stage-title">{stage?.title ?? "Hành trình Tarot"}</h1>
             <p className="tarot-stage-subtitle">{stage?.subtitle ?? "Mỗi bước là một lớp đi sâu hơn vào câu hỏi."}</p>
-            <Card className="tarot-stage-profile" padding="md" variant="glass">
-              <div className="tarot-stage-profile-mark">✦</div>
-              <div className="tarot-stage-profile-body">
-                <strong>{userName}</strong>
-                <span>Vũ trụ đang đọc: {themeLabel}</span>
-                <span>Lĩnh vực hiện tại: {niche}</span>
-                <span>Kiểu trải bài: {spread} lá</span>
-              </div>
-            </Card>
-            <div className="tarot-stage-note"><p>{topHint}</p></div>
-            <div className="tarot-stage-metrics">{(stage?.metrics ?? []).map((item) => <span key={item}>{item}</span>)}</div>
-            <div className="tarot-stage-sidebar">
-              <strong>{stage?.sidebarTitle ?? "Khung đọc"}</strong>
-              <p>{stage?.sidebarBody ?? "Mỗi màn là một lớp dữ liệu riêng, sẵn sàng nối KB khi được bật."}</p>
+          </div>
+
+          {(themeLabel || niche) && (
+            <div className="tarot-stage-context">
+              {themeLabel && <span>{themeLabel}</span>}
+              {niche && <span>{niche}</span>}
+              {question && <span className="tarot-stage-context-question">{question}</span>}
             </div>
-          </aside>
+          )}
 
           <main className="tarot-stage-main">{children}</main>
         </div>
