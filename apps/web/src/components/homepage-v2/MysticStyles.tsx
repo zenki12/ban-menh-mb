@@ -153,8 +153,9 @@ export function MysticStyles() {
 .mystic-card p { margin: 0; color: var(--bm-text-muted); line-height: 1.75; }
 .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.45), rgba(167, 139, 250, 0.5), transparent); }
 .tabs-grid { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 2rem; align-items: start; }
-.tabs-grid .cosmic-window { min-height: 520px; }
-.tabs-grid .cosmic-body { min-height: 460px; }
+.tabs-grid > * { min-width: 0; }
+.tabs-grid .cosmic-window { min-height: 520px; width: 100%; max-width: 100%; min-width: 0; }
+.tabs-grid .cosmic-body { min-height: 460px; min-width: 0; }
 .module-tabs { display: grid; gap: 0.75rem; }
 .module-tab { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid var(--bm-border-subtle); border-radius: var(--bm-radius-lg); background: rgba(255, 255, 255, 0.04); color: var(--bm-text-soft); padding: 0.85rem 1rem; cursor: pointer; text-align: left; transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease; }
 .module-tab:hover, .module-tab:focus-visible { transform: translateY(-2px); border-color: var(--bm-border-gold); background: rgba(251, 191, 36, 0.08); box-shadow: 0 0 20px rgba(251, 191, 36, 0.1); }
@@ -362,6 +363,10 @@ export function MysticStyles() {
   .mystic-hero-grid, .tabs-grid, .pricing-card, .footer-grid { grid-template-columns: 1fr; }
   .stats-grid, .pillars-grid, .steps-grid, .benefits-grid { grid-template-columns: 1fr; }
   .tradition-row { grid-template-columns: repeat(3, 1fr); }
+  .tabs-grid .cosmic-window { min-height: auto; }
+  .tabs-grid .cosmic-body { min-height: auto; }
+  .numerology-preview-grid { grid-template-columns: 1fr 1fr; }
+  .tarot-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .mystic-section { padding: 3.5rem 1rem; }
@@ -373,8 +378,10 @@ export function MysticStyles() {
   .unlock-packages-toggle { align-items: flex-start; flex-direction: column; }
   .unlock-packages-meta { width: 100%; justify-content: space-between; }
   .module-tabs { display: flex; overflow-x: auto; padding-bottom: 0.35rem; scroll-snap-type: x mandatory; }
-  .tabs-grid .cosmic-window { min-height: auto; overflow: visible; }
-  .tabs-grid .cosmic-body { min-height: auto; }
+  .tabs-grid .cosmic-window { width: 100%; max-width: 100%; min-width: 0; min-height: auto; overflow: visible; }
+  .tabs-grid .cosmic-body { min-width: 0; min-height: auto; padding-inline: 1rem; }
+  .mock-line, .chip-row, .numerology-preview-grid, .module-insight { min-width: 0; max-width: 100%; }
+  .mystic-chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
   .module-tab { min-width: 13rem; scroll-snap-align: start; }
   .tradition-row, .tarot-row, .palace-grid { grid-template-columns: 1fr 1fr; }
   .orbit-stage { min-height: 318px; }
