@@ -186,6 +186,7 @@ export function TarotExperience() {
   const [modal, setModal] = useState<TarotModalKey>(null);
   const [theme, setTheme] = useState<ThemeKey>("love");
   const [niche, setNiche] = useState("Tổng quan");
+  const [nicheKbKey, setNicheKbKey] = useState("general");
   const [nicheQuery, setNicheQuery] = useState("");
   const [question, setQuestion] = useState("");
   const [questionMode, setQuestionMode] = useState<QuestionMode>("suggested");
@@ -247,6 +248,7 @@ export function TarotExperience() {
     setFlippedIndexes([]);
     setConsciousnessStep(0);
     setNiche("Tổng quan");
+    setNicheKbKey("general");
     setNicheQuery("");
   }
 
@@ -294,8 +296,9 @@ export function TarotExperience() {
               query={nicheQuery}
               setQuery={setNicheQuery}
               niches={filteredNiches}
-              onChoose={(value) => {
-                setNiche(value);
+              onChoose={(label, kbKey) => {
+                setNiche(label);
+                setNicheKbKey(kbKey);
                 setQuestion(SAMPLE_QUESTIONS[0]);
                 setPhase("question");
               }}
@@ -304,6 +307,7 @@ export function TarotExperience() {
           ) : null}
           {phase === "question" ? (
             <QuestionView
+              nicheKey={nicheKbKey}
               onBack={() => setPhase("nicheSelect")}
               onContinue={() => setPhase("spreadSelect")}
               onSkip={() => {
@@ -438,7 +442,7 @@ function StageShell({
 
         <div className="tarot-stage-body">
           <div className="tarot-stage-heading">
-            <div className="tarot-stage-badge">{stage?.badge ?? "I"}</div>
+            <div className="tarot-stage-badge">✦</div>
             <h1 className="tarot-stage-title">{stage?.title ?? "Hành trình Tarot"}</h1>
             <p className="tarot-stage-subtitle">{stage?.subtitle ?? "Mỗi bước là một lớp đi sâu hơn vào câu hỏi."}</p>
           </div>

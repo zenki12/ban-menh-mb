@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { Button, Card } from "../../components/ui";
 import { AnalysisCard, DeckBack, RitualPulse, SelectedSlot, SpreadOption, ThemeOption } from "./tarot-ui";
 import {
   DECK,
   MINI_MODALS,
+  NICHE_QUESTIONS,
   SAMPLE_QUESTIONS,
   SPREAD_OPTIONS,
   type ReadingSection,
@@ -94,7 +96,7 @@ export function NicheSelectView({
   topic,
 }: {
   niches: TarotTopic["niches"];
-  onChoose: (value: string) => void;
+  onChoose: (label: string, kbKey: string) => void;
   query: string;
   setQuery: (value: string) => void;
   topic: TarotTopic;
@@ -103,7 +105,6 @@ export function NicheSelectView({
     <div className="tarot-stage-block">
       <Card className="tarot-stage-highlight" padding="lg" variant="glass">
         <div className="tarot-stage-highlight-title">
-          <span>Ⅱ</span>
           <strong>Lĩnh vực {topic.label}</strong>
         </div>
         <p>{topic.lead}</p>
@@ -123,9 +124,9 @@ export function NicheSelectView({
       <div className="tarot-niche-list">
         {niches.length > 0 ? (
           niches.map((item) => (
-            <button className="tarot-niche" key={item.label} onClick={() => onChoose(item.label)} type="button">
-              <strong>{item.label}</strong>
-              <span>{item.hint}</span>
+            <button className="tarot-niche" key={item.label} onClick={() => onChoose(item.label, item.kbKey)} type="button">
+              <span className="niche-label">{item.label}</span>
+              <span className="niche-hint">{item.hint}</span>
               <i aria-hidden="true">→</i>
             </button>
           ))
@@ -140,6 +141,7 @@ export function NicheSelectView({
 }
 
 export function QuestionView({
+  nicheKey,
   onBack,
   onContinue,
   onSelectQuestion,
@@ -149,6 +151,7 @@ export function QuestionView({
   setQuestion,
   setQuestionMode,
 }: {
+  nicheKey: string;
   onBack: () => void;
   onContinue: () => void;
   onSelectQuestion: (value: string) => void;
@@ -158,11 +161,15 @@ export function QuestionView({
   setQuestion: (value: string) => void;
   setQuestionMode: (value: QuestionMode) => void;
 }) {
+  const questions = useMemo(() => {
+    const pool = NICHE_QUESTIONS[nicheKey] ?? SAMPLE_QUESTIONS;
+    return [...pool].sort(() => Math.random() - 0.5);
+  }, [nicheKey]);
+
   return (
     <div className="tarot-stage-block">
       <Card className="tarot-stage-highlight tarot-stage-highlight--question" padding="lg" variant="glass">
         <div className="tarot-stage-highlight-title">
-          <span>Ⅲ</span>
           <strong>Câu hỏi của bạn</strong>
         </div>
         <p>Đặt câu hỏi ngắn gọn, cụ thể, và đủ thành tâm. Hệ thống sẽ bám vào câu này ở các bước sau.</p>
@@ -179,7 +186,7 @@ export function QuestionView({
 
       {questionMode === "suggested" ? (
         <div className="tarot-question-cloud">
-          {SAMPLE_QUESTIONS.map((item) => (
+          {questions.map((item) => (
             <button className={question === item ? "active" : ""} key={item} onClick={() => onSelectQuestion(item)} type="button">
               {item}
             </button>
@@ -226,7 +233,6 @@ export function SpreadSelectView({
     <div className="tarot-stage-block">
       <Card className="tarot-stage-highlight tarot-stage-highlight--spread" padding="lg" variant="glass">
         <div className="tarot-stage-highlight-title">
-          <span>Ⅳ</span>
           <strong>Chọn kiểu trải bài</strong>
         </div>
         <p>
