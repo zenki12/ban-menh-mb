@@ -20,7 +20,6 @@ type SummaryDashboardProps = {
   report: NumerologyReport;
   userName: string;
   dob: string;
-  unlocked: boolean;
   showCta?: boolean;
 };
 
@@ -53,7 +52,6 @@ export function SummaryDashboard({
   report,
   userName,
   dob,
-  unlocked,
   showCta = true,
 }: SummaryDashboardProps) {
   const searchParams = useSearchParams();
@@ -73,8 +71,8 @@ export function SummaryDashboard({
   );
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-lg border border-white/10 bg-[#0c0816]/86 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34)] sm:p-7">
+    <div className="min-w-0 max-w-full space-y-8 overflow-hidden">
+      <section className="min-w-0 max-w-full rounded-lg border border-white/10 bg-[#0c0816]/86 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)] sm:p-7">
         <div className="grid gap-4 border-b border-white/10 pb-5 text-sm sm:grid-cols-2">
           <div>
             <div className="text-white/48">Họ và tên</div>
@@ -86,12 +84,12 @@ export function SummaryDashboard({
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-6 py-8">
-          <div className="relative grid size-48 place-items-center rounded-full bg-[radial-gradient(circle_at_center,rgba(247,201,72,0.22),rgba(168,85,247,0.12)_48%,rgba(12,8,22,0.18)_70%)] shadow-[0_0_72px_rgba(247,201,72,0.28)] ring-4 ring-[#f7c948]/70 sm:size-64">
+        <div className="flex min-w-0 flex-col items-center gap-6 py-6 sm:py-8">
+          <div className="relative grid size-40 max-w-full place-items-center rounded-full bg-[radial-gradient(circle_at_center,rgba(247,201,72,0.22),rgba(168,85,247,0.12)_48%,rgba(12,8,22,0.18)_70%)] shadow-[0_0_72px_rgba(247,201,72,0.28)] ring-4 ring-[#f7c948]/70 sm:size-64">
             <div className="absolute inset-4 rounded-full border border-white/12" />
             <div className="text-center">
               <div className="text-xs font-semibold text-white/58 sm:text-sm">SỐ CHỦ ĐẠO</div>
-              <div className="mt-2 text-7xl font-black leading-none text-[#f7c948] sm:text-8xl">
+              <div className="mt-2 text-6xl font-black leading-none text-[#f7c948] sm:text-8xl">
                 {displayNumber(report.lifePath)}
               </div>
             </div>
@@ -153,11 +151,10 @@ export function SummaryDashboard({
         <Card as="section" className="text-center" padding="lg" variant="glass">
           <h2>Luận giải chi tiết</h2>
           <p className="mx-auto mt-3 max-w-2xl text-[var(--bm-text-soft)]">
-            Màn chi tiết sẽ mở một số chỉ số miễn phí trước, các phần chuyên sâu còn lại được khóa
-            ngay trong dòng đọc.
+            Xem toàn bộ các chỉ số và phần luận giải chuyên sâu trong một báo cáo liền mạch.
           </p>
           <Button className="mt-6" href={detailUrl} size="lg" variant="primary">
-            {unlocked ? "Xem báo cáo đầy đủ" : "Xem chi tiết miễn phí"}
+            Xem báo cáo đầy đủ
           </Button>
         </Card>
       ) : null}

@@ -17,8 +17,6 @@ import { fetchWithAuth } from "../../../lib/api/client";
 type ReportResponse = {
   ok: true;
   report: NumerologyReport;
-  unlocked: boolean;
-  entitlement: unknown;
 };
 
 function ResultContent() {
@@ -27,7 +25,6 @@ function ResultContent() {
   const [report, setReport] = useState<NumerologyReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
 
   const input = useMemo(() => {
     const fullName = searchParams.get("fullName")?.trim() ?? "";
@@ -50,7 +47,6 @@ function ResultContent() {
         body: JSON.stringify(input),
       });
       setReport(response.report);
-      setUnlocked(response.unlocked);
     } catch (err) {
       setError(isAppError(err) ? err : createError("INTERNAL_ERROR"));
     } finally {
@@ -77,7 +73,6 @@ function ResultContent() {
       <SummaryDashboard
         dob={input.dob}
         report={report}
-        unlocked={unlocked}
         userName={input.fullName}
       />
       <p className="mt-10 text-sm leading-6 text-[var(--bm-text-muted)]">
