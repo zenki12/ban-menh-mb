@@ -195,6 +195,8 @@ export function TarotExperience() {
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [flippedIndexes, setFlippedIndexes] = useState<number[]>([]);
   const [consciousnessStep, setConsciousnessStep] = useState(0);
+  const [kbSections, setKbSections] = useState<ReadingSection[] | null>(null);
+  const [kbLoading, setKbLoading] = useState(false);
 
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const dailyCard = useMemo(() => getDailyCard(todayStr), [todayStr]);
@@ -225,6 +227,35 @@ export function TarotExperience() {
     }
   }, [todayStr]);
 
+  async function fetchKbReading(drawnCards: ReadingSession["cards"], niche: string, q: string) {
+    setKbLoading(true);
+    try {
+      const base = process.env.NEXT_PUBLIC_KB_WORKER_URL ?? "http://localhost:8787";
+      const res = await fetch(`${base}/tarot/reading`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cards: drawnCards.map((card) => ({
+            name: card.nameEn,
+            orientation: card.orientation,
+            position: card.position,
+          })),
+          niche,
+          question: q,
+        }),
+      });
+      if (!res.ok) return;
+      const data = await res.json() as { ok: boolean; sections?: ReadingSection[] };
+      if (data.ok && Array.isArray(data.sections) && data.sections.length > 0) {
+        setKbSections(data.sections);
+      }
+    } catch {
+      // Silent fallback: buildReadingSections() remains available when the worker is offline.
+    } finally {
+      setKbLoading(false);
+    }
+  }
+
   function finalizeSession() {
     const cleanQuestion = question.trim() || DEFAULT_QUESTION;
     setSession({ theme, themeLabel: getThemeLabel(theme), spread, question: cleanQuestion, cards: drawCards(spread) });
@@ -250,6 +281,8 @@ export function TarotExperience() {
     setNiche("Tổng quan");
     setNicheKbKey("general");
     setNicheQuery("");
+    setKbSections(null);
+    setKbLoading(false);
   }
 
   function handleCloseModal() {
@@ -343,14 +376,18 @@ export function TarotExperience() {
       {phase === "consciousnessCheck" && session ? (
         <ConsciousnessCheckView
           onAnswer={(_answer) => {
-            if (consciousnessStep >= 2) setPhase("finalReading");
-            else setConsciousnessStep((current) => current + 1);
+            if (consciousnessStep >= 2) {
+              setPhase("finalReading");
+              void fetchKbReading(session.cards, nicheKbKey, session.question);
+            } else {
+              setConsciousnessStep((current) => current + 1);
+            }
           }}
           session={session}
           step={consciousnessStep}
         />
       ) : null}
-      {phase === "finalReading" && session ? <FinalReadingView onReset={reset} readingSections={readingSections} session={session} /> : null}
+      {phase === "finalReading" && session ? <FinalReadingView onReset={reset} readingSections={kbSections ?? readingSections} session={session} /> : null}
 
       {modal ? (
         <ModalShell onClose={handleCloseModal}>
