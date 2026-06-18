@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
 import { BackHomeBar, Footer, GalaxyBackgroundLazy, Header } from "../components/layout";
 import { AuthProvider } from "../lib/auth";
@@ -21,6 +21,12 @@ const lora = Lora({
 export const metadata: Metadata = {
   title: "Bản Mệnh",
   description: "Nền tảng tra cứu huyền học module hóa.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

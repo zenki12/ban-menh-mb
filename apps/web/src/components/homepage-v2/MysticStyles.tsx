@@ -366,6 +366,7 @@ export function MysticStyles() {
 @media (max-width: 560px) {
   .mystic-section { padding: 3.5rem 1rem; }
   .mystic-hero { min-height: auto; padding: 2.25rem 1rem 2.5rem; }
+  .mystic-hero-grid { gap: 1.5rem; }
   .mystic-hero h1 { font-size: clamp(1.9rem, 8vw, 2.6rem); }
   .mystic-actions { flex-direction: column; }
   .mystic-btn { width: 100%; }
@@ -405,6 +406,13 @@ export function MysticStyles() {
   .batu-pillar-grid { grid-template-columns: repeat(2, 1fr); }
   .batu-pillar { min-height: 6.7rem; }
   .batu-feature-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .numerology-entry-grid { grid-template-columns: 1fr; }
+  .mystic-hero-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .orbit-stage { min-height: 260px; }
+  .module-picker-grid { grid-template-columns: repeat(2, 1fr); }
 }
         `,
       }}

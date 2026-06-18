@@ -218,6 +218,7 @@
     padding-top: 1rem;
   }
 
+  .tarot-landing-layout { grid-template-columns: 1fr; }
   .tarot-landing-copy h1 { font-size: clamp(2rem, 10vw, 3rem); }
   .tarot-landing-panel { border-radius: 1.25rem; }
 
@@ -241,4 +242,12 @@
     align-items: stretch;
     flex-direction: column;
   }
+}
+
+@media (max-width: 480px) {
+  .tarot-landing-copy h1 { font-size: clamp(1.75rem, 7vw, 2.4rem); }
+  .tarot-landing-actions { flex-direction: column; gap: 0.75rem; }
+
+  .tarot-landing-actions button,
+  .tarot-landing-actions a { width: 100%; }
 }

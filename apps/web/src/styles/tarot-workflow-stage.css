@@ -268,11 +268,13 @@
   transition: border-color 180ms ease, background 180ms ease;
 }
 
-.tarot-niche strong { color: var(--bm-gold-bright); }
+.tarot-niche strong,
+.niche-label { color: var(--bm-gold-bright); font-weight: 700; }
 .tarot-niche i { color: var(--bm-primary-soft); font-style: normal; }
-.tarot-niche > span,
 .tarot-niche > i,
 .tarot-niche-arrow { display: none; }
+
+.niche-hint { display: block; font-size: 0.75rem; font-style: italic; opacity: 0.6; margin-top: 2px; }
 
 .tarot-segmented {
   display: grid;
@@ -571,4 +573,25 @@
   .tarot-deck-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
   .tarot-card-back { min-height: 8.5rem; }
   .tarot-reveal-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .tarot-deck-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .tarot-spread-reveal,
+  .tarot-cards-row,
+  [class*="tarot-spread-"] { grid-template-columns: 1fr !important; }
+
+  .tarot-niche-list { grid-template-columns: 1fr; }
+
+  .tarot-stage-actions { flex-direction: column; gap: 0.75rem; }
+
+  .tarot-stage-actions button,
+  .tarot-stage-actions a { width: 100%; justify-content: center; }
+
+  .tarot-segmented { width: 100%; }
+  .tarot-segmented button { flex: 1; }
+
+  .tarot-search-wrap { width: 100%; }
+  .tarot-search { width: 100%; }
 }
