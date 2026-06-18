@@ -96,15 +96,15 @@ export function MysticStyles() {
 .orbit-label { display: block; min-width: max-content; color: white; font-size: 0.74rem; font-weight: 800; line-height: 1.15; text-align: center; white-space: nowrap; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65); }
 .orbit-note { margin: 2.2rem 0 0; border: 1px solid var(--bm-border-gold); border-left: 3px solid var(--bm-gold-bright); border-radius: var(--bm-radius-lg); background: rgba(251, 191, 36, 0.08); padding: 0.78rem 1rem; color: var(--bm-text-soft); font-size: 0.96rem; line-height: 1.55; box-shadow: 0 0 18px rgba(251, 191, 36, 0.08); }
 .roadmap-link { color: var(--bm-gold-bright); font-weight: 900; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
-.module-modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1rem; background: rgba(2, 6, 23, 0.58); backdrop-filter: blur(10px); }
+.module-modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; overflow-y: auto; overscroll-behavior: contain; padding: 1rem; background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(10px); }
 .module-modal { position: relative; width: min(31rem, 100%); border: 1px solid var(--bm-border-gold); border-radius: var(--bm-radius-xl); background: linear-gradient(135deg, rgba(20, 15, 35, 0.96), rgba(30, 27, 75, 0.96)); box-shadow: var(--bm-shadow-purple), var(--bm-shadow-gold); padding: 1.35rem 1.4rem 1.45rem; color: var(--bm-text-soft); }
 .module-modal h2 { margin: 0.45rem 2rem 0.75rem 0; color: white; font-size: clamp(1.45rem, 5vw, 2.05rem); line-height: 1.15; }
 .module-modal p:not(.section-kicker) { margin: 0; color: var(--bm-text-soft); font-size: 1rem; line-height: 1.75; }
 .module-modal-close { position: absolute; top: 0.85rem; right: 0.85rem; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 1px solid var(--bm-border-subtle); border-radius: 999px; background: rgba(255, 255, 255, 0.06); color: var(--bm-text-main); font-size: 1.45rem; line-height: 1; cursor: pointer; }
 .module-modal-close:hover, .module-modal-close:focus-visible { border-color: var(--bm-border-gold); color: var(--bm-gold-bright); }
-.module-picker-modal { width: min(42rem, 100%); max-height: calc(100vh - 2rem); overflow: hidden; background: rgba(10, 5, 20, 0.98); }
+.module-picker-modal { width: min(42rem, 100%); max-height: calc(100vh - 2rem); overflow: hidden; background: #0a0514; }
 .module-picker-close { position: static; margin-left: auto; width: 1.9rem; height: 1.9rem; font-size: 1.2rem; }
-.module-picker-body { padding: 1.25rem; }
+.module-picker-body { flex: 1; min-height: 0; overflow-y: auto; padding: 1.25rem; }
 .module-picker-body h2 { margin: 0.45rem 0 0.75rem; color: white; font-size: clamp(1.45rem, 5vw, 2.1rem); line-height: 1.16; }
 .module-picker-copy { margin: 0 0 1.1rem; color: var(--bm-text-muted); line-height: 1.75; }
 .module-picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
@@ -391,9 +391,9 @@ export function MysticStyles() {
   .orbit-logo { width: 3.05rem; height: 3.05rem; }
   .orbit-label { font-size: 0.68rem; }
   .orbit-note { margin-top: 1.5rem; }
-  .module-modal-backdrop { align-items: end; padding: 1rem; }
+  .module-modal-backdrop { align-items: start; padding: 0.75rem 1rem 1rem; }
   .module-modal { max-height: calc(100vh - 2rem); overflow-y: auto; padding: 1.2rem 1.1rem 1.25rem; }
-  .module-picker-modal { max-height: calc(100vh - 2rem); background: rgba(10, 5, 20, 0.98); }
+  .module-picker-modal { max-height: calc(100dvh - 1.75rem); background: #0a0514; }
   .module-picker-body { padding: 1rem; overflow-y: auto; }
   .module-picker-grid { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
   .module-picker-item { min-height: 8.4rem; padding: 0.75rem 0.5rem; }
