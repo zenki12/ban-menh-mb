@@ -324,4 +324,73 @@ app.get("/tarot/combo", async (c) => {
   }
 });
 
+app.post("/tarot/reading", async (c) => {
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: { code: "VALIDATION", message: "Body JSON không hợp lệ." } }, 400);
+  }
+
+  const record = body && typeof body === "object" ? body as Record<string, unknown> : null;
+  const rawCards = Array.isArray(record?.cards) ? record.cards : [];
+  if (rawCards.length < 1) {
+    return c.json({ error: { code: "VALIDATION", message: "Thiếu danh sách lá bài." } }, 400);
+  }
+
+  const drawnCards = rawCards
+    .map((item) => {
+      const card = item && typeof item === "object" ? item as Record<string, unknown> : {};
+      const name = typeof card.name === "string" ? card.name.trim() : "";
+      const orientation = card.orientation === "reversed" ? "reversed" : "upright";
+      const position = typeof card.position === "string" && card.position.trim() ? card.position.trim() : "Lá bài";
+      return name ? { name, orientation, position } : null;
+    })
+    .filter((item): item is { name: string; orientation: "upright" | "reversed"; position: string } => item !== null);
+
+  if (drawnCards.length < 1) {
+    return c.json({ error: { code: "VALIDATION", message: "Danh sách lá bài không hợp lệ." } }, 400);
+  }
+
+  const niche = typeof record?.niche === "string" && record.niche.trim() ? record.niche.trim() : "general";
+  const question = typeof record?.question === "string" ? record.question.trim() : "";
+
+  try {
+    const kbCards = await loadTarotCards(c.env.BANMENH_KB_DEV);
+    const cardSections: Array<{ title: string; body: string }> = [];
+
+    for (const drawn of drawnCards) {
+      const kbCard = kbCards.find((card) => card.name.toLowerCase() === drawn.name.toLowerCase());
+      if (!kbCard) continue;
+
+      const text = drawn.orientation === "reversed"
+        ? (kbCard.aspects[`${niche}_rev`] ?? kbCard.aspects.general_rev ?? "")
+        : (kbCard.aspects[niche] ?? kbCard.aspects.general ?? "");
+
+      cardSections.push({
+        title: `${drawn.position} · ${kbCard.nameVi}`,
+        body: text,
+      });
+    }
+
+    const sections = [
+      ...(question ? [{ title: "Câu hỏi của bạn", body: question }] : []),
+      ...cardSections,
+      {
+        title: "Lời khuyên",
+        body: "Hãy để thông điệp thấm vào. Tarot không ép kết luận — nó chỉ soi sáng điều bạn đã biết.",
+      },
+    ];
+
+    return c.json({
+      ok: true,
+      sections,
+      meta: { niche, cardCount: cardSections.length, source: "Mystery Tarot" },
+    });
+  } catch (err) {
+    console.error("[tarot] reading lookup failed:", err);
+    return c.json({ ok: false, error: "KB_NOT_LOADED" }, 503);
+  }
+});
+
 export default app;
