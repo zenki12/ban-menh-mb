@@ -51,15 +51,40 @@ function mapFirebaseUser(fbUser: FirebaseUser): SharedUser {
 function mapFirebaseError(err: unknown): AppError | null {
   if (typeof err !== "object" || err === null) return null;
   const code = (err as { code?: string }).code ?? "";
+  console.warn("[AuthProvider] Firebase auth failed:", code || err);
   if (
     code === "auth/cancelled-popup-request" ||
     code === "auth/popup-closed-by-user"
   ) {
     return null;
   }
+  if (code === "auth/unauthorized-domain") {
+    return {
+      ...createError("AUTH_INVALID_TOKEN"),
+      message: "Domain Vercel chưa được thêm vào Firebase Authorized domains.",
+    };
+  }
+  if (code === "auth/operation-not-allowed") {
+    return {
+      ...createError("AUTH_INVALID_TOKEN"),
+      message: "Google Sign-in chưa được bật trong Firebase Authentication.",
+    };
+  }
+  if (code === "auth/popup-blocked") {
+    return {
+      ...createError("AUTH_INVALID_TOKEN"),
+      message: "Trình duyệt đã chặn popup đăng nhập. Vui lòng cho phép popup rồi thử lại.",
+    };
+  }
   if (code === "auth/network-request-failed") return createError("NETWORK_ERROR");
   if (code === "auth/invalid-credential") return createError("AUTH_INVALID_TOKEN");
   return createError("INTERNAL_ERROR");
+}
+
+function createGoogleProvider() {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  return provider;
 }
 
 /** Gọi /api/auth/session để ensure Firestore user doc — non-blocking. */
@@ -96,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function signInWithGoogle() {
     setError(null);
     try {
-      await signInWithPopup(firebaseAuth, new GoogleAuthProvider());
+      await signInWithPopup(firebaseAuth, createGoogleProvider());
     } catch (err) {
       const mapped = mapFirebaseError(err);
       if (mapped) setError(mapped);
@@ -121,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     try {
-      await linkWithPopup(current, new GoogleAuthProvider());
+      await linkWithPopup(current, createGoogleProvider());
     } catch (err) {
       const mapped = mapFirebaseError(err);
       if (mapped) setError(mapped);

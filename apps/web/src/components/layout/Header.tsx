@@ -48,8 +48,15 @@ function Spinner() {
 }
 
 function AccountArea() {
-  const { user, loading, isAnonymous, signInWithGoogle, linkAnonymousToGoogle, signOutFn } =
-    useAuth();
+  const {
+    user,
+    loading,
+    isAnonymous,
+    error,
+    signInWithGoogle,
+    linkAnonymousToGoogle,
+    signOutFn,
+  } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -68,9 +75,16 @@ function AccountArea() {
 
   if (!user) {
     return (
-      <Button onClick={signInWithGoogle} size="sm" variant="primary">
-        Đăng nhập
-      </Button>
+      <>
+        <Button onClick={signInWithGoogle} size="sm" variant="primary">
+          Đăng nhập
+        </Button>
+        {error ? (
+          <p className="mt-2 max-w-72 text-xs leading-5 text-[var(--bm-danger-soft)]">
+            {error.message}
+          </p>
+        ) : null}
+      </>
     );
   }
 
