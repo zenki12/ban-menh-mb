@@ -86,16 +86,14 @@ function buildFreePeriodPreview(section: ReportSectionRecord | undefined) {
 
 export async function POST(request: Request) {
   const bearer = getBearerToken(request);
-  if (!bearer) {
-    return NextResponse.json({ error: createError("AUTH_REQUIRED") }, { status: 401 });
-  }
-
-  let uid: string;
-  try {
-    const decoded = await adminAuth.verifyIdToken(bearer);
-    uid = decoded.uid;
-  } catch {
-    return NextResponse.json({ error: createError("AUTH_INVALID_TOKEN") }, { status: 401 });
+  let uid: string | null = null;
+  if (bearer) {
+    try {
+      const decoded = await adminAuth.verifyIdToken(bearer);
+      uid = decoded.uid;
+    } catch {
+      return NextResponse.json({ error: createError("AUTH_INVALID_TOKEN") }, { status: 401 });
+    }
   }
 
   const parsed = bodySchema.safeParse(await readJson(request));
@@ -110,14 +108,16 @@ export async function POST(request: Request) {
   let entitlement = null;
 
   // Entitlement check and KB fetch are independent — run in parallel.
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (bearer) headers.Authorization = `Bearer ${bearer}`;
+
   const [entitlementResult, kbFetchResult] = await Promise.allSettled([
-    checkEntitlement(uid, "numerology_single_report"),
+    uid ? checkEntitlement(uid, "numerology_single_report") : Promise.resolve({ has: false, entitlement: null }),
     fetch(`${workerUrl.replace(/\/$/, "")}/numerology/report`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${bearer}`,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ ...parsed.data, includeSections: true }),
       signal: controller.signal,
     }),
@@ -155,7 +155,7 @@ export async function POST(request: Request) {
         ?.indicatorCount === "number"
         ? (payload as { report: { meta: { indicatorCount: number } } }).report.meta.indicatorCount
         : 0;
-    console.log(`[numerology/report] uid=${uid} status=${response.status} indicators=${indicatorCount}`);
+    console.log(`[numerology/report] uid=${uid ?? "guest"} status=${response.status} indicators=${indicatorCount}`);
 
     if (typeof payload === "string") {
       return new NextResponse(payload, { status: response.status });

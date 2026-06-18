@@ -141,19 +141,6 @@ app.post("/numerology/report", async (c) => {
     );
   }
 
-  const token = getBearerToken(c.req.header("Authorization"));
-  if (!token) {
-    const res = error("AUTH_REQUIRED", "Thiếu Bearer token.", 401);
-    return c.json(res.body, res.status);
-  }
-
-  try {
-    await verifyFirebaseToken(token, c.env.FIREBASE_PROJECT_ID);
-  } catch {
-    const res = error("AUTH_INVALID_TOKEN", "Token không hợp lệ.", 401);
-    return c.json(res.body, res.status);
-  }
-
   let json: unknown;
   try {
     json = await c.req.json();

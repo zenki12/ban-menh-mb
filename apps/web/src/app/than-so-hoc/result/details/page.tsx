@@ -12,10 +12,9 @@ import { MagneticCTA } from "../../../../components/numerology/result/MagneticCT
 import { PartialIndicatorSection } from "../../../../components/numerology/result/PartialIndicatorSection";
 import { StickyBottomCTA } from "../../../../components/numerology/result/StickyBottomCTA";
 import { SummaryDashboard } from "../../../../components/numerology/result/SummaryDashboard";
-import { ErrorState, LoadingState, UnauthorizedState, Card } from "../../../../components/ui";
+import { ErrorState, LoadingState, Card } from "../../../../components/ui";
 import { SectionHeader } from "../../../../components/numerology/result/v1";
 import { fetchWithAuth } from "../../../../lib/api/client";
-import { useAuth } from "../../../../lib/auth";
 
 type ReportResponse = {
   ok: true;
@@ -42,22 +41,6 @@ const PRICE = "99.000đ";
 function buildSummaryHref(search: { toString: () => string }) {
   const query = search.toString();
   return query ? `/than-so-hoc/result?${query}` : "/than-so-hoc/result";
-}
-
-function isAuthError(code: AppError["code"]) {
-  return code === "AUTH_REQUIRED" || code === "AUTH_INVALID_TOKEN" || code === "AUTH_SESSION_EXPIRED";
-}
-
-function authErrorDescription(code: AppError["code"]) {
-  return code === "AUTH_REQUIRED"
-    ? "Bạn cần đăng nhập trước khi xem báo cáo Thần số học."
-    : "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.";
-}
-
-function loginReturnHref() {
-  if (typeof window === "undefined") return "/";
-  const returnUrl = `${window.location.pathname}${window.location.search}`;
-  return `/?returnUrl=${encodeURIComponent(returnUrl)}`;
 }
 
 function asRecord(data: unknown): Record<string, unknown> {
@@ -167,7 +150,6 @@ function LockedDetailsPreview({
 function ResultDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
   const [report, setReport] = useState<FreemiumReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
@@ -192,13 +174,6 @@ function ResultDetailsContent() {
       router.replace("/than-so-hoc");
       return;
     }
-    if (authLoading) return;
-    if (!user) {
-      setLoading(false);
-      setError(createError("AUTH_REQUIRED"));
-      return;
-    }
-
     setLoading(true);
     setError(null);
     try {
@@ -213,22 +188,14 @@ function ResultDetailsContent() {
     } finally {
       setLoading(false);
     }
-  }, [authLoading, input, router, user]);
+  }, [input, router]);
 
   useEffect(() => {
     void fetchReport();
   }, [fetchReport]);
 
-  if (loading || authLoading) return <LoadingState message="Đang tải luận giải..." />;
+  if (loading) return <LoadingState message="Đang tải luận giải..." />;
   if (error) {
-    if (isAuthError(error.code)) {
-      return (
-        <UnauthorizedState
-          description={authErrorDescription(error.code)}
-          onLogin={() => router.push(loginReturnHref())}
-        />
-      );
-    }
     return <ErrorState code={error.code} requestId={error.requestId} onRetry={fetchReport} />;
   }
   if (!report) return <ErrorState code="KB_NOT_AVAILABLE" onRetry={fetchReport} />;
