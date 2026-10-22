@@ -35,7 +35,7 @@ function bearerToken(request: Request): string | null {
 
 async function enrichWithPrivateKb(
   input: TarotAiReadingRequest,
-  bearer: string,
+  bearer: string | null,
 ): Promise<TarotAiReadingRequest> {
   const base = process.env.NEXT_PUBLIC_KB_WORKER_URL?.trim().replace(/\/$/, "");
 
@@ -49,8 +49,10 @@ async function enrichWithPrivateKb(
           niche: input.nicheKey,
           reversed: String(card.orientation === "reversed"),
         });
+        const headers: Record<string, string> = {};
+        if (bearer) headers.Authorization = `Bearer ${bearer}`;
         const response = await fetch(`${base}/tarot/card/${card.id}?${query}`, {
-          headers: { Authorization: `Bearer ${bearer}` },
+          headers,
           signal: controller.signal,
         });
         if (response.ok) {
