@@ -25,6 +25,11 @@ export type DeckCard = {
   advice: string;
 };
 
+export type DailyCard = DeckCard & {
+  orientation: Orientation;
+  body: string;
+};
+
 export type DrawnCard = DeckCard & {
   orientation: Orientation;
   position: string;
@@ -42,6 +47,69 @@ export type ReadingSection = {
   title: string;
   body: string;
 };
+
+export const CONSCIOUSNESS_QUESTION_POOLS: Record<ThemeKey, readonly string[]> = {
+  love: [
+    "Bạn có đang sợ bị bỏ rơi đến mức chấp nhận một mối quan hệ không rõ ràng không?",
+    "Bạn có còn dùng một tổn thương cũ để đo lường sự chân thành của người hiện tại không?",
+    "Bạn có đang hy sinh nhiều hơn điều mình thực sự muốn nhưng vẫn mong đối phương tự hiểu không?",
+    "Bạn có thường bỏ qua ranh giới cảm xúc của mình chỉ để giữ một người ở lại không?",
+    "Bạn có đang bám vào tiềm năng của mối quan hệ thay vì nhìn vào cách nó thực sự diễn ra không?",
+    "Bạn có đang chờ một lời xác nhận từ người ấy để cảm thấy mình đủ giá trị không?",
+  ],
+  career: [
+    "Bạn có đang chọn sự an toàn dù biết nó khiến đam mê và năng lực của mình dần nhỏ lại không?",
+    "Bạn có từng nghĩ thành quả của mình chỉ là may mắn và sợ người khác phát hiện mình chưa đủ giỏi không?",
+    "Bạn có đang ở lại một môi trường làm việc làm mình kiệt sức chỉ vì sợ bắt đầu lại không?",
+    "Bạn có đang chạy theo chức danh hoặc sự công nhận nhiều hơn điều mình thật sự muốn xây dựng không?",
+    "Bạn có trì hoãn một bước tiến quan trọng vì sợ phải chịu trách nhiệm lớn hơn không?",
+    "Bạn có đang im lặng trước một điều bất công ở nơi làm việc để tránh xung đột không?",
+  ],
+  finance: [
+    "Bạn có đang để nỗi sợ thiếu tiền điều khiển cả những quyết định không thực sự liên quan đến tiền không?",
+    "Bạn có trì hoãn việc nhìn thẳng vào thu chi vì lo rằng con số thực tế sẽ khiến mình bất an không?",
+    "Bạn có đang dùng mua sắm hoặc tích lũy như một cách làm dịu cảm giác thiếu an toàn bên trong không?",
+    "Bạn có biết bước tài chính cần làm tiếp theo nhưng vẫn né tránh vì sợ mình không duy trì được không?",
+    "Bạn có đang so sánh tiến độ tài chính của mình với người khác đến mức mất phương hướng riêng không?",
+    "Bạn có đang đánh đổi sự ổn định dài hạn để tìm một kết quả nhanh trong ngắn hạn không?",
+  ],
+  self: [
+    "Bạn có đang trì hoãn điều mình thật sự muốn vì sợ phiên bản mới của mình sẽ không được mọi người chấp nhận không?",
+    "Bạn có đang nói mình chưa sẵn sàng trong khi điều giữ chân bạn thực ra là nỗi sợ thất bại không?",
+    "Mong muốn và hành động hằng ngày của bạn có đang đi về hai hướng khác nhau không?",
+    "Bạn có thường nghiêm khắc với bản thân hơn cách mình đối xử với một người mình yêu thương không?",
+    "Bạn có đang giữ một vai trò cũ dù nó không còn phản ánh con người hiện tại của mình không?",
+    "Bạn có đang chờ cảm giác tự tin xuất hiện trước khi cho phép mình bắt đầu không?",
+  ],
+  general: [
+    "Bạn có đang né tránh một sự thật vì biết rằng thừa nhận nó sẽ buộc mình phải thay đổi không?",
+    "Bạn có đang cố kiểm soát điều nằm ngoài khả năng của mình thay vì tập trung vào phần mình có thể hành động không?",
+    "Bạn có đang lặp lại một lựa chọn quen thuộc dù kết quả của nó nhiều lần khiến mình thất vọng không?",
+    "Bạn có đang đặt nhu cầu của người khác lên trước tiếng nói bên trong mình không?",
+    "Bạn có biết điều gì cần buông nhưng vẫn giữ lại vì nó từng khiến mình cảm thấy an toàn không?",
+    "Bạn có đang chờ một dấu hiệu hoàn hảo thay vì tin vào dữ kiện đã đủ rõ trước mắt không?",
+  ],
+  health: [
+    "Bạn có đang bỏ qua tín hiệu cần nghỉ ngơi vì cảm thấy mình phải luôn hữu ích không?",
+    "Nhịp sống hiện tại của bạn có đang lấy đi nhiều năng lượng hơn mức nó bồi đắp không?",
+    "Bạn có đang trì hoãn việc tìm hỗ trợ chuyên môn cho một điều khiến mình lo lắng kéo dài không?",
+    "Bạn có đang dùng sự bận rộn để tránh lắng nghe cảm xúc và nhu cầu thật của cơ thể không?",
+    "Bạn có đang kỳ vọng mình hồi phục nhanh hơn nhịp độ thực tế cho phép không?",
+    "Bạn có sẵn sàng điều chỉnh một thói quen nhỏ thay vì ép mình thay đổi tất cả cùng lúc không?",
+  ],
+};
+
+export function selectConsciousnessQuestions(
+  theme: ThemeKey,
+  random: () => number = Math.random,
+): [string, string, string] {
+  const pool = [...CONSCIOUSNESS_QUESTION_POOLS[theme]];
+  for (let index = pool.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [pool[index], pool[swapIndex]] = [pool[swapIndex], pool[index]];
+  }
+  return [pool[0], pool[1], pool[2]];
+}
 
 type ThemeOption = {
   key: ThemeKey;
@@ -127,9 +195,9 @@ export const MINI_MODALS = {
       "Mỗi ngày có thể mở bằng một lá bài ngắn để quan sát nhịp tâm thế, điều cần lưu ý và một hành động nhỏ nên giữ trong ngày.",
   },
   history: {
-    title: "Lịch sử trải bài",
+    title: "Thông điệp quá khứ",
     body:
-      "Khu vực này sẽ lưu các phiên trải bài đã mở khóa, giúp bạn đọc lại thông điệp theo từng giai đoạn.",
+      "Các phiên trải bài gần nhất được lưu cục bộ để bạn có thể đọc lại thông điệp trên chính trình duyệt này.",
   },
   dictionary: {
     title: "Từ điển Tarot",
@@ -242,11 +310,14 @@ const DAILY_CARD_MESSAGES: Record<string, string> = {
 const DAILY_FALLBACK_BODY =
   "Lá bài hôm nay mời bạn quan sát kỹ nhịp cảm xúc và chọn một hành động nhỏ, rõ ràng, thay vì phản ứng quá nhanh.";
 
-export function getDailyCard(dateStr: string): { card: string; body: string } {
-  const hash = Array.from(dateStr).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+export function getDailyCard(dateStr: string): DailyCard {
+  const hash = Array.from(dateStr).reduce((value, char) => {
+    return Math.imul(value ^ char.charCodeAt(0), 16777619) >>> 0;
+  }, 2166136261);
   const card = DECK[hash % DECK.length] ?? DECK[0];
   return {
-    card: card.nameVi,
+    ...card,
+    orientation: (hash >>> 8) % 2 === 0 ? "upright" : "reversed",
     body: DAILY_CARD_MESSAGES[card.nameVi] ?? DAILY_FALLBACK_BODY,
   };
 }

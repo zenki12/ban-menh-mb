@@ -184,9 +184,11 @@
 
 .tarot-landing-tools {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
 }
+
+.tarot-landing-tools button:first-child { grid-column: 1 / -1; }
 
 .tarot-landing-tools button,
 .tarot-home-button {
@@ -201,11 +203,17 @@
 }
 
 .tarot-landing-tools button:hover,
+.tarot-landing-tools button:focus-visible,
 .tarot-home-button:hover {
   transform: translateY(-2px);
   border-color: var(--bm-border-gold);
   color: var(--bm-gold-bright);
   background: rgba(251, 191, 36, 0.08);
+}
+
+.tarot-landing-tools button:focus-visible {
+  outline: 2px solid var(--bm-gold-bright);
+  outline-offset: 2px;
 }
 
 @media (max-width: 1180px) {

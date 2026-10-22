@@ -3953,10 +3953,20 @@ Goal:
 
 Update khi xong:
 
-- `getDailyCard(dateStr)` trong tarot-data.ts: hash char-code của date string, modulo DECK.length → lá khác nhau mỗi ngày, deterministic.
+- `getDailyCard(dateStr)` trong tarot-data.ts: FNV-1a hash chuỗi ngày, modulo `DECK.length`; cả lá bài và chiều Xuôi/Ngược đều deterministic trong ngày.
 - Auto-popup useEffect: check `localStorage["tarot_daily_seen"]`, nếu khác ngày hôm nay thì `setModal("daily")`.
 - `handleCloseModal`: ghi `localStorage["tarot_daily_seen"] = todayStr` khi đóng modal daily.
 - Data source: static trong tarot-data.ts, 10 lá Major Arcana có thông điệp riêng, còn lại dùng fallback.
+
+Nâng cấp 2026-10-21:
+
+- Thay popup text bằng nghi thức lá úp/lật 3D; mặt trước dùng `tarotCardImageSrc`, giữ đúng tỉ lệ và xoay ảnh khi chiều Ngược.
+- Sau reveal hiển thị tên Việt/Anh, chiều lá, thông điệp trong ngày, gợi ý hành động 24 giờ và hai CTA.
+- Tách trạng thái `tarot_daily_seen` khỏi `bm_tarot_daily_revealed_v1`; đóng popup chưa đồng nghĩa đã lật, còn lá đã lật sẽ hiện trực tiếp khi mở lại cùng ngày.
+- Mọi thao tác localStorage có `try/catch`; khi storage bị chặn, trải nghiệm vẫn hoạt động trong state của phiên hiện tại.
+- CTA “Trải bài sâu hơn ngay” đóng modal và chuyển đúng sang `fieldSelect`; “Đã nhận thông điệp” chỉ đóng modal.
+- Flip hỗ trợ click/bàn phím, reduced-motion; ModalShell tiếp tục hỗ trợ X, Escape, click outside và focus trap.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass; Edge headless E2E 375x812 pass toàn bộ reveal/persist/reopen/CTA/close/reduced-motion và không tràn ngang.
 
 ### T-0704 - Build Tarot wizard: chọn chủ đề và câu hỏi
 
@@ -4093,7 +4103,7 @@ Update khi xong:
 
 ### T-0708 - Build Tarot local history
 
-Status: Todo
+Status: Done
 
 Bối cảnh:
 
@@ -4121,7 +4131,309 @@ Goal:
 
 Update khi xong:
 
-- Ghi dữ liệu local lưu gì.
+- Hoàn tất ngày 2026-10-21. Lịch sử dùng key versioned `bm_tarot_history_v1`, giữ tối đa 15 phiên gần nhất theo FIFO.
+- Mỗi phiên chỉ lưu ID, timestamp, chủ đề, câu hỏi, spread, lá bài (ID, tên, vị trí, chiều, đường dẫn ảnh), tóm tắt, nguồn Gemini/template và nội dung luận giải cần để xem lại.
+- Không lưu họ tên, ngày sinh, giới tính, câu trả lời làm rõ, Firebase token hoặc thông tin thanh toán trong local history.
+- Modal “Thông điệp quá khứ” có danh sách, ảnh thu nhỏ, màn chi tiết, xóa từng phiên, xóa toàn bộ, empty state và cảnh báo khi localStorage không khả dụng.
+- Mọi thao tác đọc/ghi/xóa localStorage được bọc `try/catch`; dữ liệu được kiểm tra bằng Zod trước khi dùng.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass. Edge headless E2E ở 375px pass luồng tạo quẻ → lưu → về Landing → xem danh sách/chi tiết → xóa; không tràn ngang.
+- Workspace là snapshot không có `.git`; hoàn tất bằng self-review và nghiệm thu trực tiếp theo yêu cầu của product owner, không có SHA để request review ngoài.
+
+### T-0709 - Tích hợp Gemini cho luận giải Tarot chuyên sâu
+
+Status: Done
+
+Bối cảnh:
+
+- Product owner đã duyệt ADR-009 để supersede ADR-003 và cho phép Gemini tạo luận giải Tarot cá nhân hóa.
+- Flow Tarot hiện có UI ritual, câu hỏi, spread, rút/lật bài và fallback template nhưng chưa có luận giải AI thực tế.
+- Câu hỏi Tarot, họ tên, ngày sinh và giới tính là dữ liệu nhạy cảm; việc gửi sang nhà cung cấp AI phải minh bạch và có kiểm soát.
+
+Yêu cầu:
+
+- Tạo `POST /api/tarot/reading` gọi Gemini REST API bằng native `fetch`, không thêm dependency.
+- Dùng `GEMINI_API_KEY` server-only; không đưa khóa vào client, log hoặc repository.
+- Prompt giữ cấu trúc nghiệp vụ đã được product owner duyệt: thông tin người hỏi, chủ đề/niche/câu hỏi, lá bài, chiều, vị trí, nghĩa theo chủ đề, metadata năng lượng và ba câu trả lời làm rõ.
+- Kết quả Markdown bắt buộc có ba phần: `Lời Hồi Đáp Từ Vũ Trụ`, `Sự Mặc Khải`, `Hành Động Định Mệnh`.
+- Yêu cầu Firebase Auth, chấp nhận tài khoản Anonymous; rate limit/quota theo user và IP.
+- Validate request, Gemini response và response nội bộ bằng Zod; câu hỏi tối đa 200 ký tự.
+- Timeout tối đa 20 giây; khi thiếu key, timeout, provider lỗi hoặc output không hợp lệ phải trả fallback template với HTTP 200 và `fallback: true`.
+- Không log raw câu hỏi, họ tên, ngày sinh, giới tính hoặc nội dung luận giải.
+- Prompt phải chống prompt injection và cấm phán đoán chắc chắn, hù dọa, thay thế tư vấn y tế/tâm lý/pháp lý/tài chính hoặc khuyến khích tự hại/hại người.
+- UI hiển thị loading, kết quả theo từng lá, thông báo AI bên thứ ba và disclaimer bắt buộc.
+- Cập nhật ADR, Environment, Privacy/Terms, Threat Model, legal/content docs và DEVLOG.
+
+Output cần có:
+
+- `apps/web/src/app/api/tarot/reading/route.ts`.
+- Shared Tarot AI schemas/types và helper server-side cần thiết.
+- `FinalReadingView` hiển thị kết quả AI/fallback, ảnh lá bài và trạng thái loading.
+- ADR-009 và tài liệu legal/security/environment đồng bộ.
+
+Điều kiện Done:
+
+- Request không có hoặc có Firebase token sai trả `401` và không gọi Gemini.
+- Request sai schema trả `400`; rate limit trả `429`.
+- Gemini success trả nội dung đúng ba section; output sai schema tự fallback an toàn.
+- Thiếu key, provider lỗi hoặc timeout trả HTTP 200 với `fallback: true`.
+- Không log raw PII/câu hỏi và không lộ `GEMINI_API_KEY` vào client/static bundle.
+- UI 375px không tràn ngang, có disclosure AI và disclaimer.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Code review hoàn tất; Critical/Important findings đã xử lý trước khi đổi `Done`.
+- DEVLOG ghi file sửa, command đã chạy, phần chưa làm và rủi ro còn lại.
+
+Update 2026-10-21:
+
+- Đã hoàn tất route Gemini, shared schema, auth/rate-limit/timeout/safety/fallback, làm giàu nghĩa lá từ private KB, UI kết quả và disclosure/legal/security docs.
+- Đã bổ sung trường họ tên/ngày sinh/giới tính tùy chọn và ba câu trả lời làm rõ vào request AI; không log raw dữ liệu.
+- `npm run typecheck`, `npm run lint`, Worker TypeScript và `npm run build` pass; smoke không token trả `401`; visual route Tarot 375px không tràn ngang.
+- `npm run check` còn bị chặn bởi file private `kb-private/numerology/kb.json` không có trong workspace; security/responsive audit còn các finding có sẵn ngoài phạm vi T-0709, đã ghi chi tiết trong DEVLOG.
+- Product owner đã duyệt ngoại lệ nghiệm thu cho workspace snapshot không có `.git`: bỏ bước lấy SHA/request Claude review riêng cho T-0709.
+- Nghiệm thu dựa trên `npm run typecheck`, `npm run lint`, `npm run build` đều pass và smoke bảo mật xác nhận request không token trả `401`. T-0709 chuyển `Done` ngày 2026-10-21.
+
+### T-0710 - Build Sách phép Tarot / Từ điển 78 lá
+
+Status: Done
+
+Bối cảnh:
+
+- Landing `/tarot` đã có lối vào “Từ điển Tarot” nhưng nội dung mới chỉ là placeholder 22 lá Ẩn chính.
+- Người dùng cần tra cứu toàn bộ bộ bài ngay trong module mà không cần bắt đầu một phiên trải bài.
+
+Yêu cầu:
+
+- Dùng `DECK` hiện có làm nguồn dữ liệu cho đủ 78 lá và ảnh từ `public/tarot_cards/` qua `tarotCardImageSrc`.
+- Có bộ lọc Tất cả, Ẩn chính, Gậy, Ly, Kiếm, Tiền và tìm kiếm theo tên tiếng Việt/tiếng Anh.
+- Lưới thẻ hiển thị ảnh lazy-load, tên song ngữ và từ khóa chính.
+- Chi tiết lá bài hiển thị ảnh lớn, nhóm/năng lượng hiện có, nghĩa xuôi/ngược và lời khuyên hành động.
+- Hộp thoại đóng được bằng nút X, phím Escape và click ra ngoài; hỗ trợ bàn phím và focus rõ ràng.
+- Responsive tại 375px, không tràn ngang.
+
+Output cần có:
+
+- Component thư viện Tarot và stylesheet riêng, nối vào modal “Từ điển Tarot” hiện có.
+- DEVLOG ghi file sửa, command kiểm thử, phần chưa làm và rủi ro còn lại.
+
+Điều kiện Done:
+
+- Đủ 78 lá và đúng số lượng từng nhóm 22/14/14/14/14.
+- Lọc, tìm kiếm, mở chi tiết, đổi chiều và đóng modal hoạt động.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- Kiểm tra trực tiếp luồng trên `/tarot`, gồm viewport 375px không tràn ngang.
+
+Update 2026-10-21:
+
+- Đã thay placeholder bằng thư viện đủ 78 lá từ `DECK`, tìm kiếm EN/VI có hỗ trợ tiếng Việt không dấu và bộ lọc đúng số lượng 22/14/14/14/14.
+- Lưới dùng ảnh hiện có qua `tarotCardImageSrc`, lazy-load ảnh thu nhỏ; chi tiết có nhóm/năng lượng, nghĩa xuôi/ngược và lời khuyên hành động.
+- Modal có nút đóng X kèm nhãn truy cập, Escape, click outside, focus trap; UI 375px không tràn ngang.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass. Edge headless E2E pass toàn bộ luồng mở, lọc, tìm kiếm, xem chi tiết, đổi chiều và đóng modal.
+- Workspace là snapshot không có `.git`; áp dụng ngoại lệ SHA đã được product owner xác nhận cho workspace và hoàn tất bằng self-review cùng nghiệm thu trực tiếp.
+
+### T-0711 - Hyper-personalization cho luận giải Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- Profile Tarot hiện mới là form tùy chọn cơ bản; ba câu hỏi tâm thức dùng chung cho mọi chủ đề.
+- Prompt Gemini đã nhận profile nhưng chưa tự tính cung hoàng đạo/nguyên tố và còn giới hạn độ dài làm giảm chiều sâu cá nhân hóa.
+
+Yêu cầu:
+
+- Thiết kế lại khối profile tại bước đặt câu hỏi, giữ tất cả trường tùy chọn và tự điền `user.displayName` khi có.
+- Tạo kho câu hỏi tâm thức theo từng `ThemeKey`, chọn ngẫu nhiên ba câu đúng chủ đề cho mỗi phiên.
+- Tính cung hoàng đạo, nguyên tố và con số năng lượng từ ngày sinh hợp lệ; đưa dữ kiện đã tính vào prompt.
+- Prompt gọi tên người xem, kết nối chiêm tinh, chiều lá và ba câu trả lời Có/Không trong ba phần luận giải bắt buộc.
+- Cấu hình Gemini `temperature: 0.85`, `maxOutputTokens: 3000`; giữ nguyên auth, rate limit, timeout, validation, prompt-injection boundary và content safety.
+
+Điều kiện Done:
+
+- Không nhập profile vẫn dùng tên “Bạn” và flow không bị chặn.
+- `1997-07-20` được tính là Cự Giải, nguyên tố Nước.
+- Chủ đề Tình yêu chỉ lấy ba câu trong pool Tình yêu trong một phiên.
+- Prompt mẫu với tên Hương có gọi tên, chứa Cự Giải/Nước và liên kết ba clarification.
+- UI 375px không tràn ngang; `npm run typecheck`, `npm run lint`, `npm run build` pass.
+- DEVLOG ghi rõ kiểm thử live Gemini có hoặc không có API key thật.
+
+### T-0712 - Modal chi tiết lá bài chuyên sâu tại kết quả Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- `FinalReadingView` đã hiển thị từng lá và luận giải AI nhưng chưa có tương tác mở dữ liệu chuyên sâu theo niche.
+- Tarot KB canonical có chiêm tinh, ý nghĩa gốc, từ khóa, thần số và `aspects`; raw KB phải tiếp tục nằm sau Worker/API.
+
+Yêu cầu:
+
+- Click thẻ lá bài trong kết quả để mở modal hai cột desktop, một cột mobile với profile, ảnh đúng chiều, vị trí, tên, huy hiệu và ba khối nội dung.
+- Mở rộng `GET /tarot/card/:cardId` để trả payload tối thiểu của đúng một lá và niche/chiều được yêu cầu; giữ Auth, rate limit, validation và không public raw KB.
+- Thêm Next.js proxy có Firebase Auth và Zod validate response; UI có loading/error/fallback an toàn và cache trong bộ nhớ theo phiên.
+- Modal có nút X, Escape, click outside, focus trap, trả focus, khóa body scroll và không tràn ngang tại 375px.
+
+Điều kiện Done:
+
+- Flow Sự nghiệp → Xin Việc Làm → kết quả → click lá hiển thị đủ Cung/Hành tinh/Thần số và mục `TRONG XIN VIỆC LÀM`.
+- Lá ngược xoay ảnh 180 độ; text ý nghĩa/từ khóa đúng chiều.
+- `npm run typecheck`, `npm run lint`, `npm run build` và Worker TypeScript pass.
+- E2E 375px xác nhận modal, Escape, click outside, focus và không tràn ngang; DEVLOG được cập nhật.
+
+### T-0713 - Niche Clarify và cảnh báo trải bài lặp trong ngày
+
+Status: Done
+
+Bối cảnh:
+
+- `consciousnessCheck` đang bốc câu hỏi theo chủ đề rộng, chưa dùng kho `clarify_questions.json` theo đúng `nicheKey`.
+- Người dùng có thể trải lại cùng chủ đề nhiều lần trong ngày mà chưa có nhắc nhở giữ nguyên thông điệp đầu tiên.
+
+Yêu cầu:
+
+- KB Worker chỉ trả ngẫu nhiên đúng 3 câu hỏi của niche được yêu cầu từ `kb-tarot-clarify`; giữ Firebase Auth, rate limit, validation và không public raw KB.
+- Next.js proxy validate input/output bằng Zod; frontend preload theo `nicheKey`, có fallback an toàn theo chủ đề khi KB chưa khả dụng.
+- `consciousnessCheck` có nút CÓ/KHÔNG và phần “CHIA SẺ THÊM THÔNG TIN” mở textarea có label, giới hạn độ dài; nội dung tùy chọn được đưa vào prompt nhưng không lưu history/log.
+- Sau khi hoàn tất một trải bài, lưu dấu chủ đề/ngày trong `localStorage` bằng thao tác có `try/catch`; khi vào `spreadSelect` lần nữa trong ngày, hiển thị modal “Vũ Trụ Đã Lên Tiếng”.
+- Modal dùng SVG trăng khuyết, hỗ trợ Escape, click outside, focus trap, trả focus, khóa body scroll; “Quay Lại” về landing `/tarot`, “Tiếp Tục” cho phép đi tiếp.
+
+Điều kiện Done:
+
+- Flow Sự nghiệp → Xin Việc Làm nhận 3 câu từ nhóm `job_search`, có câu về thất nghiệp/nộp hồ sơ trong kiểm thử kiểm soát.
+- Hoàn tất một quẻ Sự nghiệp rồi mở lại cùng chủ đề trong ngày sẽ hiện popup đúng copy và hai hành động hoạt động đúng.
+- Không có raw clarify KB trong frontend/static artifact; API thiếu token trả 401.
+- `npm run typecheck`, `npm run lint`, `npm run build`, Worker TypeScript và E2E 375px pass; DEVLOG được cập nhật.
+
+### T-0714 - Hoàn thiện header Modal chi tiết lá bài Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- T-0712 đã hoàn tất modal chi tiết lá bài và luồng private KB, nhưng header hồ sơ chưa có ký hiệu thời gian như mẫu nghiệm thu mới và đang ép toàn bộ nội dung thành chữ hoa.
+
+Yêu cầu:
+
+- Hiển thị header theo thứ tự `{Họ tên} [biểu tượng đồng hồ] {DD/MM/YYYY} · {Tên ngách}` bằng SVG trang trí, giữ nguyên cách viết tên/ngách và cho phép xuống dòng an toàn trên mobile.
+- Không thay đổi contract private KB, luồng Auth/rate limit hoặc các nội dung chuyên sâu đã nghiệm thu tại T-0712.
+- Mở rộng E2E modal để xác nhận biểu tượng đồng hồ, ngày sinh, tên ngách và không tràn ngang tại 375px.
+
+Điều kiện Done:
+
+- Header đúng thứ tự, SVG không tạo nhiễu cho screen reader và modal vẫn đáp ứng Escape, click outside, focus restoration.
+- `npm run typecheck`, `npm run lint`, `npm run build` và E2E 375px pass; DEVLOG được cập nhật.
+
+### T-0715 - Modal ý nghĩa tuần tự trong bước lật bài Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- `SpreadRevealView` hiện chỉ đổi trạng thái lá bài tại chỗ; người dùng phải chờ đến kết quả cuối mới mở được hồ sơ chuyên sâu từng lá.
+- Modal `TarotReadingCardDetail` và private KB API đã có từ T-0712, cần được tái sử dụng trước bước kết nối tâm thức.
+
+Yêu cầu:
+
+- Khi lật một lá úp, chạy hiệu ứng lật 3D, đánh dấu đã mở và tự động mở modal chi tiết của chính lá đó.
+- Modal hiển thị tiến độ còn lại, điều hướng Trước/Sau chỉ trong tập lá đã lật và CTA đưa focus về lá chưa lật kế tiếp.
+- Khi toàn bộ lá đã lật, modal và màn reveal cung cấp CTA “Tiếp tục kết nối tâm thức”; không được chuyển bước sớm.
+- Giữ nguyên Auth, rate limit, private KB boundary, fallback an toàn và accessibility của modal hiện có.
+
+Điều kiện Done:
+
+- E2E spread ba lá xác nhận modal tự mở theo từng lá, carousel chỉ duyệt lá đã mở, không thể sang tâm thức khi chưa lật đủ và CTA cuối chuyển đúng bước.
+- Escape, click outside, focus, reduced motion và viewport 375px hoạt động; không tràn ngang.
+- `npm run typecheck`, `npm run lint`, `npm run build` pass; DEVLOG được cập nhật.
+
+### T-0716 - Nhận diện và hiển thị Combo Cộng Hưởng Định Mệnh Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- Kho Tarot private có index 1.544 combo từ 2 đến 5 lá và nội dung chi tiết theo ngách/chiều, nhưng màn kết quả chưa nhận diện hoặc hiển thị cộng hưởng.
+- Dữ liệu combo là KB thương mại, không được đưa vào frontend bundle hay public asset.
+
+Yêu cầu:
+
+- Thêm contract Zod và thuật toán `findMatchedCombos` so khớp không phụ thuộc thứ tự, không phân biệt hoa/thường, hỗ trợ 2-5 lá và dựng đúng orientation variant theo thứ tự canonical của combo.
+- Dò combo tại KB Worker có Auth/rate limit; Next route chỉ proxy/fallback server-side và không log raw PII.
+- Hiển thị khối Cộng Hưởng Định Mệnh tại `FinalReadingView` với sigil, cấp danh hiệu, ảnh lá, chiều và luận giải theo `nicheKey`.
+- Hỗ trợ tên kiểm thử `Turniodev` chỉ trong môi trường local/test đã bật cờ, không hoạt động ở production.
+- Giữ reduced motion, accessibility và viewport 375px không tràn ngang.
+
+Điều kiện Done:
+
+- So khớp được combo 2/3/4/5 lá, đúng ngách và orientation; KB private không xuất hiện trong static/frontend artifact.
+- Luồng thật và test mode hiển thị đúng khối combo; trạng thái không khớp/lỗi không làm sập màn kết quả.
+- Test Auth 401, `npm run typecheck`, `npm run lint`, `npm run build` và kiểm tra responsive pass; DEVLOG được cập nhật.
+
+### T-0717 - Tích hợp thư viện tra cứu 1.544 Combo (Mật Mã Cộng Hưởng) vào Từ Điển Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- T-0716 chỉ dò và hiển thị combo khớp với phiên trải tại màn kết quả.
+- Từ Điển Tarot hiện mới tra cứu 78 lá, chưa có thư viện toàn bộ combo và nội dung đa chiều theo lĩnh vực/ngách.
+
+Yêu cầu:
+
+- Bổ sung hai tab `78 Lá Bài` và `Mật Mã Cộng Hưởng` trong `tarot-dictionary.tsx`.
+- Tab combo hỗ trợ lọc theo 2/3/4/5 lá, tìm theo tên combo/tên lá và phân trang 15 mục; mỗi thẻ có danh hiệu, tên, danh sách lá và ảnh thu nhỏ.
+- Modal chi tiết lazy-load private KB qua API server-side, hiển thị header combo và accordion 5 lĩnh vực → ngách → hai khối Xuôi/Ngược.
+- Không bundle `combo_index.json` hoặc `combos/details/*.json` vào client/static artifact; API có Firebase Auth, Zod và rate limit.
+- Modal hỗ trợ Escape, click outside, focus restoration, body scroll lock, reduced motion và viewport 375px không tràn ngang.
+
+Điều kiện Done:
+
+- Tra cứu đủ 1.544 combo qua index API phân trang/tìm kiếm/lọc; detail chỉ tải khi mở modal.
+- Accordion hiển thị đúng lĩnh vực, ngách và hai nhóm chiều từ private KB, có loading/error/empty state an toàn.
+- `npm run typecheck`, `npm run lint`, `npm run build`, Auth 401, E2E dictionary/accordion 375px và static artifact scan pass; DEVLOG được cập nhật.
+
+### T-0718 - Cập nhật mặt lưng Celestial Compass cho toàn bộ trải nghiệm Tarot
+
+Status: Done
+
+Bối cảnh:
+
+- Mặt lưng bài tại bàn 78 lá, bước reveal và Daily Card hiện dùng họa tiết CSS/SVG giả lập.
+- User đã cung cấp asset `Celestial Compass Tarot Card Back.png` để dùng thống nhất trong module Tarot.
+
+Yêu cầu:
+
+- Sao chép asset vào `apps/web/public/tarot_cards/card-back.png`, truy cập qua `/tarot_cards/card-back.png`.
+- Thay mặt lưng tại `DeckBack`, `SelectedSlot`/`tarot-reveal-card-back` và `tarot-daily-back` bằng ảnh mới.
+- Giữ hiệu ứng nghiêng/hover, flip 3D và nhãn “Chạm để lật lá bài”; ảnh không méo, có bo góc và aura phù hợp.
+- Không thay đổi mặt trước, thuật toán rút bài hoặc luồng Tarot.
+
+Điều kiện Done:
+
+- Ba ngữ cảnh dùng cùng asset mới và không còn sigil SVG mặt lưng cũ.
+- `npm run typecheck`, `npm run lint`, `npm run build` và smoke trình duyệt `/tarot` pass; viewport 375px không tràn ngang, reduced motion không bị phá.
+- DEVLOG được cập nhật và task chuyển `Done`.
+
+### T-0719 - Trải nghiệm bộ bài 3D, xào bài và xòe bài hình cánh cung
+
+Status: Done
+
+Bối cảnh:
+
+- Bước `deckDraw` đang render lưới 78 lá kéo dài, gây cuộn dọc và thiếu cảm giác nghi thức.
+- Asset mặt lưng Celestial Compass đã được chuẩn hóa tại `/tarot_cards/card-back.png` trong T-0718.
+
+Yêu cầu:
+
+- Thay lưới tĩnh bằng ba trạng thái `idle` → `shuffling` → `fanned`: chồng bài 3D, hoạt cảnh xào 1,2–1,5 giây và quạt bài cánh cung.
+- Fan desktop nằm gọn trong stage; hover/focus nâng lá và viền vàng. Mobile 375–430px dùng vùng cuộn ngang cảm ứng, scroll snap và nút semantic.
+- Khi chọn, lá bay xuống khay; đủ số lá tự chuyển sang `spreadReveal` mà không thay đổi thuật toán/session hiện có.
+- Hỗ trợ keyboard, `aria-live`, vùng chạm tối thiểu và bỏ qua hoạt cảnh khi `prefers-reduced-motion`.
+
+Điều kiện Done:
+
+- Luồng idle/shuffle/fan/select/auto-advance hoạt động với spread 1 và 3 lá trên desktop và 375px.
+- Không còn lưới 78 lá gây cuộn dọc; không tràn viewport ngoài vùng scroll ngang có chủ đích trên mobile.
+- `npm run typecheck`, `npm run lint`, `npm run build` và Playwright smoke pass; DEVLOG được cập nhật.
+
+AI Tools Used: Codex + `ui-ux-pro-max` để kiểm tra interaction, touch, reduced-motion và responsive.
 
 ## Phase 8 - Security, QA, Independent Launch Và Cutover
 

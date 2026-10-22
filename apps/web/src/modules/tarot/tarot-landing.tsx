@@ -99,7 +99,7 @@ export function LandingView({
 
             <div className="tarot-landing-tools">
               {[
-                ["Lịch sử", "history"],
+                ["Thông điệp quá khứ", "history"],
                 ["Từ điển", "dictionary"],
                 ["Chủ đề", "topics"],
               ].map(([label, key]) => (

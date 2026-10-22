@@ -239,6 +239,113 @@ Response:
 }
 ```
 
+### `POST /api/tarot/combo`
+
+- Bắt buộc Firebase Bearer token (kể cả Anonymous) và rate limit theo user/IP.
+- Next route chỉ chuyển danh sách lá tối thiểu sang KB Worker; combo index/detail luôn ở KV/R2 hoặc local server fallback, không trả raw index.
+
+Request:
+
+```ts
+{
+  nicheKey: string, // lowercase snake_case, tối đa 64 ký tự
+  cards: Array<{
+    id: number, // 0..77
+    nameEn: string,
+    nameVi: string,
+    orientation: "upright" | "reversed"
+  }>, // 1..12; combo thật chỉ hỗ trợ 2..5 lá
+  testModeRequested?: boolean
+}
+```
+
+Response HTTP 200 kể cả khi không khớp:
+
+```ts
+{
+  ok: true,
+  combos: Array<{
+    id: string,
+    size: 2 | 3 | 4 | 5,
+    title: string,
+    description: string,
+    text: string,
+    orientationVariant: string, // ví dụ Up_Rev
+    cards: Array<{ id: number, nameEn: string, nameVi: string, orientation: "upright" | "reversed" }>
+  }>, // tối đa 3, ưu tiên combo nhiều lá hơn
+  testMode: boolean
+}
+```
+
+- Matching không phân biệt hoa/thường, không phụ thuộc thứ tự lá trong phiên và chuẩn hóa số `Two` ↔ `2`.
+- `orientationVariant` được dựng theo thứ tự canonical trong combo index để đọc đúng nội dung theo `nicheKey`; thiếu đúng variant thì bỏ combo, không đoán nội dung.
+- `testModeRequested` chỉ có hiệu lực ở local/dev được bật cờ và bị chặn cứng trên hostname production.
+
+### `GET /api/tarot/combos`
+
+- Dùng cho tab `Mật Mã Cộng Hưởng`; bắt buộc Firebase Bearer token (kể cả Anonymous), rate limit theo user/IP và Zod cho query/response.
+- Chỉ trả metadata cần hiển thị theo trang, tối đa 15 combo/request; không trả `detail_file`, raw index hoặc nội dung luận giải đa chiều.
+
+Query:
+
+```ts
+{
+  page?: number,       // >= 1
+  pageSize?: 15,       // cố định 15
+  size?: "all" | "2" | "3" | "4" | "5",
+  q?: string           // tối đa 100 ký tự; tìm tên combo hoặc tên lá
+}
+```
+
+Response:
+
+```ts
+{
+  ok: true,
+  items: Array<{
+    id: string,
+    size: 2 | 3 | 4 | 5,
+    title: string,
+    description: string,
+    cards: Array<{ id: number, nameEn: string, nameVi: string }>
+  }>, // tối đa 15
+  total: number,
+  page: number,
+  pageSize: 15,
+  totalPages: number
+}
+```
+
+### `GET /api/tarot/combos/:comboId`
+
+- Lazy-load đúng một combo khi người dùng mở chi tiết; bắt buộc Firebase Bearer token, rate limit, ID allowlist và Zod output.
+- Worker đọc detail từ R2; local development chỉ fallback server-side vào KB canonical. Client không nhận đường dẫn file nguồn hoặc mixed orientation variants.
+
+Response:
+
+```ts
+{
+  ok: true,
+  combo: {
+    id: string,
+    size: 2 | 3 | 4 | 5,
+    title: string,
+    description: string,
+    cards: Array<{ id: number, nameEn: string, nameVi: string }>
+  },
+  domains: Array<{
+    key: "love" | "finance" | "health" | "career" | "self",
+    label: string,
+    niches: Array<{
+      key: string,
+      label: string,
+      upright: string,
+      reversed: string
+    }>
+  }> // đúng 5 lĩnh vực
+}
+```
+
 ## 4. Indexes Và Constraints
 
 - `purchases.orderId` unique.

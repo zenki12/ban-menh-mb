@@ -28,6 +28,7 @@ Keys:
 
 - `kb-numerology`
 - `kb-narrative`
+- `kb-tarot-clarify` — nội dung canonical từ `clarify/clarify_questions.json`; chỉ Worker được đọc và endpoint chỉ trả ba câu của một niche mỗi lần.
 
 ## Troubleshooting
 

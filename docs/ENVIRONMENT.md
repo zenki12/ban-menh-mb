@@ -42,6 +42,21 @@
 | `TELEGRAM_BOT_TOKEN` | Alert | Yes | Bot token |
 | `TELEGRAM_CHAT_ID` | Alert | Yes | Chat nhận alert |
 | `KB_STORAGE_BUCKET` | KB | Yes/No | Tên bucket/private storage |
+| `GEMINI_API_KEY` | Next.js server | Yes | Khóa gọi Gemini cho luận giải Tarot; tuyệt đối không dùng prefix `NEXT_PUBLIC_` |
+| `TAROT_COMBO_TEST_MODE` | Next.js server + KB Worker | No | Feature flag ép combo khi hồ sơ là `Turniodev`; chỉ bật ở local/dev test, luôn tắt ở production |
+
+### Gemini AI
+
+- Dev/Test và Production phải dùng khóa Gemini riêng, có quota/billing alert riêng.
+- Chỉ Route Handler server-side được đọc `GEMINI_API_KEY`; không ghi khóa vào client bundle, log, docs hoặc error response.
+- API Tarot áp dụng Firebase Auth, rate limit theo user/IP, timeout tối đa 20 giây và fallback KB/template.
+- Không deploy production nếu Privacy/Terms chưa công bố việc gửi dữ liệu phiên Tarot tới nhà cung cấp AI.
+
+### Tarot Combo Test Mode
+
+- Local development tự cho phép hồ sơ `Turniodev` kích hoạt một combo mẫu ngẫu nhiên; dev/test build cần đặt `TAROT_COMBO_TEST_MODE=true` ở cả Next.js và KB Worker.
+- Production phải đặt `TAROT_COMBO_TEST_MODE=false`. Route Next.js từ chối test mode trên hostname `banmenh.online` và `www.banmenh.online` ngay cả khi cấu hình nhầm.
+- Cờ kiểm thử chỉ thay đổi dữ liệu khối cộng hưởng, không thay đổi các lá đã rút, lịch sử hay nội dung Gemini.
 
 ## 5. Quy tắc deploy
 

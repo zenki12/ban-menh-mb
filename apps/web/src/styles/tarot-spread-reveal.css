@@ -1,0 +1,119 @@
+.tarot-reveal-card {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  min-height: 21rem;
+  padding: 0;
+  perspective: 75rem;
+  touch-action: manipulation;
+  width: 100%;
+}
+
+.tarot-reveal-card:focus-visible {
+  border-radius: 1.5rem;
+  outline: 3px solid var(--bm-primary-soft);
+  outline-offset: 4px;
+}
+
+.tarot-reveal-card-inner {
+  display: block;
+  min-height: 21rem;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+}
+
+.tarot-reveal-card.is-flipped .tarot-reveal-card-inner { transform: rotateY(180deg); }
+
+.tarot-reveal-card-face {
+  align-items: center;
+  backface-visibility: hidden;
+  border: 1px solid var(--bm-border-purple);
+  border-radius: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  inset: 0;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1.1rem;
+  position: absolute;
+  text-align: center;
+}
+
+.tarot-reveal-card-back {
+  background: var(--bm-bg-deep);
+  border-color: var(--bm-border-gold);
+  box-shadow: 0 0 2.75rem color-mix(in srgb, var(--bm-primary) 22%, transparent);
+  padding: 0.65rem;
+}
+
+.tarot-reveal-card-front {
+  background: rgba(25, 16, 38, 0.97);
+  border-color: var(--bm-border-gold);
+  box-shadow: 0 0 2.75rem color-mix(in srgb, var(--bm-gold) 18%, transparent);
+  transform: rotateY(180deg);
+}
+
+.tarot-reveal-card-back-image {
+  border-radius: 1rem;
+  box-shadow: 0 0 1.8rem color-mix(in srgb, var(--bm-gold) 20%, transparent);
+  display: block;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  width: auto;
+}
+
+.tarot-reveal-card-prompt {
+  backdrop-filter: blur(0.5rem);
+  background: color-mix(in srgb, var(--bm-bg-deep) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--bm-gold) 45%, transparent);
+  border-radius: 999px;
+  bottom: 1rem;
+  color: var(--bm-text-main);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 0.35rem 0.8rem;
+  position: absolute;
+}
+
+.tarot-reveal-card-front img {
+  aspect-ratio: 4 / 7;
+  border: 1px solid var(--bm-border-gold);
+  border-radius: 0.6rem;
+  height: 9.5rem;
+  object-fit: cover;
+  width: auto;
+}
+
+.tarot-reveal-card-front img.is-reversed { transform: rotate(180deg); }
+
+.tarot-reveal-card-copy {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.8rem;
+}
+
+.tarot-reveal-card-copy strong {
+  color: var(--bm-text-main);
+  font-family: var(--bm-font-serif);
+  font-size: 1.15rem;
+}
+
+.tarot-reveal-card-copy > span { color: var(--bm-text-muted); font-size: 0.78rem; }
+
+.tarot-reveal-card-copy small {
+  color: var(--bm-gold-bright);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarot-reveal-card-inner { transition-duration: 1ms; }
+}

@@ -1,4 +1,4 @@
-Tarot UI and non-AI reading flow helpers will live here.
-Implement MVP flows from T-0701 through T-0708.
-Do not call AI or import Tarot KB directly into the frontend.
-Keep card meanings behind approved backend/private boundaries.
+Tarot UI, ritual flow and AI-assisted reading helpers live here.
+Implement MVP flows from T-0701 through T-0709.
+Do not call Gemini or import private Tarot KB directly into the frontend; use the authenticated server route approved by ADR-009.
+Keep card meanings, provider credentials and premium content behind approved backend/private boundaries.

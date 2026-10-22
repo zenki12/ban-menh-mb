@@ -24,7 +24,7 @@ Bản Mệnh V2 là dự án rebuild mới hoàn toàn. Nền tảng bắt đầ
 
 - Hub / Dashboard module hóa.
 - Thần số học: tra cứu miễn phí có giới hạn, mua báo cáo đầy đủ 49.000đ/lượt.
-- Tarot MVP: trải bài không AI, có daily message, lịch sử cơ bản, thư viện ý nghĩa lá bài.
+- Tarot MVP: trải bài có Gemini hỗ trợ luận giải theo ADR-009, fallback KB/template, daily message, lịch sử cơ bản và thư viện ý nghĩa lá bài.
 - Account / Payment: đăng nhập, entitlement, PayOS, voucher, Telegram alert.
 - Dev/Test và Production tách biệt.
 - KB thần số học và KB Tarot đã có sẵn, phải được đưa vào private backend/storage khi triển khai.
@@ -34,7 +34,7 @@ Bản Mệnh V2 là dự án rebuild mới hoàn toàn. Nền tảng bắt đầ
 
 - App mobile native.
 - Admin UI đầy đủ cho voucher/payment.
-- Tarot AI/Gemini analysis.
+- Các tính năng AI ngoài luận giải Tarot đã duyệt trong ADR-009.
 - Tarot spread 5/7/10/12 lá ở bản đầu.
 - Module Tử vi, Bát tự, Chòm sao, Ma trận định mệnh ở bản đầu.
 - Marketplace chuyên gia / tư vấn trực tiếp.

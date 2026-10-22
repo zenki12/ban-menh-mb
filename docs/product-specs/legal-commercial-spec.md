@@ -9,8 +9,8 @@ Tài liệu này không thay thế tư vấn luật sư. Đây là spec sản ph
 - Nội dung huyền học chỉ mang tính tham khảo/tự phản tỉnh.
 - Không claim chắc chắn tương lai, chữa bệnh, cam kết tài chính hoặc thay thế chuyên gia.
 - Giá, quyền truy cập, thời hạn, hoàn tiền phải rõ trước khi user thanh toán.
-- MVP hiện tại chốt hướng non-AI cho phần luận giải Tarot.
-- Nếu sau này dùng AI, phải nói rõ trong Privacy/Terms và không claim “Không AI”.
+- Luận giải Tarot chuyên sâu có thể được Gemini hỗ trợ tạo nội dung theo ADR-009.
+- UI, Privacy/Terms phải nói rõ việc dùng AI và không được claim “Không AI” cho flow này.
 
 ## 2. Disclaimer Bắt Buộc
 
@@ -50,16 +50,16 @@ Privacy copy phải nói rõ:
 - Có gửi sang bên thứ ba không.
 - User yêu cầu xóa dữ liệu như thế nào.
 
-MVP hiện tại dùng hướng non-AI:
+Các module dùng công thức/KB xác định trước có thể mô tả:
 
 ```text
-Kết quả được tạo từ hệ thống công thức và kho tri thức nội bộ của Bản Mệnh, không sử dụng AI tạo sinh cho phần luận giải này.
+Kết quả này được tạo từ hệ thống công thức và kho tri thức nội bộ của Bản Mệnh; phần này không sử dụng AI tạo sinh.
 ```
 
-Nếu sau này dùng AI provider:
+Đối với luận giải Tarot có AI theo ADR-009:
 
 ```text
-Một số nội dung có thể được xử lý bởi nhà cung cấp AI bên thứ ba để hỗ trợ cá nhân hóa diễn giải. Bản Mệnh không gửi thông tin thanh toán hoặc admin secret sang các nhà cung cấp này.
+Thông tin của phiên Tarot, gồm tên hiển thị nếu có, ngày sinh/giới tính nếu bạn cung cấp, chủ đề, câu hỏi, lá bài và câu trả lời làm rõ, có thể được gửi tới Google Gemini để hỗ trợ cá nhân hóa diễn giải. Bản Mệnh không gửi thông tin thanh toán, thông tin xác thực hoặc admin secret sang nhà cung cấp AI.
 ```
 
 Không được để hai claim mâu thuẫn. Nếu bật AI sau này, phải cập nhật Privacy/Terms trước khi deploy production.

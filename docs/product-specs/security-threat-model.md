@@ -129,9 +129,42 @@ Rủi ro:
 
 Kiểm soát:
 
-- Nếu dùng AI, cập nhật Privacy/Terms.
-- Copy UI phải nói rõ “AI hỗ trợ diễn giải” nếu có.
+- Privacy/Terms và UI phải nói rõ “AI hỗ trợ diễn giải” và loại dữ liệu được gửi sang nhà cung cấp.
+- Chỉ gửi dữ liệu tối thiểu của phiên Tarot; không gửi payment data, credential, token hoặc admin secret.
+- Không log raw prompt, câu hỏi, họ tên, ngày sinh, giới tính hoặc raw provider response.
 - Không claim “Không AI” khi backend có gọi AI.
+
+### P1.6 AI API abuse, prompt injection và chi phí vượt kiểm soát
+
+Rủi ro:
+
+- Bot hoặc user lạm dụng endpoint làm phát sinh chi phí Gemini.
+- Câu hỏi chứa chỉ dẫn nhằm ghi đè system prompt hoặc ép model sinh nội dung nguy hiểm.
+- Provider timeout/output sai cấu trúc làm hỏng flow kết quả.
+
+Kiểm soát:
+
+- Firebase Auth kể cả guest Anonymous; rate limit/quota theo user và IP.
+- Zod validate request/output; câu hỏi tối đa 200 ký tự, spread MVP chỉ 1/3 lá.
+- Prompt đánh dấu dữ liệu user là untrusted và yêu cầu bỏ qua instruction nằm trong dữ liệu đó.
+- Safety settings, content-safety prompt và bypass AI cho câu hỏi có tín hiệu tự hại/hại người tức thời.
+- Timeout tối đa 20 giây và fallback template HTTP 200.
+- Theo dõi usage/cost, tách key dev/prod và cấu hình billing alert trước production.
+
+### P1.7 Tarot combo test mode hoặc private KB bị lộ
+
+Rủi ro:
+
+- Client tải trực tiếp raw index/detail 1.544 combo hoặc endpoint thư viện cho phép bulk scraping KB thương mại.
+- Kẻ tấn công bật chế độ ép combo trên production khiến nội dung kiểm thử bị hiểu là kết quả thật.
+
+Kiểm soát:
+
+- Luồng kết quả chỉ nhận tối đa ba combo đã khớp. Luồng từ điển chỉ nhận metadata tối đa 15 combo/trang và lazy-load đúng một detail/lần; không nhận raw index, `detail_file`, đường dẫn R2 hay bulk detail dump.
+- Firebase Auth, rate limit, Zod input/output, timeout proxy và fallback không gây crash.
+- Không log họ tên, câu hỏi hoặc danh sách raw của phiên; lỗi chỉ ghi mã/ngữ cảnh chung.
+- Test mode được gate ở cả Next route và Worker, gắn nhãn rõ trong UI, tắt tại production và chặn hostname production ngay cả khi cấu hình nhầm.
+- Static artifact scan phải xác nhận không có `combo_index.json`, `combos/details` hoặc đường dẫn KB canonical; chấp nhận rủi ro còn lại là nội dung đã được phục vụ hợp lệ có thể bị thu thập chậm theo thời gian và theo dõi bằng quota/telemetry.
 
 ## 4. Rủi Ro P2
 

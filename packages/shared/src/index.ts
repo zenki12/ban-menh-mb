@@ -3,3 +3,4 @@ export * from "./errors";
 export * from "./schemas";
 export * from "./storage";
 export * from "./numerology";
+export * from "./tarot-combo-taxonomy";

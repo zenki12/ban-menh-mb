@@ -18,14 +18,15 @@ Spec ready for MVP planning
 - Chọn chủ đề/câu hỏi.
 - Spread 1 lá và 3 lá.
 - Rút bài/flip/reveal.
-- Kết quả từ KB + template engine, không AI.
+- Kết quả chuyên sâu do Gemini hỗ trợ theo ADR-009; KB + template engine là fallback bắt buộc.
 - Sách phép Tarot/dictionary 78 lá.
-- Local history cơ bản.
+- Local history tối đa 15 phiên trên trình duyệt, có xem lại và xóa từng phiên/toàn bộ; không đồng bộ cloud trong MVP.
 - Credit display.
 
 ### P1
 
-- Combo/cộng hưởng.
+- Combo/cộng hưởng (T-0716 đã triển khai: match private KB 2-5 lá, đúng ngách/chiều, tối đa ba combo ưu tiên độ đặc hiệu cao).
+- Thư viện `Mật Mã Cộng Hưởng` (T-0717 đã triển khai: tra cứu 1.544 combo theo trang 15 mục, lọc/tìm kiếm và lazy-load chi tiết 5 lĩnh vực → ngách → Xuôi/Ngược).
 - Clarify questions.
 - Top topics.
 - Spread 5/7.
@@ -36,13 +37,13 @@ Spec ready for MVP planning
 
 - Spread 10/12.
 - Manual reading.
-- AI/Gemini hybrid nếu có ADR mới.
+- Mở rộng AI ngoài phạm vi luận giải đã duyệt trong ADR-009.
 - Streak/share/advanced analytics.
 
 ## Out of Scope
 
 - Không clone code/asset/endpoint/branding của Mystery Tarot/TAROT-vibe.
-- Không dùng AI generation trong MVP.
+- Không gọi Gemini trực tiếp từ frontend và không mở rộng AI ngoài ADR-009/T-0709.
 - Không mở spread lớn trước khi 1/3 lá ổn.
 - Không thêm payment/AI/storage mới nếu chưa có ADR hoặc task rõ.
 
@@ -58,6 +59,8 @@ Spec ready for MVP planning
 - Không đọc trực tiếp KB/private storage từ client.
 - API Tarot kiểm tra quota/entitlement server-side.
 - Combo details/premium reading không public raw dump.
+- `POST /api/tarot/combo` yêu cầu Firebase Auth, Zod và rate limit; Next/Worker chỉ trả các combo đã khớp, không trả index 1.544 combo.
+- `GET /api/tarot/combos` chỉ trả metadata phân trang tối đa 15 mục; `GET /api/tarot/combos/:comboId` lazy-load đúng một detail. Cả hai yêu cầu Firebase Auth, Zod và rate limit, không trả raw file/path KB.
 
 ## Dependencies
 

@@ -363,39 +363,6 @@
 
 .tarot-stage-reading-header span { display: block; margin-top: 0.65rem; color: var(--bm-text-muted); }
 
-.tarot-deck-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(13, minmax(3.05rem, 1fr));
-  gap: 0.72rem;
-}
-
-.tarot-drawn-tray {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-top: 1.75rem;
-}
-
-.tarot-drawn-tray div {
-  min-width: 7rem;
-  border: 1px solid var(--bm-border-purple);
-  border-radius: 999px;
-  color: var(--bm-text-muted);
-  padding: 0.55rem 0.8rem;
-  text-align: center;
-}
-
-.tarot-drawn-tray div.filled {
-  border-color: var(--bm-border-gold);
-  color: var(--bm-gold-bright);
-  background: rgba(251, 191, 36, 0.08);
-}
-
 .tarot-reveal-grid {
   position: relative;
   z-index: 1;
@@ -515,26 +482,7 @@
   opacity: 0.8;
 }
 
-.tarot-modal-daily { display: grid; gap: 0.5rem; }
-.tarot-modal-card-name { color: var(--bm-gold-bright); font-size: 1.25rem; font-weight: 900; }
 .tarot-modal-empty { padding: 2rem 0; text-align: center; }
-.tarot-modal-dictionary { display: grid; gap: 0.75rem; }
-
-.tarot-modal-card-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
-.tarot-modal-card-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.5rem;
-  border: 1px solid var(--bm-border-subtle);
-  border-radius: var(--bm-radius-sm);
-}
-
 .tarot-modal-topics { display: grid; gap: 0.75rem; }
 
 .tarot-modal-topic-item {
@@ -570,14 +518,10 @@
   }
 
   .tarot-stage-tabs { justify-content: center; width: 100%; }
-  .tarot-deck-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
-  .tarot-card-back { min-height: 8.5rem; }
   .tarot-reveal-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
-  .tarot-deck-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
   .tarot-spread-reveal,
   .tarot-cards-row,
   [class*="tarot-spread-"] { grid-template-columns: 1fr !important; }
@@ -594,4 +538,6 @@
 
   .tarot-search-wrap { width: 100%; }
   .tarot-search { width: 100%; }
+
 }
+

@@ -45,7 +45,7 @@ const sections: TermSection[] = [
       "Các công cụ phân tích và luận giải khác được phát triển trên nền tảng.",
     ],
     note:
-      "Ở giai đoạn hiện tại, Thần số học là module đang mở chính thức. Các module còn lại có thể được giới thiệu, thử nghiệm hoặc mở theo lộ trình sản phẩm. Nội dung luận giải chính được tạo từ hệ thống công thức, kho tri thức và nội dung đã biên tập; không dùng AI tạo sinh để viết mới từng báo cáo ở giai đoạn hiện tại.",
+      "Ở giai đoạn hiện tại, Thần số học là module đang mở chính thức. Các module còn lại có thể được giới thiệu, thử nghiệm hoặc mở theo lộ trình sản phẩm. Một số nội dung Tarot chuyên sâu có thể được Google Gemini hỗ trợ tạo theo dữ liệu phiên Tarot; các phần khác tiếp tục dùng hệ thống công thức, kho tri thức và nội dung đã biên tập.",
   },
   {
     title: "2. Tài khoản người dùng",
@@ -117,10 +117,23 @@ const sections: TermSection[] = [
       "Người dùng tự chịu trách nhiệm đối với các quyết định cá nhân được đưa ra dựa trên thông tin từ nền tảng.",
     ],
     note:
-      "Bản Mệnh không chịu trách nhiệm đối với các tổn thất trực tiếp hoặc gián tiếp phát sinh từ việc sử dụng nội dung luận giải sai mục đích.",
+      "Nội dung do AI hỗ trợ có thể không chính xác, không đầy đủ hoặc không phù hợp với hoàn cảnh cụ thể. Bản Mệnh không chịu trách nhiệm đối với các tổn thất trực tiếp hoặc gián tiếp phát sinh từ việc sử dụng nội dung luận giải sai mục đích.",
   },
   {
-    title: "7. Hành vi không được phép",
+    title: "7. Sử dụng AI trong luận giải Tarot",
+    body: [
+      "Khi sử dụng luận giải Tarot chuyên sâu, bạn đồng ý rằng dữ liệu cần thiết của phiên Tarot có thể được gửi tới Google Gemini để tạo nội dung cá nhân hóa.",
+      "Bạn không được nhập dữ liệu trái pháp luật, bí mật của người khác, thông tin thanh toán, credential hoặc nội dung nhằm lạm dụng hay phá vỡ cơ chế an toàn của hệ thống.",
+    ],
+    list: [
+      "AI không dự đoán chắc chắn tương lai hoặc định mệnh.",
+      "AI không thay thế tư vấn y tế, tâm lý, pháp lý, tài chính hoặc đầu tư.",
+      "Bản Mệnh có thể áp dụng quota, rate limit hoặc tạm dừng tính năng để bảo vệ hệ thống và kiểm soát chi phí.",
+      "Khi AI không khả dụng, hệ thống có thể hiển thị nội dung dự phòng từ kho tri thức hoặc template an toàn.",
+    ],
+  },
+  {
+    title: "8. Hành vi không được phép",
     body: ["Người dùng không được:"],
     list: [
       "Can thiệp trái phép vào hệ thống.",
@@ -135,7 +148,7 @@ const sections: TermSection[] = [
       "Bản Mệnh có quyền hạn chế, tạm ngừng hoặc chấm dứt quyền truy cập đối với các hành vi vi phạm.",
   },
   {
-    title: "8. Thay đổi dịch vụ",
+    title: "9. Thay đổi dịch vụ",
     body: ["Bản Mệnh có thể cập nhật dịch vụ khi cần thiết, bao gồm:"],
     list: [
       "Cập nhật tính năng.",
@@ -148,7 +161,7 @@ const sections: TermSection[] = [
       "Các thay đổi nhằm nâng cao chất lượng dịch vụ, bảo vệ hệ thống hoặc đáp ứng yêu cầu pháp lý. Những thay đổi quan trọng sẽ được công bố trên nền tảng.",
   },
   {
-    title: "9. Điều chỉnh điều khoản",
+    title: "10. Điều chỉnh điều khoản",
     body: [
       "Điều khoản sử dụng có thể được cập nhật theo từng thời điểm để phản ánh thay đổi của sản phẩm, hạ tầng, quy trình vận hành hoặc yêu cầu pháp lý.",
       "Việc tiếp tục sử dụng dịch vụ sau khi điều khoản được cập nhật đồng nghĩa với việc bạn chấp nhận các thay đổi đó.",

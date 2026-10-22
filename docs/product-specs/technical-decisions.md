@@ -251,7 +251,7 @@ Hệ quả:
 
 - Có thể thay Firestore bằng DB khác nếu trước khi code MVP có quyết định hạ tầng mới, nhưng phải giữ nguyên nguyên tắc: transaction/user data có nguồn sự thật riêng, KB private không nằm trong static frontend.
 
-### DR-003: Tarot MVP Non-AI
+### DR-003: Tarot MVP Non-AI (SUPERSEDED bởi ADR-009)
 
 Quyết định:
 
@@ -279,3 +279,9 @@ Hệ quả:
 Điều kiện được đổi:
 
 - Chỉ bật AI sau khi có spec riêng cho AI, privacy/terms đã cập nhật, content safety đã test và product owner duyệt claim mới.
+
+Quyết định thay thế:
+
+- Product owner đã duyệt ADR-009 ngày 2026-10-21.
+- Gemini tạo luận giải Tarot chuyên sâu qua server-only API; KB/template luôn là fallback.
+- Auth, quota, timeout, input/output validation, disclosure AI và content safety là điều kiện bắt buộc.

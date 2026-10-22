@@ -1,12 +1,30 @@
 // Ban Menh - KB Worker. Generates reports from private KV data.
 
-import { buildSynthesizedReport, generateReport, type NarrativeKb } from "@banmenh/shared";
+import {
+  buildSynthesizedReport,
+  generateReport,
+  tarotComboLookupRequestSchema,
+  tarotComboLookupResponseSchema,
+  type NarrativeKb,
+  type TarotComboCard,
+  type TarotMatchedCombo,
+} from "@banmenh/shared";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { verifyFirebaseToken } from "./lib/auth";
 import { loadKb, loadNarrative } from "./lib/kb-loader";
 import { checkRateLimit, getClientIp } from "./lib/rate-limit";
-import { findTarotCombo, loadTarotCards, loadTarotComboDetail, loadTarotComboIndex } from "./lib/tarot-kb-loader";
+import tarotComboLibraryRoutes from "./routes/tarot-combo-library";
+import {
+  findTarotCombo,
+  findMatchedCombos,
+  getTarotAspectMeaning,
+  loadTarotCards,
+  loadTarotClarifyQuestions,
+  loadTarotComboDetail,
+  loadTarotComboIndex,
+  normalizeTarotCardName,
+} from "./lib/tarot-kb-loader";
 
 type Env = {
   BANMENH_KB_DEV: KVNamespace;
@@ -15,6 +33,7 @@ type Env = {
   FIREBASE_CLIENT_EMAIL: string;
   FIREBASE_PRIVATE_KEY: string;
   CORS_ALLOWED_ORIGINS?: string;
+  TAROT_COMBO_TEST_MODE?: string;
 };
 
 type ReportBody = {
@@ -131,6 +150,8 @@ app.get("/health", (c) =>
   c.json({ ok: true, service: "kb-worker", timestamp: new Date().toISOString() }),
 );
 
+app.route("/tarot/combos", tarotComboLibraryRoutes);
+
 app.post("/numerology/report", async (c) => {
   const rateLimit = checkRateLimit(`numerology:report:${getClientIp(c.req.raw.headers)}`, 60);
   if (!rateLimit.allowed) {
@@ -227,6 +248,15 @@ app.post("/numerology/report", async (c) => {
 });
 
 app.get("/tarot/card/:cardId", async (c) => {
+  const rateLimit = checkRateLimit(`tarot:card:${getClientIp(c.req.raw.headers)}`, 120);
+  if (!rateLimit.allowed) {
+    return c.json(
+      { error: { code: "RATE_LIMITED", message: "Bạn đang mở lá bài quá nhanh, vui lòng đợi một chút." } },
+      429,
+      { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    );
+  }
+
   const token = getBearerToken(c.req.header("Authorization"));
   if (!token) {
     return c.json({ error: { code: "AUTH_REQUIRED", message: "Thiếu Bearer token." } }, 401);
@@ -242,7 +272,7 @@ app.get("/tarot/card/:cardId", async (c) => {
   const niche = c.req.query("niche") ?? "general";
   const reversed = c.req.query("reversed") === "true";
 
-  if (!Number.isInteger(cardId)) {
+  if (!Number.isInteger(cardId) || cardId < 0 || cardId > 77 || !/^[a-z0-9_]{1,64}$/.test(niche)) {
     return c.json({ error: { code: "VALIDATION", message: "cardId không hợp lệ." } }, 400);
   }
 
@@ -253,14 +283,164 @@ app.get("/tarot/card/:cardId", async (c) => {
       return c.json({ error: { code: "NOT_FOUND", message: "Không tìm thấy lá bài." } }, 404);
     }
 
-    const text = reversed
-      ? (card.aspects?.[`${niche}_rev`] ?? card.reversed ?? "")
-      : (card.aspects?.[niche] ?? card.upright ?? "");
+    const meaning = reversed ? card.reversed : card.upright;
+    const aspectMeaning = getTarotAspectMeaning(card, niche, reversed) || meaning;
+    const keywords = reversed && card.keywordsRev?.length > 0 ? card.keywordsRev : card.keywords;
 
-    return c.json({ ok: true, card: { id: card.id, name: card.name, nameVi: card.nameVi }, text });
+    return c.json({
+      ok: true,
+      card: {
+        id: card.id,
+        nameEn: card.name,
+        nameVi: card.nameVi,
+        number: card.number ?? "",
+        orientation: reversed ? "reversed" : "upright",
+        element: card.element ?? "",
+        planet: card.planet ?? "",
+        zodiac: card.zodiac ?? "",
+        numerology: card.numerology ?? "",
+        keywords,
+        meaning,
+        aspectMeaning,
+      },
+      text: aspectMeaning,
+    });
   } catch (err) {
     console.error("[tarot] card lookup failed:", err);
     return c.json({ error: { code: "SERVER_ERROR", message: "Lỗi server." } }, 500);
+  }
+});
+
+app.get("/tarot/clarify", async (c) => {
+  const rateLimit = checkRateLimit(`tarot:clarify:${getClientIp(c.req.raw.headers)}`, 60);
+  if (!rateLimit.allowed) {
+    return c.json(
+      { error: { code: "RATE_LIMITED", message: "Bạn đang mở câu hỏi quá nhanh, vui lòng đợi một chút." } },
+      429,
+      { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    );
+  }
+
+  const token = getBearerToken(c.req.header("Authorization"));
+  if (!token) return c.json({ error: { code: "AUTH_REQUIRED", message: "Thiếu Bearer token." } }, 401);
+  try {
+    await verifyFirebaseToken(token, c.env.FIREBASE_PROJECT_ID);
+  } catch {
+    return c.json({ error: { code: "AUTH_INVALID_TOKEN", message: "Token không hợp lệ." } }, 401);
+  }
+
+  const nicheKey = c.req.query("niche") ?? "general";
+  if (!/^[a-z0-9_]{1,64}$/.test(nicheKey)) {
+    return c.json({ error: { code: "VALIDATION", message: "Niche không hợp lệ." } }, 400);
+  }
+
+  try {
+    const clarify = await loadTarotClarifyQuestions(c.env.BANMENH_KB_DEV);
+    const source = clarify.groups[nicheKey];
+    if (!Array.isArray(source) || source.length < 3) {
+      return c.json({ error: { code: "NOT_FOUND", message: "Chưa có câu hỏi cho niche này." } }, 404);
+    }
+    const pool = source.filter((question) => typeof question === "string" && question.trim().length > 0);
+    for (let index = pool.length - 1; index > 0; index -= 1) {
+      const random = new Uint32Array(1);
+      crypto.getRandomValues(random);
+      const swapIndex = random[0] % (index + 1);
+      [pool[index], pool[swapIndex]] = [pool[swapIndex], pool[index]];
+    }
+    return c.json({ ok: true, nicheKey, questions: pool.slice(0, 3) });
+  } catch {
+    console.error("[tarot] clarify lookup failed");
+    return c.json({ error: { code: "SERVER_ERROR", message: "Không thể tải câu hỏi tâm thức." } }, 500);
+  }
+});
+
+app.post("/tarot/combo", async (c) => {
+  const rateLimit = checkRateLimit(`tarot:combo:${getClientIp(c.req.raw.headers)}`, 60);
+  if (!rateLimit.allowed) {
+    return c.json(
+      { error: { code: "RATE_LIMITED", message: "Bạn đang tra cứu cộng hưởng quá nhanh, vui lòng đợi một chút." } },
+      429,
+      { "Retry-After": String(rateLimit.retryAfterSeconds) },
+    );
+  }
+
+  const token = getBearerToken(c.req.header("Authorization"));
+  if (!token) return c.json({ error: { code: "AUTH_REQUIRED", message: "Thiếu Bearer token." } }, 401);
+  try {
+    await verifyFirebaseToken(token, c.env.FIREBASE_PROJECT_ID);
+  } catch {
+    return c.json({ error: { code: "AUTH_INVALID_TOKEN", message: "Token không hợp lệ." } }, 401);
+  }
+
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: { code: "VALIDATION", message: "Body JSON không hợp lệ." } }, 400);
+  }
+  const parsed = tarotComboLookupRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: { code: "VALIDATION", message: "Dữ liệu dò combo không hợp lệ." } }, 400);
+  }
+
+  try {
+    const comboIndex = await loadTarotComboIndex(c.env.BANMENH_KB_DEV);
+    const testMode = parsed.data.testMode && c.env.TAROT_COMBO_TEST_MODE === "true";
+    let matches = findMatchedCombos(comboIndex.combos, parsed.data.cards);
+
+    if (testMode) {
+      const kbCards = await loadTarotCards(c.env.BANMENH_KB_DEV);
+      const maxForcedSize = Math.max(2, Math.min(5, parsed.data.cards.length));
+      const candidates = comboIndex.combos.filter((entry) => entry.size <= maxForcedSize);
+      if (candidates.length > 0) {
+        const random = new Uint32Array(1);
+        crypto.getRandomValues(random);
+        const entry = candidates[random[0] % candidates.length];
+        const forcedCards = entry.keys.map((key, index) => {
+          const kbCard = kbCards.find((card) => normalizeTarotCardName(card.name) === normalizeTarotCardName(key));
+          if (!kbCard) return null;
+          return {
+            id: kbCard.id,
+            nameEn: kbCard.name,
+            nameVi: kbCard.nameVi,
+            orientation: parsed.data.cards[index]?.orientation ?? parsed.data.cards[0]?.orientation ?? "upright",
+          } satisfies TarotComboCard;
+        });
+        if (forcedCards.every((card): card is TarotComboCard => card !== null)) {
+          matches = [{
+            entry,
+            cards: forcedCards,
+            orientationVariant: forcedCards
+              .map((card) => card.orientation === "reversed" ? "Rev" : "Up")
+              .join("_"),
+          }];
+        }
+      }
+    }
+
+    const resolved: TarotMatchedCombo[] = [];
+    for (const match of matches) {
+      if (resolved.length >= 3) break;
+      const detail = await loadTarotComboDetail(c.env.TAROT_KB_R2, match.entry);
+      const text = detail?.[parsed.data.nicheKey]?.[match.orientationVariant]
+        ?? detail?.general?.[match.orientationVariant]
+        ?? "";
+      if (!text.trim()) continue;
+      resolved.push({
+        id: match.entry.id,
+        size: match.entry.size,
+        title: match.entry.title,
+        description: match.entry.desc,
+        text,
+        orientationVariant: match.orientationVariant,
+        cards: match.cards,
+      });
+    }
+
+    return c.json(tarotComboLookupResponseSchema.parse({ ok: true, combos: resolved, testMode }));
+  } catch {
+    console.error("[tarot] combo lookup failed");
+    return c.json({ error: { code: "SERVER_ERROR", message: "Không thể dò cộng hưởng Tarot." } }, 500);
   }
 });
 
@@ -312,6 +492,17 @@ app.get("/tarot/combo", async (c) => {
 });
 
 app.post("/tarot/reading", async (c) => {
+  const token = getBearerToken(c.req.header("Authorization"));
+  if (!token) {
+    return c.json({ error: { code: "AUTH_REQUIRED", message: "Thiếu Bearer token." } }, 401);
+  }
+
+  try {
+    await verifyFirebaseToken(token, c.env.FIREBASE_PROJECT_ID);
+  } catch {
+    return c.json({ error: { code: "AUTH_INVALID_TOKEN", message: "Token không hợp lệ." } }, 401);
+  }
+
   let body: unknown;
   try {
     body = await c.req.json();
@@ -350,9 +541,8 @@ app.post("/tarot/reading", async (c) => {
       const kbCard = kbCards.find((card) => card.name.toLowerCase() === drawn.name.toLowerCase());
       if (!kbCard) continue;
 
-      const text = drawn.orientation === "reversed"
-        ? (kbCard.aspects[`${niche}_rev`] ?? kbCard.aspects.general_rev ?? "")
-        : (kbCard.aspects[niche] ?? kbCard.aspects.general ?? "");
+      const text = getTarotAspectMeaning(kbCard, niche, drawn.orientation === "reversed")
+        || (drawn.orientation === "reversed" ? kbCard.reversed : kbCard.upright);
 
       cardSections.push({
         title: `${drawn.position} · ${kbCard.nameVi}`,

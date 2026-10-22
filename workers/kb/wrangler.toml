@@ -6,6 +6,9 @@ compatibility_date = "2026-05-23"
 [env.dev]
 name = "banmenh-kb-dev"
 
+[env.dev.vars]
+TAROT_COMBO_TEST_MODE = "true"
+
 [[env.dev.kv_namespaces]]
 binding = "BANMENH_KB_DEV"
 id = "70886bee025145cf8ff352bcfa0148b6"
@@ -16,6 +19,9 @@ bucket_name = "banmenh-tarot-kb-dev"
 
 [env.production]
 name = "banmenh-kb-prod"
+
+[env.production.vars]
+TAROT_COMBO_TEST_MODE = "false"
 
 [[env.production.kv_namespaces]]
 binding = "BANMENH_KB_DEV"

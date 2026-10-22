@@ -56,6 +56,7 @@ const sections: Section[] = [
           "Họ và tên.",
           "Ngày sinh.",
           "Giới tính (nếu có).",
+          "Chủ đề, câu hỏi Tarot, các lá bài và câu trả lời làm rõ do người dùng cung cấp.",
           "Các thông tin được người dùng chủ động cung cấp cho từng module.",
         ],
       },
@@ -105,12 +106,25 @@ const sections: Section[] = [
       "Để cung cấp dịch vụ ổn định và an toàn, Bản Mệnh có thể sử dụng một số nền tảng và dịch vụ hỗ trợ vận hành.",
       "Các dịch vụ này chỉ được sử dụng trong phạm vi cần thiết cho việc:",
     ],
-    list: ["Xác thực tài khoản.", "Lưu trữ dữ liệu.", "Xử lý thanh toán.", "Bảo mật hệ thống.", "Giám sát vận hành."],
+    list: ["Xác thực tài khoản.", "Lưu trữ dữ liệu.", "Xử lý thanh toán.", "Hỗ trợ tạo luận giải Tarot cá nhân hóa bằng AI.", "Bảo mật hệ thống.", "Giám sát vận hành."],
     note:
-      "Ví dụ: Firebase cho xác thực người dùng, Firestore cho lưu trữ dữ liệu, Cloudflare cho bảo mật và tối ưu hiệu năng hệ thống, PayOS cho xử lý thanh toán. Các đơn vị này không được phép sử dụng dữ liệu của bạn cho mục đích riêng ngoài phạm vi cung cấp dịch vụ.",
+      "Ví dụ: Firebase cho xác thực người dùng, Firestore cho lưu trữ dữ liệu, Cloudflare cho bảo mật và tối ưu hiệu năng, PayOS cho thanh toán và Google Gemini cho luận giải Tarot có AI. Khi dùng luận giải Tarot chuyên sâu, tên hiển thị nếu có, ngày sinh/giới tính nếu bạn cung cấp, chủ đề, câu hỏi, lá bài và câu trả lời làm rõ có thể được gửi tới Google Gemini. Bản Mệnh không gửi thông tin thanh toán, thông tin xác thực hoặc khóa bí mật sang nhà cung cấp AI.",
   },
   {
-    title: "6. Thanh toán an toàn",
+    title: "6. Xử lý dữ liệu Tarot bằng AI",
+    body: [
+      "Luận giải Tarot chuyên sâu có thể được Google Gemini hỗ trợ tạo nội dung. Trước khi gửi yêu cầu, hệ thống yêu cầu phiên đăng nhập, giới hạn tần suất và chỉ gửi dữ liệu cần thiết cho lượt luận giải.",
+      "Nội dung AI có thể không chính xác hoặc không phù hợp với mọi hoàn cảnh. Kết quả luôn mang tính chiêm nghiệm, không phải kết luận chắc chắn hoặc tư vấn chuyên môn.",
+    ],
+    list: [
+      "Câu hỏi được giới hạn độ dài và không được ghi nguyên văn vào log vận hành.",
+      "Hệ thống không gửi dữ liệu thanh toán, credential, token hoặc admin secret tới Gemini.",
+      "Khi Gemini lỗi hoặc quá thời gian chờ, hệ thống chuyển sang nội dung dự phòng từ template an toàn.",
+      "Bạn không nên nhập bí mật, thông tin tài chính, hồ sơ y tế hoặc dữ liệu cá nhân của người khác vào câu hỏi Tarot.",
+    ],
+  },
+  {
+    title: "7. Thanh toán an toàn",
     body: [
       "Các giao dịch thanh toán trên Bản Mệnh được xử lý thông qua đối tác thanh toán được cấp phép.",
       "Bản Mệnh không lưu trữ:",
@@ -120,7 +134,7 @@ const sections: Section[] = [
       "Quyền truy cập các nội dung trả phí chỉ được kích hoạt sau khi hệ thống xác nhận giao dịch thành công.",
   },
   {
-    title: "7. Bảo vệ dữ liệu",
+    title: "8. Bảo vệ dữ liệu",
     body: ["Chúng tôi áp dụng các biện pháp kỹ thuật và quy trình vận hành phù hợp nhằm bảo vệ dữ liệu người dùng."],
     list: [
       "Mã hóa kết nối truyền dữ liệu.",
@@ -133,19 +147,23 @@ const sections: Section[] = [
       "Mặc dù luôn nỗ lực bảo vệ dữ liệu, không có hệ thống nào có thể đảm bảo an toàn tuyệt đối trước mọi rủi ro trên Internet.",
   },
   {
-    title: "8. Lưu trữ và xóa dữ liệu",
-    body: ["Một số dữ liệu được lưu giữ nhằm:"],
+    title: "9. Lưu trữ và xóa dữ liệu",
+    body: [
+      "Một số dữ liệu được lưu giữ nhằm:",
+      "Lịch sử Tarot cục bộ được lưu trên chính trình duyệt của bạn, không đồng bộ lên máy chủ công cộng. Bản ghi này có thể gồm thời gian, chủ đề, câu hỏi, các lá bài và nội dung luận giải để bạn xem lại.",
+    ],
     list: [
       "Duy trì tài khoản người dùng.",
       "Hiển thị lại báo cáo đã tạo.",
       "Khôi phục quyền truy cập đã mua.",
       "Đối soát giao dịch và xử lý hỗ trợ.",
+      "Cho phép xóa từng phiên hoặc toàn bộ lịch sử Tarot ngay trong mục Thông điệp quá khứ.",
     ],
     note:
       "Bạn có thể yêu cầu xem dữ liệu đang được lưu trữ, chỉnh sửa thông tin không chính xác hoặc xóa dữ liệu không còn cần thiết. Một số dữ liệu có thể được giữ lại trong thời gian nhất định để đáp ứng yêu cầu pháp lý hoặc phục vụ đối soát giao dịch.",
   },
   {
-    title: "9. Quyền của người dùng",
+    title: "10. Quyền của người dùng",
     body: ["Bạn có quyền:"],
     list: [
       "Truy cập dữ liệu cá nhân liên quan đến tài khoản.",
@@ -156,7 +174,7 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "10. Cập nhật chính sách",
+    title: "11. Cập nhật chính sách",
     body: ["Chính sách này có thể được điều chỉnh khi:"],
     list: [
       "Sản phẩm mở rộng tính năng mới.",

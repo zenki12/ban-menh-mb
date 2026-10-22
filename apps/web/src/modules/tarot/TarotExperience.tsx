@@ -1,18 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import {
+  ERROR_MESSAGES,
+  isAppError,
+  type TarotAiReadingRequest,
+  type TarotAiReadingResponse,
+} from "@banmenh/shared";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Card } from "../../components/ui";
+import { fetchWithAuth } from "../../lib/api/client";
 import { useAuth } from "../../lib/auth";
 import {
-  MAJOR_NAMES,
   buildReadingSections,
+  getCardMessage,
   getDailyCard,
   MINI_MODALS,
   SAMPLE_QUESTIONS,
   STAGE_COPY,
   drawCards,
   getThemeLabel,
+  selectConsciousnessQuestions,
   type Phase,
   type ReadingSection,
   type ReadingSession,
@@ -20,9 +27,35 @@ import {
   type ThemeKey,
 } from "./tarot-data";
 import { LandingView } from "./tarot-landing";
+import { useTarotProfileName } from "./tarot-profile-state";
+import {
+  clearTarotHistory,
+  createTarotHistoryEntry,
+  deleteTarotHistoryEntry,
+  loadTarotHistory,
+  saveTarotHistory,
+  type TarotHistoryEntry,
+} from "./tarot-history";
+import { TarotHistoryView } from "./tarot-history-view";
+import { TarotDictionary } from "./tarot-dictionary";
+import { TarotDailyCard } from "./tarot-daily-card";
+import { NicheConsciousnessCheckView } from "./tarot-niche-consciousness";
+import { loadNicheClarifyQuestions } from "./tarot-niche-clarify";
+import {
+  hasCompletedTarotTheme,
+  localTarotDateKey,
+  markTarotThemeCompleted,
+} from "./tarot-repeat-warning";
+import { TarotUniverseWarning } from "./tarot-universe-warning";
+import { ALL_TOPICS, TOPICS } from "./tarot-topics";
+import {
+  DAILY_REVEALED_KEY,
+  DAILY_SEEN_KEY,
+  hasDailyDate,
+  storeDailyDate,
+} from "./tarot-daily-storage";
 import { ModalShell } from "./tarot-ui";
 import {
-  ConsciousnessCheckView,
   DeckDrawView,
   FieldSelectView,
   FinalReadingView,
@@ -32,140 +65,9 @@ import {
   SpreadRevealView,
   SpreadSelectView,
   type TarotModalKey,
-  type TarotTopic,
 } from "./tarot-workflow-stages";
 
 type QuestionMode = "suggested" | "custom";
-
-const TOPICS: TarotTopic[] = [
-  {
-    key: "love",
-    icon: "❤",
-    label: "Tình yêu",
-    subtitle: "Quan hệ & cảm xúc",
-    lead: "Chủ đề này đi vào cách hai người chạm vào nhau, cách giữ nhịp cảm xúc và những nút thắt đang cần được gọi tên.",
-    niches: [
-      { label: "Tình Yêu Tổng Quát", hint: "Bức tranh toàn cảnh tình cảm", kbKey: "love" },
-      { label: "Người Yêu Cũ", hint: "Quá khứ và những gì còn đọng lại", kbKey: "ex" },
-      { label: "Người Yêu Hiện Tại", hint: "Mối quan hệ đang diễn ra", kbKey: "current_love" },
-      { label: "Mối Quan Hệ Mập Mờ", hint: "Chưa rõ ràng, cần định hướng", kbKey: "ambiguous" },
-      { label: "Crush / Thầm Thích", hint: "Cảm xúc chưa nói thành lời", kbKey: "crush" },
-      { label: "Người Yêu Tương Lai", hint: "Tình duyên phía trước", kbKey: "future_love" },
-      { label: "Người Ấy", hint: "Đọc năng lượng một người cụ thể", kbKey: "someone" },
-      { label: "Hôn Nhân", hint: "Chuyện kết hôn và hôn nhân", kbKey: "marriage" },
-      { label: "Giải Quyết Xung Đột", hint: "Mâu thuẫn cần tháo gỡ", kbKey: "conflict" },
-      { label: "Chia Tay & Hàn Gắn", hint: "Kết thúc hoặc làm lành", kbKey: "breakup" },
-      { label: "Yêu Xa", hint: "Khoảng cách và kết nối", kbKey: "long_distance" },
-      { label: "Người Thứ Ba / Ghen Tuông", hint: "Tình huống phức tạp ba người", kbKey: "jealousy" },
-      { label: "Yêu Bản Thân", hint: "Mối quan hệ với chính mình", kbKey: "self_love" },
-      { label: "Tìm Kiếm Tình Yêu", hint: "Cơ duyên chưa gặp", kbKey: "finding_love" },
-      { label: "Mức Độ Hợp Nhau", hint: "Compatibility và tương đồng", kbKey: "compatibility" },
-      { label: "Mối Quan Hệ Độc Hại", hint: "Nhận diện và thoát ra", kbKey: "toxic_relationship" },
-      { label: "Tri Kỷ / Soulmate", hint: "Kết nối linh hồn sâu sắc", kbKey: "soulmate" },
-      { label: "Gương Vỡ Lại Lành", hint: "Cơ hội hàn gắn sau đổ vỡ", kbKey: "reconciliation" },
-      { label: "Người Thầm Thương", hint: "Người yêu bí mật", kbKey: "secret_admirer" },
-      { label: "Tình Bạn / Tri Kỷ", hint: "Sự thấu hiểu và kết nối bạn bè", kbKey: "friendship" },
-      { label: "Con Cái / Thai Kỳ", hint: "Dòng chảy gia đình, sinh sản", kbKey: "pregnancy" },
-      { label: "Thị Phi / Đàm Tiếu", hint: "Chuyện thị phi xung quanh", kbKey: "gossip" },
-      { label: "Gia Đình", hint: "Cách nói chuyện và nâng đỡ nhau", kbKey: "family" },
-    ],
-  },
-  {
-    key: "career",
-    icon: "▲",
-    label: "Sự nghiệp",
-    subtitle: "Công việc & định hướng",
-    lead: "Dành cho câu chuyện nghề nghiệp, môi trường làm việc, những ngã rẽ cần cân nhắc và nhịp phát triển tiếp theo.",
-    niches: [
-      { label: "Sự Nghiệp / Công Việc", hint: "Bức tranh toàn cảnh công việc", kbKey: "career" },
-      { label: "Xin Việc Làm", hint: "Cơ hội và lựa chọn mới", kbKey: "job_search" },
-      { label: "Thăng Tiến", hint: "Khả năng được ghi nhận", kbKey: "promotion" },
-      { label: "Kinh Doanh", hint: "Quyết định và rủi ro", kbKey: "business" },
-      { label: "Đồng Nghiệp / Cấp Trên", hint: "Quan hệ trong công việc", kbKey: "colleague" },
-      { label: "Chuyển Nghề", hint: "Ngã rẽ sự nghiệp", kbKey: "career_change" },
-      { label: "Freelance / Tự Do", hint: "Làm việc độc lập", kbKey: "freelance" },
-      { label: "Phỏng Vấn", hint: "Chuẩn bị và kết quả phỏng vấn", kbKey: "interview" },
-      { label: "Pháp Lý / Giấy Tờ", hint: "Thủ tục, hợp đồng, giấy tờ", kbKey: "legal" },
-      { label: "Chuyển Chỗ / Xuất Ngoại", hint: "Di chuyển vì công việc", kbKey: "moving" },
-      { label: "Kiệt Sức / Áp Lực", hint: "Burnout và quản lý năng lượng", kbKey: "burnout" },
-      { label: "Khởi Nghiệp", hint: "Bắt đầu venture mới", kbKey: "startup" },
-      { label: "Thị Phi Công Sở", hint: "Chuyện nội bộ, chính trị công sở", kbKey: "workplace_politics" },
-      { label: "Nghề Tay Trái", hint: "Thu nhập và đam mê song song", kbKey: "side_hustle" },
-    ],
-  },
-  {
-    key: "finance",
-    icon: "◆",
-    label: "Tài chính",
-    subtitle: "Tiền bạc & đầu tư",
-    lead: "Một lớp nhìn rõ hơn vào dòng tiền, thói quen chi tiêu, cơ hội đầu tư và những áp lực tài chính đang hiện diện.",
-    niches: [
-      { label: "Tài Chính Tổng Quát", hint: "Bức tranh toàn cảnh tài chính", kbKey: "finance" },
-      { label: "Đầu Tư", hint: "Cơ hội và cảnh báo", kbKey: "investment" },
-      { label: "Nợ Nần / Vay Mượn", hint: "Áp lực tài chính", kbKey: "debt" },
-      { label: "Tiết Kiệm / Tích Lũy", hint: "Xây dựng nền tảng vật chất", kbKey: "savings" },
-      { label: "Lộc Tài / May Mắn", hint: "Vận may tài chính", kbKey: "luck_money" },
-      { label: "Bất Động Sản", hint: "Nhà đất, tài sản cố định", kbKey: "real_estate" },
-      { label: "Thua Lỗ / Khó Khăn", hint: "Vượt qua giai đoạn khó", kbKey: "financial_loss" },
-      { label: "Vận May Bất Ngờ", hint: "Cơ hội tiền bạc không ngờ tới", kbKey: "sudden_wealth" },
-    ],
-  },
-  {
-    key: "health",
-    icon: "✦",
-    label: "Sức khỏe",
-    subtitle: "Thể chất & tinh thần",
-    lead: "Không thay thế chuyên môn y tế, nhưng giúp bạn quan sát nhịp sống, mức căng thẳng và dấu hiệu cần cân bằng lại.",
-    niches: [
-      { label: "Sức Khỏe Thể Chất", hint: "Tình trạng cơ thể hiện tại", kbKey: "health" },
-      { label: "Sức Khỏe Tinh Thần", hint: "Tâm lý và cảm xúc", kbKey: "mental" },
-      { label: "Năng Lượng / Chakra", hint: "Trạng thái năng lượng", kbKey: "energy" },
-      { label: "Ăn Uống / Chăm Sóc", hint: "Thói quen sức khỏe", kbKey: "diet" },
-      { label: "Thú Cưng", hint: "Sức khỏe và năng lượng thú cưng", kbKey: "pet" },
-      { label: "Chữa Lành", hint: "Quá trình phục hồi", kbKey: "healing" },
-      { label: "Căng Thẳng / Âu Lo", hint: "Áp lực tinh thần", kbKey: "stress" },
-      { label: "Tổn Thương Quá Khứ", hint: "Vết thương cần được nhìn nhận", kbKey: "trauma" },
-    ],
-  },
-  {
-    key: "self",
-    icon: "✧",
-    label: "Bản thân",
-    subtitle: "Học tập & phát triển",
-    lead: "Dành cho những câu hỏi về bản sắc, tiềm năng, bài học cá nhân và quãng đường đang mở ra phía trước.",
-    niches: [
-      { label: "Học Tập", hint: "Kết quả và hướng học tập", kbKey: "study" },
-      { label: "Du Học", hint: "Cơ hội học ở nước ngoài", kbKey: "study_abroad" },
-      { label: "Định Hướng Bản Thân", hint: "Bản sắc và tiềm năng", kbKey: "self" },
-      { label: "Sứ Mệnh / Mục Đích", hint: "Lý do tồn tại sâu sắc", kbKey: "purpose" },
-      { label: "Bóng Tối Nội Tâm", hint: "Phần cần đối mặt trong mình", kbKey: "shadow_self" },
-      { label: "Ra Quyết Định", hint: "Lựa chọn trước ngã rẽ", kbKey: "decision" },
-      { label: "Du Lịch / Di Chuyển", hint: "Chuyến đi và dịch chuyển", kbKey: "travel" },
-      { label: "Tâm Linh", hint: "Kết nối tâm linh và trực giác", kbKey: "spiritual" },
-      { label: "Giải Mã Giấc Mơ", hint: "Ý nghĩa giấc mơ gần đây", kbKey: "dream" },
-      { label: "Tiền Kiếp", hint: "Ký ức và bài học từ kiếp trước", kbKey: "past_life" },
-      { label: "Nghiệp Quả / Karma", hint: "Nhân quả tuần hoàn", kbKey: "karma" },
-      { label: "Tìm Đồ Thất Lạc", hint: "Manh mối và phương hướng", kbKey: "lost_item" },
-      { label: "Thi Cử / Kiểm Tra", hint: "Kết quả bài thi", kbKey: "exams" },
-      { label: "Học Bổng", hint: "Cơ hội vươn xa", kbKey: "scholarship" },
-      { label: "Năng Khiếu / Đam Mê", hint: "Khám phá biệt tài", kbKey: "talent" },
-      { label: "Thần Hộ Mệnh", hint: "Năng lượng bảo hộ xung quanh", kbKey: "spirit_guide" },
-      { label: "Tổng Quát", hint: "Không giới hạn chủ đề cụ thể", kbKey: "general" },
-    ],
-  },
-];
-
-const ALL_TOPICS: TarotTopic[] = [
-  ...TOPICS,
-  {
-    key: "general",
-    icon: "···",
-    label: "Xem Thêm",
-    subtitle: "Tất cả chủ đề",
-    lead: "Tổng hợp tất cả niche từ 5 lĩnh vực. Chọn nếu bạn đã có chủ đề cụ thể trong đầu.",
-    niches: TOPICS.flatMap((t) => t.niches),
-  },
-];
 
 const DEFAULT_QUESTION = "Tôi nên nhìn tình huống hiện tại như thế nào?";
 const STAGE_SEQUENCE: Exclude<Phase, "landing">[] = [
@@ -181,24 +83,36 @@ const STAGE_SEQUENCE: Exclude<Phase, "landing">[] = [
 ];
 
 export function TarotExperience() {
-  const { user } = useAuth();
+  const { signInAnonymouslyFn, user } = useAuth();
   const [phase, setPhase] = useState<Phase>("landing");
   const [modal, setModal] = useState<TarotModalKey>(null);
+  const [dailyRevealed, setDailyRevealed] = useState(false);
   const [theme, setTheme] = useState<ThemeKey>("love");
   const [niche, setNiche] = useState("Tổng quan");
   const [nicheKbKey, setNicheKbKey] = useState("general");
   const [nicheQuery, setNicheQuery] = useState("");
   const [question, setQuestion] = useState("");
   const [questionMode, setQuestionMode] = useState<QuestionMode>("suggested");
+  const [profileName, setProfileName] = useTarotProfileName(user?.displayName);
+  const [profileDob, setProfileDob] = useState("");
+  const [profileGender, setProfileGender] = useState("");
+  const [consciousnessPrompts, setConsciousnessPrompts] = useState(() => selectConsciousnessQuestions("love"));
   const [spread, setSpread] = useState<Spread>(3);
   const [session, setSession] = useState<ReadingSession | null>(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [flippedIndexes, setFlippedIndexes] = useState<number[]>([]);
   const [consciousnessStep, setConsciousnessStep] = useState(0);
-  const [kbSections, setKbSections] = useState<ReadingSection[] | null>(null);
-  const [kbLoading, setKbLoading] = useState(false);
-
+  const [clarifications, setClarifications] = useState<TarotAiReadingRequest["clarifications"]>([]);
+  const [additionalContext, setAdditionalContext] = useState("");
+  const [repeatWarningOpen, setRepeatWarningOpen] = useState(false);
+  const [repeatWarningBypassed, setRepeatWarningBypassed] = useState(false);
+  const [aiResponse, setAiResponse] = useState<TarotAiReadingResponse | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [history, setHistory] = useState<TarotHistoryEntry[]>([]);
+  const [historyStorageAvailable, setHistoryStorageAvailable] = useState(true);
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const localDate = useMemo(() => localTarotDateKey(), []);
   const dailyCard = useMemo(() => getDailyCard(todayStr), [todayStr]);
   const topic = useMemo(() => ALL_TOPICS.find((item) => item.key === theme) ?? ALL_TOPICS[0], [theme]);
   const readingSections = useMemo<ReadingSection[]>(() => (session ? buildReadingSections(session) : []), [session]);
@@ -213,83 +127,134 @@ export function TarotExperience() {
   const displayName = user?.displayName?.trim() || "Bạn";
   const usesStageShell =
     phase === "fieldSelect" || phase === "nicheSelect" || phase === "question" || phase === "spreadSelect";
-
   useEffect(() => {
     if (phase !== "ritualLoading") return undefined;
     const timer = window.setTimeout(() => setPhase("deckDraw"), 1800);
     return () => window.clearTimeout(timer);
   }, [phase]);
-
   useEffect(() => {
-    const seen = window.localStorage.getItem("tarot_daily_seen");
-    if (seen !== todayStr) {
+    setDailyRevealed(hasDailyDate(DAILY_REVEALED_KEY, todayStr));
+    if (!hasDailyDate(DAILY_SEEN_KEY, todayStr)) {
       setModal("daily");
     }
   }, [todayStr]);
-
-  async function fetchKbReading(drawnCards: ReadingSession["cards"], niche: string, q: string) {
-    setKbLoading(true);
+  async function fetchAiReading(
+    drawnCards: ReadingSession["cards"],
+    answers: TarotAiReadingRequest["clarifications"],
+  ) {
+    setAiLoading(true);
+    setAiError(null);
     try {
-      const base = process.env.NEXT_PUBLIC_KB_WORKER_URL ?? "http://localhost:8787";
-      const res = await fetch(`${base}/tarot/reading`, {
+      if (!user) await signInAnonymouslyFn();
+      const response = await fetchWithAuth<TarotAiReadingResponse>("/api/tarot/reading", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          profile: {
+            name: profileName.trim() || displayName,
+            dob: profileDob,
+            gender: profileGender,
+          },
+          themeLabel: session?.themeLabel ?? getThemeLabel(theme),
+          nicheLabel: niche,
+          nicheKey: nicheKbKey,
+          question: session?.question ?? question,
+          spread: session?.spread ?? spread,
           cards: drawnCards.map((card) => ({
-            name: card.nameEn,
+            id: card.id,
+            nameVi: card.nameVi,
+            nameEn: card.nameEn,
             orientation: card.orientation,
             position: card.position,
+            aspectMeaning: getCardMessage(card),
+            meaning: getCardMessage(card),
+            keywords: card.keywords,
           })),
-          niche,
-          question: q,
+          clarifications: answers,
+          additionalContext,
         }),
       });
-      if (!res.ok) return;
-      const data = await res.json() as { ok: boolean; sections?: ReadingSection[] };
-      if (data.ok && Array.isArray(data.sections) && data.sections.length > 0) {
-        setKbSections(data.sections);
+      setAiResponse(response);
+      if (session) {
+        const saved = saveTarotHistory(createTarotHistoryEntry(session, response));
+        setHistory(saved.entries);
+        setHistoryStorageAvailable(saved.storageAvailable);
       }
-    } catch {
-      // Silent fallback: buildReadingSections() remains available when the worker is offline.
+    } catch (error) {
+      setAiError(isAppError(error) ? error.message : ERROR_MESSAGES.NETWORK_ERROR);
     } finally {
-      setKbLoading(false);
+      setAiLoading(false);
     }
   }
-
   function finalizeSession() {
     const cleanQuestion = question.trim() || DEFAULT_QUESTION;
     setSession({ theme, themeLabel: getThemeLabel(theme), spread, question: cleanQuestion, cards: drawCards(spread) });
     setSelectedIndexes([]);
     setFlippedIndexes([]);
     setConsciousnessStep(0);
+    setClarifications([]);
+    setAdditionalContext("");
+    setAiResponse(null);
+    setAiError(null);
     setPhase("ritualLoading");
   }
-
   function chooseDeckCard(deckIndex: number) {
     if (!session || selectedIndexes.includes(deckIndex) || selectedIndexes.length >= session.cards.length) return;
     const next = [...selectedIndexes, deckIndex];
     setSelectedIndexes(next);
-    if (next.length >= session.cards.length) window.setTimeout(() => setPhase("spreadReveal"), 520);
+    if (next.length >= session.cards.length) {
+      const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 20 : 520;
+      window.setTimeout(() => setPhase("spreadReveal"), delay);
+    }
   }
-
   function reset() {
     setPhase("landing");
     setSession(null);
     setSelectedIndexes([]);
     setFlippedIndexes([]);
     setConsciousnessStep(0);
+    setClarifications([]);
+    setAdditionalContext("");
     setNiche("Tổng quan");
     setNicheKbKey("general");
     setNicheQuery("");
-    setKbSections(null);
-    setKbLoading(false);
+    setAiResponse(null);
+    setAiLoading(false);
+    setAiError(null);
+    setRepeatWarningOpen(false);
+    setRepeatWarningBypassed(false);
   }
-
+  function enterSpreadSelect() {
+    setPhase("spreadSelect");
+    if (!repeatWarningBypassed && hasCompletedTarotTheme(theme, localDate)) setRepeatWarningOpen(true);
+  }
   function handleCloseModal() {
     if (modal === "daily") {
-      window.localStorage.setItem("tarot_daily_seen", todayStr);
+      storeDailyDate(DAILY_SEEN_KEY, todayStr);
     }
     setModal(null);
+  }
+
+  function handleDailyReveal() {
+    setDailyRevealed(true);
+    storeDailyDate(DAILY_REVEALED_KEY, todayStr);
+  }
+
+  function handleDailyBegin() {
+    storeDailyDate(DAILY_SEEN_KEY, todayStr);
+    setModal(null);
+    setPhase("fieldSelect");
+  }
+
+  function handleOpenModal(nextModal: TarotModalKey) {
+    if (nextModal === "history") {
+      const loaded = loadTarotHistory();
+      setHistory(loaded.entries);
+      setHistoryStorageAvailable(loaded.storageAvailable);
+    }
+    if (nextModal === "daily") {
+      setDailyRevealed(hasDailyDate(DAILY_REVEALED_KEY, todayStr));
+    }
+    setModal(nextModal);
   }
 
   return (
@@ -297,7 +262,7 @@ export function TarotExperience() {
       {phase === "landing" ? (
         <LandingView
           onBegin={() => setPhase("fieldSelect")}
-          onOpenModal={setModal}
+          onOpenModal={handleOpenModal}
           onQuickStart={() => setPhase("nicheSelect")}
           setTheme={setTheme}
           theme={theme}
@@ -321,6 +286,9 @@ export function TarotExperience() {
             <FieldSelectView activeTheme={theme} onAdvance={(nextTheme) => {
               setTheme(nextTheme);
               setNiche("Tổng quan");
+              setConsciousnessPrompts(selectConsciousnessQuestions(nextTheme));
+              setAdditionalContext("");
+              setRepeatWarningBypassed(false);
               setPhase("nicheSelect");
             }} onSkip={() => setPhase("question")} topics={ALL_TOPICS} />
           ) : null}
@@ -333,6 +301,11 @@ export function TarotExperience() {
                 setNiche(label);
                 setNicheKbKey(kbKey);
                 setQuestion(SAMPLE_QUESTIONS[0]);
+                void loadNicheClarifyQuestions(
+                  kbKey,
+                  theme,
+                  () => user ? Promise.resolve() : signInAnonymouslyFn(),
+                ).then(setConsciousnessPrompts);
                 setPhase("question");
               }}
               topic={topic}
@@ -342,14 +315,20 @@ export function TarotExperience() {
             <QuestionView
               nicheKey={nicheKbKey}
               onBack={() => setPhase("nicheSelect")}
-              onContinue={() => setPhase("spreadSelect")}
+              onContinue={enterSpreadSelect}
               onSkip={() => {
                 setQuestion(DEFAULT_QUESTION);
-                setPhase("spreadSelect");
+                enterSpreadSelect();
               }}
               onSelectQuestion={setQuestion}
+              profileDob={profileDob}
+              profileGender={profileGender}
+              profileName={profileName}
               question={question}
               questionMode={questionMode}
+              setProfileDob={setProfileDob}
+              setProfileGender={setProfileGender}
+              setProfileName={setProfileName}
               setQuestionMode={setQuestionMode}
               setQuestion={setQuestion}
             />
@@ -365,20 +344,31 @@ export function TarotExperience() {
       {phase === "spreadReveal" && session ? (
         <SpreadRevealView
           flippedIndexes={flippedIndexes}
+          nicheKey={nicheKbKey}
+          nicheLabel={niche}
           onAnalysis={() => setPhase("consciousnessCheck")}
           onFlip={(index) => {
             if (!flippedIndexes.includes(index)) setFlippedIndexes((current) => [...current, index]);
           }}
+          profileDob={profileDob}
+          profileName={profileName.trim() || displayName}
           readyForAnalysis={readyForAnalysis}
           session={session}
         />
       ) : null}
       {phase === "consciousnessCheck" && session ? (
-        <ConsciousnessCheckView
-          onAnswer={(_answer) => {
+        <NicheConsciousnessCheckView
+          additionalContext={additionalContext}
+          onAdditionalContextChange={setAdditionalContext}
+          prompts={consciousnessPrompts}
+          onAnswer={(answer) => {
+            const prompt = consciousnessPrompts[consciousnessStep] ?? consciousnessPrompts[0];
+            const nextAnswers = [...clarifications, { question: prompt, answer }];
+            setClarifications(nextAnswers);
             if (consciousnessStep >= 2) {
+              markTarotThemeCompleted(theme, localDate);
               setPhase("finalReading");
-              void fetchKbReading(session.cards, nicheKbKey, session.question);
+              void fetchAiReading(session.cards, nextAnswers);
             } else {
               setConsciousnessStep((current) => current + 1);
             }
@@ -387,40 +377,73 @@ export function TarotExperience() {
           step={consciousnessStep}
         />
       ) : null}
-      {phase === "finalReading" && session ? <FinalReadingView onReset={reset} readingSections={kbSections ?? readingSections} session={session} /> : null}
+      {phase === "finalReading" && session ? (
+        <FinalReadingView
+          aiDisclosure={aiResponse?.disclosure}
+          aiError={aiError}
+          aiFallback={aiResponse?.fallback}
+          aiLoading={aiLoading}
+          aiReading={aiResponse?.reading ?? null}
+          nicheKey={nicheKbKey}
+          nicheLabel={niche}
+          onReset={reset}
+          profileDob={profileDob}
+          profileName={profileName.trim() || displayName}
+          readingSections={readingSections}
+          session={session}
+        />
+      ) : null}
+
+      {repeatWarningOpen ? (
+        <TarotUniverseWarning
+          onBack={() => {
+            setRepeatWarningOpen(false);
+            reset();
+          }}
+          onContinue={() => {
+            setRepeatWarningBypassed(true);
+            setRepeatWarningOpen(false);
+          }}
+        />
+      ) : null}
 
       {modal ? (
-        <ModalShell onClose={handleCloseModal}>
-          <h2 className="mb-4 text-2xl font-black text-[var(--bm-text-main)]">
-            {MINI_MODALS[modal].title}
-          </h2>
+        <ModalShell
+          label={MINI_MODALS[modal].title}
+          onClose={handleCloseModal}
+          panelClassName={modal === "dictionary" ? "tarot-dictionary-modal-panel" : undefined}
+        >
+          {modal !== "dictionary" && modal !== "daily" ? (
+            <h2 className="mb-4 text-2xl font-black text-[var(--bm-text-main)]">
+              {MINI_MODALS[modal].title}
+            </h2>
+          ) : null}
           {modal === "daily" && (
-            <div className="tarot-modal-daily">
-              <p className="tarot-modal-card-name">{dailyCard.card}</p>
-              <p className="mt-3 leading-relaxed text-[var(--bm-text-soft)]">{dailyCard.body}</p>
-            </div>
+            <TarotDailyCard
+              card={dailyCard}
+              onBegin={handleDailyBegin}
+              onClose={handleCloseModal}
+              onReveal={handleDailyReveal}
+              revealed={dailyRevealed}
+            />
           )}
           {modal === "history" && (
-            <div className="tarot-modal-empty">
-              <p className="text-[var(--bm-text-muted)]">Chưa có phiên trải bài nào được lưu.</p>
-              <p className="mt-2 text-sm text-[var(--bm-text-muted)]">
-                Hoàn thành một lượt trải bài để xem lại lịch sử.
-              </p>
-            </div>
+            <TarotHistoryView
+              entries={history}
+              onClear={() => {
+                const result = clearTarotHistory();
+                setHistory(result.entries);
+                setHistoryStorageAvailable(result.storageAvailable);
+              }}
+              onDelete={(id) => {
+                const result = deleteTarotHistoryEntry(id);
+                setHistory(result.entries);
+                setHistoryStorageAvailable(result.storageAvailable);
+              }}
+              storageAvailable={historyStorageAvailable}
+            />
           )}
-          {modal === "dictionary" && (
-            <div className="tarot-modal-dictionary">
-              <p className="mb-3 text-sm text-[var(--bm-text-muted)]">22 lá Ẩn chính (Major Arcana)</p>
-              <div className="tarot-modal-card-grid">
-                {MAJOR_NAMES.map(([vi, , keyword]) => (
-                  <div className="tarot-modal-card-item" key={vi}>
-                    <strong className="text-[var(--bm-text-main)]">{vi}</strong>
-                    <span className="text-sm text-[var(--bm-text-muted)]">{keyword}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {modal === "dictionary" && <TarotDictionary />}
           {modal === "topics" && (
             <div className="tarot-modal-topics">
               {TOPICS.map((topic) => (

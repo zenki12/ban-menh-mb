@@ -1,0 +1,202 @@
+.tarot-history {
+  display: grid;
+  gap: 1rem;
+}
+
+.tarot-history-privacy,
+.tarot-history-warning {
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: var(--bm-radius-md);
+  color: var(--bm-text-soft);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  padding: 0.85rem 1rem;
+}
+
+.tarot-history-warning {
+  border-color: var(--bm-border-gold);
+  color: var(--bm-gold-bright);
+}
+
+.tarot-history-list,
+.tarot-history-detail,
+.tarot-history-detail-cards {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.tarot-history-item {
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: var(--bm-radius-lg);
+  overflow: hidden;
+}
+
+.tarot-history-open {
+  align-items: center;
+  background: transparent;
+  color: inherit;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 4rem;
+  padding: 1rem;
+  text-align: left;
+  transition: background-color 160ms ease, border-color 160ms ease;
+  width: 100%;
+}
+
+.tarot-history-open:hover,
+.tarot-history-open:focus-visible {
+  background: color-mix(in srgb, var(--bm-primary) 10%, transparent);
+  outline: 2px solid var(--bm-primary-soft);
+  outline-offset: -2px;
+}
+
+.tarot-history-item-copy {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.tarot-history-item-copy time,
+.tarot-history-detail-heading time {
+  color: var(--bm-gold-bright);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tarot-history-item-copy strong {
+  color: var(--bm-text-main);
+  overflow-wrap: anywhere;
+}
+
+.tarot-history-item-copy span,
+.tarot-history-detail-heading p {
+  color: var(--bm-text-muted);
+  font-size: 0.8rem;
+}
+
+.tarot-history-thumbnails {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.tarot-history-thumbnails img {
+  border: 1px solid var(--bm-border-gold);
+  border-radius: 0.35rem;
+  height: 4.5rem;
+  object-fit: cover;
+  width: 2.8rem;
+}
+
+.tarot-history-thumbnails img.is-reversed,
+.tarot-history-detail-card img.is-reversed {
+  transform: rotate(180deg);
+}
+
+.tarot-history-delete {
+  background: color-mix(in srgb, var(--bm-danger) 7%, transparent);
+  border-top: 1px solid var(--bm-border-subtle);
+  color: var(--bm-danger-soft);
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  text-align: left;
+  width: 100%;
+}
+
+.tarot-history-delete:focus-visible {
+  outline: 2px solid var(--bm-danger-soft);
+  outline-offset: -3px;
+}
+
+.tarot-history-clear {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+}
+
+.tarot-history-detail-heading {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.tarot-history-detail-heading h3 {
+  color: var(--bm-text-main);
+  font-family: var(--bm-font-serif);
+  font-size: clamp(1.35rem, 4vw, 2rem);
+  overflow-wrap: anywhere;
+}
+
+.tarot-history-detail h4 {
+  color: var(--bm-gold-faint);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.tarot-history-reading-section p,
+.tarot-history-reading-section li {
+  color: var(--bm-text-soft);
+  line-height: 1.75;
+  margin-top: 0.55rem;
+}
+
+.tarot-history-reading-section ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.tarot-history-detail-card {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 5rem minmax(0, 1fr);
+}
+
+.tarot-history-detail-card img {
+  border: 1px solid var(--bm-border-gold);
+  border-radius: 0.6rem;
+  height: auto;
+  width: 100%;
+}
+
+.tarot-history-detail-card span {
+  color: var(--bm-gold-bright);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.tarot-history-disclaimer {
+  border-top: 1px solid var(--bm-border-subtle);
+  color: var(--bm-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  padding-top: 1rem;
+}
+
+@media (max-width: 480px) {
+  .tarot-history-open {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  .tarot-history-thumbnails img {
+    height: 5rem;
+    width: 3.1rem;
+  }
+
+  .tarot-history-clear,
+  .tarot-history-clear button {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .tarot-history-detail-card {
+    grid-template-columns: 4.25rem minmax(0, 1fr);
+  }
+}

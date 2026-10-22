@@ -1,6 +1,7 @@
-import type React from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Button, Card } from "../../components/ui";
 import { getCardMessage, type DrawnCard, type Spread } from "./tarot-data";
+import { TAROT_CARD_BACK_SRC, tarotCardImageSrc } from "./tarot-kb";
 
 export function RitualPulse() {
   return (
@@ -84,44 +85,6 @@ export function SpreadOption({
   );
 }
 
-export function DeckBack({
-  index,
-  selected,
-  disabled,
-  onClick,
-}: {
-  index: number;
-  selected: boolean;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  const rotate = (index % 13) - 6;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled || selected}
-      className={[
-        "tarot-card-back group relative h-40 rounded-2xl border transition duration-500 sm:h-48",
-        selected
-          ? "pointer-events-none -translate-y-3 border-[var(--bm-border-gold)] opacity-35"
-          : "border-[var(--bm-border-purple)] bg-[rgba(35,20,70,0.88)] hover:-translate-y-4 hover:border-[var(--bm-border-gold)] hover:shadow-[0_0_42px_rgba(251,191,36,0.22)]",
-        disabled ? "pointer-events-none opacity-40 grayscale" : "",
-      ].join(" ")}
-      style={{ transform: selected ? undefined : `rotate(${rotate}deg)` }}
-      aria-label={`Chọn lá bài ${index + 1}`}
-    >
-      <span className="absolute inset-3 rounded-xl border border-[rgba(251,191,36,0.25)]" />
-      <span className="absolute left-1/2 top-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[rgba(251,191,36,0.35)] text-3xl text-[var(--bm-gold-bright)]">
-        ✦
-      </span>
-      <span className="absolute bottom-4 left-0 right-0 text-center text-xs font-black uppercase tracking-[0.2em] text-[var(--bm-text-muted)]">
-        Tarot
-      </span>
-    </button>
-  );
-}
-
 export function SelectedSlot({
   card,
   flipped,
@@ -139,40 +102,41 @@ export function SelectedSlot({
         {card.position}
       </div>
       <button
+        aria-label={flipped ? `Xem lại chi tiết lá ${card.nameVi}` : `Lật lá bài ${index + 1}: ${card.position}`}
+        className={`tarot-reveal-card ${flipped ? "is-flipped" : ""}`}
+        id={`tarot-reveal-card-${index}`}
         type="button"
         onClick={onFlip}
-        className={[
-          "relative min-h-[280px] w-full overflow-hidden rounded-3xl border p-5 text-center transition duration-700",
-          flipped
-            ? "border-[var(--bm-border-gold)] bg-[rgba(25,16,38,0.94)] shadow-[0_0_44px_rgba(251,191,36,0.18)]"
-            : "border-[var(--bm-border-purple)] bg-[rgba(35,20,70,0.88)] hover:-translate-y-1",
-        ].join(" ")}
       >
-        <div className="grid min-h-[134px] place-items-center rounded-2xl border border-[var(--bm-border-subtle)] bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.16),rgba(124,58,237,0.10),transparent_70%)]">
-          <div
-            className={[
-              "grid size-24 place-items-center rounded-2xl border text-5xl transition duration-700",
-              flipped
-                ? "rotate-0 border-[var(--bm-border-gold)] bg-[rgba(251,191,36,0.12)] text-[var(--bm-gold-bright)]"
-                : "-rotate-6 border-[var(--bm-border-subtle)] bg-[rgba(255,255,255,0.04)] text-[var(--bm-text-muted)]",
-            ].join(" ")}
-          >
-            {flipped ? "✦" : "?"}
-          </div>
-        </div>
-        {flipped ? (
-          <>
-            <h3 className="mt-5 text-2xl font-black text-[var(--bm-text-main)]">{card.nameVi}</h3>
-            <p className="mt-1 text-sm text-[var(--bm-text-muted)]">{card.nameEn}</p>
-            <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-[var(--bm-gold-bright)]">
-              {card.orientation === "upright" ? "Chiều xuôi" : "Chiều ngược"}
-            </p>
-          </>
-        ) : (
-          <p className="mt-5 text-sm leading-7 text-[var(--bm-text-soft)]">
-            Chạm để lật lá số {index + 1}.
-          </p>
-        )}
+        <span className="tarot-reveal-card-inner">
+          <span aria-hidden={flipped} className="tarot-reveal-card-face tarot-reveal-card-back">
+            <img
+              alt=""
+              className="tarot-reveal-card-back-image"
+              decoding="async"
+              height={1536}
+              src={TAROT_CARD_BACK_SRC}
+              width={1024}
+            />
+            <span className="tarot-reveal-card-prompt">Chạm để lật lá số {index + 1}</span>
+          </span>
+
+          <span aria-hidden={!flipped} className="tarot-reveal-card-face tarot-reveal-card-front">
+            <img
+              alt=""
+              className={card.orientation === "reversed" ? "is-reversed" : undefined}
+              height={210}
+              loading="lazy"
+              src={tarotCardImageSrc(card)}
+              width={120}
+            />
+            <span className="tarot-reveal-card-copy">
+              <strong>{card.nameVi}</strong>
+              <span>{card.nameEn}</span>
+              <small>{card.orientation === "upright" ? "Chiều xuôi" : "Chiều ngược"}</small>
+            </span>
+          </span>
+        </span>
       </button>
     </article>
   );
@@ -213,17 +177,75 @@ export function AnalysisCard({ card }: { card: DrawnCard }) {
 
 export function ModalShell({
   children,
+  closeText = "Đóng",
+  label = "Hộp thoại Tarot",
   onClose,
+  panelClassName,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
+  closeText?: string;
+  label?: string;
   onClose: () => void;
+  panelClassName?: string;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialogRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const controls = [...dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )];
+      if (controls.length === 0) return;
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-[rgba(2,6,23,0.74)] px-4 py-6 backdrop-blur-md">
-      <div className="max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-[var(--bm-border-purple)] bg-[rgba(13,8,28,0.96)] p-5 shadow-[0_0_80px_rgba(124,58,237,0.26)] sm:p-7">
-        <div className="mb-5 flex justify-end">
-          <Button onClick={onClose} size="sm" variant="secondary">
-            Đóng
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-[rgba(2,6,23,0.74)] px-4 py-6 backdrop-blur-md"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div
+        aria-label={label}
+        aria-modal="true"
+        className={`max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-[var(--bm-border-purple)] bg-[rgba(13,8,28,0.96)] p-5 shadow-[0_0_80px_rgba(124,58,237,0.26)] sm:p-7 ${panelClassName ?? ""}`}
+        ref={dialogRef}
+        role="dialog"
+      >
+        <div className="tarot-modal-close-row mb-5 flex justify-end">
+          <Button aria-label="Đóng hộp thoại" onClick={onClose} size="sm" variant="secondary">
+            <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
+              <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+            </svg>
+            {closeText ? <span>{closeText}</span> : null}
           </Button>
         </div>
         {children}

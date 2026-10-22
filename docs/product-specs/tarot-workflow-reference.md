@@ -234,14 +234,14 @@ Result cần có:
 
 MVP:
 
-- Local history cho guest, giới hạn số item.
+- Local history cho guest dùng key `bm_tarot_history_v1`, giới hạn 15 phiên mới nhất, có xem lại chi tiết và xóa từng phiên/toàn bộ.
 
 P1:
 
 - Cloud history cho user login.
 - Filter theo topic/spread/date.
 
-Không lưu PII không cần thiết trong history.
+Không lưu họ tên, ngày sinh, giới tính, clarification, auth token hoặc payment data trong history. Câu hỏi Tarot được giữ vì cần để xem lại quẻ và phải có disclosure local-only rõ ràng.
 
 ### 6.9 Tarot Library / Sách Phép
 
@@ -303,7 +303,7 @@ Gợi ý cho Bản Mệnh V2:
 
 - Spread 10/12.
 - Manual reading.
-- AI/Gemini hybrid nếu có ADR mới.
+- Gemini hỗ trợ luận giải đã được duyệt trong ADR-009; mọi mở rộng AI khác cần quyết định riêng.
 - Streak/gamification.
 - Share result.
 - Advanced analytics.

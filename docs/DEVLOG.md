@@ -11,6 +11,666 @@
 
 ---
 
+## 2026-10-22 10:39 +07 — T-0719 hoàn tất trải nghiệm bộ bài 3D, xào và xòe bài
+
+Loại: UI + Interaction + Accessibility + Responsive + E2E
+
+Đã làm:
+
+- Thay lưới 78 lá tĩnh tại `deckDraw` bằng nghi thức ba trạng thái `idle` → `shuffling` → `fanned`, giữ nguyên thuật toán chọn bài và session hiện hữu.
+- Dựng chồng bài 3D bảy lớp dùng mặt lưng Celestial Compass, cho phép kích hoạt bằng nút “Xào Bài” hoặc trực tiếp trên cỗ bài.
+- Tạo hoạt cảnh xào hai nửa bộ bài đan xen trong 1,35 giây, kèm aura; khi bật `prefers-reduced-motion`, giao diện bỏ qua hoạt cảnh và mở quạt bài ngay.
+- Xòe 78 lá thành cung liền mạch trên desktop; hover/focus nâng lá và tạo viền vàng, lá được chọn bay xuống khay rồi tự chuyển sang `spreadReveal` khi đủ số lá của spread.
+- Trên mobile 375–430px, chuyển quạt bài thành vùng cuộn ngang cảm ứng có scroll snap, touch target tối thiểu 44px và tín hiệu lá kế bên; trang không phát sinh cuộn ngang ngoài vùng chủ đích.
+- Bổ sung semantic button, trạng thái `aria-pressed`, thông báo `aria-live`, điều hướng bàn phím và tự đưa focus vào lá đầu tiên khi quạt mở.
+- Tách toàn bộ style nghi thức sang file riêng, xóa component/style lưới mặt lưng cũ và cập nhật smoke test mặt lưng để theo luồng mới.
+- Hướng triển khai chịu ảnh hưởng từ `ui-ux-pro-max`: ưu tiên touch target, focus rõ, layout ổn định, chuyển động bằng transform/opacity và reduced motion.
+
+Không làm:
+
+- Không thay đổi cách xáo thứ tự dữ liệu, số lá của spread, bước lật bài, prompt Gemini, KB Tarot hoặc lịch sử phiên.
+- Không thêm dependency và không deploy production.
+- Không biến toàn trang thành vùng cuộn ngang; chỉ rail bài trên mobile được phép cuộn cảm ứng.
+
+File đã sửa/tạo:
+
+- `apps/web/src/modules/tarot/tarot-deck-ritual.tsx`
+- `apps/web/src/styles/tarot-deck-ritual.css`
+- `apps/web/src/modules/tarot/tarot-workflow-stages.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `apps/web/src/styles/tarot-workflow-stage.css`
+- `apps/web/src/styles/tarot-workflow.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `tools/tarot-deck-ritual-smoke.mjs`
+- `tools/tarot-card-back-smoke.mjs`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+File đã xóa:
+
+- `apps/web/src/styles/tarot-card-back.css` — style còn dùng đã được thay bởi stylesheet nghi thức mới; component `SelectedSlot` vẫn dùng asset mặt lưng chung.
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass; các file nguồn liên quan đều dưới giới hạn 600 dòng.
+- `npm run build` — pass; `/tarot` build thành công.
+- `node tools/tarot-deck-ritual-smoke.mjs` với Edge headless — pass: đủ ba trạng thái, 78 lá, hover, keyboard, chọn spread 3 lá, tự chuyển bước, mobile 375×812 cuộn ngang cảm ứng, reduced motion và không tràn viewport.
+- `node tools/tarot-card-back-smoke.mjs` — pass sau khi cập nhật selector theo nghi thức mới; Daily Card và `spreadReveal` tiếp tục dùng đúng mặt lưng/flip hiện hữu.
+- Review trực quan ảnh chụp desktop 1280×800 và mobile 375×812 — quạt bài nằm gọn trong stage, rail mobile dễ nhận biết có thể vuốt, khay bài không che CTA hoặc gây cuộn ngang trang.
+
+Rủi ro còn lại:
+
+- 78 nút chỉ được mount sau khi xào để giảm chi phí ở trạng thái đầu; tất cả dùng chung một URL ảnh đã cache, nhưng thiết bị rất yếu vẫn có thể chịu chi phí compositing khi quạt mở.
+- Build vẫn có cảnh báo Next.js hiện hữu về convention `middleware` deprecated; ngoài phạm vi T-0719.
+- Workspace là snapshot không có `.git`, nên không thể lấy `BASE_SHA`/`HEAD_SHA` hoặc gửi request review theo SHA; đã tự review interaction, accessibility, responsive và phạm vi thay đổi, không có finding P0/P1.
+
+## 2026-10-22 10:17 +07 — T-0718 hoàn tất mặt lưng Celestial Compass Tarot
+
+Loại: UI Asset + Interaction + Accessibility + E2E
+
+Đã làm:
+
+- Sao chép ảnh nguồn `Celestial Compass Tarot Card Back.png` vào `apps/web/public/tarot_cards/card-back.png`; URL web thống nhất là `/tarot_cards/card-back.png`.
+- Tạo hằng `TAROT_CARD_BACK_SRC` để `DeckBack`, `SelectedSlot` và Daily Card dùng chung một đường dẫn, tránh hardcode lặp lại.
+- Thay toàn bộ khung CSS/SVG mặt lưng cũ bằng ảnh Celestial Compass tại bàn 78 lá, bước lật bài và popup Thông điệp mỗi ngày.
+- Giữ flip 3D của Daily/Reveal, nhãn “Chạm để lật lá số”, bo góc và aura. Ảnh dùng kích thước khai báo 1024×1536, `object-fit` phù hợp và `alt=""` vì nút đã có accessible name.
+- Sửa transform bàn 78 lá bằng CSS variable để góc nghiêng và hiệu ứng nâng khi hover hoạt động đồng thời; thêm reduced-motion cho transition mặt lưng.
+- Tách style sang `tarot-card-back.css` sau khi lint phát hiện `tarot-workflow-stage.css` vượt giới hạn 600 dòng.
+- Hướng triển khai chịu ảnh hưởng từ `ui-ux-pro-max`: khai báo kích thước chống CLS, không lặp semantic của ảnh trang trí, giữ keyboard interaction và reduced motion.
+
+Không làm:
+
+- Không thay đổi ảnh mặt trước, thuật toán chọn/rút bài, dữ liệu Daily Card, modal chi tiết hoặc prompt Gemini.
+- Không chuyển đổi ảnh nguồn sang WebP/AVIF vì task yêu cầu URL PNG cố định; file PNG gốc 3.207.713 byte được giữ nguyên và trình duyệt tái sử dụng qua cache.
+- Không deploy production.
+
+File đã sửa/tạo:
+
+- `apps/web/public/tarot_cards/card-back.png`
+- `apps/web/src/modules/tarot/tarot-kb.ts`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `apps/web/src/modules/tarot/tarot-daily-card.tsx`
+- `apps/web/src/styles/tarot-card-back.css`
+- `apps/web/src/styles/tarot-spread-reveal.css`
+- `apps/web/src/styles/tarot-daily-card.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `tools/tarot-card-back-smoke.mjs`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass sau khi tách stylesheet; không có file nguồn vượt 600 dòng.
+- `npm run build` — pass; `/tarot` prerender thành công.
+- `node tools/tarot-card-back-smoke.mjs` với Edge headless — pass: ảnh đúng URL/kích thước tại Daily, đủ 78 ảnh ở deck, hover/nghiêng, reveal flip, keyboard Enter, reduced motion và viewport 375×812 không tràn ngang.
+
+Rủi ro còn lại:
+
+- Asset PNG khoảng 3,2 MB có thể làm lần tải đầu chậm trên mạng yếu dù chỉ tải một URL và được cache; có thể tối ưu lossless hoặc tạo biến thể responsive trong task hiệu năng riêng nếu cần.
+- Build vẫn có cảnh báo Next.js hiện hữu về convention `middleware` deprecated; ngoài phạm vi T-0718.
+- Workspace là snapshot không có `.git`, nên không thể lấy `BASE_SHA`/`HEAD_SHA` hoặc gửi request review theo SHA; đã tự review phạm vi asset, interaction, accessibility và responsive, không có finding P0/P1.
+
+## 2026-10-22 09:52 +07 — T-0717 hoàn tất thư viện 1.544 Mật Mã Cộng Hưởng
+
+Loại: Feature + Private KB + Security + UI/UX + E2E
+
+Đã làm:
+
+- Bổ sung tab `Mật Mã Cộng Hưởng` cạnh `78 Lá Bài`, bộ lọc 2/3/4/5 lá, tìm kiếm không dấu theo tên combo/tên lá, phân trang cố định 15 mục và đầy đủ loading/error/empty state.
+- Xây màn chi tiết trong modal Từ điển hiện hữu: header vàng kim, ảnh ghép, phương trình lá và Accordion 5 lĩnh vực → ngách → hai khối Xuôi/Ngược. Dùng một modal boundary để Escape, click outside, focus trap/restoration và body scroll lock không xung đột.
+- Tạo contract Zod dùng chung, taxonomy 5 lĩnh vực/70 ngách, hai Next API `GET /api/tarot/combos` và `GET /api/tarot/combos/:comboId`, cùng route KB Worker tương ứng.
+- Index chỉ trả metadata tối đa 15 mục/trang; detail chỉ đọc khi người dùng mở một combo. Worker dùng KV/R2, local fallback chỉ đọc KB canonical ở server; client không nhận raw index, `detail_file` hay đường dẫn private.
+- Thêm Firebase Auth, quota riêng cho thư viện, ID allowlist, timeout proxy và log lỗi tổng quát không chứa PII/query raw.
+- Thêm smoke nguồn KB và Playwright E2E cho lọc/tìm kiếm/phân trang/Accordion/focus/Escape/mobile 375px. Hướng UI chịu ảnh hưởng từ `ui-ux-pro-max`: hierarchy rõ, focus nhìn thấy, skeleton giữ layout và tránh nested modal.
+- Cập nhật data contract, module Tarot, Threat Model và Risk Register R-022.
+
+Không làm:
+
+- Không đưa `combo_index.json`, `combos/details/*.json` hoặc nội dung KB private vào `public`/client bundle.
+- Không thay đổi thuật toán combo ở màn kết quả T-0716, prompt Gemini, entitlement/payment hoặc deploy production.
+- Không bỏ Auth để phục vụ kiểm thử; môi trường hiện không cấp Firebase Anonymous token cho browser headless nên live request bị từ chối đúng `401`, còn UI được kiểm bằng fixture đúng schema và kho thật được kiểm riêng.
+- Không tuyên bố pixel-perfect với ảnh mẫu không có trong workspace; triển khai bám đúng cấu trúc và hành vi đã mô tả trong task.
+
+File đã sửa/tạo:
+
+- `packages/shared/src/tarot-combo-taxonomy.ts`
+- `packages/shared/src/schemas/tarot-combo-library.ts`
+- `packages/shared/src/schemas/index.ts`
+- `packages/shared/src/index.ts`
+- `workers/kb/src/lib/tarot-kb-loader.ts`
+- `workers/kb/src/routes/tarot-combo-library.ts`
+- `workers/kb/src/index.ts`
+- `apps/web/src/lib/tarot/local-tarot-kb.ts`
+- `apps/web/src/lib/tarot/rate-limit.ts`
+- `apps/web/src/app/api/tarot/combos/route.ts`
+- `apps/web/src/app/api/tarot/combos/[comboId]/route.ts`
+- `apps/web/src/modules/tarot/tarot-dictionary.tsx`
+- `apps/web/src/modules/tarot/tarot-combo-library.tsx`
+- `apps/web/src/modules/tarot/tarot-combo-detail-modal.tsx`
+- `apps/web/src/styles/tarot-combo-library.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `tools/tarot-combo-library-smoke.mjs`
+- `tools/tarot-combo-source-smoke.mjs`
+- `docs/product-specs/data-contract.md`
+- `docs/product-specs/security-threat-model.md`
+- `docs/modules/tarot.md`
+- `docs/RISK_REGISTER.md`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm run build` — pass; hai route combo library được build dạng dynamic server route.
+- `node node_modules/typescript/bin/tsc -p workers/kb/tsconfig.json` — pass.
+- Hai request list/detail không token — đều trả `401`.
+- `node tools/tarot-combo-source-smoke.mjs` — pass: 1.544 combo, phân bố 1.195/240/34/75, đủ 78 lá, không thiếu file detail.
+- `node tools/tarot-combo-library-smoke.mjs` với Edge headless — pass: 15 mục/trang, filter + search, phân trang, 5 lĩnh vực, Xuôi/Ngược, focus, Escape và viewport 375x812 không tràn ngang.
+- Scan `apps/web/.next/static` — không có `combo_index.json`, `combos/details`, đường dẫn KB canonical hoặc `tarot_kb/combos`.
+
+Rủi ro còn lại:
+
+- Firebase Anonymous chưa cấp token trong browser headless local, nên tích hợp live Auth + dữ liệu thật cần được chạy lại ở môi trường dev có Firebase cấu hình; route đã fail-closed `401` và không hạ bảo vệ để test.
+- Thư viện hợp lệ vẫn có thể bị thu thập chậm qua nhiều request; R-022 ghi rõ Auth, quota, pagination, lazy detail và yêu cầu telemetry/WAF trước production.
+- Workspace là snapshot không có `.git`, nên không thể lấy `BASE_SHA`/`HEAD_SHA` hoặc gửi code review theo SHA; đã tự review API boundary, schema, accessibility và static artifact. Không có finding P0/P1 mới.
+- Build vẫn có cảnh báo Next.js hiện hữu về convention `middleware` deprecated; ngoài phạm vi T-0717.
+
+## 2026-10-22 00:37 +07 — T-0716 hoàn tất Combo Cộng Hưởng Định Mệnh Tarot
+
+Loại: Feature + Private KB + Security + UI/UX + E2E
+
+Đã làm:
+
+- Tạo contract Zod dùng chung cho request/response combo; client chỉ gửi ID, tên và chiều của các lá đã rút, nhận tối đa ba combo đã khớp thay vì raw index/detail.
+- Bổ sung `findMatchedCombos` tại KB Worker: so khớp không phân biệt hoa/thường, không phụ thuộc thứ tự phiên trải, chuẩn hóa tên số `Two`/`2`, hỗ trợ combo 2/3/4/5 lá và dựng orientation variant theo đúng thứ tự canonical của index.
+- Nâng endpoint KB Worker `/tarot/combo` bằng POST, Firebase Auth, rate limit, Zod, nội dung đúng `nicheKey`/variant và lỗi không log raw PII; giữ GET cũ để không phá tương thích.
+- Tạo Next route `/api/tarot/combo` có Auth, quota, proxy timeout 5 giây và fallback server-only đọc KB canonical; thiếu Worker/KB trả danh sách rỗng HTTP 200 để không làm sập bài luận giải.
+- Xây khối `Cộng Hưởng Định Mệnh` trong `FinalReadingView`: sigil SVG quay nhẹ, cấp danh hiệu theo số lá, tiêu đề Việt/Anh, ảnh đúng chiều với dấu cộng, bài luận giải chuyên sâu và nhãn test mode.
+- Tối ưu mobile 375px bằng wrap linh hoạt, ảnh giữ tỉ lệ, nội dung không tràn ngang; tắt chuyển động sigil khi `prefers-reduced-motion: reduce`.
+- Tên hồ sơ `Turniodev` kích hoạt combo mẫu ngẫu nhiên ở local/dev; gate ở cả Next route và Worker, chặn hostname production, production flag mặc định `false` và không gửi raw họ tên qua API combo.
+- Cập nhật data contract, module Tarot, Environment, Threat Model và Risk Register R-021. Hướng UI chịu ảnh hưởng trực tiếp từ checklist `ui-ux-pro-max`: hierarchy rõ, chỉ một chuyển động trang trí và tôn trọng reduced motion.
+
+Không làm:
+
+- Không đưa `combo_index.json`, `details/*.json` hoặc KB private vào frontend/public/static bundle.
+- Không thay đổi các lá đã rút, prompt Gemini, lịch sử Tarot, entitlement/payment hoặc deploy production.
+- Không sửa endpoint GET combo cũ ngoài việc bổ sung endpoint POST mới tương thích với contract T-0716.
+
+File đã sửa/tạo:
+
+- `packages/shared/src/schemas/tarot-combo.ts`
+- `packages/shared/src/schemas/index.ts`
+- `workers/kb/src/lib/tarot-kb-loader.ts`
+- `workers/kb/src/index.ts`
+- `workers/kb/wrangler.toml`
+- `apps/web/src/app/api/tarot/combo/route.ts`
+- `apps/web/src/lib/tarot/local-tarot-kb.ts`
+- `apps/web/src/modules/tarot/tarot-destiny-combo.tsx`
+- `apps/web/src/modules/tarot/tarot-workflow-stages.tsx`
+- `apps/web/src/styles/tarot-ai-reading.css`
+- `apps/web/.env.example`
+- `tools/tarot-destiny-combo-smoke.mjs`
+- `docs/product-specs/data-contract.md`
+- `docs/product-specs/security-threat-model.md`
+- `docs/modules/tarot.md`
+- `docs/ENVIRONMENT.md`
+- `docs/RISK_REGISTER.md`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass; các file nguồn liên quan đều dưới 600 dòng.
+- `npm run build` — pass; route `/api/tarot/combo` được build dạng dynamic server route.
+- `npx tsc -p workers/kb/tsconfig.json` — pass.
+- Unit smoke `findMatchedCombos` — pass cho 2/3/4/5 lá, thứ tự đảo, alias số và variant chiều canonical.
+- Smoke nguồn thật — pass với đủ 1.544 entry; `The Devil + The Lovers` khớp `the devil_the lovers`, nạp đúng `love/Up_Rev`.
+- Request `POST /api/tarot/combo` không token — trả `401`.
+- `node tools/tarot-destiny-combo-smoke.mjs` với Edge headless — pass: trigger `Turniodev`, sigil, tiêu đề Việt/Anh, hai ảnh, dấu cộng, bài luận giải, nhãn test mode, reduced motion và viewport 375x812 không tràn ngang.
+- Scan `apps/web/.next/static` không phát hiện đường dẫn KB canonical, `combo_index.json` hoặc `combos/details`.
+
+Rủi ro còn lại:
+
+- Dev/test triển khai phải bật `TAROT_COMBO_TEST_MODE=true` đồng thời ở Next.js và KB Worker; production phải giữ `false` theo ENVIRONMENT.
+- Workspace là snapshot không có `.git`, vì vậy không thể lấy `BASE_SHA`/`HEAD_SHA` hoặc gửi review theo mẫu SHA trong AGENTS.md; đã tự review contract, boundary private KB, Auth/rate limit và static artifact. Không có finding P0/P1 mới.
+- Build vẫn phát cảnh báo Next.js hiện hữu về convention `middleware` đã deprecated; ngoài phạm vi T-0716.
+
+## 2026-10-22 00:06 +07 — T-0715 hoàn tất Modal ý nghĩa tuần tự trong bước lật bài Tarot
+
+Loại: Feature + UI/UX + Accessibility + E2E
+
+Đã làm:
+
+- Tách `SpreadRevealView` thành module chuyên trách, điều phối trạng thái lá đang lật, lá đang xem và danh sách lá đã mở mà không thay đổi state machine cấp ứng dụng.
+- Khi người dùng lật một lá úp, thẻ chạy hiệu ứng 3D bằng transform rồi tự mở `TarotReadingCardDetail`; nếu hệ điều hành bật reduced-motion, hiệu ứng được rút xuống tức thời và modal không chờ 620ms.
+- Tái sử dụng private card-detail API của T-0712 để hiển thị ảnh đúng chiều, vị trí, tên, hành tinh, cung, nguyên tố, thần số, ý nghĩa, từ khóa và nội dung đúng niche trước bước tâm thức; không đưa raw KB vào client/static asset.
+- Bổ sung footer tiến độ “còn N lá chưa lật”, CTA trả focus đến lá chưa mở kế tiếp, carousel Trước/Sau chỉ duyệt tập lá đã lật và chỉ cho phép sang kết nối tâm thức khi toàn bộ spread đã mở.
+- Giữ CTA dự phòng trên màn reveal sau khi đủ lá để người dùng không bị mắc kẹt nếu đóng modal bằng X, Escape hoặc click outside.
+- Bổ sung ảnh thật ở mặt trước thẻ sau flip, xử lý lá ngược, nhãn truy cập theo vị trí, focus ring, SVG điều hướng và breakpoint mobile.
+- Mở rộng `TarotReadingCardDetail` bằng footer tùy chọn và reset fallback tức thời khi carousel đổi lá, tránh hiển thị tạm nội dung của lá trước trong lúc chờ API.
+- Tách CSS flip thành file riêng sau khi lint phát hiện stylesheet workflow vượt giới hạn; `tarot-workflow-stages.tsx` còn 547 dòng và `tarot-workflow-stage.css` còn 580 dòng.
+
+Không làm:
+
+- Không thay đổi API/schema, Worker, Auth, rate limit, quota, Gemini prompt hoặc private KB contract.
+- Không mở thêm spread ngoài phạm vi hiện có và không deploy production.
+
+File đã sửa/tạo:
+
+- `apps/web/src/modules/tarot/tarot-spread-reveal.tsx`
+- `apps/web/src/modules/tarot/tarot-workflow-stages.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `apps/web/src/modules/tarot/tarot-reading-card-detail.tsx`
+- `apps/web/src/styles/tarot-spread-reveal.css`
+- `apps/web/src/styles/tarot-workflow-stage.css`
+- `apps/web/src/styles/tarot-reading-card-detail.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `tools/tarot-spread-reveal-detail-smoke.mjs`
+- `tools/tarot-card-detail-smoke.mjs`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass; toàn bộ file nguồn dưới giới hạn 600 dòng.
+- `npm run build` — pass; `/tarot`, `/api/tarot/card/[cardId]` và `/api/tarot/reading` build thành công.
+- `node tools/tarot-spread-reveal-detail-smoke.mjs` — pass: spread ba lá, modal tự mở theo từng lá, tiến độ 2 → 1 → 0, carousel chỉ qua lá đã mở, focus lá tiếp theo, gate tâm thức, ba câu clarification và kết quả Gemini cuối.
+- Smoke ba lá pass tại 375x812 và landscape 812x375, không tràn ngang, body scroll lock đúng và reduced-motion hoạt động.
+- `node tools/tarot-card-detail-smoke.mjs` — regression pass cho flow một lá, badge chiêm tinh/thần số, ảnh ngược, Escape, click outside và focus restoration.
+
+Rủi ro còn lại:
+
+- Build vẫn phát cảnh báo Next.js hiện hữu về convention `middleware` đã deprecated; không thuộc phạm vi T-0715.
+
+## 2026-10-21 21:40 +07 — T-0714 hoàn tất header Modal chi tiết lá bài Tarot
+
+Loại: UI/UX + Accessibility + E2E
+
+Đã làm:
+
+- Xác nhận T-0712 đã có đầy đủ modal chuyên sâu tại `FinalReadingView`: dữ liệu private KB đi qua API có Auth/rate limit, ảnh đúng chiều, thông tin chiêm tinh, thần số, ý nghĩa, từ khóa và luận giải đúng niche; không sao chép raw `cards.json` vào frontend.
+- Hoàn thiện header theo thứ tự `{Họ tên} [đồng hồ] {DD/MM/YYYY} · {Tên ngách}`; thay emoji bằng SVG outline ổn định, ẩn biểu tượng trang trí khỏi accessibility tree và dùng phần tử `time` cho ngày sinh.
+- Bỏ ép chữ hoa ở header, giữ đúng cách viết tên/ngách và cho phép nội dung wrap theo nhịp nhỏ để không tràn ở mobile.
+- Đồng bộ smoke fixture modal với endpoint Niche Clarify của T-0713 và bổ sung assertion cho tên, ngày sinh, ngách cùng SVG đồng hồ.
+
+Không làm:
+
+- Không thay đổi API/schema, Worker, Auth, rate limit, private KB hoặc nội dung luận giải đã nghiệm thu tại T-0712.
+- Không deploy production.
+
+File đã sửa:
+
+- `apps/web/src/modules/tarot/tarot-reading-card-detail.tsx`
+- `apps/web/src/styles/tarot-reading-card-detail.css`
+- `tools/tarot-card-detail-smoke.mjs`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm run build` — pass; route `/api/tarot/card/[cardId]` tiếp tục build thành công.
+- `node tools/tarot-card-detail-smoke.mjs` với Edge headless — pass tại 375x812 cho flow Sự nghiệp → Xin Việc Làm; xác nhận header tên/đồng hồ/ngày sinh/ngách, badge Sao Hỏa/Bạch Dương/Số 2, ảnh lá ngược, Escape, click outside, body scroll lock, focus restoration và không tràn ngang.
+
+Rủi ro còn lại:
+
+- Build vẫn phát cảnh báo Next.js hiện hữu về convention `middleware` đã deprecated; không thuộc phạm vi T-0714.
+
+## 2026-10-21 20:30 +07 — T-0713 hoàn tất Niche Clarify và cảnh báo trải bài lặp
+
+Loại: Feature + Private KB API + UI/UX + Privacy + E2E
+
+Đã làm:
+
+- Đối chiếu trực tiếp `clarify/clarify_questions.json` canonical: 1.659 câu, tối đa 219 ký tự, có các nhóm chi tiết như `job_search`, `ex`, `promotion`; xác nhận nhóm `job_search` chứa câu hỏi về nộp hồ sơ, trì hoãn và than vãn về tình hình thất nghiệp.
+- Bổ sung `GET /tarot/clarify?niche=...` tại KB Worker: Firebase Auth, rate limit theo IP, validate niche, lấy ngẫu nhiên không lặp đúng ba câu và không trả raw dump của kho private.
+- Thêm Next.js proxy `/api/tarot/clarify` với Firebase Admin verification, Zod input/output, timeout 6 giây, `no-store` và lỗi tiếng Việt an toàn. Frontend preload theo đúng `nicheKey`; nếu Worker chưa khả dụng thì fallback về kho câu hỏi theo chủ đề hiện có để luồng không crash.
+- Nâng cấp `consciousnessCheck`: ba câu CÓ/KHÔNG theo niche, nút “CHIA SẺ THÊM THÔNG TIN” mở textarea có label, focus rõ, giới hạn 1.000 ký tự và bộ đếm. Phần chia sẻ thêm được validate, đưa vào prompt trong delimiter dữ liệu không tin cậy và được kiểm tra safety; không lưu vào local history hoặc log.
+- Ghi dấu `${theme}_${date}` vào localStorage bằng helper có `try/catch` khi người dùng hoàn thành ba câu tâm thức và chuyển sang kết quả.
+- Khi vào `spreadSelect` lần nữa với cùng chủ đề trong ngày, hiển thị popup “Vũ Trụ Đã Lên Tiếng” với SVG trăng khuyết, copy cảnh báo, “Quay Lại” về landing và “Tiếp Tục” cho phép đi tiếp. Modal tái sử dụng focus trap, Escape, click outside, trả focus và body scroll lock.
+- Tách taxonomy Tarot sang `tarot-topics.ts` để `TarotExperience.tsx` còn 512 dòng và toàn bộ file liên quan tiếp tục dưới giới hạn 600 dòng.
+
+Không làm:
+
+- Không sao chép `clarify_questions.json` vào frontend, `public` hoặc production artifact; frontend chỉ nhận ba câu tối thiểu qua API.
+- Không deploy Worker/production và không ghi dữ liệu vào KV remote trong task này; Product Owner vẫn phải duyệt release và nạp canonical JSON vào key `kb-tarot-clarify` theo quy trình private.
+- Không lưu phần chia sẻ thêm hoặc ba câu trả lời Có/Không vào local history.
+
+File chính đã sửa/thêm:
+
+- `packages/shared/src/schemas/tarot-clarify.ts`
+- `packages/shared/src/schemas/tarot-ai.ts`
+- `packages/shared/src/schemas/index.ts`
+- `workers/kb/src/lib/tarot-kb-loader.ts`
+- `workers/kb/src/index.ts`
+- `workers/kb/README.md`
+- `apps/web/src/app/api/tarot/clarify/route.ts`
+- `apps/web/src/app/api/tarot/reading/route.ts`
+- `apps/web/src/lib/tarot/gemini.ts`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-niche-clarify.ts`
+- `apps/web/src/modules/tarot/tarot-niche-consciousness.tsx`
+- `apps/web/src/modules/tarot/tarot-repeat-warning.ts`
+- `apps/web/src/modules/tarot/tarot-universe-warning.tsx`
+- `apps/web/src/modules/tarot/tarot-topics.ts`
+- `apps/web/src/modules/tarot/tarot-workflow-stages.tsx`
+- `apps/web/src/styles/tarot-clarify-warning.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `tools/tarot-niche-clarify-smoke.mjs`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm tra đã chạy:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm run build` — pass; route `/api/tarot/clarify` được build thành công, 38/38 trang generated.
+- `npx tsc -p workers/kb/tsconfig.json --noEmit` — pass.
+- `GET /api/tarot/clarify?niche=job_search` không có Bearer token — trả `401 AUTH_REQUIRED` với thông báo tiếng Việt an toàn.
+- `node tools/tarot-niche-clarify-smoke.mjs` với Edge headless — pass tại 375x812: đúng ba câu `job_search`, context tùy chọn đi vào AI request, lưu dấu chủ đề/ngày, popup xuất hiện ở lượt hai, hai CTA hoạt động, body scroll lock và không tràn ngang.
+- Quét `apps/web/src`, `apps/web/public` và `apps/web/.next` theo câu canonical về thất nghiệp — không có kết quả; raw clarify KB không nằm trong frontend/static artifact.
+
+Rủi ro còn lại:
+
+- Dev/prod Worker cần được deploy và key `kb-tarot-clarify` cần được nạp từ nguồn canonical private sau khi Product Owner duyệt; trước đó UI dùng fallback theo chủ đề.
+- Build vẫn phát cảnh báo Next.js hiện hữu về convention `middleware` đã deprecated; không thuộc phạm vi T-0713.
+
+## 2026-10-21 20:09 +07 — T-0712 hoàn tất Modal chi tiết lá bài chuyên sâu
+
+Loại: Feature + API/KB + UI/UX + Accessibility + E2E
+
+Đã làm:
+
+- Cho phép click từng lá trong `FinalReadingView` để mở modal chi tiết hai cột trên desktop và một cột trên mobile; hiển thị hồ sơ người xem, ảnh đúng chiều, vị trí, tên Việt/Anh, hành tinh, cung, nguyên tố, thần số, ý nghĩa, từ khóa và luận giải đúng niche.
+- Mở rộng `GET /tarot/card/:cardId` tại KB Worker với Firebase Auth, rate limit, validate card/niche/chiều và payload tối thiểu; raw Tarot KB vẫn nằm sau Worker, không được đưa vào bundle hoặc public assets.
+- Thêm Next.js proxy `/api/tarot/card/[cardId]` với Firebase Admin verification, Zod input/output, timeout, `no-store` và thông báo lỗi an toàn; frontend có cache theo phiên và fallback từ bài luận hiện tại.
+- Hoàn thiện accessibility: focus trap, nút X, Escape, click outside, trả focus về thẻ vừa mở, khóa body scroll, focus-visible và reduced-motion.
+- Bổ sung smoke test cho luồng Sự nghiệp → Xin Việc Làm tại viewport 375x812, bao gồm badge chiêm tinh, mục `TRONG XIN VIỆC LÀM`, ảnh lá ngược 180 độ, không tràn ngang, Escape, click outside và focus restoration.
+
+Không làm:
+
+- Không sao chép raw KB sang frontend/public và không deploy KB Worker hoặc production; deployment tiếp tục cần Product Owner duyệt.
+- Không thay đổi stack, pricing, entitlement hoặc phạm vi các module khác.
+
+File chính đã sửa/thêm:
+
+- `apps/web/src/modules/tarot/tarot-reading-card-detail.tsx`
+- `apps/web/src/modules/tarot/tarot-workflow-stages.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `apps/web/src/styles/tarot-reading-card-detail.css`
+- `apps/web/src/styles/tarot-ai-reading.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `apps/web/src/app/api/tarot/card/[cardId]/route.ts`
+- `workers/kb/src/index.ts`
+- `workers/kb/src/lib/tarot-kb-loader.ts`
+- `packages/shared/src/schemas/tarot-card-detail.ts`
+- `packages/shared/src/schemas/index.ts`
+- `tools/tarot-card-detail-smoke.mjs`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm tra đã chạy:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm run build` — pass; route `/api/tarot/card/[cardId]` được build thành công.
+- `npx tsc -p workers/kb/tsconfig.json --noEmit` — pass.
+- `GET /api/tarot/card/1?niche=xin-viec-lam&reversed=true` không có Bearer token — trả `401 AUTH_REQUIRED` với thông báo tiếng Việt an toàn.
+- `node tools/tarot-card-detail-smoke.mjs` với Edge headless — pass tại 375x812 cho luồng Sự nghiệp → Xin Việc Làm; xác nhận lá ngược, badge Sao Hỏa/Bạch Dương/Số 2, Escape, click outside, body scroll lock, không tràn ngang và focus restoration.
+
+Rủi ro còn lại:
+
+- Endpoint Worker mở rộng cần được deploy theo release runbook sau khi Product Owner duyệt; trước deploy, môi trường đang trỏ Worker cũ sẽ dùng fallback an toàn từ nội dung luận giải hiện tại.
+- Build vẫn phát cảnh báo Next.js hiện hữu về convention `middleware` đã deprecated; không thuộc phạm vi T-0712.
+
+## 2026-10-21 18:05 +07 — T-0711 hoàn tất Hyper-personalization Tarot
+
+Loại: Feature + AI prompt + UI/UX + E2E
+
+Đã làm:
+
+- Thiết kế lại khối hồ sơ tùy chọn ở `QuestionView` với tiêu đề “Kết nối tần số năng lượng của bạn”, mô tả mục đích, nhãn truy cập đầy đủ, tên/biệt danh, ngày sinh và lựa chọn Nam/Nữ/Khác. Nếu Firebase user có `displayName`, tên được điền sẵn nhưng không ghi đè nội dung người dùng đã sửa; bỏ trống vẫn mặc định là “Bạn”.
+- Thay ba câu hỏi tâm thức dùng chung bằng kho sáu câu cho từng nhóm `love`, `career`, `finance`, `self`, `general` và thêm pool an toàn cho `health`; mỗi phiên xáo trộn và cố định ba câu theo đúng chủ đề đã chọn.
+- Thêm helper kiểm tra ngày sinh hợp lệ, tính 12 Cung Hoàng Đạo, bốn Nguyên tố và Con số năng lượng. Ca mẫu `1997-07-20` cho kết quả Cự Giải / Nước / 8.
+- Nâng prompt Gemini để gọi tên người xem xuyên suốt, dùng cách xưng hô theo giới tính, kết nối Cung/Nguyên tố với lá xuôi-ngược, khai thác ba clarification để tìm gốc rễ, phân tích cộng hưởng và tạo đúng ba hành động riêng. Gỡ yêu cầu viết ngắn và lệnh cấm tính chiêm tinh từ ngày sinh.
+- Đặt `temperature: 0.85`, `maxOutputTokens: 3000`; giữ nguyên ranh giới chống prompt injection, timeout, schema Zod, safety settings và fallback an toàn.
+- Bổ sung smoke test Edge headless cho toàn bộ flow 375x812 với Hương / 1997-07-20 / Tình yêu, gồm kiểm tra pool câu hỏi đúng chủ đề, không tràn ngang và bản Gemini thật có tên Hương, Cự Giải, Nước.
+
+File chính:
+
+- `apps/web/src/modules/tarot/tarot-profile-fields.tsx`
+- `apps/web/src/modules/tarot/tarot-profile-state.ts`
+- `apps/web/src/modules/tarot/tarot-data.ts`
+- `apps/web/src/modules/tarot/tarot-workflow-stages.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/lib/tarot/tarot-birth-profile.ts`
+- `apps/web/src/lib/tarot/gemini.ts`
+- `apps/web/src/styles/tarot-profile-fields.css`
+- `tools/tarot-personalization-smoke.mjs`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm run build` — pass toàn bộ 37 trang; chạy với hai worker để tránh lỗi thiếu bộ nhớ của môi trường khi Next tự mở 15 worker. Cấu hình giới hạn worker chỉ dùng tạm lúc nghiệm thu, không giữ trong source.
+- `node tools/verify-tarot-personalization.mjs` — pass: `Cự Giải`, `Nước`, Con số năng lượng `8`.
+- Edge headless E2E 375x812 — pass: nhập hồ sơ, rút một lá, ba câu tâm thức Tình yêu, AI trả kết quả thật (`fallback: false`) và bài đọc chứa `Hương`, `Cự Giải`, `Nước`; không tràn ngang.
+
+Chưa làm / rủi ro còn lại:
+
+- Chiêm tinh và Con số năng lượng chỉ là lớp cá nhân hóa chiêm nghiệm; prompt tiếp tục cấm khẳng định định mệnh và tư vấn thay thế y tế, pháp lý hay tài chính.
+- Workspace là snapshot không có `.git`; áp dụng ngoại lệ SHA đã được product owner xác nhận, self-review và nghiệm thu trực tiếp thay cho review theo commit range.
+
+Kết luận:
+
+- T-0711 đạt DoD và chuyển trạng thái `Done`.
+
+---
+
+## 2026-10-21 17:15 +07 — T-0703 nâng cấp trải nghiệm Thông điệp mỗi ngày
+
+Loại: Feature + UI/UX + Accessibility
+
+Đã làm:
+
+- Mở lại T-0703 để thay popup text tĩnh bằng trải nghiệm rút lá bài ngày hoàn chỉnh.
+- Nâng `getDailyCard(dateStr)` sang FNV-1a hash: một chuỗi ngày `YYYY-MM-DD` luôn cho cùng lá và cùng chiều Xuôi/Ngược, không phụ thuộc random runtime.
+- Tạo component daily riêng với mặt lưng huyền bí bằng CSS/SVG, nút lật semantic, hiệu ứng `rotateY` 3D và mặt trước dùng ảnh thật từ `tarotCardImageSrc`.
+- Sau reveal hiển thị tên Việt/Anh, chiều lá, thông điệp ngắn, lời khuyên hành động cho 24 giờ và CTA đi sâu vào luồng Tarot.
+- Tách key đã đóng popup `tarot_daily_seen` khỏi key đã lật `bm_tarot_daily_revealed_v1`; mở lại trong cùng ngày hiển thị trực tiếp lá đã lật.
+- Bọc toàn bộ đọc/ghi localStorage trong `try/catch`; Private browsing không làm crash modal.
+- CTA chính đóng modal và chuyển tới `fieldSelect`; CTA phụ chỉ xác nhận đã nhận thông điệp.
+- Giữ hỗ trợ nút X, Escape, click outside, focus trap; bổ sung focus-visible, touch target, tỉ lệ ảnh cố định và reduced-motion.
+- Tách helper storage khỏi `TarotExperience.tsx` để toàn bộ source tiếp tục tuân thủ giới hạn 600 dòng; xóa CSS placeholder không còn sử dụng.
+
+File chính:
+
+- `apps/web/src/modules/tarot/tarot-daily-card.tsx`
+- `apps/web/src/modules/tarot/tarot-daily-storage.ts`
+- `apps/web/src/modules/tarot/tarot-data.ts`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/styles/tarot-daily-card.css`
+- `apps/web/src/styles/tarot-workflow-stage.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm run build` — pass với Firebase credential kiểm thử chỉ tồn tại trong process; không ghi secret ra file/repository.
+- Edge headless E2E 375x812 — pass: mặt úp, click lật, ảnh/chiều lá, nội dung 24 giờ, persist ngày, mở lại hiện thẳng mặt bài, Escape, click outside, CTA sang “Chọn lĩnh vực”, reduced-motion và không tràn ngang.
+- Script E2E tạm đã xóa sau kiểm thử.
+
+Chưa làm / rủi ro còn lại:
+
+- Nguồn static hiện có thông điệp riêng cho 10 lá Major Arcana; các lá còn lại vẫn dùng fallback an toàn chung. Việc nhập đủ 78 daily message từ KB private cần luồng backend/KB riêng, không đưa raw KB vào frontend.
+- Trạng thái daily vẫn local-only cho guest; cloud sync thuộc P1 theo `tarot-workflow-reference.md`.
+- Workspace snapshot không có `.git`; dùng ngoại lệ SHA đã được product owner xác nhận cho workspace, self-review và nghiệm thu trực tiếp thay cho review theo commit range.
+
+Kết luận:
+
+- T-0703 đạt DoD nâng cấp và giữ trạng thái `Done`.
+
+---
+
+## 2026-10-21 16:30 +07 — T-0710 hoàn tất Sách phép Tarot / Từ điển 78 lá
+
+Loại: Feature + UI/UX + Accessibility
+
+Đã làm:
+
+- Đăng ký T-0710 theo phạm vi product owner duyệt và thay modal placeholder 22 lá bằng thư viện đủ 78 lá lấy trực tiếp từ `DECK`.
+- Thêm sáu bộ lọc: Tất cả, Ẩn chính, Bộ Gậy, Bộ Ly, Bộ Kiếm, Bộ Tiền; số lượng đã kiểm tra lần lượt 78/22/14/14/14/14.
+- Thêm tìm kiếm theo tên tiếng Việt hoặc tiếng Anh, có chuẩn hóa để truy vấn tiếng Việt không dấu như “Ke Kho” vẫn tìm được “Kẻ Khờ”.
+- Xây lưới thẻ responsive với ảnh từ `tarotCardImageSrc`, kích thước ảnh khai báo sẵn, `loading="lazy"` và `decoding="async"` để giảm tải khi hiển thị 78 lá.
+- Xây màn chi tiết trong cùng modal để tránh nested dialog: ảnh lớn, nhóm bài, nguyên tố của Minor Arcana, trọng tâm năng lượng, từ khóa, chuyển đổi nghĩa Xuôi/Ngược và lời khuyên hành động.
+- Nâng nút đóng modal thành nút X có nhãn truy cập; giữ Escape, click outside, focus trap, khóa body scroll và khôi phục focus từ ModalShell hiện có.
+- Thêm empty state có hành động xóa bộ lọc, focus-visible rõ ràng, touch target tối thiểu và reduced-motion.
+- Xóa CSS placeholder không còn sử dụng; không thêm dependency, API, storage hay dữ liệu ngoài phạm vi.
+
+File chính:
+
+- `apps/web/src/modules/tarot/tarot-dictionary.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `apps/web/src/styles/tarot-dictionary.css`
+- `apps/web/src/styles/tarot-workflow-stage.css`
+- `apps/web/src/app/tarot/layout.tsx`
+- `docs/TASK_REGISTRY.md`
+- `docs/DEVLOG.md`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm run build` — pass với Firebase credential kiểm thử chỉ tồn tại trong process; không ghi secret ra file/repository.
+- Edge headless E2E tại 375x812 — pass: mở “Từ điển”, xác nhận đủ 78 lá, lọc đúng 22/14/14/14/14, tìm EN, tìm VI không dấu, mở chi tiết, đổi nghĩa Ngược, đóng bằng Escape và click outside; `scrollWidth` không vượt `clientWidth`.
+- Script E2E tạm đã xóa sau kiểm thử.
+
+Chưa làm / rủi ro còn lại:
+
+- Chưa có combo dictionary hoặc luận giải thủ công; đây là scope P1/P2 trong `tarot-workflow-reference.md`.
+- Metadata hành tinh/cung hoàng đạo theo từng lá chưa có trong `DECK`; UI chỉ hiển thị metadata thật có thể suy ra an toàn từ nhóm bài (nguyên tố của bốn bộ), không tự bịa dữ liệu chiêm tinh.
+- Workspace snapshot không có `.git`; dùng ngoại lệ SHA đã được product owner xác nhận cho workspace, self-review và nghiệm thu trực tiếp thay cho review theo commit range.
+
+Kết luận:
+
+- T-0710 đạt DoD và chuyển `Done`.
+
+---
+
+## 2026-10-21 15:32 +07 — T-0708 hoàn tất Tarot local history
+
+Loại: Feature + Privacy + UI/UX
+
+Đã làm:
+
+- Tạo lớp lưu trữ versioned `bm_tarot_history_v1`, validate Zod và giới hạn 15 phiên mới nhất; quẻ mới đứng đầu, quẻ cũ nhất bị loại khi vượt giới hạn.
+- Tự động lưu sau khi `FinalReadingView` nhận response Gemini hoặc template fallback thành công.
+- Dữ liệu lưu gồm ID, thời gian, chủ đề, câu hỏi, spread, thông tin/chiều/ảnh các lá, tóm tắt, nguồn kết quả và nội dung luận giải để xem lại.
+- Không lưu profile họ tên/ngày sinh/giới tính, clarification, auth token hoặc payment data.
+- Thay placeholder bằng modal “Thông điệp quá khứ”: danh sách trực quan, ngày giờ, câu hỏi, ảnh thu nhỏ, màn đọc lại đầy đủ, disclaimer, xóa một phiên và xóa toàn bộ có xác nhận hai bước.
+- Thêm thông báo lịch sử chỉ nằm trên trình duyệt, không đồng bộ máy chủ; có cảnh báo riêng khi Private browsing/Incognito chặn localStorage.
+- Bọc mọi thao tác lấy `window.localStorage`, đọc, parse, ghi và xóa trong `try/catch`; lỗi storage không làm crash Tarot.
+- Nâng accessibility cho modal Tarot: `role=dialog`, `aria-modal`, nhãn dialog, focus ban đầu, focus trap, đóng bằng Escape, khôi phục focus và khóa body scroll.
+- Điều chỉnh nút “Thông điệp quá khứ” trên Landing thành hàng riêng để không vỡ chữ ở 375px; bổ sung focus-visible.
+
+File chính:
+
+- `apps/web/src/modules/tarot/tarot-history.ts`
+- `apps/web/src/modules/tarot/tarot-history-view.tsx`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`
+- `apps/web/src/modules/tarot/tarot-ui.tsx`
+- `apps/web/src/modules/tarot/tarot-landing.tsx`
+- `apps/web/src/modules/tarot/tarot-data.ts`
+- `apps/web/src/styles/tarot-history.css`
+- `apps/web/src/styles/tarot-workflow-landing.css`
+- `apps/web/src/app/tarot/layout.tsx`
+
+Kiểm thử:
+
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm --workspace workers/kb exec tsc -- --noEmit` — pass.
+- `npm run build` — pass với Firebase credential kiểm thử chỉ tồn tại trong process.
+- Edge headless E2E 375x812 — pass: tạo quẻ mới → lưu local history → trở về Landing → mở “Thông điệp quá khứ” → xem chi tiết → xóa quẻ; xác nhận không tràn ngang và localStorage về mảng rỗng.
+- `npm run security:smoke` — không có finding mới từ T-0708; còn bốn false-positive có sẵn ở `ErrorState.tsx`, `tarot-kb.ts` và `tarot-questions.ts`.
+- Script/screenshot E2E tạm đã được xóa sau kiểm thử; không thêm dependency mới.
+
+Kết luận:
+
+- T-0708 đạt DoD và chuyển `Done`. Workspace snapshot không có `.git`; thực hiện self-review và nghiệm thu trực tiếp theo yêu cầu product owner thay cho review theo SHA.
+- Rủi ro còn lại: câu hỏi Tarot nằm trong bộ nhớ trình duyệt và có thể bị người khác dùng chung thiết bị xem; UI đã disclosure rõ và cung cấp xóa từng phiên/toàn bộ.
+
+---
+
+## 2026-10-21 15:04 +07 — T-0709 tích hợp Gemini cho luận giải Tarot
+
+Loại: Feature + Security + Documentation
+
+Đã làm:
+
+- Tạo ADR-009 (supersede ADR-003) và đăng ký T-0709 với guardrail AI, riêng tư, chi phí và fallback.
+- Tạo `POST /api/tarot/reading`: Firebase ID token/Anonymous Auth, rate limit theo user và IP, Zod input/output, câu hỏi tối đa 200 ký tự, timeout Gemini 18 giây và fallback template HTTP 200.
+- Gọi Gemini 2.5 Flash bằng native `fetch`; prompt dùng thông tin người hỏi, chủ đề/niche, câu hỏi, ba câu trả lời làm rõ, vị trí/chiều lá bài, nghĩa theo chủ đề, metadata chiêm tinh/năng lượng và bắt buộc ba section Markdown đã duyệt.
+- Thêm prompt-injection boundary và content-safety: không tiên đoán chắc chắn, hù dọa, tự hại/hại người hoặc thay thế tư vấn y tế, tâm lý, pháp lý và tài chính.
+- Làm giàu `aspectMeaning` server-side qua endpoint Tarot KB đã xác thực; bổ sung Firebase Auth cho endpoint KB `/tarot/reading` cũ để đóng đường truy cập không xác thực.
+- Nối `FinalReadingView` với API, gồm loading, lỗi tiếng Việt, ảnh/tên/vị trí/chiều từng lá, overview, synergy, advice, trạng thái fallback, disclosure AI và disclaimer.
+- Bổ sung form cá nhân hóa tùy chọn (họ tên, ngày sinh, giới tính) cùng thông báo trước khi dữ liệu phiên Tarot được Google Gemini xử lý.
+- Cập nhật `.env.example`, ENVIRONMENT, Privacy, Terms, Threat Model, Risk Register, technical decisions, project/module/workflow docs và legal copy.
+- Tách component/style hồ sơ và AI reading để mọi source file giữ dưới giới hạn 600 dòng.
+
+File chính đã sửa/tạo:
+
+- `apps/web/src/app/api/tarot/reading/route.ts`
+- `apps/web/src/lib/tarot/gemini.ts`, `apps/web/src/lib/tarot/rate-limit.ts`
+- `packages/shared/src/schemas/tarot-ai.ts`
+- `apps/web/src/modules/tarot/TarotExperience.tsx`, `tarot-workflow-stages.tsx`, `tarot-profile-fields.tsx`, `tarot-data.ts`, `tarot-kb.ts`
+- `apps/web/src/styles/tarot-ai-reading.css`, `tarot-profile-fields.css`, `tarot-workflow-stage.css`
+- `workers/kb/src/index.ts`
+- `docs/ADR.md`, `docs/TASK_REGISTRY.md`, `docs/ENVIRONMENT.md`, `docs/RISK_REGISTER.md` và các product/module/legal docs liên quan.
+
+Command/check đã chạy:
+
+- `npm install` — hoàn tất; npm audit báo 25 vulnerability dependency hiện có (1 low, 9 moderate, 13 high, 2 critical), chưa tự động sửa vì ngoài scope và có thể gây breaking change.
+- `npm run typecheck` — pass.
+- `npm run lint` — pass.
+- `npm --workspace workers/kb exec tsc -- --noEmit` — pass.
+- `npm run build` — pass với Firebase credential kiểm thử tạm chỉ tồn tại trong process; không ghi secret ra file/repository.
+- Smoke `POST /api/tarot/reading` không token — trả `401`.
+- Playwright/Edge viewport 375x812 trên `/tarot` — route render được và không tràn ngang; ảnh tạm đã xóa.
+- `npm run check` — dừng ở `kb:test-diacritics` do thiếu file gitignored `kb-private/numerology/kb.json`.
+- `npm run security:smoke` — còn fail bởi bốn false-positive có sẵn tại `ErrorState.tsx`, `tarot-kb.ts` và `tarot-questions.ts`; không có finding mới ở route/prompt T-0709.
+- `npm run qa:responsive-audit` — còn fail bởi rule cũ ở Header, Footer và Home Hub; các rule này không kiểm tra UI Tarot mới.
+
+Chưa làm / rủi ro còn lại:
+
+- Chưa gọi live Gemini vì không có `GEMINI_API_KEY` thật trong môi trường; cần kiểm thử dev/test với key riêng và billing alert trước production.
+- Chưa kiểm thử E2E nhánh token hợp lệ + Gemini success/timeout trên hạ tầng Firebase/Gemini thật.
+- Workspace là snapshot độc lập không có `.git`; product owner đã duyệt bỏ qua bước lấy SHA/request Claude review riêng cho T-0709.
+- Rate limit hiện là in-memory theo instance; production multi-instance cần KV/Durable Object nếu cần quota toàn cục chặt.
+
+Kết luận nghiệm thu:
+
+- Product owner nghiệm thu T-0709 dựa trên `npm run typecheck`, `npm run lint`, `npm run build` đều pass và smoke bảo mật request không token trả `401`.
+- T-0709 hoàn tất và chuyển trạng thái `Done` ngày 2026-10-21. Kiểm thử Gemini live với key dev/test và billing alert vẫn là bước vận hành trước production, không chặn nghiệm thu implementation.
+
+---
+
 ## 2026-06-16 18:00 +07 — T-AUDIT-S2B hoàn tất
 
 Loại: Audit Fix

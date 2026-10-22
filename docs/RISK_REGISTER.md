@@ -28,6 +28,11 @@
 | R-015 | API thiếu rate limit cơ bản dẫn tới spam auth/payment/admin/report | Security/API | Medium | Done | Codex | T-0606n-4 thêm in-memory rate limit: KB report 60/phút, payment create 10/phút, auth session 10/phút, admin voucher 20/phút |
 | R-016 | Worker trả CORS quá rộng hoặc thiếu allowlist origin | Security/Worker | Medium | Done | Codex | T-0606n-1 thêm CORS allowlist cho KB/Payment Worker với localhost, dev/prod domain và `CORS_ALLOWED_ORIGINS` |
 | R-017 | Firestore rules/indexes chưa được deploy trước production | Security/Data | High | Pending | User/Codex | Cần Firebase CLI login và deploy `firestore:rules,firestore:indexes`; không nằm trong T-0606n |
+| R-018 | Gemini nhận dữ liệu phiên Tarot hoặc bị prompt injection/API abuse | AI/Privacy/Security | High | Mitigated | User/Codex | ADR-009; disclosure Privacy/Terms; auth Anonymous; Zod; quota user/IP; timeout; không log raw PII; safety prompt; fallback template |
+| R-019 | Chi phí/latency Gemini vượt ngưỡng vận hành | AI/Operations | High | Open | User/Codex | Tách key dev/prod, giới hạn prompt/output, quota 5 lượt/10 phút/user, billing alert và theo dõi usage trước production |
+| R-020 | Local history chứa câu hỏi Tarot nhạy cảm và có thể bị người dùng chung thiết bị xem | Privacy/Tarot | High | Mitigated | User/Codex | Chỉ lưu tối đa 15 phiên trên browser; không lưu profile/token/payment; disclosure rõ không cloud sync; có xóa từng phiên/toàn bộ; Zod + try/catch storage |
+| R-021 | Chế độ ép combo Tarot bị bật nhầm trên production hoặc bị lợi dụng như kết quả thật | Tarot/Security | High | Mitigated | User/Codex | Chỉ nhận trigger `Turniodev`; gate theo môi trường ở cả Next.js và Worker; chặn hostname production; gắn nhãn “Chế độ kiểm thử”; production flag luôn false |
+| R-022 | Thư viện combo bị bulk scrape dù KB không nằm trong static bundle | Tarot/KB/Security | High | Mitigated | User/Codex | Firebase Auth; quota user/IP; metadata 15 mục/trang; detail lazy-load từng combo; Zod/ID allowlist; không trả raw index/path; theo dõi traffic và siết quota/WAF trước production |
 
 ## 3. Review cadence
 

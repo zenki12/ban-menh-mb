@@ -22,11 +22,6 @@
   48% { transform: scale(1); }
 }
 
-@keyframes tarot-card-breathe {
-  0%, 100% { transform: translateY(0) rotate(var(--tarot-rotate, 0deg)); }
-  50% { transform: translateY(-7px) rotate(var(--tarot-rotate, 0deg)); }
-}
-
 .tarot-fade-up { animation: tarot-fade-up 520ms ease-out both; }
 
 .tarot-gradient {
@@ -43,7 +38,3 @@
 .tarot-ripple { animation: tarot-ripple-out 3.6s ease-out infinite; }
 .tarot-heartbeat { animation: tarot-heartbeat 3.8s ease-in-out infinite; }
 
-.tarot-card-back:hover:not(:disabled) {
-  cursor: pointer;
-  animation: tarot-card-breathe 2.6s ease-in-out infinite;
-}

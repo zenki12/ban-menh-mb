@@ -1,0 +1,308 @@
+.tarot-dictionary,
+.tarot-dictionary-detail {
+  display: grid;
+  min-width: 0;
+  gap: 1.25rem;
+}
+
+.tarot-dictionary-heading {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tarot-dictionary-heading h2,
+.tarot-dictionary-detail-copy h3 {
+  color: var(--bm-text-main);
+  font-size: clamp(1.6rem, 5vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.tarot-dictionary-heading > p,
+.tarot-dictionary-name-en {
+  color: var(--bm-text-muted);
+  line-height: 1.6;
+}
+
+.tarot-dictionary-eyebrow,
+.tarot-dictionary-advice-label {
+  color: var(--bm-gold-bright);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tarot-dictionary-search {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--bm-text-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.tarot-dictionary-search-field {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding: 0 0.9rem;
+  border: 1px solid var(--bm-border-strong);
+  border-radius: var(--bm-radius-md);
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.tarot-dictionary-search-field:focus-within {
+  border-color: var(--bm-primary-soft);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.18);
+}
+
+.tarot-dictionary-search-field svg {
+  width: 1.2rem;
+  flex: 0 0 auto;
+  stroke: var(--bm-text-muted);
+  stroke-width: 1.8;
+}
+
+.tarot-dictionary-search-field input {
+  min-width: 0;
+  width: 100%;
+  min-height: 2.85rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--bm-text-main);
+  font-size: 1rem;
+}
+
+.tarot-dictionary-search-field input::placeholder { color: var(--bm-text-muted); }
+
+.tarot-dictionary-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tarot-dictionary-filters button,
+.tarot-dictionary-orientation button,
+.tarot-dictionary-back,
+.tarot-dictionary-empty button {
+  min-height: 2.75rem;
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--bm-text-soft);
+  cursor: pointer;
+  font-weight: 800;
+  touch-action: manipulation;
+}
+
+.tarot-dictionary-filters button {
+  padding: 0.55rem 0.8rem;
+}
+
+.tarot-dictionary-filters button span {
+  color: var(--bm-text-muted);
+  font-size: 0.75rem;
+}
+
+.tarot-dictionary-filters button.is-active,
+.tarot-dictionary-orientation button.is-active {
+  border-color: var(--bm-primary-soft);
+  background: rgba(124, 58, 237, 0.25);
+  color: var(--bm-text-main);
+}
+
+.tarot-dictionary-filters button:focus-visible,
+.tarot-dictionary-orientation button:focus-visible,
+.tarot-dictionary-back:focus-visible,
+.tarot-dictionary-card:focus-visible,
+.tarot-dictionary-empty button:focus-visible {
+  outline: 3px solid var(--bm-gold-bright);
+  outline-offset: 3px;
+}
+
+.tarot-dictionary-result-count {
+  color: var(--bm-text-muted);
+  font-size: 0.85rem;
+}
+
+.tarot-dictionary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tarot-dictionary-card {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: var(--bm-radius-lg);
+  background: rgba(255, 255, 255, 0.045);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  touch-action: manipulation;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.tarot-dictionary-card:hover {
+  border-color: var(--bm-border-purple);
+  background: rgba(124, 58, 237, 0.1);
+  transform: translateY(-2px);
+}
+
+.tarot-dictionary-card-image {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: rgba(2, 6, 23, 0.72);
+}
+
+.tarot-dictionary-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.tarot-dictionary-card-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+  padding: 0.75rem;
+}
+
+.tarot-dictionary-card-copy strong {
+  color: var(--bm-text-main);
+  line-height: 1.3;
+}
+
+.tarot-dictionary-card-copy > span,
+.tarot-dictionary-card-copy small {
+  overflow-wrap: anywhere;
+  color: var(--bm-text-muted);
+  line-height: 1.35;
+}
+
+.tarot-dictionary-card-copy small { color: var(--bm-primary-soft); }
+
+.tarot-dictionary-empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--bm-border-strong);
+  border-radius: var(--bm-radius-lg);
+  color: var(--bm-text-muted);
+  text-align: center;
+}
+
+.tarot-dictionary-empty strong { color: var(--bm-text-main); }
+.tarot-dictionary-empty button { padding: 0.5rem 1rem; }
+
+.tarot-dictionary-back {
+  width: fit-content;
+  padding: 0.5rem 1rem;
+}
+
+.tarot-dictionary-detail-layout {
+  display: grid;
+  min-width: 0;
+  gap: 1.5rem;
+}
+
+.tarot-dictionary-detail-visual {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.tarot-dictionary-detail-frame {
+  width: min(100%, 15rem);
+  padding: 0.45rem;
+  border: 1px solid rgba(251, 191, 36, 0.55);
+  border-radius: 1rem;
+  background: linear-gradient(145deg, rgba(251, 191, 36, 0.18), rgba(124, 58, 237, 0.2));
+  box-shadow: 0 0 32px rgba(124, 58, 237, 0.28);
+}
+
+.tarot-dictionary-detail-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.7rem;
+}
+
+.tarot-dictionary-energy,
+.tarot-dictionary-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.tarot-dictionary-energy span,
+.tarot-dictionary-keywords span {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--bm-text-soft);
+  font-size: 0.78rem;
+}
+
+.tarot-dictionary-detail-copy {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 0.8rem;
+}
+
+.tarot-dictionary-detail-copy .tarot-dictionary-keywords { justify-content: flex-start; }
+
+.tarot-dictionary-orientation {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tarot-dictionary-orientation button {
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--bm-radius-md);
+}
+
+.tarot-dictionary-meaning,
+.tarot-dictionary-advice {
+  padding: 1rem;
+  border: 1px solid var(--bm-border-subtle);
+  border-radius: var(--bm-radius-lg);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--bm-text-soft);
+  line-height: 1.7;
+}
+
+.tarot-dictionary-advice {
+  display: grid;
+  gap: 0.45rem;
+  border-color: rgba(251, 191, 36, 0.28);
+}
+
+@media (min-width: 640px) {
+  .tarot-dictionary-heading { grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.9fr); align-items: end; }
+  .tarot-dictionary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 768px) {
+  .tarot-dictionary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tarot-dictionary-detail-layout { grid-template-columns: minmax(13rem, 0.75fr) minmax(0, 1.25fr); align-items: start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarot-dictionary-card { transition: none; }
+  .tarot-dictionary-card:hover { transform: none; }
+}

@@ -14,12 +14,61 @@
 |---|---|---|---|---|---|
 | ADR-001 | 2026-05-13 | Stack/Architecture | Stack chính của Bản Mệnh V2 | ACCEPTED | - |
 | ADR-002 | 2026-05-13 | Security/Data | KB thần số học phải nằm ở private backend/storage | ACCEPTED | - |
-| ADR-003 | 2026-05-13 | Product/Architecture | Tarot MVP dùng KB + template engine, chưa dùng AI tạo sinh | ACCEPTED | - |
+| ADR-003 | 2026-05-13 | Product/Architecture | Tarot MVP dùng KB + template engine, chưa dùng AI tạo sinh | SUPERSEDED | ADR-009 |
 | ADR-004 | 2026-05-16 | Stack/Styling | Tailwind CSS v4 + design tokens cho UI | ACCEPTED | - |
 | ADR-005 | 2026-05-16 | Stack/Validation | Zod cho runtime validation và schema | ACCEPTED | - |
 | ADR-006 | 2026-05-16 | Stack/API | Hono framework cho Cloudflare Workers | ACCEPTED | - |
 | ADR-007 | 2026-06-05 | Payment/Architecture | Module-scoped payment URL với shared component (Option C hybrid) | ACCEPTED | - |
 | ADR-008 | 2026-06-05 | KB/Narrative | Numerology narrative extension khi V1 partial-rich | ACCEPTED | - |
+| ADR-009 | 2026-10-21 | AI/Tarot | Gemini tạo luận giải Tarot với KB/template fallback | ACCEPTED | ADR-003 |
+
+---
+
+## ADR-009 - Gemini tạo luận giải Tarot với KB/template fallback
+
+| Field | Value |
+|---|---|
+| Status | ACCEPTED |
+| Category | AI/Tarot |
+| Owner | Zenki / Codex |
+| Liên quan | T-0709, ADR-003, tarot-workflow-reference, security-threat-model, legal-commercial-spec |
+| Supersedes | ADR-003 |
+
+### Bối cảnh
+
+ADR-003 khóa Tarot MVP ở chế độ non-AI để giữ nội dung ổn định và giảm rủi ro. Product owner đã duyệt chuyển sang Gemini để tạo luận giải chuyên sâu theo chủ đề, niche, câu hỏi, các lá bài và câu trả lời làm rõ. Thay đổi này gửi dữ liệu người dùng sang nhà cung cấp AI bên thứ ba, phát sinh chi phí biến đổi và làm tăng rủi ro nội dung, riêng tư và lạm dụng API.
+
+### Quyết định
+
+- Gemini 2.5 Flash là nguồn tạo luận giải Tarot chuyên sâu chính qua server-only Next.js Route Handler.
+- KB/template hiện có là fallback bắt buộc khi thiếu cấu hình, timeout, provider lỗi, quota nội bộ hoặc output không hợp lệ.
+- Chỉ backend được đọc `GEMINI_API_KEY` và gọi Gemini. Frontend không nhận khóa, endpoint provider hoặc raw provider response.
+- API yêu cầu Firebase ID token, chấp nhận Anonymous Auth, validate input/output bằng Zod, giới hạn câu hỏi 200 ký tự và timeout tối đa 20 giây.
+- Áp dụng rate limit theo user và IP. Không log raw câu hỏi, họ tên, ngày sinh, giới tính, prompt hoặc nội dung luận giải.
+- Prompt coi mọi dữ liệu người dùng là dữ liệu không đáng tin cậy, không làm theo chỉ dẫn nằm trong câu hỏi và không được suy diễn chắc chắn tương lai.
+- Output bắt buộc theo ba section Markdown: `Lời Hồi Đáp Từ Vũ Trụ`, `Sự Mặc Khải`, `Hành Động Định Mệnh`.
+- UI và Privacy/Terms phải nói rõ một số dữ liệu Tarot được gửi tới nhà cung cấp AI để tạo nội dung cá nhân hóa.
+- Không gửi payment data, credential, token, admin secret hoặc dữ liệu ngoài phạm vi phiên Tarot sang Gemini.
+- Không deploy production trước khi kiểm thử content safety, quota/cost guardrail và legal copy hoàn tất.
+
+### Lý do
+
+- Tăng mức cá nhân hóa và chiều sâu so với template cố định.
+- Vẫn giữ khả năng hoạt động khi AI gián đoạn nhờ fallback xác định trước.
+- Server-only boundary, auth, quota và validation giảm nguy cơ lộ khóa, abuse và output không kiểm soát.
+
+### Hệ quả
+
+- Chi phí phụ thuộc số lượt và độ dài prompt/output; cần theo dõi usage trước production.
+- Câu hỏi Tarot và thông tin hồ sơ có thể được xử lý bởi Google Gemini theo chính sách của nhà cung cấp.
+- Nội dung AI không được coi là sự thật hoặc tư vấn chuyên môn; disclaimer và safety prompt là bắt buộc.
+- Fallback phải luôn sẵn sàng và không được làm UI crash.
+
+### Điều kiện xem xét lại
+
+- Chi phí hoặc latency vượt ngưỡng vận hành.
+- Provider thay đổi chính sách dữ liệu/model hoặc chất lượng tiếng Việt giảm.
+- Safety audit phát hiện nội dung gây hại hoặc phán đoán tuyệt đối không thể kiểm soát ổn định.
 
 ---
 
@@ -143,7 +192,7 @@ KB thần số học không được nằm trong public asset, client bundle, lo
 
 | Field | Value |
 |---|---|
-| Status | ACCEPTED |
+| Status | SUPERSEDED bởi ADR-009 |
 | Category | Product/Architecture |
 | Owner | Zenki / Codex |
 | Liên quan | tarot-workflow-reference, modules/tarot, content-quality-spec |

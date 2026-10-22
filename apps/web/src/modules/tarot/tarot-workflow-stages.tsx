@@ -1,8 +1,14 @@
-import { useMemo } from "react";
+import type { TarotAiReading } from "@banmenh/shared";
+import { useMemo, useState } from "react";
 import { Button, Card } from "../../components/ui";
-import { AnalysisCard, DeckBack, RitualPulse, SelectedSlot, SpreadOption, ThemeOption } from "./tarot-ui";
+import { TarotProfileFields } from "./tarot-profile-fields";
+import { TarotDestinyCombos } from "./tarot-destiny-combo";
+import { TarotDeckRitual } from "./tarot-deck-ritual";
+import { TarotReadingCardDetail } from "./tarot-reading-card-detail";
+import type { TarotTopic } from "./tarot-topics";
+import { AnalysisCard, RitualPulse, SpreadOption, ThemeOption } from "./tarot-ui";
+import { tarotCardImageSrc } from "./tarot-kb";
 import {
-  DECK,
   MINI_MODALS,
   NICHE_QUESTIONS,
   SAMPLE_QUESTIONS,
@@ -13,16 +19,9 @@ import {
   type ThemeKey,
 } from "./tarot-data";
 
-export type TarotModalKey = keyof typeof MINI_MODALS | null;
+export { SpreadRevealView } from "./tarot-spread-reveal";
 
-export type TarotTopic = {
-  key: ThemeKey;
-  icon: string;
-  label: string;
-  subtitle: string;
-  lead: string;
-  niches: Array<{ label: string; hint: string; kbKey: string }>;
-};
+export type TarotModalKey = keyof typeof MINI_MODALS | null;
 
 type QuestionMode = "suggested" | "custom";
 
@@ -146,8 +145,14 @@ export function QuestionView({
   onContinue,
   onSelectQuestion,
   onSkip,
+  profileDob,
+  profileGender,
+  profileName,
   question,
   questionMode,
+  setProfileDob,
+  setProfileGender,
+  setProfileName,
   setQuestion,
   setQuestionMode,
 }: {
@@ -156,8 +161,14 @@ export function QuestionView({
   onContinue: () => void;
   onSelectQuestion: (value: string) => void;
   onSkip: () => void;
+  profileDob: string;
+  profileGender: string;
+  profileName: string;
   question: string;
   questionMode: QuestionMode;
+  setProfileDob: (value: string) => void;
+  setProfileGender: (value: string) => void;
+  setProfileName: (value: string) => void;
   setQuestion: (value: string) => void;
   setQuestionMode: (value: QuestionMode) => void;
 }) {
@@ -204,6 +215,15 @@ export function QuestionView({
           <span className="tarot-counter">{question.length} / 200</span>
         </label>
       )}
+
+      <TarotProfileFields
+        dob={profileDob}
+        gender={profileGender}
+        name={profileName}
+        onDobChange={setProfileDob}
+        onGenderChange={setProfileGender}
+        onNameChange={setProfileName}
+      />
 
       <div className="tarot-stage-actions">
         <Button onClick={onBack} variant="secondary">
@@ -304,66 +324,7 @@ export function DeckDrawView({
           <span>Chạm vào các lá bài để chọn đúng số lượng theo kiểu trải đã chọn.</span>
         </div>
 
-        <div className="tarot-deck-grid">
-          {DECK.map((card, index) => (
-            <DeckBack
-              disabled={selectedIndexes.length >= session.cards.length && !selectedIndexes.includes(index)}
-              index={index}
-              key={card.id}
-              onClick={() => onChoose(index)}
-              selected={selectedIndexes.includes(index)}
-            />
-          ))}
-        </div>
-
-        <div className="tarot-drawn-tray">
-          {session.cards.map((card, index) => (
-            <div className={selectedIndexes[index] !== undefined ? "filled" : ""} key={`${card.id}-${index}`}>
-              {card.position}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function SpreadRevealView({
-  flippedIndexes,
-  onAnalysis,
-  onFlip,
-  readyForAnalysis,
-  session,
-}: {
-  flippedIndexes: number[];
-  onAnalysis: () => void;
-  onFlip: (index: number) => void;
-  readyForAnalysis: boolean;
-  session: ReadingSession;
-}) {
-  return (
-    <section className="tarot-stage tarot-stage--reveal tarot-fade-up">
-      <div className="tarot-stage-shell tarot-stage-shell--wide">
-        <div className="tarot-stage-reading-header">
-          <p>{session.themeLabel} · {session.question}</p>
-          <h2>Lật từng lá để mở thông điệp</h2>
-          <span>Đọc xong mới sang bước kết nối tâm thức và tổng hợp luận giải.</span>
-        </div>
-
-        <div className={`tarot-reveal-grid tarot-reveal-grid--${session.cards.length}`}>
-          {session.cards.map((card, index) => {
-            const flipped = flippedIndexes.includes(index);
-            return <SelectedSlot card={card} flipped={flipped} index={index} key={`${card.id}-${index}`} onFlip={() => onFlip(index)} />;
-          })}
-        </div>
-
-        {readyForAnalysis ? (
-          <div className="tarot-center-action">
-            <Button onClick={onAnalysis} size="lg">
-              Xem luận giải
-            </Button>
-          </div>
-        ) : null}
+        <TarotDeckRitual onChoose={onChoose} selectedIndexes={selectedIndexes} session={session} />
       </div>
     </section>
   );
@@ -371,19 +332,15 @@ export function SpreadRevealView({
 
 export function ConsciousnessCheckView({
   onAnswer,
+  prompts,
   session,
   step,
 }: {
   onAnswer: (answer: boolean) => void;
+  prompts: readonly [string, string, string];
   session: ReadingSession;
   step: number;
 }) {
-  const prompts = [
-    "Trong tình huống này, bạn có đang giữ một niềm tin cũ mà chưa dám đổi không?",
-    "Có chi tiết nào bạn đã lờ đi nhưng thực ra lại là tín hiệu quan trọng?",
-    "Bạn có sẵn sàng biến điều vừa nhận ra thành một hành động cụ thể trong vài ngày tới không?",
-  ];
-
   return (
     <section className="tarot-stage tarot-stage--consciousness tarot-fade-up">
       <div className="tarot-stage-shell tarot-stage-shell--centered">
@@ -397,6 +354,7 @@ export function ConsciousnessCheckView({
           <div className="tarot-star">✦</div>
           <h1>Kết nối tâm thức</h1>
           <p>Vũ trụ cần bạn xác nhận 3 điều để thông điệp được giải mã chính xác hơn cho hoàn cảnh hiện tại.</p>
+          <p className="tarot-consciousness-progress">Câu {step + 1} / 3</p>
           <div className="tarot-consciousness-question">{prompts[step]}</div>
           <div className="tarot-consciousness-actions">
             <Button onClick={() => onAnswer(true)} variant="secondary">
@@ -416,42 +374,125 @@ export function ConsciousnessCheckView({
 }
 
 export function FinalReadingView({
+  aiDisclosure,
+  aiError,
+  aiFallback,
+  aiLoading,
+  aiReading,
+  nicheKey,
+  nicheLabel,
   onReset,
+  profileDob,
+  profileName,
   readingSections,
   session,
 }: {
+  aiDisclosure?: string;
+  aiError?: string | null;
+  aiFallback?: boolean;
+  aiLoading: boolean;
+  aiReading: TarotAiReading | null;
+  nicheKey: string;
+  nicheLabel: string;
   onReset: () => void;
+  profileDob: string;
+  profileName: string;
   readingSections: ReadingSection[];
   session: ReadingSession;
 }) {
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+
   return (
     <section className="tarot-stage tarot-stage--final tarot-fade-up">
       <div className="tarot-stage-shell tarot-stage-shell--wide">
         <div className="tarot-stage-reading-header">
           <p>{session.themeLabel} · Thông điệp sau cùng</p>
           <h2>Thông điệp từ vũ trụ</h2>
-          <span>Đây là bản đọc đã ghép đầy đủ các lớp. Sau này KB sẽ đi vào đúng các slot này mà không cần đổi khung.</span>
+          <span>Luận giải kết hợp câu hỏi, ngữ cảnh và toàn bộ các lá bài bạn đã mở.</span>
         </div>
 
-        <div className="tarot-final-grid">
-          <div className="tarot-final-story">
-            {readingSections.map((section) => (
-              <Card as="article" className="tarot-final-section tarot-final-section--placeholder" key={section.title} padding="lg" variant="glass">
-                <h3>{section.title}</h3>
-                <p>{section.body}</p>
+        {aiLoading ? (
+          <Card className="tarot-ai-loading" padding="lg" variant="glass">
+            <div aria-hidden="true" className="tarot-ai-orbit">✦</div>
+            <h3>Đang kết nối các lớp thông điệp</h3>
+            <p>Hệ thống đang luận giải mối liên hệ giữa câu hỏi, vị trí và chiều của từng lá bài.</p>
+          </Card>
+        ) : (
+          <div className="tarot-final-grid">
+            <div className="tarot-final-story">
+              {aiReading ? (
+                <>
+                  <TarotDestinyCombos
+                    nicheKey={nicheKey}
+                    profileName={profileName}
+                    session={session}
+                  />
+                  <Card as="article" className="tarot-final-section" padding="lg" variant="glass">
+                    <h3>Lời Hồi Đáp Từ Vũ Trụ</h3>
+                    <p>{aiReading.overview}</p>
+                  </Card>
+
+                  {aiReading.cards.map((item, index) => {
+                    const card = session.cards[index];
+                    return card ? (
+                      <button
+                        aria-label={`Xem chi tiết chuyên sâu lá ${card.nameVi}`}
+                        className="tarot-ai-card-trigger"
+                        key={`${item.position}-${item.cardName}`}
+                        onClick={() => setSelectedCardIndex(index)}
+                        type="button"
+                      >
+                        <Card className="tarot-ai-card-reading" padding="lg" variant="glass">
+                          <img
+                            alt={`${card.nameVi} - ${card.orientation === "upright" ? "Xuôi" : "Ngược"}`}
+                            className={`tarot-ai-card-image ${card.orientation === "reversed" ? "is-reversed" : ""}`}
+                            src={tarotCardImageSrc(card)}
+                          />
+                          <div>
+                            <p className="tarot-ai-card-position">{item.position}</p>
+                            <h3>{item.cardName}</h3>
+                            <p>{item.interpretation}</p>
+                            <span className="tarot-ai-card-detail-hint">Xem chi tiết lá bài</span>
+                          </div>
+                        </Card>
+                      </button>
+                    ) : null;
+                  })}
+
+                  <Card as="article" className="tarot-final-section" padding="lg" variant="glass">
+                    <h3>Góc Nhìn Sâu Hơn & Nút Thắt</h3>
+                    <p>{aiReading.synergy}</p>
+                  </Card>
+
+                  <Card as="article" className="tarot-final-section" padding="lg" variant="glass">
+                    <h3>Gợi Ý Hành Động Thực Tế</h3>
+                    <ul className="tarot-ai-advice-list">
+                      {aiReading.advice.map((item) => <li key={item}>{item}</li>)}
+                    </ul>
+                  </Card>
+                </>
+              ) : (
+                readingSections.map((section) => (
+                  <Card as="article" className="tarot-final-section tarot-final-section--placeholder" key={section.title} padding="lg" variant="glass">
+                    <h3>{section.title}</h3>
+                    <p>{section.body}</p>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            <div className="tarot-final-aside">
+              <Card className="tarot-final-card" padding="lg" variant="glass">
+                <h3>Nguồn luận giải</h3>
+                <p>{aiFallback ? "Gemini tạm thời không khả dụng; hệ thống đang hiển thị bản đọc dự phòng từ template an toàn." : "Nội dung được Gemini hỗ trợ diễn giải từ dữ liệu của phiên Tarot."}</p>
               </Card>
-            ))}
+              <AnalysisCard card={session.cards[0]} />
+              {session.cards[1] ? <AnalysisCard card={session.cards[1]} /> : null}
+            </div>
           </div>
+        )}
 
-          <div className="tarot-final-aside">
-            <Card className="tarot-final-card" padding="lg" variant="glass">
-              <h3>Điểm nhấn của lượt đọc</h3>
-              <p>Lá mở đầu và lá trung tâm thường cho biết mạch đọc chính của toàn bộ phiên trải.</p>
-            </Card>
-            <AnalysisCard card={session.cards[0]} />
-            {session.cards[1] ? <AnalysisCard card={session.cards[1]} /> : null}
-          </div>
-        </div>
+        {aiError ? <p className="tarot-ai-error" role="status">{aiError}</p> : null}
 
         <Card className="tarot-final-card" padding="lg" variant="glass">
           <h3>Bộ lá đã mở</h3>
@@ -464,12 +505,32 @@ export function FinalReadingView({
           </div>
         </Card>
 
+        <Card className="tarot-ai-disclosure" padding="lg" variant="glass">
+          <h3>Minh bạch về AI</h3>
+          <p>{aiDisclosure ?? "Một số nội dung có thể được xử lý bởi nhà cung cấp AI bên thứ ba để hỗ trợ cá nhân hóa diễn giải."}</p>
+          <p>
+            Thông điệp mang tính chất chiêm nghiệm và định hướng tinh thần, không thay thế lời khuyên y tế, tài chính hay pháp lý. Nội dung trên Bản Mệnh chỉ mang tính tham khảo, hỗ trợ tự phản tỉnh và giải trí có định hướng; bạn chịu trách nhiệm với các quyết định cá nhân của mình.
+          </p>
+        </Card>
+
         <div className="tarot-center-action">
           <Button onClick={onReset} size="lg">
             Trở về đầu hành trình
           </Button>
         </div>
       </div>
+
+      {selectedCardIndex !== null && session.cards[selectedCardIndex] ? (
+        <TarotReadingCardDetail
+          card={session.cards[selectedCardIndex]}
+          dob={profileDob}
+          fallbackAspectMeaning={aiReading?.cards[selectedCardIndex]?.interpretation ?? ""}
+          name={profileName}
+          nicheKey={nicheKey}
+          nicheLabel={nicheLabel}
+          onClose={() => setSelectedCardIndex(null)}
+        />
+      ) : null}
     </section>
   );
 }

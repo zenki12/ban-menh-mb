@@ -26,7 +26,7 @@ const faqs = [
   {
     question: "Nội dung có dùng AI tạo sinh cho phần luận giải không?",
     answer:
-      "Không. Phần luận giải hiện tại được tạo từ hệ thống công thức và kho nội dung đã biên tập của Bản Mệnh, không dùng AI tạo sinh để viết mới từng báo cáo.",
+      "Một số luận giải Tarot chuyên sâu được Google Gemini hỗ trợ cá nhân hóa và luôn có thông báo minh bạch tại màn kết quả. Các phần còn lại có thể dùng hệ thống công thức, kho tri thức và nội dung đã biên tập của Bản Mệnh.",
   },
   {
     question: "Tôi không rành huyền học, đọc luận giải có hiểu được không?",
