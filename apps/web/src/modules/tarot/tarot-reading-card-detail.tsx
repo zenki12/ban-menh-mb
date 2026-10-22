@@ -160,13 +160,6 @@ export function TarotReadingCardDetail({
             </div>
           ) : null}
 
-          {error ? (
-            <div className="tarot-reading-detail-error" role="status">
-              <p>{error} Phần ý nghĩa an toàn từ phiên trải bài vẫn được hiển thị bên dưới.</p>
-              <button onClick={() => setRetry((value) => value + 1)} type="button">Thử tải lại</button>
-            </div>
-          ) : null}
-
           <section className="tarot-reading-detail-section">
             <h3>Ý NGHĨA</h3>
             <p>{detail.meaning}</p>

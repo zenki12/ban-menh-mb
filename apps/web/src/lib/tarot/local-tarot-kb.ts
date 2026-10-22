@@ -10,6 +10,32 @@ import type {
   TarotMatchedCombo,
 } from "@banmenh/shared";
 import { TAROT_COMBO_DOMAINS } from "@banmenh/shared";
+import { DECK } from "../../modules/tarot/tarot-data";
+
+const MAJOR_ASTRO: Record<number, { element?: string; planet?: string; zodiac?: string; number: string }> = {
+  0: { element: "Khí", planet: "Sao Thiên Vương", zodiac: "Bảo Bình", number: "0" },
+  1: { element: "Khí", planet: "Sao Thủy", number: "I" },
+  2: { element: "Nước", planet: "Mặt Trăng", number: "II" },
+  3: { element: "Đất", planet: "Sao Kim", number: "III" },
+  4: { element: "Lửa", zodiac: "Bạch Dương", number: "IV" },
+  5: { element: "Đất", zodiac: "Kim Ngưu", number: "V" },
+  6: { element: "Khí", zodiac: "Song Tử", number: "VI" },
+  7: { element: "Nước", zodiac: "Cự Giải", number: "VII" },
+  8: { element: "Lửa", zodiac: "Sư Tử", number: "VIII" },
+  9: { element: "Đất", zodiac: "Xử Nữ", number: "IX" },
+  10: { element: "Lửa", planet: "Sao Mộc", number: "X" },
+  11: { element: "Khí", zodiac: "Thiên Bình", number: "XI" },
+  12: { element: "Nước", planet: "Sao Hải Vương", number: "XII" },
+  13: { element: "Nước", zodiac: "Bọ Cạp", number: "XIII" },
+  14: { element: "Lửa", zodiac: "Nhân Mã", number: "XIV" },
+  15: { element: "Đất", zodiac: "Ma Kết", number: "XV" },
+  16: { element: "Lửa", planet: "Sao Hỏa", number: "XVI" },
+  17: { element: "Khí", zodiac: "Bảo Bình", number: "XVII" },
+  18: { element: "Nước", zodiac: "Song Ngư", number: "XVIII" },
+  19: { element: "Lửa", planet: "Mặt Trời", number: "XIX" },
+  20: { element: "Lửa", planet: "Sao Diêm Vương", number: "XX" },
+  21: { element: "Đất", planet: "Sao Thổ", number: "XXI" },
+};
 
 interface ClarifyData {
   groups: Record<string, string[]>;
@@ -123,39 +149,74 @@ export function getLocalTarotCardDetail(
 ): TarotCardDetail | null {
   try {
     const cardData = ensureCards();
-    if (!cardData) return null;
-    const card = cardData.cards.find((c) => c.id === cardId);
-    if (!card) return null;
+    if (cardData) {
+      const card = cardData.cards.find((c) => c.id === cardId);
+      if (card) {
+        let meaning = reversed ? card.reversed : card.upright;
+        let aspectMeaning = meaning;
+        const aspect = card.aspects?.[nicheKey];
+        if (typeof aspect === "object" && aspect) {
+          aspectMeaning = (reversed ? aspect.reversed : aspect.upright) || aspectMeaning;
+        } else if (typeof aspect === "string") {
+          aspectMeaning = aspect;
+        } else {
+          const flattened = card.aspects?.[reversed ? `${nicheKey}_rev` : nicheKey];
+          if (typeof flattened === "string") aspectMeaning = flattened;
+        }
 
-    let meaning = reversed ? card.reversed : card.upright;
-    let aspectMeaning = meaning;
-    const aspect = card.aspects?.[nicheKey];
-    if (typeof aspect === "object" && aspect) {
-      aspectMeaning = (reversed ? aspect.reversed : aspect.upright) || aspectMeaning;
-    } else if (typeof aspect === "string") {
-      aspectMeaning = aspect;
-    } else {
-      const flattened = card.aspects?.[reversed ? `${nicheKey}_rev` : nicheKey];
-      if (typeof flattened === "string") aspectMeaning = flattened;
+        const keywords = (reversed && card.keywordsRev && card.keywordsRev.length > 0)
+          ? card.keywordsRev
+          : (card.keywords || []);
+
+        return {
+          id: card.id,
+          nameEn: card.name,
+          nameVi: card.nameVi,
+          number: card.number ?? "",
+          orientation: reversed ? "reversed" : "upright",
+          element: card.element ?? "",
+          planet: card.planet ?? "",
+          zodiac: card.zodiac ?? "",
+          numerology: card.numerology ?? "",
+          keywords,
+          meaning,
+          aspectMeaning,
+        };
+      }
     }
 
-    const keywords = (reversed && card.keywordsRev && card.keywordsRev.length > 0)
-      ? card.keywordsRev
-      : (card.keywords || []);
+    // Fallback cho môi trường đám mây (Vercel) khi không có ổ đĩa E:\
+    const deckCard = DECK.find((c) => c.id === cardId) ?? DECK[cardId];
+    if (!deckCard) return null;
+
+    const major = MAJOR_ASTRO[cardId];
+    let element = major?.element ?? "";
+    let planet = major?.planet ?? "";
+    let zodiac = major?.zodiac ?? "";
+    let number = major?.number ?? "";
+
+    if (cardId >= 22) {
+      const suitIdx = Math.floor((cardId - 22) / 14);
+      const rankIdx = (cardId - 22) % 14;
+      const suitElements = ["Lửa", "Nước", "Khí", "Đất"];
+      element = suitElements[suitIdx] ?? "";
+      const rankNumbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Page", "Knight", "Queen", "King"];
+      number = rankNumbers[rankIdx] ?? "";
+    }
 
     return {
-      id: card.id,
-      nameEn: card.name,
-      nameVi: card.nameVi,
-      number: card.number ?? "",
+      id: deckCard.id,
+      nameEn: deckCard.nameEn,
+      nameVi: deckCard.nameVi,
+      number,
       orientation: reversed ? "reversed" : "upright",
-      element: card.element ?? "",
-      planet: card.planet ?? "",
-      zodiac: card.zodiac ?? "",
-      numerology: card.numerology ?? "",
-      keywords,
-      meaning,
-      aspectMeaning,
+      element,
+      planet,
+      zodiac,
+      numerology: "",
+      keywords: deckCard.keywords,
+      meaning: reversed ? deckCard.reversed : deckCard.upright,
+      aspectMeaning: reversed ? deckCard.reversed : deckCard.upright,
     };
   } catch (err) {
     console.error("[local-tarot-kb] Error reading full card detail:", err);
