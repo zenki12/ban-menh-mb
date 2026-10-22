@@ -35,9 +35,9 @@ function cleanupExpired(now: number) {
   }
 }
 
-export function tarotRateLimitResponse(request: Request, uid: string): NextResponse | null {
+export function tarotRateLimitResponse(request: Request, uid?: string | null): NextResponse | null {
   const now = Date.now();
-  const userReset = consume(`tarot-ai:user:${uid}`, USER_LIMIT, now);
+  const userReset = uid && uid !== "guest" ? consume(`tarot-ai:user:${uid}`, USER_LIMIT, now) : null;
   const ipReset = consume(`tarot-ai:ip:${clientIp(request)}`, IP_LIMIT, now);
   cleanupExpired(now);
 
@@ -51,9 +51,9 @@ export function tarotRateLimitResponse(request: Request, uid: string): NextRespo
   );
 }
 
-export function tarotLibraryRateLimitResponse(request: Request, uid: string): NextResponse | null {
+export function tarotLibraryRateLimitResponse(request: Request, uid?: string | null): NextResponse | null {
   const now = Date.now();
-  const userReset = consume(`tarot-library:user:${uid}`, 120, now);
+  const userReset = uid && uid !== "guest" ? consume(`tarot-library:user:${uid}`, 120, now) : null;
   const ipReset = consume(`tarot-library:ip:${clientIp(request)}`, 240, now);
   cleanupExpired(now);
   const resetAt = userReset ?? ipReset;

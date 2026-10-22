@@ -27,13 +27,13 @@ function isComboTestModeAllowed(request: Request, requested: boolean): boolean {
 
 export async function POST(request: Request) {
   const bearer = bearerToken(request);
-  if (!bearer) return NextResponse.json({ error: createError("AUTH_REQUIRED") }, { status: 401 });
-
-  let uid: string;
-  try {
-    uid = (await adminAuth.verifyIdToken(bearer)).uid;
-  } catch {
-    return NextResponse.json({ error: createError("AUTH_INVALID_TOKEN") }, { status: 401 });
+  let uid: string = "guest";
+  if (bearer) {
+    try {
+      uid = (await adminAuth.verifyIdToken(bearer)).uid;
+    } catch {
+      uid = "guest";
+    }
   }
 
   const rateLimitError = tarotRateLimitResponse(request, uid);

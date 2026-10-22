@@ -18,12 +18,13 @@ function bearerToken(request: Request): string | null {
 
 export async function GET(request: Request) {
   const bearer = bearerToken(request);
-  if (!bearer) return NextResponse.json({ error: createError("AUTH_REQUIRED") }, { status: 401 });
-  let uid: string;
-  try {
-    uid = (await adminAuth.verifyIdToken(bearer)).uid;
-  } catch {
-    return NextResponse.json({ error: createError("AUTH_INVALID_TOKEN") }, { status: 401 });
+  let uid: string = "guest";
+  if (bearer) {
+    try {
+      uid = (await adminAuth.verifyIdToken(bearer)).uid;
+    } catch {
+      uid = "guest";
+    }
   }
   const rateLimitError = tarotLibraryRateLimitResponse(request, uid);
   if (rateLimitError) return rateLimitError;

@@ -17,12 +17,12 @@ function bearerToken(request: Request): string | null {
 
 export async function GET(request: Request) {
   const bearer = bearerToken(request);
-  if (!bearer) return NextResponse.json({ error: createError("AUTH_REQUIRED") }, { status: 401 });
-
-  try {
-    await adminAuth.verifyIdToken(bearer);
-  } catch {
-    return NextResponse.json({ error: createError("AUTH_INVALID_TOKEN") }, { status: 401 });
+  if (bearer) {
+    try {
+      await adminAuth.verifyIdToken(bearer);
+    } catch {
+      // Bỏ qua lỗi token cho thao tác lấy câu hỏi làm rõ
+    }
   }
 
   const niche = tarotClarifyNicheSchema.safeParse(new URL(request.url).searchParams.get("niche") ?? "general");

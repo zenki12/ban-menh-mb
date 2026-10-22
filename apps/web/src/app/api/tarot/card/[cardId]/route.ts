@@ -31,12 +31,12 @@ function bearerToken(request: Request): string | null {
 
 export async function GET(request: Request, context: RouteContext) {
   const bearer = bearerToken(request);
-  if (!bearer) return NextResponse.json({ error: createError("AUTH_REQUIRED") }, { status: 401 });
-
-  try {
-    await adminAuth.verifyIdToken(bearer);
-  } catch {
-    return NextResponse.json({ error: createError("AUTH_INVALID_TOKEN") }, { status: 401 });
+  if (bearer) {
+    try {
+      await adminAuth.verifyIdToken(bearer);
+    } catch {
+      // Bỏ qua lỗi token cho thao tác xem nghĩa lá bài công khai
+    }
   }
 
   const { cardId: rawCardId } = await context.params;
